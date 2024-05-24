@@ -5,7 +5,7 @@ import product3 from "../../../assets/images/ecommerce/jpg/3.jpg";
 import product5 from "../../../assets/images/ecommerce/jpg/5.jpg";
 import product4 from "../../../assets/images/ecommerce/jpg/4.jpg";
 import product6 from "../../../assets/images/ecommerce/jpg/6.jpg";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import store from '../../../redux/store';
 import { connect } from 'react-redux';
 import { ThemeChanger } from "../../../redux/action";
@@ -38,7 +38,7 @@ interface HeaderProps { }
 const Header: FC<HeaderProps> = ({ local_varaiable, ThemeChanger }: any) => {
   //Fullscvreen
   const [fullScreen, setFullScreen] = useState(false);
-
+  const history = useNavigate();
   const toggleFullScreen = () => {
     const elem = document.documentElement;
 
@@ -745,7 +745,10 @@ const Header: FC<HeaderProps> = ({ local_varaiable, ThemeChanger }: any) => {
                       className="ti ti-wallet text-[1.125rem] me-2 opacity-[0.7]"></i>Bal: $7,12,950</Link></li>
                     <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" to={`${import.meta.env.BASE_URL}pages/chat/`}><i
                       className="ti ti-headset text-[1.125rem] me-2 opacity-[0.7]"></i>Support</Link></li>
-                    <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" to={`${import.meta.env.BASE_URL}`}><i
+                    <li onClick={()=>{
+                        localStorage.clear()
+                        history('/')
+                    }}><Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" to={`${import.meta.env.BASE_URL}`}><i
                       className="ti ti-logout text-[1.125rem] me-2 opacity-[0.7]"></i>Log Out</Link></li>
                   </ul>
                 </div>
