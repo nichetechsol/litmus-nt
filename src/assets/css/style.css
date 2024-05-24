@@ -119,7 +119,7 @@ Background Image
 @tailwind utilities;
 :root {
   --body-bg:	240 241 247;
-  --primary:	132 90 223;
+  --primary:	3 33 37;
   --primary-rgb:	132, 90 ,223;
   --secondary:	35 183 229;
   --warning: 245 184 73;
@@ -155,6 +155,7 @@ Background Image
   --github:	51 51 51;
   --google:	207 78 67;
   --youtube:	255 0 0;
+  --theme-bg: 3 33 37;
 }
 
 /* dark mode */
@@ -13691,3 +13692,9 @@ input[type=color i]::-webkit-color-swatch {
 }
 
 /*# sourceMappingURL=style.css.map */
+.desktop-logo{
+  @apply w-[13rem];
+}
+.bg-theme {
+  @apply bg-primary !important;
+}
