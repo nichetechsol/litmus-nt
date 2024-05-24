@@ -54,6 +54,7 @@ const Login: FC<LoginProps> = ({ ThemeChanger }: any) => {
     }, []);
     return (
         <Fragment>
+            <div className='bg-theme'>
             <div className="container">
                 <div className="authentication authentication-basic items-center h-full text-defaultsize text-defaulttextcolor">
                     <div className="grid grid-cols-12">
@@ -61,22 +62,13 @@ const Login: FC<LoginProps> = ({ ThemeChanger }: any) => {
                         <div className="xxl:col-span-4 xl:col-span-4 lg:col-span-4 md:col-span-6 sm:col-span-8 col-span-12">
                             <div className="my-[2.5rem] flex justify-center">
                                 <Link to={`${import.meta.env.BASE_URL}dashboards/crm/`}>
-                                    <img src={desktoplogo} alt="logo" className="desktop-logo" />
-                                    <img src={desktopdarklogo} alt="logo" className="desktop-dark" />
+                                    <img src={desktoplogo} alt="logo" className="desktop-dark" />
+                                    <img src={desktopdarklogo} alt="logo" className="desktop-logo" />
                                 </Link>
                             </div>
 
                             <div className="box">
-                                <nav className="!block firebase-data mt-6 bg-light mx-auto p-2 rounded-md" aria-label="Tabs">
-                                    <div className="flex justify-center space-x-2  rtl:space-x-reverse">
-                                        <button type="button" className="hs-tab-active:bg-primary hs-tab-active:text-white py-2 px-2 inline-flex items-center gap-2 bg-transparent text-sm font-medium text-center text-gray-500 rounded-sm hover:text-primary  dark:text-white/70 dark:hover:text-white active" id="pills-with-brand-color-item-1" data-hs-tab="#pills-with-brand-color-01" aria-controls="pills-with-brand-color-01">
-                                            <img src={react} alt="user-img" className="w-6 h-6 rounded-full ring-0" />
-                                        </button>
-                                        <button type="button" className="hs-tab-active:bg-primary hs-tab-active:text-white py-2 px-2 inline-flex items-center gap-2 bg-transparent text-sm font-medium text-center text-gray-500 rounded-sm hover:text-primary  dark:text-white/70 dark:hover:text-white" id="pills-with-brand-color-item-2" data-hs-tab="#pills-with-brand-color-02" aria-controls="pills-with-brand-color-02">
-                                            <img src={firebase} alt="user-img" className="w-6 h-6 rounded-full ring-0" />
-                                        </button>
-                                    </div>
-                                </nav>
+                               
                                 <div className="box-body !p-[3rem]" role="tabpanel" id="pills-with-brand-color-01" aria-labelledby="pills-with-brand-color-item-1">
                                     <p className="h5 font-semibold mb-2 text-center">Sign In</p>
                                     <p className="mb-4 text-[#8c9097] dark:text-white/50 opacity-[0.7] font-normal text-center">Welcome back Jhon !</p>
@@ -120,23 +112,8 @@ const Login: FC<LoginProps> = ({ ThemeChanger }: any) => {
                                                 onClick={Login1}>Sign In</button>
                                         </div>
                                     </div>
-                                    <div className="text-center">
-                                        <p className="text-[0.75rem] text-[#8c9097] dark:text-white/50 mt-4">Dont have an account? <Link to={`${import.meta.env.BASE_URL}firebase/signup`} className="text-primary">Sign Up</Link></p>
-                                    </div>
-                                    <div className="text-center my-4 authentication-barrier">
-                                        <span>OR</span>
-                                    </div>
-                                    <div className="btn-list text-center">
-                                        <button aria-label="button" type="button" className="ti-btn ti-btn-icon ti-btn-light me-[0.365rem]">
-                                            <i className="ri-facebook-line font-bold text-dark opacity-[0.7]"></i>
-                                        </button>
-                                        <button aria-label="button" type="button" className="ti-btn ti-btn-icon ti-btn-light me-[0.365rem]">
-                                            <i className="ri-google-line font-bold text-dark opacity-[0.7]"></i>
-                                        </button>
-                                        <button aria-label="button" type="button" className="ti-btn ti-btn-icon ti-btn-light">
-                                            <i className="ri-twitter-line font-bold text-dark opacity-[0.7]"></i>
-                                        </button>
-                                    </div>
+                                 
+                                   
                                 </div>
                                 <div className="box-body !p-[3rem] hidden" role="tabpanel" id="pills-with-brand-color-02" aria-labelledby="pills-with-brand-color-item-2">
                                     <p className="h5 font-semibold mb-2 text-center">Sign In</p>
@@ -204,6 +181,7 @@ const Login: FC<LoginProps> = ({ ThemeChanger }: any) => {
                         <div className="xxl:col-span-4 xl:col-span-4 lg:col-span-4 md:col-span-3 sm:col-span-2"></div>
                     </div>
                 </div>
+            </div>
             </div>
         </Fragment>
 
