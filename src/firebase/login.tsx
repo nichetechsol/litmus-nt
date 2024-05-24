@@ -32,13 +32,18 @@ const LoginScreen: FC<LoginProps> = ({ ThemeChanger }: any) => {
     // const [loading, setLoading] = useState<boolean>(false);
     const navigate = useNavigate();
     useEffect(() => {
-        const storedEmail = localStorage.getItem('rememberedEmail');
-        const storedPassword = localStorage.getItem('rememberedPassword');
-        if (storedEmail && storedPassword) {
-            setEmail(storedEmail);
-            setPassword(storedPassword);
-            setRememberMe(true);
-        }
+        const auth = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
+        if (auth) {
+            routeChange()
+        }else{
+            const storedEmail = localStorage.getItem('rememberedEmail');
+            const storedPassword = localStorage.getItem('rememberedPassword');
+            if (storedEmail && storedPassword) {
+                setEmail(storedEmail);
+                setPassword(storedPassword);
+                setRememberMe(true);
+            }
+        }      
     }, []);
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newEmail = e.target.value.trim().replace(/\s+/g, '');
