@@ -500,7 +500,7 @@ const Header: FC<HeaderProps> = ({ local_varaiable, ThemeChanger }: any) => {
                             <div className="grow">
                               <div className="flex items-start justify-between mb-0">
                                 <div className="mb-0 !text-[0.8125rem] text-[#232323] font-semibold dark:text-[#8c9097] dark:text-white/50">
-                                  <Link to="#">{idx.name}</Link>
+                                  <Link to={`${import.meta.env.BASE_URL}pages/ecommerce/cart/`}>{idx.name}</Link>
                                 </div>
 
                                 <div className="inline-flex">
@@ -523,7 +523,7 @@ const Header: FC<HeaderProps> = ({ local_varaiable, ThemeChanger }: any) => {
                     </ul>
                     <div className={`p-3 empty-header-item border-t ${cartItemCount === 0 ? 'hidden' : ''}`}>
                       <div className="grid">
-                        <Link to="#" className="w-full ti-btn ti-btn-primary-full p-2">Proceed to checkout</Link>
+                        <Link to={`${import.meta.env.BASE_URL}pages/ecommerce/checkout/`} className="w-full ti-btn ti-btn-primary-full p-2">Proceed to checkout</Link>
                       </div>
                     </div>
                     <div className={`p-[3rem] empty-item ${cartItemCount === 0 ? '' : 'hidden'}`}>
@@ -533,7 +533,7 @@ const Header: FC<HeaderProps> = ({ local_varaiable, ThemeChanger }: any) => {
                         </span>
                         <h6 className="font-bold mb-1 mt-3 text-[1rem] text-defaulttextcolor dark:text-[#8c9097] dark:text-white/50">Your Cart is Empty</h6>
                         <span className="mb-3 !font-normal text-[0.8125rem] block text-defaulttextcolor dark:text-[#8c9097] dark:text-white/50">Add some items to make me happy :)</span>
-                        <a href="#" className="ti-btn ti-btn-primary btn-wave ti-btn-wave btn-sm m-1 !text-[0.75rem] !py-[0.25rem] !px-[0.5rem]"
+                        <a href={`${import.meta.env.BASE_URL}pages/ecommerce/products/`} className="ti-btn ti-btn-primary btn-wave ti-btn-wave btn-sm m-1 !text-[0.75rem] !py-[0.25rem] !px-[0.5rem]"
                           data-abc="true">continue shopping <i className="bi bi-arrow-right ms-1"></i></a>
                       </div>
                     </div>
@@ -574,7 +574,7 @@ const Header: FC<HeaderProps> = ({ local_varaiable, ThemeChanger }: any) => {
                             <div className="grow flex items-center justify-between">
                               <div>
                                 <p className="mb-0 text-defaulttextcolor dark:text-[#8c9097] dark:text-white/50 text-[0.8125rem] font-semibold"><Link
-                                  to="#">{notification.text1}</Link>
+                                  to={`${import.meta.env.BASE_URL}pages/notifications/`}>{notification.text1}</Link>
                                   <span className={notification.class}>{notification.class1}</span></p>
                                 <span className="text-[#8c9097] dark:text-white/50 font-normal text-[0.75rem] header-notification-text">Order No: 123456
                                   {notification.text2}</span>
@@ -592,7 +592,7 @@ const Header: FC<HeaderProps> = ({ local_varaiable, ThemeChanger }: any) => {
 
                   <div className={`p-4 empty-header-item1 border-t mt-2 ${notifications.length === 0 ? 'hidden' : ''}`}>
                     <div className="grid">
-                      <a href="#" className="ti-btn ti-btn-primary-full !m-0 w-full p-2">View All</a>
+                      <a href={`${import.meta.env.BASE_URL}pages/notifications/`} className="ti-btn ti-btn-primary-full !m-0 w-full p-2">View All</a>
                     </div>
                   </div>
                   <div className={`p-[3rem] empty-item1 ${notifications.length === 0 ? '' : 'hidden'}`}>
@@ -727,25 +727,25 @@ const Header: FC<HeaderProps> = ({ local_varaiable, ThemeChanger }: any) => {
 
                   <ul className="text-defaulttextcolor font-medium dark:text-[#8c9097] dark:text-white/50">
                     <li>
-                      <Link className="w-full ti-dropdown-item !text-[0.8125rem] !gap-x-0  !p-[0.65rem] !inline-flex" to="#">
+                      <Link className="w-full ti-dropdown-item !text-[0.8125rem] !gap-x-0  !p-[0.65rem] !inline-flex" to={`${import.meta.env.BASE_URL}pages/profile/`}>
                         <i className="ti ti-user-circle text-[1.125rem] me-2 opacity-[0.7]"></i>Profile
                       </Link>
                     </li>
                     <li>
-                      <Link className="w-full ti-dropdown-item !text-[0.8125rem] !gap-x-0  !p-[0.65rem] !inline-flex" to="#"><i
+                      <Link className="w-full ti-dropdown-item !text-[0.8125rem] !gap-x-0  !p-[0.65rem] !inline-flex" to={`${import.meta.env.BASE_URL}pages/email/mailapp/`}><i
                         className="ti ti-inbox text-[1.125rem] me-2 opacity-[0.7]"></i>Inbox <span
                           className="!py-1 !px-[0.45rem] !font-semibold !rounded-sm text-success text-[0.75em] bg-success/10 ms-auto">25</span>
                       </Link>
                     </li>
-                    <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !gap-x-0 !p-[0.65rem] !inline-flex" to="#"><i
+                    <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !gap-x-0 !p-[0.65rem] !inline-flex" to={`${import.meta.env.BASE_URL}pages/todolist/`}><i
                       className="ti ti-clipboard-check text-[1.125rem] me-2 opacity-[0.7]"></i>Task Manager</Link></li>
-                    <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !gap-x-0 !p-[0.65rem] !inline-flex" to="#"><i
+                    <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !gap-x-0 !p-[0.65rem] !inline-flex" to={`${import.meta.env.BASE_URL}pages/email/mailsettings/`}><i
                       className="ti ti-adjustments-horizontal text-[1.125rem] me-2 opacity-[0.7]"></i>Settings</Link></li>
                     <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !gap-x-0 !p-[0.65rem] !inline-flex" to="#"><i
                       className="ti ti-wallet text-[1.125rem] me-2 opacity-[0.7]"></i>Bal: $7,12,950</Link></li>
-                    <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" to="#"><i
+                    <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" to={`${import.meta.env.BASE_URL}pages/chat/`}><i
                       className="ti ti-headset text-[1.125rem] me-2 opacity-[0.7]"></i>Support</Link></li>
-                    <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" to="#"><i
+                    <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" to={`${import.meta.env.BASE_URL}authentication/signin/signincover/`}><i
                       className="ti ti-logout text-[1.125rem] me-2 opacity-[0.7]"></i>Log Out</Link></li>
                   </ul>
                 </div>

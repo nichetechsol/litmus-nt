@@ -1,4 +1,5 @@
 import  { FC, Fragment, useEffect, useState } from 'react';
+import { MENUITEMS } from '../sidebar/sidemenu/sidemenu';
 import { Link } from 'react-router-dom';
 
 
@@ -10,6 +11,12 @@ const Modalsearch: FC<ModalsearchProps> = () => {
 
   const handleClose = () => setShow(false);
 
+  const [show1, setShow1] = useState(false);
+  const [InputValue, setInputValue] = useState("");
+  const [show2, setShow2] = useState(false);
+  const [searchcolor, setsearchcolor] = useState("text-dark");
+  const [searchval, setsearchval] = useState("Type something");
+  const [NavData, setNavData] = useState([]);
   useEffect(() => {
     const clickHandler = (_event:any) => {
       const searchResult = document.querySelector(".search-result");
@@ -31,7 +38,60 @@ const Modalsearch: FC<ModalsearchProps> = () => {
       document.querySelector(".search-result")?.classList.add("d-none");
   });
 
+  const myfunction = (inputvalue: any) => {
+    document.querySelector(".search-result")?.classList.remove("d-none");
+  
+    const i: any = [];
+    const allElement2: any = [];
+  
+    MENUITEMS.forEach((mainLevel) => {
+      if (mainLevel.children) {
+        setShow1(true);
+        mainLevel.children.forEach((subLevel) => {
+          i.push(subLevel);
+          if (subLevel.children) {
+            subLevel.children.forEach((subLevel1: any) => {
+              i.push(subLevel1);
+              if (subLevel1.children) {
+                subLevel1.children.forEach((subLevel2: any) => {
+                  i.push(subLevel2);
+                });
+              }
+            });
+          }
+        });
+      }
+    });
+  
 
+    for (const allElement of i) {
+      if (allElement.title.toLowerCase().includes(inputvalue.toLowerCase())) {
+        if (allElement.title.toLowerCase().startsWith(inputvalue.toLowerCase())) {
+          setShow2(true);
+    
+          // Check if the element has a path and doesn't already exist in allElement2 before pushing
+          if (allElement.path && !allElement2.some((el:any) => el.title === allElement.title)) {
+            allElement2.push(allElement);
+          }
+        }
+      }
+    }
+  
+    if (!allElement2.length || inputvalue === "") {
+      if (inputvalue === "") {
+        setShow2(false);
+        setsearchval("Type something");
+        setsearchcolor('text-dark');
+      }
+      if (!allElement2.length) {
+        setShow2(false);
+        setsearchcolor('text-danger');
+        setsearchval("There is no component with this name");
+      }
+    }
+  
+    setNavData(allElement2);
+  };
 
   const Removingdata=[
     {id:1, name:'People'},
@@ -61,7 +121,12 @@ const Modalsearch: FC<ModalsearchProps> = () => {
   
             <input type="search" className="form-control border-0 px-2 !text-[0.8rem] w-full focus:ring-transparent"
               placeholder="Search" aria-label="Username"
-              autoComplete="off"/>
+              defaultValue={InputValue}
+              autoComplete="off"
+              onChange={(ele) => {
+                myfunction(ele.target.value);
+                setInputValue(ele.target.value);
+              }}/>
   
             <a aria-label="anchor" href="#!" className="flex items-center input-group-text bg-light !py-[0.375rem] !px-[0.75rem]"
               id="voice-search"><i className="fe fe-mic header-link-icon"></i></a>
@@ -89,6 +154,37 @@ const Modalsearch: FC<ModalsearchProps> = () => {
               </ul>
             </div>
           </div>
+          {show1 ? (
+              <div className="box search-result relative z-[9] search-fix  border border-gray-200 dark:border-white/10 mt-1 w-100">
+                <div className="box-header">
+                  <h6 className="box-title me-2 text-break">
+                    Search result of {InputValue}
+                  </h6>
+                </div>
+                <div className="box-body p-2 flex flex-col max-h-[250px] overflow-auto">
+                  {show2 ? (
+                    NavData.map((e:any) => (
+                      <div
+                        key={Math.random()}
+                        className="ti-list-group gap-x-3.5  text-gray-800 dark:bg-bgdark dark:border-white/10 dark:text-white"
+                      >
+                        <Link
+                          to={`${e.path}/`}
+                          className="search-result-item"
+                          onClick={() => { setShow1(false), setInputValue(""); }}
+                        >
+                          {e.title}
+                        </Link>
+                      </div>
+                    ))
+                  ) : (
+                    <b className={`${searchcolor} `}>{searchval}</b>
+                  )}
+                </div>
+              </div>
+            ) : (
+              ""
+            )}
           <div className="mt-5">
             <p className="font-normal  text-[#8c9097] dark:text-white/50 text-[0.813rem] dark:text-gray-200 mb-2">Are You Looking For...</p>
   
@@ -106,21 +202,21 @@ const Modalsearch: FC<ModalsearchProps> = () => {
   
             <div id="dismiss-alert" role="alert"
               className="!p-2 border dark:border-defaultborder/10 rounded-[0.3125rem] flex items-center text-defaulttextcolor dark:text-defaulttextcolor/70 !mb-2 !text-[0.8125rem] alert">
-              <Link to="#"><span>Notifications</span></Link>
+              <Link to={`${import.meta.env.BASE_URL}pages/notifications`}><span>Notifications</span></Link>
               <Link aria-label="anchor" className="ms-auto leading-none" to="#" data-hs-remove-element="#dismiss-alert"><i
                   className="fe fe-x !text-[0.8125rem] text-[#8c9097] dark:text-white/50"></i></Link>
             </div>
   
             <div id="dismiss-alert1" role="alert"
               className="!p-2 border dark:border-defaultborder/10 rounded-[0.3125rem] flex items-center text-defaulttextcolor dark:text-defaulttextcolor/70 !mb-2 !text-[0.8125rem] alert">
-              <Link to="#"><span>Alerts</span></Link>
+              <Link to={`${import.meta.env.BASE_URL}uielements/alerts`}><span>Alerts</span></Link>
               <Link aria-label="anchor" className="ms-auto leading-none" to="#" data-hs-remove-element="#dismiss-alert1"><i
                   className="fe fe-x !text-[0.8125rem] text-[#8c9097] dark:text-white/50"></i></Link>
             </div>
   
             <div id="dismiss-alert2" role="alert"
               className="!p-2 border dark:border-defaultborder/10 rounded-[0.3125rem] flex items-center text-defaulttextcolor dark:text-defaulttextcolor/70 !mb-0 !text-[0.8125rem] alert">
-              <Link to="#"><span>Mail</span></Link>
+              <Link to={`${import.meta.env.BASE_URL}pages/email/mailapp`}><span>Mail</span></Link>
               <Link aria-label="anchor" className="ms-auto lh-1" to="#" data-hs-remove-element="#dismiss-alert2"><i
                   className="fe fe-x !text-[0.8125rem] text-[#8c9097] dark:text-white/50"></i></Link>
             </div>

@@ -10,7 +10,7 @@ import img9 from "../assets/images/ecommerce/png/9.png";
 import img10 from "../assets/images/ecommerce/png/10.png";
 import img11 from "../assets/images/ecommerce/png/11.png";
 import img12 from "../assets/images/ecommerce/png/12.png";
-import { Maindata } from "../container/ecommercedata";
+import { Maindata } from "../container/pages/ecommerce/ecommercedata";
 const initialState = {
    lang: "en",
     dir: "ltr",

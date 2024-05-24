@@ -5,7 +5,7 @@ Project                        :    Ynex - React Typescript Tailwind Admin Templ
 
 Created Date                   :   07/02/2024
 
-Created Date                   :   26/04/2024
+Updated Date                   :   26/04/2024
 
 Author & Copyright Ownership   :   Spruko Technologies Private Limited 
 
@@ -5386,7 +5386,7 @@ label {
   @apply bg-white bg-bodybg !important;
 }
 [data-page-style=classic][data-nav-layout=horizontal] .app-sidebar {
-  @apply border-b border-defaultborder dark:border-defaultborder/10 !important;
+  @apply border-b border-[rgba(255,255,255,0.1)] dark:border-defaultborder/10 !important;
 }
 [data-page-style=classic][data-nav-layout=horizontal][data-menu-styles=light] .app-sidebar {
   @apply border-b border-defaultborder dark:border-defaultborder/10 !important;

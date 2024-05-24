@@ -1,15 +1,15 @@
-import img1 from "../assets/images/ecommerce/png/1.png";
-import img2 from "../assets/images/ecommerce/png/2.png";
-import img3 from "../assets/images/ecommerce/png/3.png";
-import img4 from "../assets/images/ecommerce/png/4.png";
-import img5 from "../assets/images/ecommerce/png/5.png";
-import img6 from "../assets/images/ecommerce/png/6.png";
-import img7 from "../assets/images/ecommerce/png/7.png";
-import img8 from "../assets/images/ecommerce/png/8.png";
-import img9 from "../assets/images/ecommerce/png/9.png";
-import img10 from "../assets/images/ecommerce/png/10.png";
-import img11 from "../assets/images/ecommerce/png/11.png";
-import img12 from "../assets/images/ecommerce/png/12.png";
+import img1 from "../../../assets/images/ecommerce/png/1.png";
+import img2 from "../../../assets/images/ecommerce/png/2.png";
+import img3 from "../../../assets/images/ecommerce/png/3.png";
+import img4 from "../../../assets/images/ecommerce/png/4.png";
+import img5 from "../../../assets/images/ecommerce/png/5.png";
+import img6 from "../../../assets/images/ecommerce/png/6.png";
+import img7 from "../../../assets/images/ecommerce/png/7.png";
+import img8 from "../../../assets/images/ecommerce/png/8.png";
+import img9 from "../../../assets/images/ecommerce/png/9.png";
+import img10 from "../../../assets/images/ecommerce/png/10.png";
+import img11 from "../../../assets/images/ecommerce/png/11.png";
+import img12 from "../../../assets/images/ecommerce/png/12.png";
 export const ItemData1 = [
     {
        id: '1',

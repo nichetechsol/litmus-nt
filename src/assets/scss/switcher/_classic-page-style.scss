@@ -28,7 +28,7 @@
   }
   &[data-nav-layout="horizontal"] {
     .app-sidebar {
-      @apply border-b border-defaultborder dark:border-defaultborder/10 #{!important};
+      @apply border-b border-[rgba(255,255,255,0.1)] dark:border-defaultborder/10 #{!important};
     }
     &[data-menu-styles=light] {
       .app-sidebar {

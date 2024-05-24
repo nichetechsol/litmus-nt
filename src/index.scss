@@ -1,6 +1,26 @@
+@import 'leaflet/dist/leaflet.css';
+@import "react-tabulator/lib/styles.css"; // default theme
+@import "react-tabulator/css/bootstrap/tabulator_bootstrap.min.css"; // use Theme(s)
+@import "react-tabulator/lib/css/bootstrap/tabulator_bootstrap.min.css";
+@import "react-datepicker/dist/react-datepicker.css"; //datepicker
+
+@import 'filepond/dist/filepond.min.css'; // filepond
+@import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css"; // filepond
+
 @import '../src/assets/css/style.css';
 //simonwep colorpicker
 @import "@simonwep/pickr/dist/themes/classic.min.css";
 @import "@simonwep/pickr/dist/themes/monolith.min.css";
 @import "@simonwep/pickr/dist/themes/nano.min.css";
+@import 'react-perfect-scrollbar/dist/css/styles.css';
+
+@import "react-tabulator/lib/styles.css"; // default theme
+@import "react-tabulator/css/bootstrap/tabulator_bootstrap.min.css"; // use Theme(s)
+@import "react-tabulator/lib/css/bootstrap/tabulator_bootstrap.min.css";
+
+@import "gridjs/dist/theme/mermaid.css";
 @import "simplebar-react/dist/simplebar.min.css"; //simplebar
+
+
+
+

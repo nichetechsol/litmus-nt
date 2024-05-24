@@ -163,7 +163,7 @@ Accordion #1<svg className="hs-accordion-active:hidden hs-accordion-active:text-
   <svg className="hs-accordion-active:block hs-accordion-active:text-primary
    hs-accordion-active:group-hover:text-primary hidden w-3 h-3 text-gray-600 
    group-hover:text-gray-500 dark:text-[#8c9097] dark:text-white/50" width="16" height="16"
-    viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    viewBox="0 0 16 16" fill="none" xmlns="http:www.w3.org/2000/svg">
      <path d="M2 11L8.16086 5.31305C8.35239 5.13625 8.64761 5.13625 8.83914 5.31305L15 11"  
      stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg></button>
      <div id="hs-basic-with-title-and-arrow-stretched-collapse-one" className="hs-accordion-content w-full overflow-hidden transition-[height] duration-300" aria-labelledby="hs-basic-with-title-and-arrow-stretched-heading-one">

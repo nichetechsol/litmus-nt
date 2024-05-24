@@ -389,6 +389,7 @@ export const DoubletFn = (actionfunction: any) => {
     localStorage.setItem("ynexverticalstyles", "doublemenu");
     localStorage.removeItem("ynexnavstyles");
 
+
 };
 export const bgImage1 = (actionfunction: any) => {
     const theme = store.getState();
@@ -745,6 +746,8 @@ export const Themebackgroundcolor = ({ actionfunction }: any) => {
         localStorage.setItem("darkBgRGB", `${r - 14} ${g - 14} ${b - 14}`);
         localStorage.setItem("Light", `${r - 9} ${g - 9} ${b - 9}`);
         localStorage.setItem("bodyBgRGB", `${r} ${g} ${b}`);
+        // localStorage.setItem("darkBgRGB3", `${r+19} ${g+19} ${b+19}`);
+        // localStorage.setItem("darkBgRGB4", "255, 255, 255, 0.1");
         localStorage.removeItem("ynexMenu");
         localStorage.removeItem("ynexHeader");
 
