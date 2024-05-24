@@ -1,5 +1,5 @@
-import  { FC, Fragment, useState } from 'react';
-import { Link } from 'react-router-dom';
+import  { FC, Fragment, useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Conversionratio, Dealsstatistics, Profit, Profitearned, Revenueanalytics, Sourcedata, Totalcustomers, Totaldeals, Totalrevenue } from './crmdata';
 import face10 from "../../../assets/images/faces/10.jpg";
 import face12 from "../../../assets/images/faces/12.jpg";
@@ -9,7 +9,14 @@ interface CrmProps {}
 const Crm: FC<CrmProps> = () => {
       // for User search function
       const [Data, setData] = useState(Dealsstatistics);
-
+      const navigate = useNavigate();
+    
+      useEffect(() => {
+        const auth = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
+        if (!auth) {
+          navigate('/'); 
+        }
+      }, []);
       const userdata: any = [];
   
       const myfunction = (idx: any) => {

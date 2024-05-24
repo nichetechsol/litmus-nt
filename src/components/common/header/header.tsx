@@ -745,7 +745,7 @@ const Header: FC<HeaderProps> = ({ local_varaiable, ThemeChanger }: any) => {
                       className="ti ti-wallet text-[1.125rem] me-2 opacity-[0.7]"></i>Bal: $7,12,950</Link></li>
                     <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" to={`${import.meta.env.BASE_URL}pages/chat/`}><i
                       className="ti ti-headset text-[1.125rem] me-2 opacity-[0.7]"></i>Support</Link></li>
-                    <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" to={`${import.meta.env.BASE_URL}authentication/signin/signincover/`}><i
+                    <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" to={`${import.meta.env.BASE_URL}`}><i
                       className="ti ti-logout text-[1.125rem] me-2 opacity-[0.7]"></i>Log Out</Link></li>
                   </ul>
                 </div>

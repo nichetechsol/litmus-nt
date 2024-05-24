@@ -77,12 +77,14 @@
     "redux-thunk": "^2.4.2",
     "sass": "^1.70.0",
     "simplebar-react": "^3.2.4",
+    "sweetalert": "^2.1.2",
     "sweetalert2": "^11.10.3",
     "swiper": "^11.0.5",
     "tailwind": "^4.0.0",
     "tailwind-clip-path": "^1.0.0",
     "uploader": "^3.48.3",
-    "yet-another-react-lightbox": "^3.16.0"
+    "yet-another-react-lightbox": "^3.16.0",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.48",
