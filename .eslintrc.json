@@ -51,6 +51,6 @@
       "no-unused-vars":"off",
       "eslint no-lone-blocks": "off",
       "react/no-unescaped-entities": "off",
-      "eslint no-mixed-spaces-and-tabs": "smart-tabs"
+      "no-mixed-spaces-and-tabs": ["error", "smart-tabs"]
   }
 }
