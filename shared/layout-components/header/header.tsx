@@ -1,3 +1,4 @@
+import withAuth from '@/hoc/withAuth';
 import Link from 'next/link'
 import React, { Fragment, useEffect, useState } from 'react';
 import { ThemeChanger } from "../../redux/action";
@@ -826,4 +827,4 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
 const mapStateToProps = (state:any) => ({
   local_varaiable: state
 });
-export default connect(mapStateToProps, { ThemeChanger })(Header);
+export default withAuth(connect(mapStateToProps, { ThemeChanger })(Header));

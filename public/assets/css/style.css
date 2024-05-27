@@ -112,8 +112,8 @@ Background Image
 /* End Tailwind Styles */
 :root {
   --body-bg:	240 241 247;
-  --primary:	132 90 223;
-  --primary-rgb:	132, 90 ,223;
+  --primary:	3 33 37;
+  --primary-rgb:	3, 33, 37;
   --secondary:	35 183 229;
   --warning: 245 184 73;
   --info:	73 182 245;
@@ -148,6 +148,7 @@ Background Image
   --github:	51 51 51;
   --google:	207 78 67;
   --youtube:	255 0 0;
+  --theme-bg: 3 33 37;
 }
 
 /* dark mode */
@@ -2207,10 +2208,10 @@ Background Image
   @apply my-0 mx-auto w-[13.75rem] h-[13.75rem];
 }
 .authentication.authentication-basic .desktop-dark {
-  @apply hidden;
+  @apply block;
 }
 .authentication.authentication-basic .desktop-logo {
-  @apply block;
+  @apply hidden;
 }
 
 .dark .authentication.authentication-basic .desktop-dark {
@@ -14044,3 +14045,9 @@ h6 {
 }
 
 /*# sourceMappingURL=style.css.map */
+.login-logo{
+  @apply w-[13rem];
+}
+.bg-theme {
+  @apply bg-primary !important;
+}

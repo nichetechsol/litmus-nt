@@ -84,7 +84,7 @@ const Fullcalendar = () => {
     const draggableEl: any = document.getElementById("external-events");
     new Draggable(draggableEl, {
       itemSelector: ".fc-event",
-      eventData: function (eventEl) {
+      eventData: function (eventEl:any) {
         const title = eventEl.getAttribute("title");
         const id = eventEl.getAttribute("data");
         const classValue = eventEl.getAttribute("class");
