@@ -1,5 +1,5 @@
 {
-  "name": "ynex",
+  "name": "Litmus",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -22,6 +22,7 @@
     "@mui/material": "^5.14.13",
     "@reduxjs/toolkit": "^1.9.7",
     "@simonwep/pickr": "^1.9.0",
+    "@supabase/supabase-js": "^2.43.4",
     "@tailwindcss/forms": "^0.5.7",
     "@types/date-fns": "^2.6.0",
     "@types/leaflet": "^1.9.8",
@@ -36,6 +37,7 @@
     "filepond-plugin-image-exif-orientation": "^1.0.11",
     "filepond-plugin-image-preview": "^4.6.11",
     "firebase": "^10.6.0",
+    "fullcalendar": "^6.1.13",
     "gridjs": "^6.0.6",
     "gridjs-react": "^6.0.1",
     "leaflet": "^1.9.4",
@@ -76,10 +78,12 @@
     "redux-thunk": "^2.4.2",
     "sass": "^1.69.5",
     "simplebar-react": "^3.2.4",
+    "sweetalert": "^2.1.2",
     "sweetalert2": "^11.10.1",
     "swiper": "^11.0.5",
     "tailwind-clip-path": "^1.0.0",
-    "yet-another-react-lightbox": "^3.15.6"
+    "yet-another-react-lightbox": "^3.15.6",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^5.0.0",
@@ -90,6 +94,7 @@
     "eslint-config-next": "14.0.0",
     "node-sass": "^9.0.0",
     "postcss": "^8.4.33",
-    "tailwindcss": "^3.4.1"
+    "tailwindcss": "^3.4.1",
+    "typescript": "5.4.5"
   }
 }
