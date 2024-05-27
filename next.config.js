@@ -8,13 +8,14 @@ const nextConfig = {
   swcMinify: true,
   basePath: "",
   assetPrefix :"",
+  distDir: 'build',
   images: {
     loader: "imgix",
     path: "/",
   },
 };
 
-// module.exports = nextConfig;
-module.exports = {
-  distDir: 'build',
-}
+module.exports = nextConfig;
+// module.exports = {
+//   distDir: 'build',
+// }
