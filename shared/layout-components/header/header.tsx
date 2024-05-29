@@ -5,12 +5,14 @@ import { connect } from 'react-redux';
 import store from '@/shared/redux/store';
 import Modalsearch from '../modal-search/modalsearch';
 import { basePath } from '@/next.config';
-
-const Header = ({ local_varaiable, ThemeChanger }:any) => {
+import { getUserRole } from '@/supabase/org_details';
+import swal from "sweetalert";
+import { useRouter } from 'next/navigation';
+const Header = ({ local_varaiable, ThemeChanger }: any) => {
 
   const [passwordshow1, setpasswordshow1] = useState(false);
 
-  const data=  <span className="font-[600] py-[0.25rem] px-[0.45rem] rounded-[0.25rem] bg-pink/10 text-pink text-[0.625rem]">Free shipping</span>
+  const data = <span className="font-[600] py-[0.25rem] px-[0.45rem] rounded-[0.25rem] bg-pink/10 text-pink text-[0.625rem]">Free shipping</span>
 
   const cartProduct = [
     {
@@ -62,7 +64,7 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
 
   const [cartItems, setCartItems] = useState([...cartProduct]);
   const [cartItemCount, setCartItemCount] = useState(cartProduct.length);
-  const handleRemove = (itemId: number,event: { stopPropagation: () => void; }) => {
+  const handleRemove = (itemId: number, event: { stopPropagation: () => void; }) => {
     event.stopPropagation();
     const updatedCart = cartItems.filter((item) => item.id !== itemId);
     setCartItems(updatedCart);
@@ -74,19 +76,19 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
   const span1 = <span className="text-warning">ID: #1116773</span>
   const span2 = <span className="text-success">ID: 7731116</span>
 
- const span3 = <span className="font-[600] py-[0.25rem] px-[0.45rem] rounded-[0.25rem] bg-pink/10 text-pink text-[0.625rem]">Free shipping</span>
+  const span3 = <span className="font-[600] py-[0.25rem] px-[0.45rem] rounded-[0.25rem] bg-pink/10 text-pink text-[0.625rem]">Free shipping</span>
 
- const notifydata = [
-  { id: 1, class: "Your Order Has Been Shipped", data: "Order No: 123456 Has Shipped To Your Delivery Address", icon: "gift", class2: "", color: "!bg-primary/10",color2: "primary"},
-  { id: 2, class: "Discount Available", data: "Discount Available On Selected Products", icon: "discount-2", class2: "", color: "!bg-secondary/10",color2:"secondary" },
-  { id: 3, class: "Account Has Been Verified", data: "Your Account Has Been Verified Sucessfully", icon: "user-check", class2: "", color: "!bg-pink/10",color2: "pink"},
-  { id: 4, class: "Order Placed", data: "Order Placed Successfully", icon: "circle-check", class2: span1, color: "!bg-warning/10",color2: "warning"},
-  { id: 5, class: "Order Delayed", data: "Order Delayed Unfortunately", icon: "clock", class2: span2, color: "!bg-success/10",color2: "success"},
-]
+  const notifydata = [
+    { id: 1, class: "Your Order Has Been Shipped", data: "Order No: 123456 Has Shipped To Your Delivery Address", icon: "gift", class2: "", color: "!bg-primary/10", color2: "primary" },
+    { id: 2, class: "Discount Available", data: "Discount Available On Selected Products", icon: "discount-2", class2: "", color: "!bg-secondary/10", color2: "secondary" },
+    { id: 3, class: "Account Has Been Verified", data: "Your Account Has Been Verified Sucessfully", icon: "user-check", class2: "", color: "!bg-pink/10", color2: "pink" },
+    { id: 4, class: "Order Placed", data: "Order Placed Successfully", icon: "circle-check", class2: span1, color: "!bg-warning/10", color2: "warning" },
+    { id: 5, class: "Order Delayed", data: "Order Delayed Unfortunately", icon: "clock", class2: span2, color: "!bg-success/10", color2: "success" },
+  ]
 
   const [notifications, setNotifications] = useState([...notifydata]);
 
-  const handleNotificationClose = (index: number,event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+  const handleNotificationClose = (index: number, event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     if (event) {
       event.stopPropagation();
     }
@@ -102,12 +104,12 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
     const updatedNotifications = notifications.filter((notification) => notification.id !== notificationId);
     setNotifications(updatedNotifications);
   };
-  
+
   let [storedata, SetStoreData] = useState(local_varaiable);
 
   //full screen
   const [isFullscreen, setIsFullscreen] = useState(false);
-  
+
   const toggleFullscreen = () => {
     const element = document.documentElement;
     if (
@@ -184,7 +186,7 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
     }
   }
 
-  const toggleSidebar = () => { 
+  const toggleSidebar = () => {
     const theme = store.getState();
     let sidemenuType = theme.dataNavLayout;
     if (window.innerWidth >= 992) {
@@ -205,10 +207,10 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
           case "overlay":
             ThemeChanger({ ...theme, "dataNavStyle": "" });
             if (theme.dataToggled === "icon-overlay-close") {
-              ThemeChanger({ ...theme, "dataToggled": "","iconOverlay" :''});
+              ThemeChanger({ ...theme, "dataToggled": "", "iconOverlay": '' });
             } else {
               if (window.innerWidth >= 992) {
-                ThemeChanger({ ...theme, "dataToggled": "icon-overlay-close","iconOverlay" :'' });
+                ThemeChanger({ ...theme, "dataToggled": "icon-overlay-close", "iconOverlay": '' });
               }
             }
             break;
@@ -225,30 +227,30 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
           case "doublemenu":
             ThemeChanger({ ...theme, "dataNavStyle": "" });
             ThemeChanger({ ...theme, "dataNavStyle": "" });
-              if (theme.dataToggled === "double-menu-open") {
-                ThemeChanger({ ...theme, "dataToggled": "double-menu-close" });
-              } else {
-                let sidemenu = document.querySelector(".side-menu__item.active");
-                if (sidemenu) {
-                  ThemeChanger({ ...theme, "dataToggled": "double-menu-open" });
-                  if (sidemenu.nextElementSibling) {
-                    sidemenu.nextElementSibling.classList.add("double-menu-active");
-                  } else {
+            if (theme.dataToggled === "double-menu-open") {
+              ThemeChanger({ ...theme, "dataToggled": "double-menu-close" });
+            } else {
+              let sidemenu = document.querySelector(".side-menu__item.active");
+              if (sidemenu) {
+                ThemeChanger({ ...theme, "dataToggled": "double-menu-open" });
+                if (sidemenu.nextElementSibling) {
+                  sidemenu.nextElementSibling.classList.add("double-menu-active");
+                } else {
 
-                    ThemeChanger({ ...theme, "dataToggled": "" });
-                  }
+                  ThemeChanger({ ...theme, "dataToggled": "" });
                 }
               }
+            }
             // doublemenu(ThemeChanger);
             break;
           // detached
           case "detached":
             if (theme.dataToggled === "detached-close") {
-              ThemeChanger({ ...theme, "dataToggled": "","iconOverlay" :'' });
+              ThemeChanger({ ...theme, "dataToggled": "", "iconOverlay": '' });
             } else {
-              ThemeChanger({ ...theme, "dataToggled": "detached-close","iconOverlay" :'' });
+              ThemeChanger({ ...theme, "dataToggled": "detached-close", "iconOverlay": '' });
             }
-            
+
             break;
 
           // default
@@ -269,7 +271,7 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
             if (theme.dataToggled === "menu-hover-closed") {
               ThemeChanger({ ...theme, "dataToggled": "" });
             } else {
-              ThemeChanger({ ...theme, "dataToggled": "menu-hover-closed"});
+              ThemeChanger({ ...theme, "dataToggled": "menu-hover-closed" });
 
             }
             break;
@@ -333,7 +335,7 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
   //Dark Model
   const ToggleDark = () => {
     console.log("ToggleDarkToggleDarkToggleDarkToggleDark");
-   
+
     ThemeChanger({
       ...local_varaiable,
       "class": local_varaiable.class == "dark" ? "light" : "dark",
@@ -374,7 +376,7 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
   useEffect(() => {
     const navbar = document?.querySelector(".header");
     const navbar1 = document?.querySelector(".app-sidebar");
-    const sticky:any = navbar?.clientHeight;
+    const sticky: any = navbar?.clientHeight;
     // const sticky1 = navbar1.clientHeight;
 
     function stickyFn() {
@@ -396,6 +398,52 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
       window.removeEventListener("DOMContentLoaded", stickyFn);
     };
   }, []);
+
+
+  const [user_id, setuser_id] = useState("")
+  const [user_fname, setUser_fname] = useState("")
+  const [user_lname, setUserlname] = useState("")
+  const [user_role, setUserrole] = useState("");
+  useEffect(() => {
+    const userid: any = localStorage.getItem("user_id");
+    const userfname: any = localStorage.getItem("user_fname");
+    const userlname: any = localStorage.getItem("user_lname");
+    const userrole: any = localStorage.getItem("user_role");
+    setuser_id(userid)
+    setUser_fname(userfname);
+    setUserlname(userlname);
+    setUserrole(userrole);
+  }, [])
+
+
+const history = useRouter()
+  const [userRoleName, setUserRoleName] = useState('')
+  useEffect(() => {
+    const fetchData2 = async () => {
+      try {
+        const data: any = await getUserRole();
+
+        if (data && data.data && data.data.length > 0) {
+          console.log(user_role)
+          for (let i = 0; i < data.data.length; i++) {
+            if (data.data[i].id == user_role) {
+              console.log("Matching user role found. Name:", data.data[i].name);
+              setUserRoleName(data.data[i].name)
+            }
+            else {
+              console.log("Not found")
+            }
+          }
+        } else {
+          console.log("No organization details found.");
+        }
+      } catch (error: any) {
+        console.error("Error fetching organization details:", error.message);
+      }
+    };
+
+    fetchData2();
+  }, [user_role]);
 
   return (
     <Fragment>
@@ -555,9 +603,9 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
                     <hr className="dropdown-divider dark:border-white/10" />
                   </div>
                   <ul className="list-none mb-0" id="header-cart-items-scroll">
-                  {cartItems.map((idx) => (
+                    {cartItems.map((idx) => (
                       <li className={`ti-dropdown-item border-b dark:border-defaultborder/10 border-defaultborder ${idx.class}`} key={Math.random()}>
-                        <div className="flex items-start cart-dropdown-item"> 
+                        <div className="flex items-start cart-dropdown-item">
 
                           <img src={`${process.env.NODE_ENV === "production" ? basePath : ""}${idx.src}`} alt="img"
                             className="!h-[1.75rem] !w-[1.75rem] leading-[1.75rem] text-[0.65rem] rounded-[50%] br-5 me-3" />
@@ -570,7 +618,7 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
 
                               <div className="inline-flex">
                                 <span className="text-black mb-1 dark:text-white !font-medium">{idx.price}</span>
-                                <Link aria-label="anchor" href="#!" className="header-cart-remove ltr:float-right rtl:float-left dropdown-item-close"  onClick={(event) => handleRemove(idx.id, event)}><i
+                                <Link aria-label="anchor" href="#!" className="header-cart-remove ltr:float-right rtl:float-left dropdown-item-close" onClick={(event) => handleRemove(idx.id, event)}><i
                                   className="ti ti-trash"></i></Link>
                               </div>
                             </div>
@@ -627,7 +675,7 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
                   </div>
                   <div className="dropdown-divider"></div>
                   <ul className="list-none !m-0 !p-0 end-0" id="header-notification-scroll">
-                  {notifications.map((idx, index) => (
+                    {notifications.map((idx, index) => (
                       <li className="ti-dropdown-item dropdown-item" key={Math.random()}>
                         <div className="flex items-start">
                           <div className="pe-2">
@@ -766,11 +814,11 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
                   onClick={() => toggleFullscreen()}
                   href="#!"
                   className="inline-flex flex-shrink-0 justify-center items-center gap-2  !rounded-full font-medium dark:hover:bg-black/20 dark:text-[#8c9097] dark:text-white/50 dark:hover:text-white dark:focus:ring-white/10 dark:focus:ring-offset-white/10">
-                   {isFullscreen ? (
-          <i className="bx bx-exit-fullscreen full-screen-close header-link-icon"></i>
-        ) : (
-          <i className="bx bx-fullscreen full-screen-open header-link-icon"></i>
-        )}
+                  {isFullscreen ? (
+                    <i className="bx bx-exit-fullscreen full-screen-close header-link-icon"></i>
+                  ) : (
+                    <i className="bx bx-fullscreen full-screen-open header-link-icon"></i>
+                  )}
                 </Link>
               </div>
               <div className="header-element md:!px-[0.65rem] px-2 hs-dropdown !items-center ti-dropdown [--placement:bottom-left]">
@@ -780,15 +828,15 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
                   <img className="inline-block rounded-full " src={`${process.env.NODE_ENV === "production" ? basePath : ""}/assets/images/faces/9.jpg`} width="32" height="32" alt="Image Description" />
                 </button>
                 <div className="md:block hidden dropdown-profile">
-                  <p className="font-semibold mb-0 leading-none text-[#536485] text-[0.813rem] ">Json Taylor</p>
-                  <span className="opacity-[0.7] font-normal text-[#536485] block text-[0.6875rem] ">Web Designer</span>
+                  <p className="font-semibold mb-0 leading-none text-[#536485] text-[0.813rem] ">{user_fname}{" "}{user_lname}</p>
+                  <span className="opacity-[0.7] font-normal text-[#536485] block text-[0.6875rem] ">{userRoleName}</span>
                 </div>
                 <div
                   className="hs-dropdown-menu ti-dropdown-menu !-mt-3 border-0 w-[11rem] !p-0 border-defaultborder hidden main-header-dropdown  pt-0 overflow-hidden header-profile-dropdown dropdown-menu-end"
                   aria-labelledby="dropdown-profile">
 
                   <ul className="text-defaulttextcolor font-medium dark:text-[#8c9097] dark:text-white/50">
-                    <li>
+                    {/* <li>
                       <Link className="w-full ti-dropdown-item !text-[0.8125rem] !gap-x-0  !p-[0.65rem] !inline-flex" href="/components/pages/profile/">
                         <i className="ti ti-user-circle text-[1.125rem] me-2 opacity-[0.7]"></i>Profile
                       </Link>
@@ -806,29 +854,43 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
                     <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !gap-x-0 !p-[0.65rem] !inline-flex " href="#!"><i
                       className="ti ti-wallet text-[1.125rem] me-2 opacity-[0.7]"></i>Bal: $7,12,950</Link></li>
                     <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" href="/components/pages/chat/"><i
-                      className="ti ti-headset text-[1.125rem] me-2 opacity-[0.7]"></i>Support</Link></li>
-                    <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" href="/components/authentication/sign-in/signin-cover/"><i
+                      className="ti ti-headset text-[1.125rem] me-2 opacity-[0.7]"></i>Support</Link></li> */}
+                    <li onClick={() => {
+                      localStorage.removeItem('sb-emsjiuztcinhapaurcrl-auth-token');
+                      history.push('/')
+                      // swal({
+                      //   text: "Are you sure you want to  logout?",
+                      //   icon: "warning",
+                      //   buttons: true,
+                      //   dangerMode: true,
+                      // }).then((willDelete) => {
+                      //   if (willDelete) {
+                      //     localStorage.clear()
+                      //     history.push('/')
+                      //   }
+                      // })
+                    }}><Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" href="/components/authentication/sign-in/signin-cover/"><i
                       className="ti ti-logout text-[1.125rem] me-2 opacity-[0.7]"></i>Log Out</Link></li>
-                  </ul>
-                </div>
-              </div>
-              <div className="header-element md:px-[0.48rem]">
-                <button aria-label="button" type="button"
-                  className="hs-dropdown-toggle switcher-icon inline-flex flex-shrink-0 justify-center items-center gap-2  rounded-full font-medium  align-middle transition-all text-xs dark:text-[#8c9097] dark:text-white/50 dark:hover:text-white dark:focus:ring-white/10 dark:focus:ring-offset-white/10"
-                  data-hs-overlay="#hs-overlay-switcher">
-                  <i className="bx bx-cog header-link-icon animate-spin-slow"></i>
-                </button>
+                </ul>
               </div>
             </div>
+            <div className="header-element md:px-[0.48rem]">
+              <button aria-label="button" type="button"
+                className="hs-dropdown-toggle switcher-icon inline-flex flex-shrink-0 justify-center items-center gap-2  rounded-full font-medium  align-middle transition-all text-xs dark:text-[#8c9097] dark:text-white/50 dark:hover:text-white dark:focus:ring-white/10 dark:focus:ring-offset-white/10"
+                data-hs-overlay="#hs-overlay-switcher">
+                <i className="bx bx-cog header-link-icon animate-spin-slow"></i>
+              </button>
+            </div>
           </div>
-        </nav>
       </div>
-      <Modalsearch />
-    </Fragment>
+    </nav>
+      </div >
+  <Modalsearch />
+    </Fragment >
   )
 }
 
-const mapStateToProps = (state:any) => ({
+const mapStateToProps = (state: any) => ({
   local_varaiable: state
 });
 export default connect(mapStateToProps, { ThemeChanger })(Header);

@@ -22,7 +22,7 @@ const LoginForm = () => {
       const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token')
       if (token) {
         setTokenVerify(true)
-        redirect("/organizations")
+        redirect("/dashboard")
       } else {
         setTokenVerify(false)
       }
@@ -119,7 +119,7 @@ const LoginForm = () => {
         localStorage.setItem('user_fname', user_firstname);
         localStorage.setItem('user_lname', user_lastname);
         localStorage.setItem('user_role', user_role);
-        navigate.push('/organizations');
+        navigate.push('/dashboard');
       } else {
         swal({
           icon: 'error',
