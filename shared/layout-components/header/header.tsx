@@ -1,4 +1,3 @@
-import withAuth from '@/hoc/withAuth';
 import Link from 'next/link'
 import React, { Fragment, useEffect, useState } from 'react';
 import { ThemeChanger } from "../../redux/action";
@@ -333,7 +332,8 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
   };
   //Dark Model
   const ToggleDark = () => {
-
+    console.log("ToggleDarkToggleDarkToggleDarkToggleDark");
+   
     ThemeChanger({
       ...local_varaiable,
       "class": local_varaiable.class == "dark" ? "light" : "dark",
@@ -342,7 +342,8 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
 
     });
     const theme = store.getState();
-
+    // console.log(theme);
+    console.log(theme.class);
     if (theme.class != "dark") {
       ThemeChanger({
         ...theme,
@@ -356,12 +357,15 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
       localStorage.removeItem("ynexdarktheme");
       localStorage.removeItem("ynexHeader");
       localStorage.removeItem("ynexMenu");
-
+      localStorage.setItem("theme", "light");
+      location.reload()
     }
 
     else {
       localStorage.setItem("ynexdarktheme", "dark");
       localStorage.removeItem("ynexlighttheme");
+      localStorage.setItem("theme", "dark");
+      location.reload()
     }
 
   };
@@ -827,4 +831,4 @@ const Header = ({ local_varaiable, ThemeChanger }:any) => {
 const mapStateToProps = (state:any) => ({
   local_varaiable: state
 });
-export default withAuth(connect(mapStateToProps, { ThemeChanger })(Header));
+export default connect(mapStateToProps, { ThemeChanger })(Header);

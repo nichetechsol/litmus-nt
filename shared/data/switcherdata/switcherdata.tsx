@@ -1,9 +1,12 @@
 import MenuItems from "@/shared/layout-components/sidebar/nav";
 import store from "@/shared/redux/store";
-import { ClassAttributes, InputHTMLAttributes, JSX, useState } from "react";
+import { ClassAttributes, InputHTMLAttributes, JSX, useState, } from "react";
 
 export function Dark(actionfunction:any) {
     const theme :any = store.getState()
+
+    console.log("theme",theme);
+    
     actionfunction({
         ...theme,
         "class": "dark",
@@ -21,6 +24,8 @@ export function Dark(actionfunction:any) {
 }
 export function Light(actionfunction:any) {
     const theme = store.getState()
+
+    console.log("theme",theme);
     actionfunction({
         ...theme,
         "class": "light",
@@ -705,7 +710,7 @@ function hexToRgb(hex: string) {
 //themeprimarycolor
 const Themeprimarycolor = ({ actionfunction }:any) => {
     const theme = store.getState();
-    const [state, updateState] = useState("#FFFFFF");
+    const [state, updateState] = useState("#FF0000");
     const handleInput = (e:any) => {
         let { r, g, b }:any = hexToRgb(e.target.value);
         updateState(e.target.value);
@@ -901,6 +906,8 @@ export const LocalStorageBackup = (actionfunction:any) => {
 
             break;
         case 'dark':
+            console.log("darkdarkdarkdark");
+            
             darkHeader(actionfunction);
 
             break;

@@ -1,3 +1,4 @@
+"use client"
 import store from '@/shared/redux/store';
 import React, { Fragment, useEffect } from 'react';
 import { Provider } from 'react-redux';

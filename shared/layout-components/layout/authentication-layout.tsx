@@ -1,3 +1,4 @@
+"use client"
 import store from '@/shared/redux/store'
 import React, { Fragment } from 'react'
 import { Helmet, HelmetProvider } from 'react-helmet-async'

@@ -63,7 +63,7 @@ const Landingswitcher = ({ local_varaiable, ThemeChanger }:any) => {
           <div className="ti-offcanvas-body" id="switcher-body">
             <div className="">
             <div className="">
-                <p className="switcher-style-head">Theme Color Mode:</p>
+                <p className="switcher-style-head">Theme Color Modeeee:</p>
                 <div className="grid grid-cols-3 switcher-style">
                   <div className="flex items-center">
                     <input type="radio" name="theme-style" className="ti-form-radio" id="switcher-light-theme" checked={local_varaiable.class != "dark"} onChange={e => { }}
