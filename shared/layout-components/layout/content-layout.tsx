@@ -1,3 +1,4 @@
+"use client"
 import React, { Fragment, useEffect, useState } from 'react'
 import Sidebar from '../sidebar/sidebar';
 import { Provider } from 'react-redux';

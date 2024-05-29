@@ -3,7 +3,7 @@ import React, { Fragment, useState, useEffect } from "react";
 import { connect } from "react-redux";
 import MenuItems from "./nav";
 import { ThemeChanger } from "../../redux/action";
-import { useRouter } from "next/router";
+import {usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { basePath } from "@/next.config";
 import store from "@/shared/redux/store";
@@ -41,6 +41,7 @@ const Sidebar = ({ local_varaiable, ThemeChanger }: any) => {
 	}, []);
 
 	const location = useRouter();
+	const locationPath = usePathname();
 
 	function Onhover() {
 		const theme = store.getState();
@@ -399,7 +400,11 @@ const Sidebar = ({ local_varaiable, ThemeChanger }: any) => {
 
 		// Start observing the target element
 		observer.observe(targetElement, config);
-		let currentPath = location.pathname.endsWith("/") ? location.pathname.slice(0, -1) : location.pathname;
+
+		console.log(usePathname);
+		console.log(location);
+		
+		let currentPath = locationPath.endsWith("/") ? locationPath.slice(0, -1) : locationPath;
 		if (currentPath !== previousUrl) {
 			setMenuUsingUrl(currentPath);
 			setPreviousUrl(currentPath);
