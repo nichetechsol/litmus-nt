@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build 2>&1 | findstr /V /C:\"API routes and middleware\"",
+    "dev": "vite",
+    "build": "tsc && vite build",
     "start": "next start",
     "lint": "next lint",
     "postcss": "sass ./public/assets/scss/style.scss ./public/assets/css/style.css && postcss ./public/assets/css/style.css -o ./public/assets/css/style.css",
