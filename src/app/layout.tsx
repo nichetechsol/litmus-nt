@@ -63,7 +63,7 @@ export default function RootLayout({ children }: {
   return (
     <html lang="en">
       <head>
-        <title>"My App"</title>
+        <title>Litmus</title>
         {/* Add additional meta tags as needed */}
       </head>
       <body>
