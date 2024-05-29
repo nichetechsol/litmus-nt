@@ -404,8 +404,8 @@ const Sidebar = ({ local_varaiable, ThemeChanger }: any) => {
 		console.log(usePathname);
 		console.log(location);
 		
-		let currentPath = locationPath.endsWith("/") ? locationPath.slice(0, -1) : locationPath;
-		if (currentPath !== previousUrl) {
+		let currentPath = locationPath && locationPath.endsWith("/") ? locationPath.slice(0, -1) : locationPath;
+		if (currentPath && currentPath !== previousUrl) {
 			setMenuUsingUrl(currentPath);
 			setPreviousUrl(currentPath);
 		}
@@ -550,7 +550,8 @@ const Sidebar = ({ local_varaiable, ThemeChanger }: any) => {
 			if (mutation.type === 'attributes' && mutation.attributeName === 'data-nav-layout') {
 				const newValue = mutation.target.getAttribute('data-nav-layout');
 				if (newValue == 'vertical') {
-					let currentPath = location.pathname.endsWith('/') ? location.pathname.slice(0, -1) : location.pathname;
+					let currentPath = locationPath && locationPath.endsWith("/") ? locationPath.slice(0, -1) : locationPath;
+					// let currentPath = location.pathname.endsWith('/') ? location.pathname.slice(0, -1) : location.pathname;
 					currentPath = !currentPath ? '/dashboard/ecommerce' : currentPath;
 					setMenuUsingUrl(currentPath);
 				} else {

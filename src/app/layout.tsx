@@ -36,19 +36,27 @@ import { Providers } from './providers'
 //   title: 'My Next.js App', // Add your desired metadata here
 // };
 
-const layouts = {
-  '/landing': LandingLayout, // Define the layout mapping for your landing route
-  '/auth/*': AuthenticationLayout, // Apply authentication layout for all routes under /auth
-  '/dashboard': ContentLayout, // Use ContentLayout for all other routes (default)
+// Define interface for layout functions
+interface LayoutComponent {
+  (props: { children: React.ReactNode }): JSX.Element;
+}
+
+// Define layout mapping using an interface
+const layouts: { [route: string]: LayoutComponent } = {
+  '/landing': LandingLayout,
+  '/auth/*': AuthenticationLayout,
+  '/dashboard': ContentLayout,
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: {
+  children: React.ReactNode
+}) {
   const router = useRouter();
   const locationPath = usePathname();
-            console.log(locationPath);
-            console.log(layouts[locationPath]);
+  
+            
   // Determine the appropri  console.log(locationPath);ate layout based on the route
-  const baseRoute = getBaseRoute(locationPath);
+  const baseRoute = getBaseRoute(locationPath || "/auth");
   console.log(baseRoute);
   const Layout = layouts[baseRoute] || AuthenticationLayout; // Use ContentLayout as default
 
@@ -69,7 +77,7 @@ export default function RootLayout({ children }) {
   );
 }
 
-const getBaseRoute = (path) => {
+const getBaseRoute = (path: string) => {
   const parts = path.split('/');
   return `/${parts[1]}`;
 };
