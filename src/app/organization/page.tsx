@@ -381,7 +381,7 @@ useEffect(() => {
                         <div className="box-body !p-0">
                         {user_role == "1" ?
                             <div className="p-4 grid border-b border-dashed dark:border-defaultborder/10">
-                                <Link href="#!" className="hs-dropdown-toggle py-2  px-3 ti-btn bg-primary text-white !font-medium w-full !mb-0" data-hs-overlay="#todo-compose"><i className="ri-add-circle-line !text-[1rem]"></i>Add Organization
+                                <Link href="" className="hs-dropdown-toggle py-2  px-3 ti-btn bg-primary text-white !font-medium w-full !mb-0" data-hs-overlay="#todo-compose"><i className="ri-add-circle-line !text-[1rem]"></i>Add Organization
                                 </Link>
                                 <div id="todo-compose" className="hs-overlay hidden ti-modal">
                                     <div className="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out">
@@ -515,7 +515,7 @@ useEffect(() => {
                                     <input type="text" 
                                     value={searchTerm ?? ""}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="form-control w-full !rounded-md !bg-light border-0 !rounded-e-none" placeholder="Search Task Here" aria-describedby="button-addon2" />
+                                    className="form-control w-full !rounded-md !bg-light border-0 !rounded-e-none" placeholder="Search Organization" aria-describedby="button-addon2" />
                                     <button type="button" aria-label="button" className="ti-btn ti-btn-light !rounded-s-none !mb-0" id="button-addon2"><i className="ri-search-line text-[#8c9097] dark:text-white/50"></i></button>
                                 </div>
                             </div>
@@ -595,7 +595,7 @@ useEffect(() => {
                                 <div className="box-body !p-0">
                                     <div className="md:flex px-4 py-6 items-center justify-between">
                                         <div>
-                                            <h6 className="font-semibold mb-0 text-[1rem]">Organization</h6>
+                                            <h6 className="font-semibold mb-0 text-[1rem]">Organizations</h6>
                                         </div>
                                         
                                        
@@ -616,8 +616,8 @@ useEffect(() => {
                     <div className="flex items-start ">
                         <div className="flex flex-grow flex-wrap gap-2">
                             <div className="avatar avatar-xl avatar-rounded me-3">
-                                <img src="../../../assets/images/faces/4.jpg" alt={org.org_name?org.org_name[0].toUpperCase(): ""} />
-                                
+                                {/* <img src="../../../assets/images/faces/4.jpg" alt={org.org_name?org.org_name[0].toUpperCase(): ""} /> */}
+                                <h4>   <i className="ri-building-fill text-black"></i></h4>
                             </div>
                             <div>
                                 <h6 className=" mb-1 font-semibold text-[1rem]"> {org.org_name} </h6>

@@ -37,7 +37,7 @@ interface EntitlementList {
 }
 
 // Function to count records for an organization dashboard
-async function orgDashboardCounts(org_id: number): Promise<Result<DashboardCounts>> {
+async function orgDashboardCounts(org_id: any): Promise<Result<DashboardCounts>> {
   try {
     const { count: userCount, error: userError } = await supabase
       .from("org_users")
@@ -119,7 +119,7 @@ async function orgUserList(org_id: any, start: any, end: any,search:any): Promis
       .from("users")
       .select("*")
       .in("id", userIds)
-      .ilike("name", `%${search}%`);
+      .ilike("firstname", `%${search}%`);
 
 
     if (usersError) {
@@ -181,7 +181,7 @@ async function orgUserList(org_id: any, start: any, end: any,search:any): Promis
 }
 
 // Function to fetch a list of entitlements for an organization
-async function orgEntitlementList(org_id: number, start: number, end: number): Promise<Result<{ totalCount: number, entitlements: EntitlementList[] }>> {
+async function orgEntitlementList(org_id: any, start: number, end: number): Promise<Result<{ totalCount: number, entitlements: EntitlementList[] }>> {
   try {
     // Fetch total count of entitlements
     const { count: totalCount, error: countError } = await supabase
