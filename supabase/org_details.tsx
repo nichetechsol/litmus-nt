@@ -31,7 +31,7 @@ interface OrganizationWithSiteCount {
   sites_count: number;
 }
 
-async function fetchOrganizationAndSiteDetails(user_id: string | null): Promise<OrganizationWithSiteCount[] | null> {
+async function fetchOrganizationAndSiteDetails(user_id: any | null): Promise<OrganizationWithSiteCount[] | null> {
   try {
     // Fetch org_id associated with the user
     const { data: userOrgs, error: userOrgError } = await supabase
@@ -169,7 +169,7 @@ async function fetchOrganizationTypes(): Promise<Result<any[]>> { // Replace `an
   }
 }
 
-async function addOrganization(data: { user_id: any; role_id: any; name: string; description: string; type_id: number; status: string; domain: string[]; }): Promise<Result<any>> {
+async function addOrganization(data: { user_id: any; role_id: any; name: string; description: string; type_id: any; status: string; domain: string[]; }): Promise<Result<any>> {
   try {
     // Insert organization details
     const { data: insertData, error: insertError } = await supabase
@@ -233,7 +233,7 @@ async function addOrganization(data: { user_id: any; role_id: any; name: string;
   }
 }
 
-async function updateOrganization(data: { name: string; description: string; type_id: number; status: string; domain: string[]; org_id: number }): Promise<Result<any>> { // Replace `any` with the appropriate type if available
+async function updateOrganization(data: { name: string; description: string; type_id: any; status: string; domain: string[]; org_id: any }): Promise<Result<any>> { // Replace `any` with the appropriate type if available
   try {
     // Update organization details
     const { data: updateData, error } = await supabase
@@ -288,7 +288,7 @@ async function updateOrganization(data: { name: string; description: string; typ
   }
 }
 
-async function viewOrganization(org_id: number): Promise<Result<OrgDetail[]>> {
+async function viewOrganization(org_id: any): Promise<Result<OrgDetail[]>> {
   try {
     // Fetch organization details
     const { data: orgDetails, error } = await supabase
@@ -309,7 +309,7 @@ async function viewOrganization(org_id: number): Promise<Result<OrgDetail[]>> {
   }
 }
 
-async function deleteOrganization(org_id: number): Promise<Result<null>> {
+async function deleteOrganization(org_id: any): Promise<Result<null>> {
   try {
     // Delete matching domains from 'domains' table
     const { error: domainError } = await supabase
