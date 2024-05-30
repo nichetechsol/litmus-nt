@@ -464,14 +464,14 @@ const history = useRouter()
                   </Link>
                 </div>
               </div>
-              <div className="header-element md:px-[0.325rem] !items-center" onClick={() => toggleSidebar()}>
+              {/* <div className="header-element md:px-[0.325rem] !items-center" onClick={() => toggleSidebar()}>
                 <Link aria-label="Hide Sidebar"
-                  className="sidemenu-toggle animated-arrow  hor-toggle horizontal-navtoggle inline-flex items-center" href="#!"><span></span></Link>
-              </div>
+                  className="sidemenu-toggle animated-arrow  hor-toggle horizontal-navtoggle inline-flex items-center" href=""><span></span></Link>
+              </div> */}
             </div>
             <div className="header-content-right">
 
-              <div className="header-element py-[1rem] md:px-[0.65rem] px-2 header-search">
+              {/* <div className="header-element py-[1rem] md:px-[0.65rem] px-2 header-search">
                 <button aria-label="button" type="button" data-hs-overlay="#search-modal"
                   className="inline-flex flex-shrink-0 justify-center items-center gap-2  rounded-full font-medium focus:ring-offset-0 focus:ring-offset-white transition-all text-xs dark:bg-bgdark dark:hover:bg-black/20 dark:text-[#8c9097] dark:text-white/50 dark:hover:text-white dark:focus:ring-white/10 dark:focus:ring-offset-white/10">
                   <i className="bx bx-search-alt-2 header-link-icon"></i>
@@ -820,7 +820,7 @@ const history = useRouter()
                     <i className="bx bx-fullscreen full-screen-open header-link-icon"></i>
                   )}
                 </Link>
-              </div>
+              </div> */}
               <div className="header-element md:!px-[0.65rem] px-2 hs-dropdown !items-center ti-dropdown [--placement:bottom-left]">
 
                 <button id="dropdown-profile" type="button"
@@ -874,13 +874,13 @@ const history = useRouter()
                 </ul>
               </div>
             </div>
-            <div className="header-element md:px-[0.48rem]">
+            {/* <div className="header-element md:px-[0.48rem]">
               <button aria-label="button" type="button"
                 className="hs-dropdown-toggle switcher-icon inline-flex flex-shrink-0 justify-center items-center gap-2  rounded-full font-medium  align-middle transition-all text-xs dark:text-[#8c9097] dark:text-white/50 dark:hover:text-white dark:focus:ring-white/10 dark:focus:ring-offset-white/10"
                 data-hs-overlay="#hs-overlay-switcher">
                 <i className="bx bx-cog header-link-icon animate-spin-slow"></i>
               </button>
-            </div>
+            </div> */}
           </div>
       </div>
     </nav>
