@@ -11301,9 +11301,9 @@ hr {
 .alert .btn-close i {
   @apply text-[1.5rem] leading-[1.5];
 }
-.alert:last-child {
+/* .alert:last-child {
   @apply mb-0;
-}
+} */
 .alert .alert-link {
   @apply font-semibold;
 }

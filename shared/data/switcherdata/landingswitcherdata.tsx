@@ -178,8 +178,8 @@ export const LandingpageReset = (actionfunction:any) => {
 };
 
 export const LocalStorageBackup1 = (actionfunction: any) => {
-    // (localStorage.ynexdarktheme) ? Dark(actionfunction) : "";
-    // (localStorage.ynexlighttheme) ? Light(actionfunction) : "";
+    (localStorage.ynexdarktheme) ? Dark(actionfunction) : "";
+    (localStorage.ynexlighttheme) ? Light(actionfunction) : "";
     (localStorage.ynexrtl) ? Rtl(actionfunction) : "";
   
     // Theme Primary: Colors: Start

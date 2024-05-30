@@ -46,6 +46,8 @@ const layouts: { [route: string]: LayoutComponent } = {
   '/landing': LandingLayout,
   '/auth/*': AuthenticationLayout,
   '/dashboard': ContentLayout,
+  '/organization': ContentLayout,
+  '/orgdashboard': ContentLayout,
 };
 
 export default function RootLayout({ children }: {

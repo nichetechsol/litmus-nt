@@ -8,6 +8,8 @@ import swal from "sweetalert";
 import React, { Fragment, useEffect, useLayoutEffect, useState } from "react";
 import { Login } from '@/supabase/auth'
 import { passwordSchema, emailSchema } from '@/helper/ValidationHelper'
+import Loader from '@/utils/Loader/Loader'
+
 
 const validationSchema = Yup.object().shape({
   email: emailSchema,
@@ -15,6 +17,8 @@ const validationSchema = Yup.object().shape({
 });
 
 const LoginForm = () => {
+  
+  const [loading, setLoading] = useState<boolean>(false);
   const [tokenVerify, setTokenVerify] = useState(true)
   // const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token')
   useLayoutEffect(() => {
@@ -22,7 +26,7 @@ const LoginForm = () => {
       const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token')
       if (token) {
         setTokenVerify(true)
-        redirect("/dashboard")
+        redirect("/organization")
       } else {
         setTokenVerify(false)
       }
@@ -107,6 +111,7 @@ const LoginForm = () => {
       } else {
         localStorage.removeItem('rememberMe');
       }
+      setLoading(true)
       const result: any = await Login(email, password);
       if (result.errorCode === 0) {
 
@@ -119,7 +124,8 @@ const LoginForm = () => {
         localStorage.setItem('user_fname', user_firstname);
         localStorage.setItem('user_lname', user_lastname);
         localStorage.setItem('user_role', user_role);
-        navigate.push('/dashboard');
+        navigate.push('/organization');
+        setLoading(false)
       } else {
         swal({
           icon: 'error',
@@ -173,6 +179,7 @@ const LoginForm = () => {
 
   return (
     <>
+    {loading && <Loader />}
       {!tokenVerify && (
         <Fragment>
           <div className="bg-theme">
@@ -182,7 +189,7 @@ const LoginForm = () => {
                   <div className="xxl:col-span-4 xl:col-span-4 lg:col-span-4 md:col-span-3 sm:col-span-2"></div>
                   <div className="xxl:col-span-4 xl:col-span-4 lg:col-span-4 md:col-span-6 sm:col-span-8 col-span-12">
                     <div className="my-[2.5rem] flex justify-center">
-                      <Link href="/components/dashboards/crm/">
+                      <Link href="/organization">
                         <img src={`${process.env.NODE_ENV === "production" ? basePath : ""}/assets/images/brand-logos/desktop-logo.png`} alt="logo" className="desktop-logo " />
                         <img src={`${process.env.NODE_ENV === "production" ? basePath : ""}/assets/images/brand-logos/desktop-dark.png`} alt="logo" className="desktop-dark login-logo" />
                       </Link>

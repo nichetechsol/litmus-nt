@@ -25,14 +25,9 @@ interface solidalert1 {
 }
 
 export const solidalert:solidalert1[] = [
+ 
     {id:1, color:"primary"},
-    {id:2, color:"secondary"},
-    {id:3, color:"success"},
-    {id:4, color:"danger"},
-    {id:5, color:"warning"},
-    {id:6, color:"info"},
-    {id:7, color:"light",},
-    {id:8, color:"dark"},
+
 ]
 
 //Outline Colored Alerts
