@@ -1,313 +1,111 @@
-"use client"
-import { basePath } from "@/next.config";
-import { auth } from "@/shared/firebase/firebaseapi";
-import Link from "next/link";
-import { redirect, useRouter } from "next/navigation";
-import * as Yup from 'yup';
-import swal from "sweetalert";
-import React, { Fragment, useEffect, useLayoutEffect, useState } from "react";
-import { Login } from '@/supabase/auth'
-import { passwordSchema, emailSchema } from '@/helper/ValidationHelper'
+'use client';
 
-const validationSchema = Yup.object().shape({
-  email: emailSchema,
-  password: passwordSchema,
-});
+import Head from 'next/head';
+import * as React from 'react';
+import '@/lib/env';
 
-const LoginForm = () => {
-  const [tokenVerify, setTokenVerify] = useState(true)
-  // const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token')
-  useLayoutEffect(() => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token')
-      if (token) {
-        setTokenVerify(true)
-        redirect("/dashboard")
-      } else {
-        setTokenVerify(false)
-      }
-    }
-  }, [])
-  useEffect(() => {
-    const storedEmail = localStorage.getItem('rememberedEmail');
-    const storedPassword = localStorage.getItem('rememberedPassword');
-    if (storedEmail && storedPassword) {
-      setEmail(storedEmail);
-      setPassword(storedPassword);
-      setRememberMe(true);
-    }
-  }, []);
+import ArrowLink from '@/components/links/ArrowLink';
+import ButtonLink from '@/components/links/ButtonLink';
+import UnderlineLink from '@/components/links/UnderlineLink';
+import UnstyledLink from '@/components/links/UnstyledLink';
 
-  const [passwordshow1, setpasswordshow1] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+/**
+ * SVGR Support
+ * Caveat: No React Props Type.
+ *
+ * You can override the next-env if the type is important to you
+ * @see https://stackoverflow.com/questions/68103844/how-to-override-next-js-svg-module-declaration
+ */
+import Logo from '~/svg/Logo.svg';
+import Showcode from '@/shared/layout-components/showcode/showcode';
+import Link from 'next/link';
+import { modal11 } from '@/shared/data/prism/advance-uiprism';
 
+// !STARTERCONF -> Select !STARTERCONF and CMD + SHIFT + F
+// Before you begin editing, follow all comments with `STARTERCONF`,
+// to customize the default configuration.
 
-  const [err, setError] = useState("");
-  // const [data, setData] = useState({
-  //   "email": "adminnextjs@gmail.com",
-  //   "password": "1234567890",
-  // });
-  // const { email, password } = data;
-  const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordErr, setPasswordErr] = useState("");
-  // const changeHandler = (e:any) => {
-  //   setData({ ...data, [e.target.name]: e.target.value });
-  //   setError("");
-  // };
-  // const Login = (e:any) => {
-  //   e.preventDefault();
-  //   auth.signInWithEmailAndPassword(email, password).then(
-  //     user => {console.log(user); RouteChange();}).catch(err => {setError(err.message);});
-  // };
-
-  // const Login1 = (_e:any) => {
-  //   if (data.email == "adminnextjs@gmail.com" && data.password == "1234567890") {
-  //     RouteChange();
-  // }
-  // else {
-  //     setError("The Auction details did not Match");
-  //     setData({
-  //         "email": "adminnextjs@gmail.com",
-  //         "password": "1234567890",
-  //     });
-  // }
-  // };
-  let navigate = useRouter();
-  const validateForm = async () => {
-    try {
-      await validationSchema.validate({ email, password }, { abortEarly: false });
-      setEmailError("");
-      setPasswordErr("");
-      return true;
-    } catch (err) {
-      if (err instanceof Yup.ValidationError) {
-        const emailErrorMsg = err.inner.find(error => error.path === 'email')?.message || "";
-        const passwordErrorMsg = err.inner.find(error => error.path === 'password')?.message || "";
-        setEmailError(emailErrorMsg);
-        setPasswordErr(passwordErrorMsg);
-      }
-      return false;
-    }
-  };
-  const handleSubmit = async () => {
-    if (rememberMe) {
-      localStorage.setItem('rememberedEmail', email);
-      localStorage.setItem('rememberedPassword', password);
-    } else {
-      localStorage.removeItem('rememberedEmail');
-      localStorage.removeItem('rememberedPassword');
-    }
-    // e.preventDefault();
-    const isValid = await validateForm();
-    if (isValid) {
-      if (rememberMe) {
-        localStorage.setItem('rememberMe', 'true');
-      } else {
-        localStorage.removeItem('rememberMe');
-      }
-      const result: any = await Login(email, password);
-      if (result.errorCode === 0) {
-
-        console.log('Data signed in successfully:', result.user[0].id);
-        const user_id: any = result.user[0]?.id;
-        const user_role: any = result.user[0]?.user_role;
-        const user_firstname: any = result.user[0]?.firstname;
-        const user_lastname: any = result.user[0]?.lastname;
-        localStorage.setItem('user_id', user_id);
-        localStorage.setItem('user_fname', user_firstname);
-        localStorage.setItem('user_lname', user_lastname);
-        localStorage.setItem('user_role', user_role);
-        navigate.push('/dashboard');
-      } else {
-        swal({
-          icon: 'error',
-          text: result.message,
-        });
-      }
-      console.log(result);
-    }
-  };
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newEmail = e.target.value.trim().replace(/\s+/g, '');
-    setEmail(newEmail);
-
-    emailSchema.validate(newEmail)
-      .then(() => {
-        setEmailError('');
-      })
-      .catch((err: Yup.ValidationError) => {
-        setEmailError(err.message);
-      });
-  };
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newPassword = e.target.value.trim();
-    setPassword(newPassword);
-
-    passwordSchema.validate(newPassword)
-      .then(() => {
-        setPasswordErr('');
-      })
-      .catch((err: Yup.ValidationError) => {
-        setPasswordErr(err.message);
-      });
-  };
-  const handleKeyPress = (e: any) => {
-    if (e.key === 'Enter') {
-      handleSubmit();
-    }
-  };
-
-  // const RouteChange = () => {
-  //   let path = "/components/dashboards/crm/";
-  //   navigate.push(path);
-  // };
-  const handleRememberMeChange = (e: any) => {
-    // setRememberMe(!rememberMe);
-    setRememberMe(e.target.checked);
-  };
-
-  let loader = <div role="status"> <svg aria-hidden="true" className="inline w-4 h-4 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" /><path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill" /></svg><span className="sr-only">Loading...</span></div>;
-
+export default function HomePage() {
   return (
-    <>
-      {!tokenVerify && (
-        <Fragment>
-          <div className="bg-theme">
-            <div className="container">
-              <div className="flex justify-center authentication authentication-basic items-center h-full text-defaultsize text-defaulttextcolor">
-                <div className="grid grid-cols-12">
-                  <div className="xxl:col-span-4 xl:col-span-4 lg:col-span-4 md:col-span-3 sm:col-span-2"></div>
-                  <div className="xxl:col-span-4 xl:col-span-4 lg:col-span-4 md:col-span-6 sm:col-span-8 col-span-12">
-                    <div className="my-[2.5rem] flex justify-center">
-                      <Link href="/components/dashboards/crm/">
-                        <img src={`${process.env.NODE_ENV === "production" ? basePath : ""}/assets/images/brand-logos/desktop-logo.png`} alt="logo" className="desktop-logo " />
-                        <img src={`${process.env.NODE_ENV === "production" ? basePath : ""}/assets/images/brand-logos/desktop-dark.png`} alt="logo" className="desktop-dark login-logo" />
-                      </Link>
+    <main>
+      <Head>
+        <title>Hi</title>
+      </Head>
+      <section className='bg-white'>
+        <div className='layout relative flex min-h-screen flex-col items-center justify-center py-12 text-center'>
+          <Logo className='w-16' />
+          <h1 className='mt-4'>Next.js + Tailwind CSS + TypeScript Starter</h1>
+          <p className='mt-2 text-sm text-gray-800'>
+            A starter for Next.js, Tailwind CSS, and TypeScript with Absolute
+            Import, Seo, Link component, pre-configured with Husky{' '}
+          </p>
+          <div className="xl:col-span-4 col-span-12">
+            <Showcode title="Static Backdrop" code={modal11} customCardClass="custom-box">
+              <Link href="#!" className="hs-dropdown-toggle ti-btn ti-btn-primary-full " data-hs-overlay="#staticBackdrop">Launch static backdrop modal
+              </Link>
+              <div id="staticBackdrop" className="hs-overlay hidden ti-modal  [--overlay-backdrop:static]">
+                <div className="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out">
+                  <div className="ti-modal-content">
+                    <div className="ti-modal-header">
+                      <h6 className="modal-title text-[1rem] font-semibold">Modal title</h6>
+                      <button type="button" className="hs-dropdown-toggle !text-[1rem] !font-semibold !text-defaulttextcolor" data-hs-overlay="#staticBackdrop">
+                        <span className="sr-only">Close</span>
+                        <i className="ri-close-line"></i>
+                      </button>
                     </div>
-
-                    <div className="box !p-[3rem]">
-
-                      <div className="box-body" role="tabpanel" id="pills-with-brand-color-01" aria-labelledby="pills-with-brand-color-item-1">
-
-                        <p className="h5 font-semibold mb-2 text-center">Sign In</p>
-                        {err && <div className="p-4 mb-4 bg-danger/40 text-sm  border-t-4 border-danger text-danger/60 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
-                          {err}
-                        </div>}
-
-                        {/* <p className="mb-4 text-[#8c9097] dark:text-white/50 opacity-[0.7] font-normal text-center">Welcome back Jhon !</p> */}
-                        <div className="grid grid-cols-12 gap-y-4">
-                          <div className="xl:col-span-12 col-span-12">
-                            <label htmlFor="signin-email" className="form-label text-default">Email</label>
-                            <input type="text" name="email"
-                              className="form-control form-control-lg w-full !rounded-md"
-                              id="email" value={email}
-                              onChange={handleEmailChange}
-                              maxLength={320}
-                              onKeyDown={handleKeyPress} />
-                            {emailError && <div className="text-danger">{emailError}</div>}
-                            {/* <input type="text" name="email" className="form-control form-control-lg w-full !rounded-md" id="email" onChange={changeHandler} value={email}/> */}
-                          </div>
-                          <div className="xl:col-span-12 col-span-12 mb-2">
-                            <label htmlFor="signin-password" className="form-label text-default block">Password
-                              {/* <Link href="/components/authentication/reset-password/reset-basic/" className="float-right text-danger">Forget password ?</Link> */}
-                            </label>
-                            <div className="input-group">
-                              <input name="password"
-                                type={(passwordshow1) ? 'text' : "password"}
-                                value={password}
-                                onChange={handlePasswordChange}
-                                onKeyDown={handleKeyPress}
-                                maxLength={16}
-                                className="form-control form-control-lg !rounded-s-md"
-                                id="signin-password"
-                                placeholder="password" />
-                              {/* <input name="password" type={(passwordshow1) ? 'text' : "password"} value={password} onChange={changeHandler} className="form-control form-control-lg !rounded-s-md" id="signin-password" placeholder="password" /> */}
-                              <button onClick={() => setpasswordshow1(!passwordshow1)} aria-label="button" className="ti-btn ti-btn-light !rounded-s-none !mb-0" type="button" id="button-addon2"><i className={`${passwordshow1 ? 'ri-eye-line' : 'ri-eye-off-line'} align-middle`}></i></button>
-
-                            </div>
-                            {passwordErr && <div className="text-danger">{passwordErr}</div>}
-                            <div className="mt-2">
-                              <div className="form-check !ps-0">
-                                <input className="form-check-input" type="checkbox" value="" id="defaultCheck1"
-                                  checked={rememberMe}
-                                  onKeyDown={handleKeyPress}
-                                  onChange={handleRememberMeChange} />
-                                <label className="form-check-label text-[#8c9097] dark:text-white/50 font-normal" htmlFor="defaultCheck1">
-                                  Remember password ?
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="xl:col-span-12 col-span-12 grid mt-2" onClick={handleSubmit}  >
-                            <button className="ti-btn ti-btn-primary !bg-primary !text-white !font-medium">Sign In</button>
-                            {/* <Link onClick={(e)=>{handleSubmit(e)}} href="#!" className="ti-btn ti-btn-primary !bg-primary !text-white !font-medium">Sign In</Link> */}
-                          </div>
-                        </div>
-
-
-
-                      </div>
-                      {/* <div className="box-body hidden" role="tabpanel"  id="pills-with-brand-color-02" aria-labelledby="pills-with-brand-color-item-2">
-                  <p className="h5 font-semibold mb-2 text-center">Sign In</p>
-                  {err &&  <div className="p-4 mb-4 bg-danger/40 text-sm  border-t-4 border-danger text-danger/60 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
-  {err}
-</div>}
-                  <p className="mb-4 text-[#8c9097] dark:text-white/50 opacity-[0.7] font-normal text-center">Welcome back Jhon !</p>
-                  <div className="grid grid-cols-12 gap-y-4">
-                    <div className="xl:col-span-12 col-span-12">
-                      <label htmlFor="signin-email" className="form-label text-default">Email</label>
-                      <input type="email" name="email" className="form-control form-control-lg w-full !rounded-md" id="email" onChange={changeHandler} value={email} placeholder="Email" />
+                    <div className="ti-modal-body px-4">
+                      <p>I will not close if you click outside me. Don't even try to
+                        press
+                        escape key.</p>
                     </div>
-                    <div className="xl:col-span-12 col-span-12 mb-2">
-                      <label htmlFor="signin-password" className="form-label text-default block">Password<Link href="/components/authentication/reset-password/reset-basic/" className="float-right text-danger">Forget password ?</Link></label>
-                      <div className="input-group">
-                        <input name="password" type={(passwordshow1) ? 'text' : "password"} value={password} onChange={changeHandler} className="form-control form-control-lg !rounded-s-md" id="signin-password" placeholder="password" />
-                        <button onClick={() => setpasswordshow1(!passwordshow1)} aria-label="button" className="ti-btn ti-btn-light !rounded-s-none !mb-0" type="button" id="button-addon2"><i className={`${passwordshow1 ? 'ri-eye-line' : 'ri-eye-off-line'} align-middle`}></i></button>
-                      </div>
-                      <div className="mt-2">
-                        <div className="form-check !ps-0">
-                          <input className="form-check-input" type="checkbox" value="" id="defaultCheck1" />
-                          <label className="form-check-label text-[#8c9097] dark:text-white/50 font-normal" htmlFor="defaultCheck1">
-                            Remember password ?
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="xl:col-span-12 col-span-12 grid mt-2">
-                      <Link onClick={handleSubmit} href="#!" className="ti-btn ti-btn-primary !bg-primary !text-white !font-medium">Sign In</Link>
+                    <div className="ti-modal-footer">
+                      <button type="button"
+                        className="hs-dropdown-toggle ti-btn  ti-btn-secondary-full align-middle"
+                        data-hs-overlay="#staticBackdrop
+                                          
+                                          ">
+                        Close
+                      </button>
+                      <button type="button" className="ti-btn bg-primary text-white !font-medium">Understood</button>
                     </div>
                   </div>
-                  <div className="text-center">
-                    <p className="text-[0.75rem] text-[#8c9097] dark:text-white/50 mt-4">Dont have an account? <Link href="/signup" className="text-primary">Sign Up</Link></p>
-                  </div>
-                  <div className="text-center my-4 authentication-barrier">
-                    <span>OR</span>
-                  </div>
-                  <div className="btn-list text-center">
-                    <button aria-label="button" type="button" className="ti-btn ti-btn-icon ti-btn-light me-[0.365rem]">
-                      <i className="ri-facebook-line font-bold text-dark opacity-[0.7]"></i>
-                    </button>
-                    <button aria-label="button" type="button" className="ti-btn ti-btn-icon ti-btn-light me-[0.365rem]">
-                      <i className="ri-google-line font-bold text-dark opacity-[0.7]"></i>
-                    </button>
-                    <button aria-label="button" type="button" className="ti-btn ti-btn-icon ti-btn-light">
-                      <i className="ri-twitter-line font-bold text-dark opacity-[0.7]"></i>
-                    </button>
-                  </div>
-                </div> */}
-                    </div>
-                  </div>
-                  <div className="xxl:col-span-4 xl:col-span-4 lg:col-span-4 md:col-span-3 sm:col-span-2"></div>
                 </div>
               </div>
-            </div>
+            </Showcode>
           </div>
-        </Fragment>
-      )}</>
-  );
-};
+          <p className='mt-2 text-sm text-gray-700'>
+            <ArrowLink href='https://github.com/theodorusclarence/ts-nextjs-tailwind-starter'>
+              See the repository
+            </ArrowLink>
+          </p>
 
-export default LoginForm;
+          <ButtonLink className='mt-6' href='/components' variant='light'>
+            See all components
+          </ButtonLink>
+          <ButtonLink className='mt-6' href='/auth' variant='light'>
+            login
+          </ButtonLink>
+          <UnstyledLink
+            href='https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Ftheodorusclarence%2Fts-nextjs-tailwind-starter'
+            className='mt-4'
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              width='92'
+              height='32'
+              src='https://vercel.com/button'
+              alt='Deploy with Vercel'
+            />
+          </UnstyledLink>
+
+          <footer className='absolute bottom-2 text-gray-700'>
+            © {new Date().getFullYear()} By{' '}
+            <UnderlineLink href='https://theodorusclarence.com?ref=tsnextstarter'>
+              Theodorus Clarence
+            </UnderlineLink>
+          </footer>
+        </div>
+      </section>
+    </main>
+  );
+}

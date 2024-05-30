@@ -1,83 +1,62 @@
-// import '../app/styles/globals.scss';
-// import ContentLayout from '../shared/layout-components/layout/content-layout';
-// import Authenticationlayout from "../shared/layout-components/layout/authentication-layout";
-// import Landinglayout from '@/shared/layout-components/layout/landing-layout';
+import { Metadata } from 'next';
+import * as React from 'react';
 
+import '@/styles/globals.css';
+// !STARTERCONF This is for demo purposes, remove @/styles/colors.css import immediately
+import '@/styles/colors.css';
 
-//   import './styles/style.css';
-// import React from 'react';
+import { siteConfig } from '@/constant/config';
 
-// export const metadata = {
-//   title: 'My Next.js App',
-// };
-
-// export default function RootLayout({
-//   children,
-// }: {
-//   children: React.ReactNode;
-// }) {
-//   return (
-//     <html lang="en">
-//       <body>{children}</body>
-//     </html>
-//   );
-// }
-"use client"
-import {usePathname, useRouter } from 'next/navigation';
-import Head from 'next/head';
-import '../app/styles/globals.scss';
-// Import your layout components
-import ContentLayout from '@/shared/layout-components/layout/content-layout';
-import AuthenticationLayout from '@/shared/layout-components/layout/authentication-layout';
-import LandingLayout from '@/shared/layout-components/layout/landing-layout';
-import { Providers } from './providers'
-
-// export const metadata = {
-//   title: 'My Next.js App', // Add your desired metadata here
-// };
-
-// Define interface for layout functions
-interface LayoutComponent {
-  (props: { children: React.ReactNode }): JSX.Element;
-}
-
-// Define layout mapping using an interface
-const layouts: { [route: string]: LayoutComponent } = {
-  '/landing': LandingLayout,
-  '/auth/*': AuthenticationLayout,
-  '/dashboard': ContentLayout,
+// !STARTERCONF Change these default meta
+// !STARTERCONF Look at @/constant/config to change them
+export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: siteConfig.title,
+    template: `%s | ${siteConfig.title}`,
+  },
+  description: siteConfig.description,
+  robots: { index: true, follow: true },
+  // !STARTERCONF this is the default favicon, you can generate your own from https://realfavicongenerator.net/
+  // ! copy to /favicon folder
+  icons: {
+    icon: '/favicon/favicon.ico',
+    shortcut: '/favicon/favicon-16x16.png',
+    apple: '/favicon/apple-touch-icon.png',
+  },
+  manifest: `/favicon/site.webmanifest`,
+  openGraph: {
+    url: siteConfig.url,
+    title: siteConfig.title,
+    description: siteConfig.description,
+    siteName: siteConfig.title,
+    images: [`${siteConfig.url}/images/og.jpg`],
+    type: 'website',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: [`${siteConfig.url}/images/og.jpg`],
+    // creator: '@th_clarence',
+  },
+  // authors: [
+  //   {
+  //     name: 'Theodorus Clarence',
+  //     url: 'https://theodorusclarence.com',
+  //   },
+  // ],
 };
 
-export default function RootLayout({ children }: {
-  children: React.ReactNode
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
 }) {
-  const router = useRouter();
-  const locationPath = usePathname();
-  
-            
-  // Determine the appropri  console.log(locationPath);ate layout based on the route
-  const baseRoute = getBaseRoute(locationPath || "/auth");
-  console.log(baseRoute);
-  const Layout = layouts[baseRoute] || AuthenticationLayout; // Use ContentLayout as default
-
   return (
     <html lang="en">
-      <head>
-        <title>Litmus</title>
-        {/* Add additional meta tags as needed */}
-      </head>
-      <body>
-      <Providers>
-      {Layout && <Layout>{children}</Layout>} {/* Conditionally render layout */}
-        </Providers>
-       
-      </body>
-    
+      <body>{children}</body>
     </html>
   );
 }
-
-const getBaseRoute = (path: string) => {
-  const parts = path.split('/');
-  return `/${parts[1]}`;
-};
