@@ -6,7 +6,7 @@ import store from '@/shared/redux/store';
 import Modalsearch from '../modal-search/modalsearch';
 import { basePath } from '@/next.config';
 import { getUserRole } from '@/supabase/org_details';
-import swal from "sweetalert";
+import Swal from "sweetalert2";
 import { useRouter } from 'next/navigation';
 const Header = ({ local_varaiable, ThemeChanger }: any) => {
 
@@ -464,14 +464,14 @@ const history = useRouter()
                   </Link>
                 </div>
               </div>
-              <div className="header-element md:px-[0.325rem] !items-center" onClick={() => toggleSidebar()}>
+              {/* <div className="header-element md:px-[0.325rem] !items-center" onClick={() => toggleSidebar()}>
                 <Link aria-label="Hide Sidebar"
-                  className="sidemenu-toggle animated-arrow  hor-toggle horizontal-navtoggle inline-flex items-center" href="#!"><span></span></Link>
-              </div>
+                  className="sidemenu-toggle animated-arrow  hor-toggle horizontal-navtoggle inline-flex items-center" href=""><span></span></Link>
+              </div> */}
             </div>
             <div className="header-content-right">
 
-              <div className="header-element py-[1rem] md:px-[0.65rem] px-2 header-search">
+              {/* <div className="header-element py-[1rem] md:px-[0.65rem] px-2 header-search">
                 <button aria-label="button" type="button" data-hs-overlay="#search-modal"
                   className="inline-flex flex-shrink-0 justify-center items-center gap-2  rounded-full font-medium focus:ring-offset-0 focus:ring-offset-white transition-all text-xs dark:bg-bgdark dark:hover:bg-black/20 dark:text-[#8c9097] dark:text-white/50 dark:hover:text-white dark:focus:ring-white/10 dark:focus:ring-offset-white/10">
                   <i className="bx bx-search-alt-2 header-link-icon"></i>
@@ -820,7 +820,7 @@ const history = useRouter()
                     <i className="bx bx-fullscreen full-screen-open header-link-icon"></i>
                   )}
                 </Link>
-              </div>
+              </div> */}
               <div className="header-element md:!px-[0.65rem] px-2 hs-dropdown !items-center ti-dropdown [--placement:bottom-left]">
 
                 <button id="dropdown-profile" type="button"
@@ -855,32 +855,38 @@ const history = useRouter()
                       className="ti ti-wallet text-[1.125rem] me-2 opacity-[0.7]"></i>Bal: $7,12,950</Link></li>
                     <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" href="/components/pages/chat/"><i
                       className="ti ti-headset text-[1.125rem] me-2 opacity-[0.7]"></i>Support</Link></li> */}
+                    
                     <li onClick={() => {
-                      localStorage.removeItem('sb-emsjiuztcinhapaurcrl-auth-token');
-                      history.push('/')
-                      // swal({
-                      //   text: "Are you sure you want to  logout?",
-                      //   icon: "warning",
-                      //   buttons: true,
-                      //   dangerMode: true,
-                      // }).then((willDelete) => {
-                      //   if (willDelete) {
-                      //     localStorage.clear()
-                      //     history.push('/')
-                      //   }
-                      // })
-                    }}><Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" href="/components/authentication/sign-in/signin-cover/"><i
-                      className="ti ti-logout text-[1.125rem] me-2 opacity-[0.7]"></i>Log Out</Link></li>
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: 'Do you really want to logout?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, logout!',
+                            cancelButtonText: 'Cancel'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                localStorage.removeItem('sb-emsjiuztcinhapaurcrl-auth-token');
+                                history.push('/');
+                            }
+                        });
+                    }}>
+                      <button className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex">
+                      {/* <Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" href="/components/authentication/sign-in/signin-cover/"> */}
+                        <i
+                      className="ti ti-logout text-[1.125rem] me-2 opacity-[0.7]"></i>Log Out</button></li>
                 </ul>
               </div>
             </div>
-            <div className="header-element md:px-[0.48rem]">
+            {/* <div className="header-element md:px-[0.48rem]">
               <button aria-label="button" type="button"
                 className="hs-dropdown-toggle switcher-icon inline-flex flex-shrink-0 justify-center items-center gap-2  rounded-full font-medium  align-middle transition-all text-xs dark:text-[#8c9097] dark:text-white/50 dark:hover:text-white dark:focus:ring-white/10 dark:focus:ring-offset-white/10"
                 data-hs-overlay="#hs-overlay-switcher">
                 <i className="bx bx-cog header-link-icon animate-spin-slow"></i>
               </button>
-            </div>
+            </div> */}
           </div>
       </div>
     </nav>
