@@ -796,7 +796,7 @@ id="customizedAccordion">
 
 //Modals & Closes
 
-export const modal1 =`<a href="#" className="hs-dropdown-toggle ti-btn ti-btn-primary-full" data-hs-overlay="#todo-compose">Launch demo modal
+export const modal1:any =`<a href="#" className="hs-dropdown-toggle ti-btn ti-btn-primary-full" data-hs-overlay="#todo-compose">Launch demo modal
 </a>
 <div id="todo-compose" className="hs-overlay hidden ti-modal">
     <div className="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out">

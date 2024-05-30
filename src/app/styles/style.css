@@ -10316,7 +10316,7 @@ body {
 
 /* Start Alert Styles */
 .alert {
-  @apply text-sm rounded-sm px-4 py-3 mb-5 last:mb-0;
+  @apply text-sm rounded-sm px-4 py-3 mb-5 ;
 }
 
 .text-badge .badge {
@@ -11302,9 +11302,9 @@ hr {
 .alert .btn-close i {
   @apply text-[1.5rem] leading-[1.5];
 }
-.alert:last-child {
+/* .alert:last-child {
   @apply mb-0;
-}
+} */
 .alert .alert-link {
   @apply font-semibold;
 }
