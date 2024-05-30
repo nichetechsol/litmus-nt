@@ -350,8 +350,8 @@ export const MenuItems : any= [
 
 //                 ],
 //             },
-            { path: "/orgdashboard", icon: DashboardIcon, type: "link", active: false, selected: false, title: "Dashboard" },
-            { path: "/sites", icon: Icons, type: "link", active: false, selected: false, title: "Sites" }
+            // { path: "/orgdashboard", icon: DashboardIcon, type: "link", active: false, selected: false, title: "Dashboard" },
+            { path: "/organization", icon: Icons, type: "link", active: false, selected: false, title: "Organizations" }
        
 
 ];

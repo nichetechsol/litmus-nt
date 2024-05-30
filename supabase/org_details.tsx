@@ -86,7 +86,7 @@ async function fetchOrganizationAndSiteDetails(user_id: string | null): Promise<
   }
 }
 
-async function organizationSidebarList(search: string, user_id: number): Promise<Result<OrgDetail[]>> {
+async function organizationSidebarList(search: string, user_id: string): Promise<Result<OrgDetail[]>> {
   try {
     // Fetch org_id associated with the user
     const { data: userOrgs, error: userOrgError } = await supabase
