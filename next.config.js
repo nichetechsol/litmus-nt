@@ -3,8 +3,7 @@ const nextConfig = {
   eslint: {
     dirs: ['src'],
   },
-  basePath: '',
-  output: 'export',
+
   reactStrictMode: true,
   swcMinify: true,
 
