@@ -107,7 +107,7 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
 
       if (orgSelectError) {
         console.error('Error while selecting org_users:', orgSelectError.message);
-        return { errorCode: 1, data: null };
+        return { errorCode: 1, data: 'Error while selecting org_users:' };
       } else {
         if (org_users && org_users.length > 0) {
           const { data: site_users, error: siteSelectError } = await supabase
@@ -117,7 +117,7 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
 
           if (siteSelectError) {
             console.error('Error while checking site users:', siteSelectError.message);
-            return { errorCode: 1, data: null };
+            return { errorCode: 1, data: 'Error while checking site users:' };
           } else {
             if (!site_users || site_users.length === 0) {
               console.log('Send invitation email to user to join the sites');
@@ -130,13 +130,13 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
           }
         } else {
           console.log('User is not in the organization, please add this user to the organization first');
-          return { errorCode: 1, data: null };
+          return { errorCode: 1, data: 'User is not in the organization, please add this user to the organization first' };
         }
       }
     }
   } catch (error) {
     console.error('Unexpected error during user addition:', error);
-    return { errorCode: -1, data: null };
+    return { errorCode: -1, data: 'Unexpected error during user addition:'+error };
   }
 }
 
