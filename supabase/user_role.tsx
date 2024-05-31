@@ -2,7 +2,7 @@ import { supabase } from "./db";
 
 // Define an interface for the user role data
 interface UserRole {
-  id: number;
+  id: any;
   name: string;
   description: string;
 }

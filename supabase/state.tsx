@@ -2,9 +2,9 @@ import { supabase } from "./db";
 
 // Define an interface for the state data
 interface State {
-  id: number;
+  id: any;
   name: string;
-  country_id: number;
+  country_id: any;
 }
 
 // Define a type for the result returned by the function
@@ -15,7 +15,7 @@ interface Result<T> {
 }
 
 // Function to fetch the list of states based on the country_id
-async function stateList(country_id: number): Promise<Result<State[]>> {
+async function stateList(country_id: any): Promise<Result<State[]>> {
   try {
     // Validate the country_id
     if (!country_id) {

@@ -1,25 +1,25 @@
 import { supabase } from "./db";
 
 interface SiteDetails {
-  id: number;
-  org_id: number;
+  id: any;
+  org_id: any;
   name: string;
-  type_id: number;
+  type_id: any;
   address1: string;
   address2?: string;
   city: string;
   pin_code: string;
   about_site?: string;
   status: string;
-  country_id: number;
-  state_id: number;
+  country_id: any;
+  state_id: any;
 }
 
 interface User {
-  id: number;
-  site_id: number;
-  user_id: number;
-  role_id: number;
+  id: any;
+  site_id: any;
+  user_id: any;
+  role_id: any;
 }
 
 
@@ -37,7 +37,7 @@ interface SiteDetailsWithUsers {
   state: string | null;
 }
 
-async function fetchSiteDetails(org_id: number): Promise<Result<SiteDetailsWithUsers[]>> {
+async function fetchSiteDetails(org_id: any): Promise<Result<SiteDetailsWithUsers[]>> {
   try {
     // Fetch organization details
     const { data: siteDetails, error } = await supabase
@@ -127,7 +127,7 @@ async function fetchSiteDetails(org_id: number): Promise<Result<SiteDetailsWithU
   }
 }
 
-async function fetchSiteSidebarList(searchQuery: string, org_id: number): Promise<Result<SiteDetails[]>> {
+async function fetchSiteSidebarList(searchQuery: string, org_id: any): Promise<Result<SiteDetails[]>> {
   try {
     // Fetch site details with names matching the search query
     const { data: siteDetails, error } = await supabase

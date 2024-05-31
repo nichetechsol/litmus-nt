@@ -12,28 +12,28 @@ interface Result<T> {
 }
 
 interface DashboardCounts {
-  userCount: number | null;
-  entitlementCount: number | null;
-  sitesDetailCount: number | null;
+  userCount: any | null;
+  entitlementCount: any | null;
+  sitesDetailCount: any | null;
 }
 
 interface UserList {
   data:any
-  id: number;
+  id: any;
   email: string;
   firstname: string;
   lastname: string;
-  role_id: number;
+  role_id: any;
   role: string;
 }
 
 interface EntitlementList {
-  id: number;
-  org_id: number;
-  entitlement_name_id: number;
-  entitlement_value_id: number;
+  id: any;
+  org_id: any;
+  entitlement_name_id: any;
+  entitlement_value_id: any;
   entitlementName: string;
-  entitlementValue: number;
+  entitlementValue: any;
 }
 
 // Function to count records for an organization dashboard
@@ -96,12 +96,12 @@ async function orgDashboardCounts(org_id: any): Promise<Result<DashboardCounts>>
 }
 
 // Function to fetch a list of users for an organization
+// Function to fetch a list of users for an organization
 async function orgUserList(org_id: any, start: any, end: any,search:any): Promise<Result<{ userList: UserList[], totalCount: any }>> {
   try {
     const { data: orgUsers, error: orgUsersError } = await supabase
       .from("org_users")
       .select("*")
-      .range(start, end)
       .eq("org_id", org_id);
 
     if (orgUsersError) {
@@ -119,6 +119,7 @@ async function orgUserList(org_id: any, start: any, end: any,search:any): Promis
       .from("users")
       .select("*")
       .in("id", userIds)
+      .range(start, end)
       .ilike("firstname", `%${search}%`);
 
 
@@ -161,10 +162,10 @@ async function orgUserList(org_id: any, start: any, end: any,search:any): Promis
     }).filter(Boolean) as UserList[];
 
     const totalCount = await supabase
-      .from("org_users")
+    .from("users")
       .select("*", { count: 'exact' })
-      .eq("org_id", org_id)
-      .then(({ count }) => count);
+      .in("id", userIds)
+      .ilike("firstname", `%${search}%`).then(({ count }) => count);
 
     console.log("Organization users list with details:", userList);
     return {
@@ -181,7 +182,7 @@ async function orgUserList(org_id: any, start: any, end: any,search:any): Promis
 }
 
 // Function to fetch a list of entitlements for an organization
-async function orgEntitlementList(org_id: any, start: number, end: number): Promise<Result<{ totalCount: number, entitlements: EntitlementList[] }>> {
+async function orgEntitlementList(org_id: any, start: any, end: any): Promise<Result<{ totalCount: number, entitlements: EntitlementList[] }>> {
   try {
     // Fetch total count of entitlements
     const { count: totalCount, error: countError } = await supabase

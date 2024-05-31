@@ -4,12 +4,12 @@ import { supabase } from "./db";
 
 // Define the interfaces for the input data and result
 interface UserData {
-  org_id?: number;
+  org_id?: any;
   email?: string;
   firstname?: string;
   lastname?: string;
-  user_id?: number;
-  role_id?: number;
+  user_id?: any;
+  role_id?: any;
 }
 
 interface Result<T> {
@@ -18,7 +18,7 @@ interface Result<T> {
 }
 
 // Function to get the role of a site user
-async function getSiteUserRole(user_id: number, site_id: number): Promise<Result<any>> {
+async function getSiteUserRole(user_id: any, site_id: any): Promise<Result<any>> {
   if (!user_id || !site_id) {
     console.error('Invalid input: user ID and site ID cannot be null');
     return { errorCode: 1, data: null };
@@ -168,7 +168,7 @@ async function modifyUserOfSites(UserData: UserData): Promise<Result<any>> {
 }
 
 // Function to remove a user from the 'site_users' table based on user ID
-async function removeUserFromSites(id: number): Promise<Result<string>> {
+async function removeUserFromSites(id: any): Promise<Result<string>> {
   if (!id) {
     console.error('Invalid input: user ID cannot be null or empty');
     return { errorCode: 1, data: null };
