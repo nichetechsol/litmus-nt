@@ -7,20 +7,20 @@ interface UserData {
   email?: string;
   firstname?: string;
   lastname?: string;
-  user_id?: any;
-  role_id?: any;
+  user_id?: number;
+  role_id?: number;
 }
 
 interface User {
-  id: any;
+  id: number;
   email: string;
   firstname: string;
   lastname: string;
 }
 
 interface OrgUser {
-  user_id: any;
-  role_id: any;
+  user_id: number;
+  role_id: number;
 }
 
 
@@ -139,7 +139,7 @@ async function modifyUserOfOrganization(UserData: UserData): Promise<Result<OrgU
 }
 
 // Function to remove a user from an organization based on user ID
-async function removeUserFromOrganization(id: any): Promise<Result<null>> {
+async function removeUserFromOrganization(id: number): Promise<Result<null>> {
   // Validate the input
   if (!id) {
     console.error('Invalid input: user ID cannot be null');
@@ -168,7 +168,7 @@ async function removeUserFromOrganization(id: any): Promise<Result<null>> {
   }
 }
 
-async function getOrgUserRole(user_id: any, org_id: any): Promise<Result<null>> {
+async function getOrgUserRole(user_id: number, org_id: number): Promise<Result<null>> {
   // Validate the input
   if (!user_id || !org_id) {
     console.error('Invalid input: user ID and org ID cannot be null');

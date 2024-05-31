@@ -5,15 +5,15 @@ import { supabase } from "./db";
 
 
 interface OrgDetail {
-  id: any;
+  id: number;
   name: string;
   description: string;
-  type_id: any;
+  type_id: number;
   status: string;
 }
 
 interface UserRole {
-  id: any;
+  id: number;
   name: string;
 }
 
@@ -28,7 +28,7 @@ interface OrganizationWithSiteCount {
   errorCode: number;
   org_id: string;
   org_name: string;
-  sites_count: any;
+  sites_count: number;
 }
 
 async function fetchOrganizationAndSiteDetails(user_id: any | null): Promise<OrganizationWithSiteCount[] | null> {
@@ -86,7 +86,7 @@ async function fetchOrganizationAndSiteDetails(user_id: any | null): Promise<Org
   }
 }
 
-async function organizationSidebarList(search: string, user_id: any): Promise<Result<OrgDetail[]>> {
+async function organizationSidebarList(search: string, user_id: string): Promise<Result<OrgDetail[]>> {
   try {
     // Fetch org_id associated with the user
     const { data: userOrgs, error: userOrgError } = await supabase

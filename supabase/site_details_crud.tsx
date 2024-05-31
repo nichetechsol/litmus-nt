@@ -3,30 +3,30 @@ import { supabase } from "./db";
 
 // Define interfaces for the site data and result structure
 interface SiteData {
-  org_id: any;
+  org_id: number;
   name: string;
-  type_id: any;
+  type_id: number;
   address1: string;
   address2?: string;
   city: string;
   pin_code: string;
   about_site?: string;
   status: string;
-  country_id: any;
-  state_id: any;
+  country_id: number;
+  state_id: number;
 }
 
 interface UpdateSiteData {
   name?: string;
-  type_id?: any;
+  type_id?: number;
   address1?: string;
   address2?: string;
   city?: string;
   pin_code?: string;
   about_site?: string;
   status?: string;
-  country_id?: any;
-  state_id?: any;
+  country_id?: number;
+  state_id?: number;
 }
 
 interface Result<T> {
@@ -99,7 +99,7 @@ async function addSites(data: SiteData): Promise<Result<any>> {
 }
 
 // Function to update a site
-async function updateSite(siteId: any, updateData: UpdateSiteData): Promise<Result<any>> {
+async function updateSite(siteId: number, updateData: UpdateSiteData): Promise<Result<any>> {
   try {
     // Validate the input
     if (!siteId || !updateData) {
@@ -141,7 +141,7 @@ async function updateSite(siteId: any, updateData: UpdateSiteData): Promise<Resu
 }
 
 // Function to delete a site
-async function deleteSite(siteId: any): Promise<Result<any>> {
+async function deleteSite(siteId: number): Promise<Result<any>> {
   try {
     // Validate the input
     if (!siteId) {
