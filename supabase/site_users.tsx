@@ -4,12 +4,12 @@ import { supabase } from "./db";
 
 // Define the interfaces for the input data and result
 interface UserData {
-  org_id?: any;
+  org_id?: number;
   email?: string;
   firstname?: string;
   lastname?: string;
-  user_id?: any;
-  role_id?: any;
+  user_id?: number;
+  role_id?: number;
 }
 
 interface Result<T> {
@@ -18,7 +18,7 @@ interface Result<T> {
 }
 
 // Function to get the role of a site user
-async function getSiteUserRole(user_id: any, site_id: any): Promise<Result<any>> {
+async function getSiteUserRole(user_id: number, site_id: number): Promise<Result<any>> {
   if (!user_id || !site_id) {
     console.error('Invalid input: user ID and site ID cannot be null');
     return { errorCode: 1, data: null };
@@ -62,7 +62,7 @@ async function getSiteUserRole(user_id: any, site_id: any): Promise<Result<any>>
 async function addUserToSites(UserData: UserData): Promise<Result<string>> {
   if (!UserData.org_id) {
     console.error('Invalid input: org_id cannot be null or empty');
-    return { errorCode: 1, data: null };
+    return { errorCode: 1, data: 'Invalid input: org_id cannot be null or empty' };
   }
 
   try {
@@ -77,7 +77,7 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
 
       if (selectError) {
         console.error('Error while selecting users by email:', selectError.message);
-        return { errorCode: 1, data: null };
+        return { errorCode: 1, data: 'Error while selecting users by email:' };
       }
     } else if (UserData.firstname && UserData.lastname) {
       ({ data: users, error: selectError } = await supabase
@@ -88,11 +88,11 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
 
       if (selectError) {
         console.error('Error while selecting users by name:', selectError.message);
-        return { errorCode: 1, data: null };
+        return { errorCode: 1, data: 'Error while selecting users by name:' };
       }
     } else {
       console.error('Please provide either an email or both firstname and lastname');
-      return { errorCode: 1, data: null };
+      return { errorCode: 1, data: 'Please provide either an email or both firstname and lastname' };
     }
 
     if (!users || users.length === 0) {
@@ -168,7 +168,7 @@ async function modifyUserOfSites(UserData: UserData): Promise<Result<any>> {
 }
 
 // Function to remove a user from the 'site_users' table based on user ID
-async function removeUserFromSites(id: any): Promise<Result<string>> {
+async function removeUserFromSites(id: number): Promise<Result<string>> {
   if (!id) {
     console.error('Invalid input: user ID cannot be null or empty');
     return { errorCode: 1, data: null };
