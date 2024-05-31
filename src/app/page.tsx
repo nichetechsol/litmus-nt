@@ -1,72 +1,431 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
+import { basePath } from 'next.config';
+import Image from 'next/image';
+import Link from 'next/link';
+import { redirect, useRouter } from 'next/navigation';
+import React, { Fragment, useEffect, useLayoutEffect, useState } from 'react';
+import swal from 'sweetalert';
+import * as Yup from 'yup';
 
-import Head from 'next/head';
-import * as React from 'react';
-import '@/lib/env';
+import { emailSchema, passwordSchema } from '@/helper/ValidationHelper';
+import { Login } from '@/supabase/auth';
+import Loader from '@/utils/Loader/Loader';
 
-import ArrowLink from '@/components/links/ArrowLink';
-import ButtonLink from '@/components/links/ButtonLink';
-import UnderlineLink from '@/components/links/UnderlineLink';
-import UnstyledLink from '@/components/links/UnstyledLink';
+const validationSchema = Yup.object().shape({
+  email: emailSchema,
+  password: passwordSchema,
+});
 
-/**
- * SVGR Support
- * Caveat: No React Props Type.
- *
- * You can override the next-env if the type is important to you
- * @see https://stackoverflow.com/questions/68103844/how-to-override-next-js-svg-module-declaration
- */
-import Logo from '~/svg/Logo.svg';
+const LoginForm = () => {
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordErr, setPasswordErr] = useState('');
 
-// !STARTERCONF -> Select !STARTERCONF and CMD + SHIFT + F
-// Before you begin editing, follow all comments with `STARTERCONF`,
-// to customize the default configuration.
+  const [loading, setLoading] = useState<boolean>(false);
+  const [tokenVerify, setTokenVerify] = useState(true);
+  // const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token')
+  useLayoutEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
+      if (token) {
+        setTokenVerify(true);
+        redirect('/');
+      } else {
+        setTokenVerify(false);
+      }
+    }
+  }, []);
+  useEffect(() => {
+    const storedEmail = localStorage.getItem('rememberedEmail');
+    const storedPassword = localStorage.getItem('rememberedPassword');
+    if (storedEmail && storedPassword) {
+      // setEmail(storedEmail);
+      // setPassword(storedPassword);
+      // setRememberMe(true);
+    }
+  }, []);
 
-export default function HomePage() {
+  const [passwordshow1, setpasswordshow1] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+
+  // const [err, setError] = useState("");
+  // const [data, setData] = useState({
+  //   "email": "adminnextjs@gmail.com",
+  //   "password": "1234567890",
+  // });
+  // const { email, password } = data;
+
+  // const changeHandler = (e:any) => {
+  //   setData({ ...data, [e.target.name]: e.target.value });
+  //   setError("");
+  // };
+  // const Login = (e:any) => {
+  //   e.preventDefault();
+  //   auth.signInWithEmailAndPassword(email, password).then(
+  //     user => {console.log(user); RouteChange();}).catch(err => {setError(err.message);});
+  // };
+
+  // const Login1 = (_e:any) => {
+  //   if (data.email == "adminnextjs@gmail.com" && data.password == "1234567890") {
+  //     RouteChange();
+  // }
+  // else {
+  //     setError("The Auction details did not Match");
+  //     setData({
+  //         "email": "adminnextjs@gmail.com",
+  //         "password": "1234567890",
+  //     });
+  // }
+  // };
+  const navigate = useRouter();
+  const validateForm = async () => {
+    try {
+      await validationSchema.validate(
+        { email, password },
+        { abortEarly: false },
+      );
+      setEmailError('');
+      setPasswordErr('');
+      return true;
+    } catch (err) {
+      if (err instanceof Yup.ValidationError) {
+        const emailErrorMsg =
+          err.inner.find((error) => error.path === 'email')?.message || '';
+        const passwordErrorMsg =
+          err.inner.find((error) => error.path === 'password')?.message || '';
+        setEmailError(emailErrorMsg);
+        setPasswordErr(passwordErrorMsg);
+      }
+      return false;
+    }
+  };
+  const handleSubmit = async () => {
+    if (rememberMe) {
+      localStorage.setItem('rememberedEmail', email);
+      localStorage.setItem('rememberedPassword', password);
+    } else {
+      localStorage.removeItem('rememberedEmail');
+      localStorage.removeItem('rememberedPassword');
+    }
+    // e.preventDefault();
+    const isValid = await validateForm();
+    if (isValid) {
+      if (rememberMe) {
+        localStorage.setItem('rememberMe', 'true');
+      } else {
+        localStorage.removeItem('rememberMe');
+      }
+      setLoading(true);
+      const result: any = await Login(email, password);
+      if (result?.errorCode === 0) {
+        const user_id: any = result.user[0]?.id;
+        const user_role: any = result.user[0]?.user_role;
+        const user_firstname: any = result.user[0]?.firstname;
+        const user_lastname: any = result.user[0]?.lastname;
+        localStorage.setItem('user_id', user_id);
+        localStorage.setItem('user_fname', user_firstname);
+        localStorage.setItem('user_lname', user_lastname);
+        localStorage.setItem('user_role', user_role);
+        navigate.push('/organization');
+        setLoading(false);
+      } else {
+        swal({
+          icon: 'error',
+          text: result.message,
+        });
+      }
+    }
+  };
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newEmail = e.target.value.trim().replace(/\s+/g, '');
+    setEmail(newEmail);
+
+    emailSchema
+      .validate(newEmail)
+      .then(() => {
+        setEmailError('');
+      })
+      .catch((err: Yup.ValidationError) => {
+        setEmailError(err.message);
+      });
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPassword = e.target.value.trim();
+    setPassword(newPassword);
+
+    passwordSchema
+      .validate(newPassword)
+      .then(() => {
+        setPasswordErr('');
+      })
+      .catch((err: Yup.ValidationError) => {
+        setPasswordErr(err.message);
+      });
+  };
+  const handleKeyPress = (e: any) => {
+    if (e.key === 'Enter') {
+      handleSubmit();
+    }
+  };
+
+  // const RouteChange = () => {
+  //   let path = "/components/dashboards/crm/";
+  //   navigate.push(path);
+  // };
+  const handleRememberMeChange = (e: any) => {
+    // setRememberMe(!rememberMe);
+    setRememberMe(e.target.checked);
+  };
+
   return (
-    <main>
-      <Head>
-        <title>Hi</title>
-      </Head>
-      <section className='bg-white'>
-        <div className='layout relative flex min-h-screen flex-col items-center justify-center py-12 text-center'>
-          <Logo className='w-16' />
-          <h1 className='mt-4'>Next.js + Tailwind CSS + TypeScript Starter</h1>
-          <p className='mt-2 text-sm text-gray-800'>
-            A starter for Next.js, Tailwind CSS, and TypeScript with Absolute
-            Import, Seo, Link component, pre-configured with Husky{' '}
-          </p>
-          <p className='mt-2 text-sm text-gray-700'>
-            <ArrowLink href='https://github.com/theodorusclarence/ts-nextjs-tailwind-starter'>
-              See the repository
-            </ArrowLink>
-          </p>
+    <>
+      {loading && <Loader />}
+      {!tokenVerify && (
+        <Fragment>
+          <div className='bg-theme'>
+            <div className='container'>
+              <div className='flex justify-center authentication authentication-basic items-center h-full text-defaultsize text-defaulttextcolor'>
+                <div className='grid grid-cols-12'>
+                  <div className='xxl:col-span-4 xl:col-span-4 lg:col-span-4 md:col-span-3 sm:col-span-2'></div>
+                  <div className='xxl:col-span-4 xl:col-span-4 lg:col-span-4 md:col-span-6 sm:col-span-8 col-span-12'>
+                    <div className='my-[2.5rem] flex justify-center'>
+                      <Link href='/organization'>
+                        <Image
+                          src={`${
+                            process.env.NODE_ENV === 'production'
+                              ? basePath
+                              : ''
+                          }/assets/images/brand-logos/desktop-logo.png`}
+                          alt='logo'
+                          className='desktop-logo '
+                        />
+                        <Image
+                          src={`${
+                            process.env.NODE_ENV === 'production'
+                              ? basePath
+                              : ''
+                          }/assets/images/brand-logos/desktop-dark.png`}
+                          alt='logo'
+                          className='desktop-dark login-logo'
+                        />
+                      </Link>
+                    </div>
 
-          <ButtonLink className='mt-6' href='/components' variant='light'>
-            See all components
-          </ButtonLink>
+                    <div className='box !p-[3rem]'>
+                      <div
+                        className='box-body'
+                        role='tabpanel'
+                        id='pills-with-brand-color-01'
+                        aria-labelledby='pills-with-brand-color-item-1'
+                      >
+                        <p className='h5 font-semibold mb-2 text-center'>
+                          Sign In
+                        </p>
+                        {/* {err && <div className="p-4 mb-4 bg-danger/40 text-sm  border-t-4 border-danger text-danger/60 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                          {err}
+                        </div>} */}
 
-          <UnstyledLink
-            href='https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Ftheodorusclarence%2Fts-nextjs-tailwind-starter'
-            className='mt-4'
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              width='92'
-              height='32'
-              src='https://vercel.com/button'
-              alt='Deploy with Vercel'
-            />
-          </UnstyledLink>
-
-          <footer className='absolute bottom-2 text-gray-700'>
-            © {new Date().getFullYear()} By{' '}
-            <UnderlineLink href='https://theodorusclarence.com?ref=tsnextstarter'>
-              Theodorus Clarence
-            </UnderlineLink>
-          </footer>
-        </div>
-      </section>
-    </main>
+                        {/* <p className="mb-4 text-[#8c9097] dark:text-white/50 opacity-[0.7] font-normal text-center">Welcome back Jhon !</p> */}
+                        <div className='grid grid-cols-12 gap-y-4'>
+                          <div className='xl:col-span-12 col-span-12'>
+                            <label
+                              htmlFor='signin-email'
+                              className='form-label text-default'
+                            >
+                              Email
+                            </label>
+                            <input
+                              type='text'
+                              name='email'
+                              className='form-control form-control-lg w-full !rounded-md'
+                              id='email'
+                              value={email}
+                              onChange={handleEmailChange}
+                              maxLength={320}
+                              onKeyDown={handleKeyPress}
+                            />
+                            {emailError && (
+                              <div className='text-danger'>{emailError}</div>
+                            )}
+                            {/* <input type="text" name="email" className="form-control form-control-lg w-full !rounded-md" id="email" onChange={changeHandler} value={email}/> */}
+                          </div>
+                          <div className='xl:col-span-12 col-span-12 mb-2'>
+                            <label
+                              htmlFor='signin-password'
+                              className='form-label text-default block'
+                            >
+                              Password
+                              {/* <Link href="/components/authentication/reset-password/reset-basic/" className="float-right text-danger">Forget password ?</Link> */}
+                            </label>
+                            <div className='input-group'>
+                              <input
+                                name='password'
+                                type={passwordshow1 ? 'text' : 'password'}
+                                value={password}
+                                onChange={handlePasswordChange}
+                                onKeyDown={handleKeyPress}
+                                maxLength={16}
+                                className='form-control form-control-lg !rounded-s-md'
+                                id='signin-password'
+                                placeholder='password'
+                              />
+                              {/* <input name="password" type={(passwordshow1) ? 'text' : "password"} value={password} onChange={changeHandler} className="form-control form-control-lg !rounded-s-md" id="signin-password" placeholder="password" /> */}
+                              <button
+                                onClick={() => setpasswordshow1(!passwordshow1)}
+                                aria-label='button'
+                                className='ti-btn ti-btn-light !rounded-s-none !mb-0'
+                                type='button'
+                                id='button-addon2'
+                              >
+                                <i
+                                  className={`${
+                                    passwordshow1
+                                      ? 'ri-eye-line'
+                                      : 'ri-eye-off-line'
+                                  } align-middle`}
+                                ></i>
+                              </button>
+                            </div>
+                            {passwordErr && (
+                              <div className='text-danger'>{passwordErr}</div>
+                            )}
+                            <div className='mt-2'>
+                              <div className='form-check !ps-0'>
+                                <input
+                                  className='form-check-input'
+                                  type='checkbox'
+                                  value=''
+                                  id='defaultCheck1'
+                                  checked={rememberMe}
+                                  onKeyDown={handleKeyPress}
+                                  onChange={handleRememberMeChange}
+                                />
+                                <label
+                                  className='form-check-label text-[#8c9097] dark:text-white/50 font-normal'
+                                  htmlFor='defaultCheck1'
+                                >
+                                  Remember password ?
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            className='xl:col-span-12 col-span-12 grid mt-2'
+                            onClick={handleSubmit}
+                          >
+                            <button className='ti-btn ti-btn-primary !bg-primary !text-white !font-medium'>
+                              Sign In
+                            </button>
+                            {/* <Link onClick={(e)=>{handleSubmit(e)}} href="#!" className="ti-btn ti-btn-primary !bg-primary !text-white !font-medium">Sign In</Link> */}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className='xxl:col-span-4 xl:col-span-4 lg:col-span-4 md:col-span-3 sm:col-span-2'></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Fragment>
+      )}
+    </>
   );
-}
+};
+
+export default LoginForm;
+
+// // "use client"
+// import { basePath } from "next.config";
+
+// import Link from "next/link";
+// import { redirect, useRouter } from "next/navigation";
+// import * as Yup from 'yup';
+// import swal from "sweetalert";
+// import React, { Fragment, useEffect, useLayoutEffect, useState } from "react";
+// import { Login } from '@/supabase/auth'
+// import { passwordSchema, emailSchema } from '@/helper/ValidationHelper'
+// import Loader from '@/utils/Loader/Loader'
+
+// const LoginForm = () => {
+
+//   return (
+//     <>
+//       <Fragment>
+//         <div className="bg-theme">
+//           <div className="container">
+//             <div className="flex justify-center authentication authentication-basic items-center h-full text-defaultsize text-defaulttextcolor">
+//               <div className="grid grid-cols-12">
+//                 <div className="xxl:col-span-4 xl:col-span-4 lg:col-span-4 md:col-span-3 sm:col-span-2"></div>
+//                 <div className="xxl:col-span-4 xl:col-span-4 lg:col-span-4 md:col-span-6 sm:col-span-8 col-span-12">
+//                   <div className="my-[2.5rem] flex justify-center">
+//                     <Link href="/organization">
+//                       <img src={`${process.env.NODE_ENV === "production" ? basePath : ""}/assets/images/brand-logos/desktop-logo.png`} alt="logo" className="desktop-logo " />
+//                       <img src={`${process.env.NODE_ENV === "production" ? basePath : ""}/assets/images/brand-logos/desktop-dark.png`} alt="logo" className="desktop-dark login-logo" />
+//                     </Link>
+//                   </div>
+
+//                   <div className="box !p-[3rem]">
+
+//                     <div className="box-body" role="tabpanel" id="pills-with-brand-color-01" aria-labelledby="pills-with-brand-color-item-1">
+
+//                       <p className="h5 font-semibold mb-2 text-center">Sign In</p>
+
+//                       {/* <p className="mb-4 text-[#8c9097] dark:text-white/50 opacity-[0.7] font-normal text-center">Welcome back Jhon !</p> */}
+//                       <div className="grid grid-cols-12 gap-y-4">
+//                         <div className="xl:col-span-12 col-span-12">
+//                           <label htmlFor="signin-email" className="form-label text-default">Email</label>
+//                           <input type="text" name="email"
+//                             className="form-control form-control-lg w-full !rounded-md"
+//                             id="email"
+//                             maxLength={320}
+//                           />
+//                           {/* <input type="text" name="email" className="form-control form-control-lg w-full !rounded-md" id="email" onChange={changeHandler} value={email}/> */}
+//                         </div>
+//                         <div className="xl:col-span-12 col-span-12 mb-2">
+//                           <label htmlFor="signin-password" className="form-label text-default block">Password
+//                             {/* <Link href="/components/authentication/reset-password/reset-basic/" className="float-right text-danger">Forget password ?</Link> */}
+//                           </label>
+//                           <div className="input-group">
+//                             <input name="password"
+//                               type={"password"}
+//                               maxLength={16}
+//                               className="form-control form-control-lg !rounded-s-md"
+//                               id="signin-password"
+//                               placeholder="password" />
+//                             {/* <input name="password" type={(passwordshow1) ? 'text' : "password"} value={password} onChange={changeHandler} className="form-control form-control-lg !rounded-s-md" id="signin-password" placeholder="password" /> */}
+
+//                           </div>
+//                           <div className="mt-2">
+//                             <div className="form-check !ps-0">
+//                               <input className="form-check-input" type="checkbox" value="" id="defaultCheck1" />
+//                               <label className="form-check-label text-[#8c9097] dark:text-white/50 font-normal" htmlFor="defaultCheck1">
+//                                 Remember password ?
+//                               </label>
+//                             </div>
+//                           </div>
+//                         </div>
+//                         <div className="xl:col-span-12 col-span-12 grid mt-2"   >
+//                           <button className="ti-btn ti-btn-primary !bg-primary !text-white !font-medium">Sign In</button>
+//                           {/* <Link onClick={(e)=>{handleSubmit(e)}} href="#!" className="ti-btn ti-btn-primary !bg-primary !text-white !font-medium">Sign In</Link> */}
+//                         </div>
+//                       </div>
+
+//                     </div>
+
+//                   </div>
+//                 </div>
+//                 <div className="xxl:col-span-4 xl:col-span-4 lg:col-span-4 md:col-span-3 sm:col-span-2"></div>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </Fragment>
+//     </>
+//   );
+// };
+
+// export default LoginForm;
