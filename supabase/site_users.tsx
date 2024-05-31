@@ -97,7 +97,7 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
 
     if (!users || users.length === 0) {
       console.log('No such user found');
-      return { errorCode: 1, data: null };
+      return { errorCode: 1, data: 'No such user found' };
     } else {
       const { data: org_users, error: orgSelectError } = await supabase
         .from('org_users')
