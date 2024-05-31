@@ -96,12 +96,12 @@ async function orgDashboardCounts(org_id: any): Promise<Result<DashboardCounts>>
 }
 
 // Function to fetch a list of users for an organization
+// Function to fetch a list of users for an organization
 async function orgUserList(org_id: any, start: any, end: any,search:any): Promise<Result<{ userList: UserList[], totalCount: any }>> {
   try {
     const { data: orgUsers, error: orgUsersError } = await supabase
       .from("org_users")
       .select("*")
-      .range(start, end)
       .eq("org_id", org_id);
 
     if (orgUsersError) {
@@ -119,6 +119,7 @@ async function orgUserList(org_id: any, start: any, end: any,search:any): Promis
       .from("users")
       .select("*")
       .in("id", userIds)
+      .range(start, end)
       .ilike("firstname", `%${search}%`);
 
 
@@ -143,7 +144,7 @@ async function orgUserList(org_id: any, start: any, end: any,search:any): Promis
       };
     }
 
-    const roleMap: Record<any, string> = {};
+    const roleMap: Record<number, string> = {};
     userRoles.forEach(role => {
       roleMap[role.id] = role.name;
     });
@@ -161,10 +162,10 @@ async function orgUserList(org_id: any, start: any, end: any,search:any): Promis
     }).filter(Boolean) as UserList[];
 
     const totalCount = await supabase
-      .from("org_users")
+    .from("users")
       .select("*", { count: 'exact' })
-      .eq("org_id", org_id)
-      .then(({ count }) => count);
+      .in("id", userIds)
+      .ilike("firstname", `%${search}%`).then(({ count }) => count);
 
     console.log("Organization users list with details:", userList);
     return {
