@@ -2,7 +2,7 @@ import { supabase } from "./db";
 
 // Define the interface for the country data
 interface Country {
-  id: number;
+  id: any;
   name: string;
   // Add other country fields as needed
 }

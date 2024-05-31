@@ -12,28 +12,28 @@ interface Result<T> {
 }
 
 interface DashboardCounts {
-  userCount: number | null;
-  entitlementCount: number | null;
-  sitesDetailCount: number | null;
+  userCount: any | null;
+  entitlementCount: any | null;
+  sitesDetailCount: any | null;
 }
 
 interface UserList {
   data:any
-  id: number;
+  id: any;
   email: string;
   firstname: string;
   lastname: string;
-  role_id: number;
+  role_id: any;
   role: string;
 }
 
 interface EntitlementList {
-  id: number;
-  org_id: number;
-  entitlement_name_id: number;
-  entitlement_value_id: number;
+  id: any;
+  org_id: any;
+  entitlement_name_id: any;
+  entitlement_value_id: any;
   entitlementName: string;
-  entitlementValue: number;
+  entitlementValue: any;
 }
 
 // Function to count records for an organization dashboard
@@ -143,7 +143,7 @@ async function orgUserList(org_id: any, start: any, end: any,search:any): Promis
       };
     }
 
-    const roleMap: Record<number, string> = {};
+    const roleMap: Record<any, string> = {};
     userRoles.forEach(role => {
       roleMap[role.id] = role.name;
     });
@@ -181,7 +181,7 @@ async function orgUserList(org_id: any, start: any, end: any,search:any): Promis
 }
 
 // Function to fetch a list of entitlements for an organization
-async function orgEntitlementList(org_id: any, start: number, end: number): Promise<Result<{ totalCount: number, entitlements: EntitlementList[] }>> {
+async function orgEntitlementList(org_id: any, start: any, end: any): Promise<Result<{ totalCount: number, entitlements: EntitlementList[] }>> {
   try {
     // Fetch total count of entitlements
     const { count: totalCount, error: countError } = await supabase
