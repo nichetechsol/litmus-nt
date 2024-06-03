@@ -1,6 +1,11 @@
 name: Code Check
 on:
-  pull_request: {}
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
 
 concurrency:
   group: ${{ github.job }}-${{ github.ref }}
