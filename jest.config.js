@@ -16,9 +16,6 @@ const customJestConfig = {
 
   testEnvironment: 'jest-environment-jsdom',
 
-  /**
-   * Absolute imports and Module Path Aliases
-   */
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^~/(.*)$': '<rootDir>/public/$1',
