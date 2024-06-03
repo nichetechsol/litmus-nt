@@ -1,16 +1,29 @@
+/* eslint-disable no-constant-condition */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unused-imports/no-unused-vars */
-import React from 'react';
 
-const Icons = <i className='bx bx-store-alt side-menu__icon'></i>;
-
-export const MenuItems: unknown = [
+export const MenuItems: any = [
   {
     path: '/organization',
-    icon: Icons,
     type: 'link',
-    active: false,
-    selected: false,
+    active: false, //typeof window !== "undefined" && window.location.href.includes('organization') ? true : false,
+    selected: false, //typeof window !== "undefined" && window.location.href.includes('organization') ? true : false,
     title: 'Organizations',
   },
+  {
+    path: '/orgdashboard',
+    type: 'link',
+    active: false, //typeof window !== "undefined" && window.location.href.includes('orgdashboard') ? true : false,
+    selected: false, //typeof window !== "undefined" && window.location.href.includes('orgdashboard') ? true : false,
+    title: 'Dashboard',
+  },
+  {
+    path: '/sites',
+    type: 'link',
+    active: false, //typeof window !== "undefined" && window.location.href.includes('sites') ? true : false,
+    selected: false, //typeof window !== "undefined" && window.location.href.includes('sites') ? true : false,
+    title: 'Sites',
+  },
 ];
+
 export default MenuItems;

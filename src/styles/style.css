@@ -20023,3 +20023,9 @@ h6 {
 .bg-theme {
   @apply bg-primary;
 }
+.pagination {
+  @apply flex;
+}
+.pagination .page-link {
+  @apply w-[1.8rem] h-[1.8rem] bg-white border-b-defaultborder block leading-[1.8rem] text-center;
+}
