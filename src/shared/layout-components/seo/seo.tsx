@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import React from 'react';
 
-import favicon from '../../../../public/assets/images/brand-logos/favicon.ico';
+import favicon from '../../../../public/assets/images/brand-logos/fav-icon.png';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Seo = ({ title }: any) => {
