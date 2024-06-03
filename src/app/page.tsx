@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable @next/next/no-img-element */
 'use client';
-import Image from 'next/image';
 import Link from 'next/link';
 import { redirect, useRouter } from 'next/navigation';
 import React, {
@@ -20,8 +19,6 @@ import { Login } from '@/supabase/auth';
 import Loader from '@/utils/Loader/Loader';
 
 import { basePath } from '../../next.config';
-import eyeOff from '../../public/assets/images/brand-logos/eye off.png';
-import eyeOn from '../../public/assets/images/brand-logos/eye.png';
 
 const validationSchema = Yup.object().shape({
   email: emailSchema,
@@ -33,7 +30,7 @@ const LoginForm = () => {
   const [emailError, setEmailError] = useState('');
   const [password, setPassword] = useState('');
   const [passwordErr, setPasswordErr] = useState('');
-  const [passwordshow1, setpasswordshow1] = useState(false);
+  // const [passwordshow1, setpasswordshow1] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useRouter();
@@ -252,7 +249,7 @@ const LoginForm = () => {
                           <div className='input-group'>
                             <input
                               name='password'
-                              type={passwordshow1 ? 'text' : 'password'}
+                              type='password'
                               value={password}
                               onChange={handlePasswordChange}
                               onKeyDown={handleKeyPress}
@@ -261,21 +258,6 @@ const LoginForm = () => {
                               id='signin-password'
                               placeholder='password'
                             />
-                            <button
-                              onClick={() => setpasswordshow1(!passwordshow1)}
-                              aria-label='button'
-                              className='ti-btn ti-btn-light !rounded-s-none !mb-0'
-                              type='button'
-                              id='button-addon2'
-                            >
-                              <Image
-                                src={passwordshow1 ? eyeOn : eyeOff}
-                                width={100}
-                                height={100}
-                                alt=''
-                                className='!w-[1.35rem] rounded-full'
-                              />
-                            </button>
                           </div>
                           {passwordErr && (
                             <div className='text-danger'>{passwordErr}</div>
