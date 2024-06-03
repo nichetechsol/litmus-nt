@@ -778,13 +778,31 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                   type='button'
                   className='hs-dropdown-toggle ti-dropdown-toggle !gap-2 !p-0 flex-shrink-0 sm:me-2 me-0 !rounded-full !shadow-none text-xs align-middle !border-0 !shadow-transparent '
                 >
-                  <Image
+                  <div className='avatar avatar-xl avatar-rounded '>
+                    {' '}
+                    <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
+                      {/* {SingleSite?.site?SingleSite?.site?.name[0].toUpperCase(): ""} */}
+                      {user_fname
+                        ? user_fname
+                            .split(' ')
+                            .map((word) => word[0].toUpperCase())
+                            .join('')
+                        : ''}
+                      {user_lname
+                        ? user_lname
+                            .split(' ')
+                            .map((word) => word[0].toUpperCase())
+                            .join('')
+                        : ''}
+                    </span>
+                  </div>
+                  {/* <Image
                     className='inline-block rounded-full '
                     src='/assets/images/user.jpg'
                     width='32'
                     height='32'
                     alt='Image Description'
-                  />
+                  /> */}
                 </button>
                 <div className='md:block hidden dropdown-profile'>
                   <p className='font-semibold mb-0 leading-none text-[#536485] text-[0.813rem] '>

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import React, {
   Fragment,
   useEffect,
@@ -93,7 +93,7 @@ const LoginForm = () => {
       const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
       if (!token) {
         setTokenVerify(false);
-        // redirect("/")
+        redirect('/');
       } else {
         setTokenVerify(true);
       }
@@ -727,11 +727,22 @@ const LoginForm = () => {
                               <div className='flex items-start '>
                                 <div className='flex flex-grow flex-wrap gap-2'>
                                   <div className='avatar avatar-xl avatar-rounded me-3'>
+                                    <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
+                                      {/* {SingleSite?.site?SingleSite?.site?.name[0].toUpperCase(): ""} */}
+                                      {org.org_name
+                                        ? org.org_name
+                                            .split(' ')
+                                            .map((word) =>
+                                              word[0].toUpperCase(),
+                                            )
+                                            .join('')
+                                        : ''}
+                                    </span>
                                     {/* <img src="../../../assets/images/faces/4.jpg" alt={org.org_name?org.org_name[0].toUpperCase(): ""} /> */}
-                                    <h4>
+                                    {/* <h4>
                                       {' '}
-                                      <i className='ri-building-fill text-black'></i>
-                                    </h4>
+                                      <i className='ri-building-fill text-black'>dd</i>
+                                    </h4> */}
                                   </div>
                                   <div>
                                     <h6 className=' mb-1 font-semibold text-[1rem]'>

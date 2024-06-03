@@ -66,7 +66,8 @@ const layouts: { [route: string]: LayoutComponent } = {
   '/auth/*': AuthenticationLayout,
   // '/dashboard': ContentLayout,
   '/organization': ContentLayout,
-  // '/orgdashboard': ContentLayout,
+  '/orgdashboard': ContentLayout,
+  '/sites': ContentLayout,
 };
 export default function RootLayout({
   children,

@@ -13,21 +13,21 @@ export const MenuItems: any = [
     selected: false,
     title: 'Organizations',
   },
-  {
-    path: '/orgdashboard',
-    icon: Icons,
-    type: 'link',
-    active: false,
-    selected: false,
-    title: 'Dashboard',
-  },
-  {
-    path: '/sites',
-    icon: Icons,
-    type: 'link',
-    active: false,
-    selected: false,
-    title: 'Sites',
-  },
+  // {
+  //   path: '/orgdashboard',
+  //   icon: Icons,
+  //   type: 'link',
+  //   active: false,
+  //   selected: false,
+  //   title: 'Dashboard',
+  // },
+  // {
+  //   path: '/sites',
+  //   icon: Icons,
+  //   type: 'link',
+  //   active: false,
+  //   selected: false,
+  //   title: 'Sites',
+  // },
 ];
 export default MenuItems;
