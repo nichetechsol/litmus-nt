@@ -15,8 +15,9 @@ import MenuItems from './nav';
 import { ThemeChanger } from '../../redux/action';
 
 const Sidebar = ({ local_varaiable, ThemeChanger }: any) => {
+  // const result = MenuItems.slice(0, 1);
   const [menuitems, setMenuitems] = useState(MenuItems);
-
+  // const [orgid, setorgid] = useState<any | null>(null);
   function closeMenu() {
     const closeMenudata = (items: any) => {
       items?.forEach((item: any) => {
@@ -27,6 +28,15 @@ const Sidebar = ({ local_varaiable, ThemeChanger }: any) => {
     closeMenudata(MenuItems);
     setMenuitems((arr: any) => [...arr]);
   }
+
+  // useEffect(() => {
+  //   if (orgid) {
+  //     setMenuitems(MenuItems);
+  //   } else {
+  //     const result = MenuItems.slice(0, 1);
+  //     setMenuitems(result);
+  //   }
+  // }, [orgid])
 
   useEffect(() => {
     const mainContent = document.querySelector('.main-content');
@@ -42,6 +52,7 @@ const Sidebar = ({ local_varaiable, ThemeChanger }: any) => {
     }
     mainContent?.addEventListener('click', menuClose);
     window.addEventListener('resize', menuResizeFn);
+    // setorgid(localStorage.getItem('org_id'));
   }, []);
 
   const location = useRouter();
@@ -719,7 +730,7 @@ const Sidebar = ({ local_varaiable, ThemeChanger }: any) => {
               </div>
 
               <ul className='main-menu' onClick={() => Sideclick()}>
-                {MenuItems.map((levelone: any) => (
+                {menuitems.map((levelone: any) => (
                   <Fragment key={Math.random()}>
                     <li
                       className={`${

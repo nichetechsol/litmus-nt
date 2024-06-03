@@ -1,3 +1,5 @@
+/* eslint-disable unused-imports/no-unused-imports */
+/* eslint-disable simple-import-sort/imports */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 
@@ -6,7 +8,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import * as Yup from 'yup';
-
+import swal from 'sweetalert';
 import {
   MessageSchema,
   PincodeSchema,
@@ -26,7 +28,9 @@ import { addSites } from '@/supabase/site_details_crud';
 import { fetchSiteType } from '@/supabase/site_type';
 import { stateList } from '@/supabase/state';
 import Loader from '@/utils/Loader/Loader';
+import { toast } from 'react-toastify';
 
+import 'react-toastify/dist/ReactToastify.css';
 // interface SiteSearch {
 //   id: string;
 //   name: string;
@@ -155,6 +159,10 @@ const Page: React.FC = () => {
   useEffect(() => {
     const orgid: any = localStorage.getItem('org_id');
     Setorg_id(orgid);
+    if (!orgid) {
+      swal('Please select organization', { icon: 'error' });
+      redirect('/organization');
+    }
   }, []);
   /// for getting details of site
   const FetchSiteDetails = async () => {
@@ -918,6 +926,11 @@ const Page: React.FC = () => {
                             <h6 className='font-semibold mb-0 text-[1rem]'>
                               Sites
                             </h6>
+                            {SitesList && SitesList.length == 0 && (
+                              <div className='col-md-12 w-100 mt-4'>
+                                <p className='text-center'>No Data Found</p>{' '}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -928,102 +941,106 @@ const Page: React.FC = () => {
                       className='grid grid-cols-12 gap-x-6'
                       id='tasks-container'
                     >
-                      {SitesList &&
-                        SitesList.map((SingleSite) => (
-                          <div
-                            className='xl:col-span-4 col-span-12 task-card'
-                            style={{ cursor: 'pointer' }}
-                            key={SingleSite?.site?.id}
-                            onClick={() => {
-                              // localStorage.setItem("org_id", org.org_id);
-                              // localStorage.setItem("org_name", org.org_name);
-                              // history.push("/orgdashboard");
-                              // handleOrgRole(org.org_id);
-                            }}
-                          >
-                            <div className='box task-pending-card'>
-                              <div className='box-body'>
-                                <div className='flex justify-between align-center flex-wrap gap-2'>
-                                  <p className='font-semibold mb-4 flex items-center'>
-                                    <Link aria-label='anchor' href='#!'></Link>
-                                    {SingleSite?.site
-                                      ? SingleSite?.site?.name
-                                      : ''}
-                                  </p>
-                                  <div className='avatar avatar-xl avatar-rounded '>
-                                    {' '}
-                                    <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
-                                      {/* {SingleSite?.site?SingleSite?.site?.name[0].toUpperCase(): ""} */}
+                      {SitesList && SitesList.length > 0
+                        ? SitesList.map((SingleSite) => (
+                            <div
+                              className='xl:col-span-4 col-span-12 task-card'
+                              style={{ cursor: 'pointer' }}
+                              key={SingleSite?.site?.id}
+                              onClick={() => {
+                                // localStorage.setItem("org_id", org.org_id);
+                                // localStorage.setItem("org_name", org.org_name);
+                                // history.push("/orgdashboard");
+                                // handleOrgRole(org.org_id);
+                              }}
+                            >
+                              <div className='box task-pending-card'>
+                                <div className='box-body'>
+                                  <div className='flex justify-between align-center flex-wrap gap-2'>
+                                    <p className='font-semibold mb-4 flex items-center'>
+                                      <Link
+                                        aria-label='anchor'
+                                        href='#!'
+                                      ></Link>
                                       {SingleSite?.site
                                         ? SingleSite?.site?.name
-                                            .split(' ')
-                                            .map((word) =>
-                                              word[0].toUpperCase(),
-                                            )
-                                            .join('')
                                         : ''}
-                                    </span>
+                                    </p>
+                                    <div className='avatar avatar-xl avatar-rounded '>
+                                      {' '}
+                                      <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
+                                        {/* {SingleSite?.site?SingleSite?.site?.name[0].toUpperCase(): ""} */}
+                                        {SingleSite?.site
+                                          ? SingleSite?.site?.name
+                                              .split(' ')
+                                              .map((word) =>
+                                                word[0].toUpperCase(),
+                                              )
+                                              .join('')
+                                          : ''}
+                                      </span>
+                                    </div>
                                   </div>
-                                </div>
-                                <div className=''>
-                                  <div>
-                                    <ul className='list-group list-group-flush'>
-                                      <li className='list-group-item fw-semibold'>
-                                        <i className='bx bx-map align-middle me-2 text-muted'></i>
-                                        <b>Address </b>
-                                        <span className='ms-1 text-muted fw-normal d-inline-block'>
-                                          {SingleSite?.site
-                                            ? SingleSite.site?.address1
-                                            : ''}
-                                          ,
-                                          {SingleSite?.site
-                                            ? SingleSite.site?.address2
-                                            : ''}
-                                          ,
-                                          {SingleSite?.site
-                                            ? SingleSite.site?.city
-                                            : ''}
-                                          ,
-                                          {SingleSite?.site
-                                            ? SingleSite.state
-                                            : ''}
-                                          ,
-                                          {SingleSite?.site
-                                            ? SingleSite.country
-                                            : ''}
-                                        </span>
-                                      </li>
-                                      <li className='list-group-item fw-semibold'>
-                                        <i className='bx bx-briefcase align-middle me-2 text-muted'></i>
-                                        <b>Owner</b>
-                                        <span className='ms-1 text-muted fw-normal d-inline-block'>
-                                          {SingleSite?.ownerNames}
-                                        </span>
-                                      </li>
-                                      <li className='list-group-item fw-semibold'>
-                                        <i className='bx bx-user align-middle me-2 text-muted'></i>
-                                        <b>Number of users</b>
-                                        <span className='ms-1 text-muted fw-normal d-inline-block'>
-                                          {SingleSite?.users?.length}
-                                        </span>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                  <div>
-                                    <div className='btn-list text-center mt-5'>
-                                      <button
-                                        type='button'
-                                        className='ti-btn bg-primary text-white !font-medium'
-                                      >
-                                        Production
-                                      </button>
+                                  <div className=''>
+                                    <div>
+                                      <ul className='list-group list-group-flush'>
+                                        <li className='list-group-item fw-semibold'>
+                                          <i className='bx bx-map align-middle me-2 text-muted'></i>
+                                          <b>Address </b>
+                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                            {SingleSite?.site
+                                              ? SingleSite.site?.address1
+                                              : ''}
+                                            ,
+                                            {SingleSite?.site
+                                              ? SingleSite.site?.address2
+                                              : ''}
+                                            ,
+                                            {SingleSite?.site
+                                              ? SingleSite.site?.city
+                                              : ''}
+                                            ,
+                                            {SingleSite?.site
+                                              ? SingleSite.state
+                                              : ''}
+                                            ,
+                                            {SingleSite?.site
+                                              ? SingleSite.country
+                                              : ''}
+                                          </span>
+                                        </li>
+                                        <li className='list-group-item fw-semibold'>
+                                          <i className='bx bx-briefcase align-middle me-2 text-muted'></i>
+                                          <b>Owner</b>
+                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                            {SingleSite?.ownerNames}
+                                          </span>
+                                        </li>
+                                        <li className='list-group-item fw-semibold'>
+                                          <i className='bx bx-user align-middle me-2 text-muted'></i>
+                                          <b>Number of users</b>
+                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                            {SingleSite?.users?.length}
+                                          </span>
+                                        </li>
+                                      </ul>
+                                    </div>
+                                    <div>
+                                      <div className='btn-list text-center mt-5'>
+                                        <button
+                                          type='button'
+                                          className='ti-btn bg-primary text-white !font-medium'
+                                        >
+                                          Production
+                                        </button>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          ))
+                        : null}
                     </div>
                   </div>
                 </div>

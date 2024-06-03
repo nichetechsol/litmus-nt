@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
@@ -20,7 +21,6 @@ import { getUserRole } from '@/supabase/org_details';
 import {
   addUserToOrganization,
   modifyUserOfOrganization,
-  removeUserFromOrganization,
 } from '@/supabase/org_user';
 import Loader from '@/utils/Loader/Loader';
 interface OrgUser {
@@ -86,6 +86,10 @@ const OrgDashboard = () => {
     // setUserlname(userlname);
     setUserrole(userrole);
     setorg_id(org_id);
+    if (!org_id) {
+      swal('Please select organization', { icon: 'error' });
+      redirect('/organization');
+    }
     setorgName(orgName);
   }, []);
 
@@ -254,14 +258,14 @@ const OrgDashboard = () => {
       .then(() => setRoleError(''))
       .catch((err: Yup.ValidationError) => setRoleError(err.message));
   };
-  const handleEdit = (user: any) => {
-    setChangeFlage(false);
-    setUserNameId(user.id);
-    setEmail(user.email);
-    setFirstName(user.firstname);
-    setLastName(user.lastname);
-    setRole(user.role_id);
-  };
+  // const handleEdit = (user: any) => {
+  //   setChangeFlage(false);
+  //   setUserNameId(user.id);
+  //   setEmail(user.email);
+  //   setFirstName(user.firstname);
+  //   setLastName(user.lastname);
+  //   setRole(user.role_id);
+  // };
   const handleFiledClear = () => {
     setEmailError('');
     setFirstNameError('');
@@ -276,35 +280,35 @@ const OrgDashboard = () => {
     setRole('');
     setChangeFlage(true);
   };
-  const handleDelete = (id: any) => {
-    swal({
-      title: 'Confirm Delete',
-      text: 'Are you sure you want to delete?',
-      icon: 'warning',
-      buttons: ['Cancel', 'Delete'],
-      dangerMode: true,
-    }).then(async (willDelete: any) => {
-      if (willDelete) {
-        try {
-          setLoading(true);
-          const response = await removeUserFromOrganization(id);
+  // const handleDelete = (id: any) => {
+  //   swal({
+  //     title: 'Confirm Delete',
+  //     text: 'Are you sure you want to delete?',
+  //     icon: 'warning',
+  //     buttons: ['Cancel', 'Delete'],
+  //     dangerMode: true,
+  //   }).then(async (willDelete: any) => {
+  //     if (willDelete) {
+  //       try {
+  //         setLoading(true);
+  //         const response = await removeUserFromOrganization(id);
 
-          if (response.errorCode === 0) {
-            swal('Record deleted!', { icon: 'success' });
-            fetchData2();
-            setLoading(false);
-            // Optionally, update your state or refetch data here
-          } else {
-            swal('Error deleting record!', { icon: 'error' });
-            setLoading(false);
-          }
-        } catch (error) {
-          swal('Unexpected error occurred!', { icon: 'error' });
-          setLoading(false);
-        }
-      }
-    });
-  };
+  //         if (response.errorCode === 0) {
+  //           swal('Record deleted!', { icon: 'success' });
+  //           fetchData2();
+  //           setLoading(false);
+  //           // Optionally, update your state or refetch data here
+  //         } else {
+  //           swal('Error deleting record!', { icon: 'error' });
+  //           setLoading(false);
+  //         }
+  //       } catch (error) {
+  //         swal('Unexpected error occurred!', { icon: 'error' });
+  //         setLoading(false);
+  //       }
+  //     }
+  //   });
+  // };
   const validateForm = async () => {
     try {
       await validationSchema.validate(
@@ -672,7 +676,7 @@ const OrgDashboard = () => {
                                 data-hs-overlay='#todo-compose'
                               >
                                 <i className='ri-add-circle-line !text-[1rem]'></i>
-                                Add Organization
+                                Add User
                               </div>
                             </button>
                           ) : (
@@ -892,7 +896,7 @@ const OrgDashboard = () => {
                                   </td>
 
                                   <td>
-                                    <div className='flex flex-row items-center !gap-2 text-[0.9375rem]'>
+                                    {/* <div className='flex flex-row items-center !gap-2 text-[0.9375rem]'>
                                       <div
                                         aria-label='anchor'
                                         data-bs-target='#formmodal'
@@ -918,7 +922,7 @@ const OrgDashboard = () => {
                                       >
                                         <i className='ri-delete-bin-line'></i>
                                       </div>
-                                    </div>
+                                    </div> */}
                                   </td>
                                 </tr>
                               ))

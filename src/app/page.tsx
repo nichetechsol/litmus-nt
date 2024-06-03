@@ -136,6 +136,7 @@ const LoginForm = () => {
           icon: 'error',
           text: result.message,
         });
+        setLoading(false);
       }
     }
   };

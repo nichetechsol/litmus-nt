@@ -853,6 +853,7 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                             localStorage.removeItem(
                               'sb-emsjiuztcinhapaurcrl-auth-token',
                             );
+                            localStorage.removeItem('org_id');
                             history.push('/');
                           }
                         });

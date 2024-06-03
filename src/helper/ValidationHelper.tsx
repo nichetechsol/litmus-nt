@@ -30,7 +30,7 @@ const emailSchema = Yup.string()
   .email('Invalid email address format. Please enter a valid email address.')
   .required('Email address is required. Please enter your email address.')
   .matches(
-    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|email)$/,
+    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|co.in)$/,
     'Invalid email address format. Please enter a valid email address.',
   );
 
