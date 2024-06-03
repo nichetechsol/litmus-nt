@@ -1,5 +1,5 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
-import Image from 'next/image';
 import Link from 'next/link';
 import { redirect, useRouter } from 'next/navigation';
 import React, {
@@ -16,6 +16,8 @@ import * as Yup from 'yup';
 import { emailSchema, passwordSchema } from '@/helper/ValidationHelper';
 import { Login } from '@/supabase/auth';
 import Loader from '@/utils/Loader/Loader';
+
+import { basePath } from '../../next.config';
 
 const validationSchema = Yup.object().shape({
   email: emailSchema,
@@ -169,7 +171,21 @@ const LoginForm = () => {
                 <div className='xxl:col-span-4 xl:col-span-4 lg:col-span-4 md:col-span-6 sm:col-span-8 col-span-12'>
                   <div className='my-[2.5rem] flex justify-center'>
                     <Link href='/organization'>
-                      <Image
+                      <img
+                        src={`${
+                          process.env.NODE_ENV === 'production' ? basePath : ''
+                        }/assets/images/brand-logos/desktop-logo.png`}
+                        alt='logo'
+                        className='desktop-logo '
+                      />
+                      <img
+                        src={`${
+                          process.env.NODE_ENV === 'production' ? basePath : ''
+                        }/assets/images/brand-logos/desktop-dark.png`}
+                        alt='logo'
+                        className='desktop-dark login-logo'
+                      />
+                      {/* <Image
                         src='/assets/images/brand-logos/desktop-logo.png'
                         alt='logo'
                         width={100}
@@ -182,7 +198,7 @@ const LoginForm = () => {
                         width={100}
                         height={100}
                         className='desktop-dark login-logo'
-                      />
+                      /> */}
                     </Link>
                   </div>
 
