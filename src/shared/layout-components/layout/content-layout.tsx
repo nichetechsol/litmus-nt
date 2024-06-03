@@ -1,15 +1,13 @@
-/* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-'use client';
 import React, { Fragment, useEffect, useState } from 'react';
+// import Backtotop from '../backtotop/backtotop'
 import { Provider } from 'react-redux';
 
 import store from '@/shared/redux/store';
 
-// import Backtotop from '../backtotop/backtotop'
-// import Footer from '../footer/footer';
-// import Header from '../header/header';
-// import Sidebar from '../sidebar/sidebar';
+import Footer from '../footer/footer';
+import Header from '../header/header';
+import Sidebar from '../sidebar/sidebar';
 import Switcher from '../switcher/switcher';
 
 const ContentLayout = ({ children }: any) => {
@@ -28,22 +26,30 @@ const ContentLayout = ({ children }: any) => {
     import('preline');
   }, []);
 
+  const Bodyclickk = () => {
+    if (window.innerWidth > 992) {
+      const html = document.documentElement;
+      if (html.getAttribute('icon-overlay') === 'open') {
+        html.setAttribute('icon-overlay', '');
+      }
+    }
+  };
   return (
     <Fragment>
       <Provider store={store}>
         <div style={{ display: `${lateLoad ? 'block' : 'none'}` }}>
           <Switcher />
-          {/* <div className='page'>
-        <Header/>
-        <Sidebar/>
-        <div className='content'>
-          <div className='main-content'>
-            {children}
+          <div className='page'>
+            <Header />
+            <Sidebar />
+            <div className='content'>
+              <div className='main-content' onClick={Bodyclickk}>
+                {children}
+              </div>
+            </div>
+            <Footer />
           </div>
-        </div>
-        <Footer/>
-      </div>
-      <Backtotop /> */}
+          {/* <Backtotop /> */}
         </div>
       </Provider>
     </Fragment>
