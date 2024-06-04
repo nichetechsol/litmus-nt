@@ -5,7 +5,7 @@
 import { redirect } from 'next/navigation';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Pagination from 'react-js-pagination';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import swal from 'sweetalert';
 import * as Yup from 'yup';
 
@@ -20,7 +20,9 @@ import {
 import { getUserRole } from '@/supabase/org_details';
 import {
   addUserToOrganization,
+  getOrgUserRole,
   modifyUserOfOrganization,
+  removeUserFromOrganization,
 } from '@/supabase/org_user';
 import Loader from '@/utils/Loader/Loader';
 interface OrgUser {
@@ -68,23 +70,23 @@ const OrgDashboard = () => {
       }
     }
   }, []);
-  // const [user_id, setuser_id] = useState("")
+  const [user_id, setuser_id] = useState('');
   // const [user_fname, setUser_fname] = useState("")
   // const [user_lname, setUserlname] = useState("")
-  const [user_role, setUserrole] = useState('');
+  // const [user_role, setUserrole] = useState('');
   const [org_id, setorg_id] = useState('');
   const [orgName, setorgName] = useState('');
   useEffect(() => {
-    // const userid: any = localStorage.getItem("user_id");
+    const userid: any = localStorage.getItem('user_id');
     // const userfname: any = localStorage.getItem("user_fname");
     // const userlname: any = localStorage.getItem("user_lname");
-    const userrole: any = localStorage.getItem('user_role');
+    // const userrole: any = localStorage.getItem('user_role');
     const org_id: any = localStorage.getItem('org_id');
     const orgName: any = localStorage.getItem('org_name');
-    // setuser_id(userid)
+    setuser_id(userid);
     // setUser_fname(userfname);
     // setUserlname(userlname);
-    setUserrole(userrole);
+    // setUserrole(userrole);
     setorg_id(org_id);
     if (!org_id) {
       swal('Please select organization', { icon: 'error' });
@@ -258,14 +260,14 @@ const OrgDashboard = () => {
       .then(() => setRoleError(''))
       .catch((err: Yup.ValidationError) => setRoleError(err.message));
   };
-  // const handleEdit = (user: any) => {
-  //   setChangeFlage(false);
-  //   setUserNameId(user.id);
-  //   setEmail(user.email);
-  //   setFirstName(user.firstname);
-  //   setLastName(user.lastname);
-  //   setRole(user.role_id);
-  // };
+  const handleEdit = (user: any) => {
+    setChangeFlage(false);
+    setUserNameId(user.id);
+    setEmail(user.email);
+    setFirstName(user.firstname);
+    setLastName(user.lastname);
+    setRole(user.role_id);
+  };
   const handleFiledClear = () => {
     setEmailError('');
     setFirstNameError('');
@@ -280,35 +282,35 @@ const OrgDashboard = () => {
     setRole('');
     setChangeFlage(true);
   };
-  // const handleDelete = (id: any) => {
-  //   swal({
-  //     title: 'Confirm Delete',
-  //     text: 'Are you sure you want to delete?',
-  //     icon: 'warning',
-  //     buttons: ['Cancel', 'Delete'],
-  //     dangerMode: true,
-  //   }).then(async (willDelete: any) => {
-  //     if (willDelete) {
-  //       try {
-  //         setLoading(true);
-  //         const response = await removeUserFromOrganization(id);
+  const handleDelete = (id: any) => {
+    swal({
+      title: 'Confirm Delete',
+      text: 'Are you sure you want to delete?',
+      icon: 'warning',
+      buttons: ['Cancel', 'Delete'],
+      dangerMode: true,
+    }).then(async (willDelete: any) => {
+      if (willDelete) {
+        try {
+          setLoading(true);
+          const response = await removeUserFromOrganization(id, org_id);
 
-  //         if (response.errorCode === 0) {
-  //           swal('Record deleted!', { icon: 'success' });
-  //           fetchData2();
-  //           setLoading(false);
-  //           // Optionally, update your state or refetch data here
-  //         } else {
-  //           swal('Error deleting record!', { icon: 'error' });
-  //           setLoading(false);
-  //         }
-  //       } catch (error) {
-  //         swal('Unexpected error occurred!', { icon: 'error' });
-  //         setLoading(false);
-  //       }
-  //     }
-  //   });
-  // };
+          if (response.errorCode === 0) {
+            swal('Record deleted!', { icon: 'success' });
+            fetchData2();
+            setLoading(false);
+            // Optionally, update your state or refetch data here
+          } else {
+            swal('Error deleting record!', { icon: 'error' });
+            setLoading(false);
+          }
+        } catch (error) {
+          swal('Unexpected error occurred!', { icon: 'error' });
+          setLoading(false);
+        }
+      }
+    });
+  };
   const validateForm = async () => {
     try {
       await validationSchema.validate(
@@ -355,21 +357,40 @@ const OrgDashboard = () => {
             org_id: org_id,
           };
           result = await addUserToOrganization(userData);
-
-          if (result.errorCode === 0) {
+          if (result.errorCode == 0) {
             toast.success(result.data, { autoClose: 3000 });
+            const button = document.getElementById('close-modal-btn');
+            if (button) {
+              button.click(); // Directly trigger click event on button
+            }
           }
         } else {
-          const userData = { role_id: role, user_id: userNameId };
+          const userData = {
+            role_id: role,
+            user_id: userNameId,
+            org_id: org_id,
+          };
           result = await modifyUserOfOrganization(userData);
+          if (result.errorCode == 0) {
+            toast.success('Updated Successfully', { autoClose: 3000 });
+            const button = document.getElementById('close-modal-btn');
+            if (button) {
+              button.click(); // Directly trigger click event on button
+            }
+          } else {
+            toast.error("Couldn't Update", { autoClose: 3000 });
+            const button = document.getElementById('close-modal-btn');
+            if (button) {
+              button.click(); // Directly trigger click event on button
+            }
+          }
         }
-        if (result && result.data != null) {
-          setLoading(false);
-        }
+
         if (closeModalButtonRef.current) {
           closeModalButtonRef.current.click();
         }
         fetchData2();
+
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -387,17 +408,35 @@ const OrgDashboard = () => {
       handleSubmit();
     }
   };
+  const [userrole2, setuserrole2] = useState();
+  useEffect(() => {
+    const fetchData2 = async () => {
+      try {
+        const data: any = await getOrgUserRole(user_id, org_id);
+
+        if (data) {
+          setuserrole2(data.data.id);
+        } else {
+          // console.log("No Role Found.");
+        }
+      } catch (error: any) {
+        // console.error("Error fetching organization details:", error.message);
+      }
+    };
+
+    fetchData2();
+  }, [user_id, org_id]);
   return (
     <>
       {loading && <Loader />}
       {tokenVerify && (
         <>
+          <ToastContainer />
           <div className='md:flex block items-center justify-between my-[1.5rem] page-header-breadcrumb'>
             <div>
               <p className='font-semibold text-[1.125rem] text-defaulttextcolor dark:text-defaulttextcolor/70 !mb-0 '>
                 Dashboard ({orgName})
               </p>
-              {/* <p className="font-normal text-[#8c9097] dark:text-white/50 text-[0.813rem]">Track your sales activity, leads and deals here.</p> */}
             </div>
           </div>
           <div className='grid grid-cols-12 gap-x-6'>
@@ -409,14 +448,10 @@ const OrgDashboard = () => {
                       <div className='box overflow-hidden'>
                         <div className='box-body'>
                           <div className='flex items-top justify-between'>
-                            {/* <div>
-                              <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
-                                <i className='ti ti-users text-[1rem] text-white'></i>
-                              </span>
-                            </div> */}
                             <div>
                               <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
-                                <i className='ti ti-users text-[1rem] text-white'></i>
+                                {/* <i className='ti ti-users text-[1rem] text-white'></i> */}
+                                <i className='ri-group-line text-white'></i>
                               </span>
                             </div>
                             <div className='flex-grow ms-4'>
@@ -441,7 +476,8 @@ const OrgDashboard = () => {
                           <div className='flex items-top justify-between'>
                             <div>
                               <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-secondary'>
-                                <i className='ti ti-wallet text-[1rem] text-white'></i>
+                                {/* <i className='ti ti-wallet text-[1rem] text-white'></i> */}
+                                <i className='ri-wallet-2-line text-white'></i>
                               </span>
                             </div>
                             <div className='flex-grow ms-4'>
@@ -466,7 +502,8 @@ const OrgDashboard = () => {
                           <div className='flex items-top justify-between'>
                             <div>
                               <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-success'>
-                                <i className='ti ti-wave-square text-[1rem] text-white'></i>
+                                {/* <i className='ti ti-wave-square text-[1rem] text-white'></i> */}
+                                <i className='ri-pulse-line text-white'></i>
                               </span>
                             </div>
                             <div className='flex-grow ms-4'>
@@ -492,21 +529,6 @@ const OrgDashboard = () => {
                   <div className='box'>
                     <div className='box-header flex justify-between'>
                       <div className='box-title'>List Of Entitlement</div>
-                      {/* <div className="hs-dropdown ti-dropdown">
-                      <Link aria-label="anchor" href="#!"
-                        className="flex items-center justify-center w-[1.75rem] h-[1.75rem]  !text-[0.8rem] !py-1 !px-2 rounded-sm bg-light border-light shadow-none !font-medium"
-                        aria-expanded="false">
-                        <i className="fe fe-more-vertical text-[0.8rem]"></i>
-                      </Link>
-                      <ul className="hs-dropdown-menu ti-dropdown-menu hidden">
-                        <li><Link className="ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block"
-                          href="#!">Week</Link></li>
-                        <li><Link className="ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block"
-                          href="#!">Month</Link></li>
-                        <li><Link className="ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block"
-                          href="#!">Year</Link></li>
-                      </ul>
-                    </div> */}
                     </div>
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>
@@ -535,55 +557,13 @@ const OrgDashboard = () => {
                           activePage={activePage2}
                           itemsCountPerPage={perPage2}
                           totalItemsCount={totalItemsCount2}
-                          pageRangeDisplayed={5} // Adjust as needed
+                          pageRangeDisplayed={5}
                           onChange={(page: React.SetStateAction<number>) =>
                             setActivePage2(page)
                           }
                           itemClass='page-item pagination-custom'
                           linkClass='page-link'
                         />
-                        {/* <li className="mb-[0.9rem]">
-                        <div className="flex items-start flex-wrap">
-                         
-                          <div className="flex-grow">
-                            <p className="font-semibold mb-[1.4px]  text-[0.813rem]">Emigo Kiaren</p>
-           
-                          </div>
-                          <div className="font-semibold text-[0.9375rem] ">$4,289</div>
-                        </div>
-                      </li>
-                      <li className="mb-[0.9rem]">
-                        <div className="flex items-top flex-wrap">
-                        
-                          <div className="flex-grow">
-                            <p className="font-semibold mb-[1.4px]  text-[0.813rem]">Randy Origoan
-                            </p>
-                            
-                          </div>
-                          <div className="font-semibold text-[0.9375rem] ">$6,347</div>
-                        </div>
-                      </li>
-                      <li className="mb-[0.9rem]">
-                        <div className="flex items-top flex-wrap">
-                        
-                          <div className="flex-grow">
-                            <p className="font-semibold mb-[1.4px]  text-[0.813rem]">George Pieterson
-                            </p>
-                    
-                          </div>
-                          <div className="font-semibold text-[0.9375rem] ">$3,894</div>
-                        </div>
-                      </li>
-                      <li>
-                        <div className="flex items-top flex-wrap">
-                         
-                          <div className="flex-grow">
-                            <p className="font-semibold mb-[1.4px]  text-[0.813rem]">Kiara Advain</p>
-                            
-                          </div>
-                          <div className="font-semibold text-[0.9375rem] ">$2,679</div>
-                        </div>
-                      </li> */}
                       </ul>
                     </div>
                   </div>
@@ -594,59 +574,13 @@ const OrgDashboard = () => {
                       <div className='box-title'>
                         Location Of Sites And Users
                       </div>
-                      <div className='hs-dropdown ti-dropdown'>
-                        {/* <Link aria-label="anchor" href="#!"
-                      className="flex items-center justify-center w-[1.75rem] h-[1.75rem] ! !text-[0.8rem] !py-1 !px-2 rounded-sm bg-light border-light shadow-none !font-medium"
-                      aria-expanded="false">
-                      <i className="fe fe-more-vertical text-[0.8rem]"></i>
-                    </Link>
-                    <ul className="hs-dropdown-menu ti-dropdown-menu hidden">
-                      <li><Link className="ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block"
-                        href="#!">Week</Link></li>
-                      <li><Link className="ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block"
-                        href="#!">Month</Link></li>
-                      <li><Link className="ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block"
-                        href="#!">Year</Link></li>
-                    </ul> */}
-                      </div>
+                      <div className='hs-dropdown ti-dropdown'></div>
                     </div>
                     <div className='box-body overflow-hidden'>
                       <div className='leads-source-chart flex items-center justify-center'>
                         {/* <img src={imgMap} /> */}
                       </div>
                     </div>
-                    {/* <div className="grid grid-cols-4 border-t border-dashed dark:border-defaultborder/10">
-                  <div className="col !p-0">
-                    <div className="!ps-4 p-[0.95rem] text-center border-e border-dashed dark:border-defaultborder/10">
-                      <span className="text-[#8c9097] dark:text-white/50 text-[0.75rem] mb-1 crm-lead-legend mobile inline-block">Mobile
-                      </span>
-                      <div><span className="text-[1rem]  font-semibold">1,624</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col !p-0">
-                    <div className="p-[0.95rem] text-center border-e border-dashed dark:border-defaultborder/10">
-                      <span className="text-[#8c9097] dark:text-white/50 text-[0.75rem] mb-1 crm-lead-legend desktop inline-block">Desktop
-                      </span>
-                      <div><span className="text-[1rem]  font-semibold">1,267</span></div>
-                    </div>
-                  </div>
-                  <div className="col !p-0">
-                    <div className="p-[0.95rem] text-center border-e border-dashed dark:border-defaultborder/10">
-                      <span className="text-[#8c9097] dark:text-white/50 text-[0.75rem] mb-1 crm-lead-legend laptop inline-block">Laptop
-                      </span>
-                      <div><span className="text-[1rem]  font-semibold">1,153</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col !p-0">
-                    <div className="!pe-4 p-[0.95rem] text-center">
-                      <span className="text-[#8c9097] dark:text-white/50 text-[0.75rem] mb-1 crm-lead-legend tablet inline-block">Tablet
-                      </span>
-                      <div><span className="text-[1rem]  font-semibold">679</span></div>
-                    </div>
-                  </div>
-                </div> */}
                   </div>
                 </div>
 
@@ -655,13 +589,9 @@ const OrgDashboard = () => {
                     <div className='box-header justify-between'>
                       <div className='box-title'>User Management</div>
                       <div className='flex flex-wrap gap-2'>
-                        {/* <div>
-                      <input className="ti-form-control form-control-sm" type="text" placeholder="Search Here"
-                        aria-label=".form-control-sm example" />
-                    </div> */}
                         <div className='hs-dropdown ti-dropdown'>
                           {' '}
-                          {user_role === '1' || user_role === '2' ? (
+                          {userrole2 === 1 || userrole2 === 2 ? (
                             <button
                               className='btn btn-primary btn-wave mb-3'
                               data-bs-target='#formmodal'
@@ -712,7 +642,7 @@ const OrgDashboard = () => {
                                   <div className='grid grid-cols-12 gap-2'>
                                     <div className='xl:col-span-12 col-span-12'>
                                       <label
-                                        htmlFor='task-name'
+                                        htmlFor='Email'
                                         className='ti-form-label'
                                       >
                                         Email*
@@ -720,8 +650,8 @@ const OrgDashboard = () => {
                                       <input
                                         type='text'
                                         className='form-control w-full'
-                                        id='task-name'
-                                        placeholder='Task Name'
+                                        id='Email'
+                                        placeholder='Enter Email'
                                         onChange={handleEmailChange}
                                         onKeyDown={handleKeyPress}
                                         maxLength={320}
@@ -745,7 +675,7 @@ const OrgDashboard = () => {
                                         type='text'
                                         className='form-control w-full'
                                         id='task-name'
-                                        placeholder='Task Name'
+                                        placeholder='Enter First Name'
                                         onChange={handleFirstNameChange}
                                         onKeyDown={handleKeyPress}
                                         maxLength={255}
@@ -759,7 +689,7 @@ const OrgDashboard = () => {
                                     </div>
                                     <div className='xl:col-span-12 col-span-12'>
                                       <label
-                                        htmlFor='task-name'
+                                        htmlFor='Last Name'
                                         className='ti-form-label'
                                       >
                                         Last Name*
@@ -767,8 +697,8 @@ const OrgDashboard = () => {
                                       <input
                                         type='text'
                                         className='form-control w-full'
-                                        id='task-name'
-                                        placeholder='Task Name'
+                                        id='Last Name'
+                                        placeholder='Enter Last Name'
                                         onChange={handleLastNameChange}
                                         onKeyDown={handleKeyPress}
                                         maxLength={255}
@@ -815,6 +745,7 @@ const OrgDashboard = () => {
                                 <div className='ti-modal-footer'>
                                   <button
                                     type='button'
+                                    id='close-modal-btn'
                                     className='hs-dropdown-toggle ti-btn  ti-btn-light align-middle'
                                     data-hs-overlay='#todo-compose'
                                     ref={closeModalButtonRef}
@@ -860,15 +791,18 @@ const OrgDashboard = () => {
                                 className='!text-start !text-[0.85rem]'
                               >
                                 {' '}
-                                Organization
+                                Role
                               </th>
-
-                              <th
-                                scope='col'
-                                className='!text-start !text-[0.85rem]'
-                              >
-                                Action
-                              </th>
+                              {userrole2 === 1 || userrole2 === 2 ? (
+                                <th
+                                  scope='col'
+                                  className='!text-start !text-[0.85rem]'
+                                >
+                                  Action
+                                </th>
+                              ) : (
+                                <></>
+                              )}
                             </tr>
                           </thead>
                           <tbody>
@@ -894,36 +828,37 @@ const OrgDashboard = () => {
                                       {user.role}
                                     </span>
                                   </td>
-
-                                  <td>
-                                    {/* <div className='flex flex-row items-center !gap-2 text-[0.9375rem]'>
-                                      <div
-                                        aria-label='anchor'
-                                        data-bs-target='#formmodal'
-                                        data-bs-toggle='modal'
-                                        data-bs-whatever='@fat'
-                                        onClick={() => {
-                                          handleEdit(user);
-                                        }}
-                                        className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-primary/10 text-primary hover:bg-primary hover:text-white hover:border-primary'
-                                      >
-                                        <i
-                                          className='ri-edit-line'
+                                  {userrole2 === 1 || userrole2 === 2 ? (
+                                    <td>
+                                      <div className='flex flex-row items-center !gap-2 text-[0.9375rem]'>
+                                        <div
+                                          aria-label='anchor'
+                                          data-bs-target='#formmodal'
+                                          data-bs-toggle='modal'
+                                          data-bs-whatever='@fat'
                                           data-hs-overlay='#todo-compose'
-                                        ></i>
-                                      </div>
+                                          onClick={() => {
+                                            handleEdit(user);
+                                          }}
+                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-primary/10 text-primary hover:bg-primary hover:text-white hover:border-primary'
+                                        >
+                                          <i className='ri-edit-line'></i>
+                                        </div>
 
-                                      <div
-                                        aria-label='anchor'
-                                        onClick={() => {
-                                          handleDelete(user.id);
-                                        }}
-                                        className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-primary/10 text-primary hover:bg-primary hover:text-white hover:border-primary'
-                                      >
-                                        <i className='ri-delete-bin-line'></i>
+                                        <div
+                                          aria-label='anchor'
+                                          onClick={() => {
+                                            handleDelete(user.id);
+                                          }}
+                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-primary/10 text-primary hover:bg-primary hover:text-white hover:border-primary'
+                                        >
+                                          <i className='ri-delete-bin-line'></i>
+                                        </div>
                                       </div>
-                                    </div> */}
-                                  </td>
+                                    </td>
+                                  ) : (
+                                    <></>
+                                  )}
                                 </tr>
                               ))
                             ) : (
@@ -952,31 +887,6 @@ const OrgDashboard = () => {
                         </table>
                       </div>
                     </div>
-                    {/* <div className="box-footer">
-                  <div className="sm:flex items-center">
-                    <div className="text-defaulttextcolor dark:text-defaulttextcolor/70">
-                      Showing 5 Entries <i className="bi bi-arrow-right ms-2 font-semibold"></i>
-                    </div>
-                    <div className="ms-auto">
-                      <nav aria-label="Page navigation" className="pagination-style-4">
-                        <ul className="ti-pagination mb-0">
-                          <li className="page-item disabled">
-                            <Link className="page-link" href="#!">
-                              Prev
-                            </Link>
-                          </li>
-                          <li className="page-item"><Link className="page-link active" href="#!">1</Link></li>
-                          <li className="page-item"><Link className="page-link" href="#!">2</Link></li>
-                          <li className="page-item">
-                            <Link className="page-link !text-primary" href="#!">
-                              next
-                            </Link>
-                          </li>
-                        </ul>
-                      </nav>
-                    </div>
-                  </div>
-                </div> */}
                   </div>
                 </div>
 

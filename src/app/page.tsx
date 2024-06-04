@@ -30,7 +30,7 @@ const LoginForm = () => {
   const [emailError, setEmailError] = useState('');
   const [password, setPassword] = useState('');
   const [passwordErr, setPasswordErr] = useState('');
-  // const [passwordshow1, setpasswordshow1] = useState(false);
+  const [passwordshow1, setpasswordshow1] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useRouter();
@@ -123,8 +123,11 @@ const LoginForm = () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const user_lastname: any = result.user[0]?.lastname;
         localStorage.setItem('user_id', user_id);
-        localStorage.setItem('user_fname', user_firstname);
-        localStorage.setItem('user_lname', user_lastname);
+        localStorage.setItem(
+          'user_fname',
+          user_firstname ? user_firstname : '',
+        );
+        localStorage.setItem('user_lname', user_lastname ? user_lastname : '');
         localStorage.setItem('user_role', user_role);
         navigate.push('/organization');
         setLoading(false);
@@ -249,7 +252,7 @@ const LoginForm = () => {
                           <div className='input-group'>
                             <input
                               name='password'
-                              type='password'
+                              type={passwordshow1 ? 'text' : 'password'}
                               value={password}
                               onChange={handlePasswordChange}
                               onKeyDown={handleKeyPress}
@@ -258,6 +261,21 @@ const LoginForm = () => {
                               id='signin-password'
                               placeholder='password'
                             />
+                            <button
+                              onClick={() => setpasswordshow1(!passwordshow1)}
+                              aria-label='button'
+                              className='ti-btn ti-btn-light !rounded-s-none !mb-0'
+                              type='button'
+                              id='button-addon2'
+                            >
+                              <i
+                                className={`${
+                                  passwordshow1
+                                    ? 'ri-eye-line'
+                                    : 'ri-eye-off-line'
+                                } align-middle`}
+                              ></i>
+                            </button>
                           </div>
                           {passwordErr && (
                             <div className='text-danger'>{passwordErr}</div>

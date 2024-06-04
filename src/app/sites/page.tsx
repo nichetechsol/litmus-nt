@@ -90,12 +90,12 @@ const Page: React.FC = () => {
   useEffect(() => {
     const fetchData2 = async () => {
       try {
-        setLoading(true);
+        // setLoading(true);
         const data: any = await getUserRole();
 
         if (data && data.data && data.data.length > 0) {
           for (let i = 0; i < data.data.length; i++) {
-            setLoading(false);
+            // setLoading(false);
             // if (data.data[i].id == user_role) {
             //   console.log("Matching user role found. Name:", data.data[i].name);
             //   setUserRoleName(data.data[i].name);
@@ -104,7 +104,7 @@ const Page: React.FC = () => {
             // }
           }
         } else {
-          setLoading(false);
+          // setLoading(false);
           // console.log("No organization details found.");
         }
       } catch (error: any) {
@@ -171,7 +171,7 @@ const Page: React.FC = () => {
       const data1 = await fetchSiteDetails(org_id);
 
       if (data1) {
-        setOSitesList(data1.data);
+        setOSitesList(data1.data ? data1.data : []);
         setLoading(false);
       } else {
         setLoading(false);
@@ -189,7 +189,7 @@ const Page: React.FC = () => {
   ///searching site
   const fetchData1 = async () => {
     try {
-      setLoading(true);
+      // setLoading(true);
 
       const result1 = await fetchSiteSidebarList(
         searchTerm !== '' ? searchTerm : null,
@@ -198,11 +198,11 @@ const Page: React.FC = () => {
 
       if (result1.errorCode === 0 && result1.data) {
         setsidebarSite(result1.data);
-        setLoading(false);
+        // setLoading(false);
       } else {
         // console.log("No organization details found.");
         setsidebarSite([]);
-        setLoading(false);
+        // setLoading(false);
       }
     } catch (error: any) {
       setLoading(false);
@@ -926,13 +926,13 @@ const Page: React.FC = () => {
                             <h6 className='font-semibold mb-0 text-[1rem]'>
                               Sites
                             </h6>
-                            {SitesList && SitesList.length == 0 && (
-                              <div className='col-md-12 w-100 mt-4'>
-                                <p className='text-center'>No Data Found</p>{' '}
-                              </div>
-                            )}
                           </div>
                         </div>
+                        {/* {SitesList && SitesList.length == 0 && 
+                              <div className='col-md-12 w-100 mt-4 mb-4'>
+                                <p className='text-center'>No Data Found</p>{' '}
+                              </div>
+                            } */}
                       </div>
                     </div>
                   </div>

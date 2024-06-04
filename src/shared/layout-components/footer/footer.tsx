@@ -7,7 +7,7 @@ const Footer = () => {
         <div className='container'>
           <span className='text-gray dark:text-defaulttextcolor/50'>
             {' '}
-            Copyright © <span id='year'>2024</span>All rights reserved{' '}
+            Copyright © <span id='year'>2024 </span>All rights reserved{' '}
           </span>
         </div>
       </footer>

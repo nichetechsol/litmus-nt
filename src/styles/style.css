@@ -4481,7 +4481,7 @@ label {
 }
 
 .app-sidebar {
-  @apply w-[15rem] h-full bg-[#111c43] dark:bg-bodybg border-e border-e-white/10 fixed top-0 start-0 font-Montserrat z-[49] transition-all ease-linear duration-[0.05s];
+  @apply w-[15rem] h-full bg-[#032125] dark:bg-bodybg border-e border-e-white/10 fixed top-0 start-0 font-Montserrat z-[49] transition-all ease-linear duration-[0.05s];
 }
 .app-sidebar .main-sidebar-header {
   @apply h-[3.75rem] w-[15rem] fixed flex  dark:bg-bodybg z-[9] items-center justify-center py-[0.813rem] px-5 border-b border-b-white/10 border-e border-e-white/10 transition-all ease-linear duration-[0.05s];
@@ -7402,7 +7402,7 @@ label {
 [bg-img='bgimg3'].light[data-menu-styles='dark'] .app-sidebar,
 [bg-img='bgimg2'].light[data-menu-styles='dark'] .app-sidebar,
 [bg-img='bgimg1'].light[data-menu-styles='dark'] .app-sidebar {
-  @apply before:bg-[#111c43]/80;
+  @apply before:bg-[#032125]/80;
 }
 [bg-img='bgimg5'].light[data-menu-styles='dark']
   .app-sidebar
@@ -7450,7 +7450,7 @@ label {
 [bg-img='bgimg3'][data-menu-styles='dark'] .app-sidebar,
 [bg-img='bgimg2'][data-menu-styles='dark'] .app-sidebar,
 [bg-img='bgimg1'][data-menu-styles='dark'] .app-sidebar {
-  @apply before:bg-[#111c43]/80;
+  @apply before:bg-[#032125]/80;
 }
 [bg-img='bgimg5'][data-menu-styles='dark'] .app-sidebar .main-sidebar-header,
 [bg-img='bgimg4'][data-menu-styles='dark'] .app-sidebar .main-sidebar-header,
@@ -8333,7 +8333,7 @@ label {
 /* Start Header Styles */
 [data-header-styles='dark'] .app-header {
   --header-prime-color: 255 255 255;
-  @apply bg-[#111c43] border-white/10;
+  @apply bg-[#032125] border-white/10;
 }
 [data-header-styles='dark']
   .app-header
@@ -9182,7 +9182,7 @@ label {
 /* End Menu-Scrollable Styles */
 /* Start Menu Styles */
 [data-menu-styles='dark'] .app-sidebar {
-  @apply bg-[#111c43] border-white/10;
+  @apply bg-[#032125] border-white/10;
 }
 [data-menu-styles='dark'] .app-sidebar .main-sidebar-header {
   @apply backdrop-blur-3xl;
@@ -9209,7 +9209,7 @@ label {
   .main-sidebar-header
   .slide.has-sub
   .slide-menu {
-  @apply bg-[#111c43];
+  @apply bg-[#032125];
 }
 [data-menu-styles='dark'][data-vertical-style='overlay'][data-toggled='icon-overlay-close']:not(
     [icon-overlay='open']
@@ -9324,7 +9324,7 @@ label {
     )
     .app-sidebar
     .main-sidebar-header {
-    @apply bg-[#111c43];
+    @apply bg-[#032125];
   }
   [data-menu-styles='dark'][data-nav-style='menu-click'][data-toggled='menu-click-closed']:not(
       [data-nav-layout='horizontal']
@@ -9410,7 +9410,7 @@ label {
     .app-sidebar
     .slide.has-sub
     .slide-menu {
-    @apply bg-[#111c43] border-white/10;
+    @apply bg-[#032125] border-white/10;
   }
   [data-menu-styles='dark'][data-nav-style='menu-click'][data-toggled='menu-click-closed']:not(
       [data-nav-layout='horizontal']
@@ -9442,7 +9442,7 @@ label {
     .app-sidebar
     .slide-menu
     .child2 {
-    @apply bg-[#111c43] border-white/10;
+    @apply bg-[#032125] border-white/10;
   }
   [data-menu-styles='dark'][data-nav-style='menu-click'][data-toggled='menu-click-closed']:not(
       [data-nav-layout='horizontal']
@@ -9508,7 +9508,7 @@ label {
     .app-sidebar
     .slide.has-sub
     .slide-menu.child3 {
-    @apply bg-[#111c43] border-white/10;
+    @apply bg-[#032125] border-white/10;
   }
   [data-menu-styles='dark'][data-nav-layout='horizontal']
     .app-sidebar
@@ -15995,7 +15995,7 @@ body {
 
 /* Start Alert Styles */
 .alert {
-  @apply text-sm rounded-sm px-4 py-3 mb-5 last:mb-0;
+  @apply text-sm rounded-sm px-4 py-3 mb-5;
 }
 
 .text-badge .badge {
@@ -16998,9 +16998,9 @@ hr {
 .alert .btn-close i {
   @apply text-[1.5rem] leading-[1.5];
 }
-.alert:last-child {
+/* .alert:last-child {
   @apply mb-0;
-}
+} */
 .alert .alert-link {
   @apply font-semibold;
 }
@@ -20028,4 +20028,12 @@ h6 {
 }
 .pagination .page-link {
   @apply w-[1.8rem] h-[1.8rem] bg-white border-b-defaultborder block leading-[1.8rem] text-center;
+}
+.domain-name-div {
+  @apply w-[80%];
+  overflow-wrap: break-word;
+}
+.ti-btn-icon-table img {
+  @apply w-[1.8rem];
+  overflow: visible;
 }
