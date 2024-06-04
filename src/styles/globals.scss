@@ -1,15 +1,21 @@
 // //Remix Icons
-// @font-face {
-//   font-family: "remixicon";
-//   src: url("../public/assets/iconfonts/RemixIcons/fonts/remixicon.eot");
-//   src: url("../public/assets/iconfonts/RemixIcons/fonts/remixicon.eot") format("embedded-opentype"),
-//     url("../public/assets/iconfonts/RemixIcons/fonts/remixicon.woff2") format("woff2"),
-//     url("../public/assets/iconfonts/RemixIcons/fonts/remixicon.woff") format("woff"),
-//     url("../public/assets/iconfonts/RemixIcons/fonts/remixicon.ttf") format("truetype"),
-//     url("../public/assets/iconfonts/RemixIcons/fonts/remixicon.svg") format("svg");
-//   /* iOS 4.1- */
-//   font-display: swap;
-// }
+@font-face {
+  font-family: 'remixicon';
+  src: url('../../public/assets/iconfonts/RemixIcons/fonts/remixicon.eot');
+  src:
+    url('../../public/assets/iconfonts/RemixIcons/fonts/remixicon.eot')
+      format('embedded-opentype'),
+    url('../../public/assets/iconfonts/RemixIcons/fonts/remixicon.woff2')
+      format('woff2'),
+    url('../../public/assets/iconfonts/RemixIcons/fonts/remixicon.woff')
+      format('woff'),
+    url('../../public/assets/iconfonts/RemixIcons/fonts/remixicon.ttf')
+      format('truetype'),
+    url('../../public/assets/iconfonts/RemixIcons/fonts/remixicon.svg')
+      format('svg');
+  /* iOS 4.1- */
+  font-display: swap;
+}
 
 // //Boxicons
 // @font-face {
@@ -53,7 +59,7 @@
 //     url("../public/assets/iconfonts/feather/fonts/feather/feather-webfont.svg") format("svg");
 // }
 
-// @import "../public/assets/iconfonts/RemixIcons/fonts/remixicon.css";
+@import '../../public/assets/iconfonts/RemixIcons/fonts/remixicon.css';
 // @import "../public/assets/iconfonts/boxicons/css/boxicons.css";
 // @import "../public/assets/iconfonts/tabler-icons/iconfont/tabler-icons.css";
 // @import "../public/assets/iconfonts/bootstrap-icons/icons/font/bootstrap-icons.css";
