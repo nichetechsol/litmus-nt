@@ -9,6 +9,7 @@ interface UserData {
   lastname?: string;
   user_id?: any;
   role_id?: any;
+  org_id?: any;
 }
 
 interface User {
@@ -104,7 +105,7 @@ async function modifyUserOfOrganization(
   UserData: UserData,
 ): Promise<Result<OrgUser[]>> {
   // Validate inputs
-  if (!UserData.user_id || !UserData.role_id) {
+  if (!UserData.user_id || !UserData.role_id || !UserData.org_id) {
     return { errorCode: 1, data: null };
   }
 
@@ -114,6 +115,7 @@ async function modifyUserOfOrganization(
       .from('org_users')
       .update({ role_id: UserData.role_id })
       .eq('user_id', UserData.user_id)
+      .eq('org_id', UserData.org_id)
       .select();
 
     // Check for errors during the update operation
@@ -129,9 +131,12 @@ async function modifyUserOfOrganization(
 }
 
 // Function to remove a user from an organization based on user ID
-async function removeUserFromOrganization(id: any): Promise<Result<null>> {
+async function removeUserFromOrganization(
+  id: any,
+  org_id: any,
+): Promise<Result<null>> {
   // Validate the input
-  if (!id) {
+  if (!id || !org_id) {
     return { errorCode: 1, data: null };
   }
 
@@ -140,7 +145,8 @@ async function removeUserFromOrganization(id: any): Promise<Result<null>> {
     const { error } = await supabase
       .from('org_users')
       .delete()
-      .eq('user_id', id);
+      .eq('user_id', id)
+      .eq('org_id', org_id);
 
     // Check for errors during the delete operation
     if (error) {

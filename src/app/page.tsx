@@ -123,8 +123,11 @@ const LoginForm = () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const user_lastname: any = result.user[0]?.lastname;
         localStorage.setItem('user_id', user_id);
-        localStorage.setItem('user_fname', user_firstname);
-        localStorage.setItem('user_lname', user_lastname);
+        localStorage.setItem(
+          'user_fname',
+          user_firstname ? user_firstname : '',
+        );
+        localStorage.setItem('user_lname', user_lastname ? user_lastname : '');
         localStorage.setItem('user_role', user_role);
         navigate.push('/organization');
         setLoading(false);

@@ -21,6 +21,44 @@ interface LoginResult {
   user?: UserData[];
 }
 
+// // Function for logging in
+// async function Login(email: string, password: string): Promise<LoginResult> {
+//   try {
+//     // Fetch organization details
+//     const { data: authData, error: authError } =
+//       await supabase.auth.signInWithPassword({
+//         email: email,
+//         password: password,
+//       });
+
+//     if (authError) {
+//       if (authError.message === 'Invalid login credentials') {
+//         return { errorCode: 1, message: authError.message };
+//       } else {
+//         return { errorCode: 1, message: authError.message };
+//       }
+//     }
+
+//     if (!authData || !authData.user) {
+//       return { errorCode: 1, message: 'Invalid data' };
+//     }
+
+//     const { data: userData, error: userError } = await supabase
+//       .from('users')
+//       .select('*')
+//       .eq('auth_id', authData.user.id);
+
+//     if (userError) {
+//       return { errorCode: 1, message: userError.message };
+//     }
+
+//     return { errorCode: 0, auth: authData, user: userData };
+//   } catch (error) {
+//     return { errorCode: -1, message: (error as Error).message }; // Return a general error code
+//   }
+// }
+
+// export { Login };
 // Function for logging in
 async function Login(email: string, password: string): Promise<LoginResult> {
   try {
@@ -32,7 +70,7 @@ async function Login(email: string, password: string): Promise<LoginResult> {
       });
 
     if (authError) {
-      if (authError.message === 'Invalid login credentials') {
+      if (authError.message === 'Invalid login credentialss') {
         return { errorCode: 1, message: authError.message };
       } else {
         return { errorCode: 1, message: authError.message };
@@ -49,13 +87,15 @@ async function Login(email: string, password: string): Promise<LoginResult> {
       .eq('auth_id', authData.user.id);
 
     if (userError) {
-      return { errorCode: 1, message: userError.message };
+      return { errorCode: 1, message: 'Invalid data' };
     }
-
-    return { errorCode: 0, auth: authData, user: userData };
+    if (userData.length > 0) {
+      return { errorCode: 0, auth: authData, user: userData };
+    } else {
+      return { errorCode: 1, message: 'User data is not found' };
+    }
   } catch (error) {
     return { errorCode: -1, message: (error as Error).message }; // Return a general error code
   }
 }
-
 export { Login };

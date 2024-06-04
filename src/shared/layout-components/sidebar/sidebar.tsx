@@ -662,7 +662,7 @@ const Sidebar = ({ local_varaiable, ThemeChanger }: any) => {
         onMouseLeave={() => Outhover()}
       >
         <div className='main-sidebar-header'>
-          <Link href='/components/dashboards/crm/' className='header-logo'>
+          <Link href='/organization' className='header-logo'>
             <img
               src={`${
                 process.env.NODE_ENV === 'production' ? '' : ''
@@ -754,7 +754,8 @@ const Sidebar = ({ local_varaiable, ThemeChanger }: any) => {
                             levelone.selected ? 'active' : ''
                           }`}
                         >
-                          {levelone.icon}
+                          {levelone.icon}{' '}
+                          <i className={`${levelone.ico} me-2`}></i>
                           <span className='side-menu__label'>
                             {levelone.title}{' '}
                             {levelone.badgetxt ? (
