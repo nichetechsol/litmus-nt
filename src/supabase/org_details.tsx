@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabase } from './db';
-
+import { sendEmailFunction } from './email';
 interface OrgDetail {
   id: number;
   name: string;
@@ -101,7 +101,7 @@ async function organizationSidebarList(
     }
 
     // Extract the org_ids from userOrgs
-    const orgIds = userOrgs.map((org) => org.org_id);
+    const orgIds = userOrgs.map((org: any) => org.org_id);
 
     let orgDetails: OrgDetail[] = [];
 
@@ -170,6 +170,7 @@ async function addOrganization(data: {
   type_id: any;
   status: string;
   domain: string[];
+  token: any;
 }): Promise<Result<any>> {
   try {
     // Insert organization details
@@ -195,7 +196,7 @@ async function addOrganization(data: {
       .insert([
         {
           user_id: data.user_id,
-          role_id: data.role_id,
+          role_id: 1,
           org_id: insertData[0].id,
         },
       ])
@@ -220,6 +221,17 @@ async function addOrganization(data: {
       } else {
         domainInsertResults.push({ success: true, data: insertDomain });
       }
+    }
+    try {
+      await sendEmailFunction(
+        'soumiya@nichetech.in',
+        'Add Organization',
+        'add_org',
+        'eyJhbGciOiJIUzI1NiIsImtpZCI6ImpmZVZXUEovY3RVdElDRTYiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzE3NTcxMTc5LCJpYXQiOjE3MTc1Njc1NzksImlzcyI6Imh0dHBzOi8vZW1zaml1enRjaW5oYXBhdXJjcmwuc3VwYWJhc2UuY28vYXV0aC92MSIsInN1YiI6ImQ2MTA4ODVmLWU2Y2YtNDdmZi04ODBhLTkxN2YzN2Q2Y2EzOSIsImVtYWlsIjoicGFydGhyQG5pY2hldGVjaC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7fSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTcxNzUwNDkxMn1dLCJzZXNzaW9uX2lkIjoiNGU2YzAyMGMtMDE3Mi00M2VmLWE0YzYtYTYzMjdmMzliMDk0IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.lK5uoj3Csv3tSc_BwKsp90lWiSMvc5NX8zmfsBBg5Sw',
+      );
+      // Clear input fields after successful email send
+    } catch (error) {
+      // Handle error here
     }
     return {
       errorCode: 0,

@@ -86,7 +86,6 @@ async function orgDashboardCounts(
 }
 
 // Function to fetch a list of users for an organization
-// Function to fetch a list of users for an organization
 async function orgUserList(
   org_id: any,
   start: any,
@@ -94,6 +93,7 @@ async function orgUserList(
   search: any,
 ): Promise<Result<{ userList: UserList[]; totalCount: any }>> {
   try {
+    search = 'Parth';
     const { data: orgUsers, error: orgUsersError } = await supabase
       .from('org_users')
       .select('*')
@@ -106,15 +106,22 @@ async function orgUserList(
       };
     }
 
-    const userIds = orgUsers.map((orgUser) => orgUser.user_id);
-    const roleIds = orgUsers.map((orgUser) => orgUser.role_id);
+    const userIds = orgUsers.map((orgUser: any) => orgUser.user_id);
+    const roleIds = orgUsers.map((orgUser: any) => orgUser.role_id);
 
-    const { data: users, error: usersError } = await supabase
+    let userQuery = supabase
       .from('users')
       .select('*')
       .in('id', userIds)
-      .range(start, end)
-      .ilike('firstname', `%${search}%`);
+      .range(start, end);
+
+    if (search) {
+      userQuery = userQuery.ilike('firstname', `%${search}%`);
+    } else {
+      userQuery = userQuery.or('firstname.ilike.%,firstname.is.null');
+    }
+
+    const { data: users, error: usersError } = await userQuery;
 
     if (usersError) {
       return {
@@ -154,12 +161,19 @@ async function orgUserList(
       })
       .filter(Boolean) as UserList[];
 
-    const totalCount = await supabase
+    const totalCountQuery = supabase
       .from('users')
       .select('*', { count: 'exact' })
-      .in('id', userIds)
-      .ilike('firstname', `%${search}%`)
-      .then(({ count }) => count);
+      .in('id', userIds);
+
+    if (search) {
+      totalCountQuery.ilike('firstname', `%${search}%`);
+    } else {
+      totalCountQuery.or('firstname.ilike.%,firstname.is.null');
+    }
+
+    const totalCountResult = await totalCountQuery;
+    const totalCount = totalCountResult.count || 0;
 
     return {
       errorCode: 0,
