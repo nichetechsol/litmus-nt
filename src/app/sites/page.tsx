@@ -5,13 +5,24 @@
 
 'use client';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import CryptoJS from 'crypto-js';
+import { redirect, useRouter } from 'next/navigation';
+import React, {
+  ReactNode,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import * as Yup from 'yup';
 import swal from 'sweetalert';
+
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
   MessageSchema,
   PincodeSchema,
+  SiteAddress2Schema,
   SiteAddressSchema,
   SiteCitySchema,
   SiteNameSchema,
@@ -28,13 +39,8 @@ import { addSites } from '@/supabase/site_details_crud';
 import { fetchSiteType } from '@/supabase/site_type';
 import { stateList } from '@/supabase/state';
 import Loader from '@/utils/Loader/Loader';
-import { toast } from 'react-toastify';
+import { getOrgUserRole } from '@/supabase/org_user';
 
-import 'react-toastify/dist/ReactToastify.css';
-// interface SiteSearch {
-//   id: string;
-//   name: string;
-// }
 interface Country {
   id: number;
   name: string;
@@ -56,6 +62,7 @@ interface SiteTpesDropDown {
 }
 
 interface SiteDetailsWithUsers {
+  type_name: string | null;
   site: SiteDetails;
   users: User[];
   ownerNames: string[];
@@ -63,7 +70,7 @@ interface SiteDetailsWithUsers {
   state: string | null;
 }
 interface SiteDetails {
-  id: number;
+  id: string;
   org_id: number;
   name: string;
   type_id: number;
@@ -84,28 +91,69 @@ interface User {
 }
 
 const Page: React.FC = () => {
-  const [org_id, Setorg_id] = useState('');
-  // const [userRoleName, setUserRoleName] = useState("");
-  //   const user_role: any = localStorage.getItem("user_role");
+  const ENCRYPTION_KEY = 'pass123';
+  const encryptData = (data: string | number | null | undefined): string => {
+    if (!data && data !== 0) {
+      return '';
+    }
+    const stringData = String(data); // Convert to string
+    return CryptoJS.AES.encrypt(stringData, ENCRYPTION_KEY).toString();
+  };
+  const decryptData = (
+    encryptedData: string | null,
+  ): string | number | null => {
+    if (!encryptedData) {
+      return null;
+    }
+    try {
+      const decryptedString = CryptoJS.AES.decrypt(
+        encryptedData,
+        ENCRYPTION_KEY,
+      ).toString(CryptoJS.enc.Utf8);
+      return !isNaN(Number(decryptedString))
+        ? Number(decryptedString)
+        : decryptedString;
+    } catch (error) {
+      return null;
+    }
+  };
+  const navigate = useRouter();
+  const [org_id, Setorg_id] = useState<any>('');
+  const [user_id, setuser_id] = useState<any>('');
+  // const [user_role, setUserrole] = useState('');
+  // useEffect(() => {
+  //   const userid: any = localStorage.getItem('user_id');
+  //   // const userrole: any = localStorage.getItem('user_role');
+  //   const orgid: any = localStorage.getItem('org_id');
+  //   setuser_id(userid);
+  //   // setUserrole(userrole);
+  //   Setorg_id(orgid);
+  //   if (!orgid) {
+  //     swal('Please select organization', { icon: 'error' });
+  //     redirect('/organization');
+  //   }
+  // }, []);
+  useEffect(() => {
+    const decryptedUserid = decryptData(localStorage.getItem('user_id'));
+    const decryptedOrgId = decryptData(localStorage.getItem('org_id'));
+    setuser_id(decryptedUserid);
+    Setorg_id(decryptedOrgId);
+
+    if (!decryptedOrgId) {
+      swal('Please select organization', { icon: 'error' });
+      redirect('/organization');
+    }
+  }, []);
+  const [userrole2, setuserrole2] = useState('');
   useEffect(() => {
     const fetchData2 = async () => {
       try {
-        // setLoading(true);
-        const data: any = await getUserRole();
+        const data: any = await getOrgUserRole(user_id, org_id);
 
-        if (data && data.data && data.data.length > 0) {
-          for (let i = 0; i < data.data.length; i++) {
-            // setLoading(false);
-            // if (data.data[i].id == user_role) {
-            //   console.log("Matching user role found. Name:", data.data[i].name);
-            //   setUserRoleName(data.data[i].name);
-            // } else {
-            //   console.log("Not found");
-            // }
-          }
+        if (data) {
+          setuserrole2(data.data.id);
         } else {
-          // setLoading(false);
-          // console.log("No organization details found.");
+          // console.log("No Role Found.");
         }
       } catch (error: any) {
         // console.error("Error fetching organization details:", error.message);
@@ -113,8 +161,7 @@ const Page: React.FC = () => {
     };
 
     fetchData2();
-  }, []);
-
+  }, [user_id, org_id]);
   const [loading, setLoading] = useState<boolean>(false);
   const [SitesList, setOSitesList] = useState<SiteDetailsWithUsers[] | null>(
     null,
@@ -156,28 +203,22 @@ const Page: React.FC = () => {
 
   const closeModalButtonRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    const orgid: any = localStorage.getItem('org_id');
-    Setorg_id(orgid);
-    if (!orgid) {
-      swal('Please select organization', { icon: 'error' });
-      redirect('/organization');
-    }
-  }, []);
   /// for getting details of site
   const FetchSiteDetails = async () => {
     try {
       setLoading(true);
       const data1 = await fetchSiteDetails(org_id);
+      if (org_id) {
+        if (data1) {
+          setOSitesList(data1.data ? data1.data : []);
 
-      if (data1) {
-        setOSitesList(data1.data ? data1.data : []);
-        setLoading(false);
-      } else {
-        setLoading(false);
-        // console.log("No Sites details found.");
+          setLoading(false);
+        } else {
+          setLoading(false);
+          // console.log("No Sites details found.");
+        }
       }
-    } catch (error: unknown) {
+    } catch (error: any) {
       setLoading(false);
       // console.error("Error fetching Sites details:", error.message);
     }
@@ -191,21 +232,28 @@ const Page: React.FC = () => {
     try {
       // setLoading(true);
 
-      const result1 = await fetchSiteSidebarList(
-        searchTerm !== '' ? searchTerm : null,
-        org_id,
-      );
+      const result1: any = await fetchSiteSidebarList(searchTerm, org_id);
 
-      if (result1.errorCode === 0 && result1.data) {
+      if (result1.errorCode === 0 && result1.data.length > 0) {
         setsidebarSite(result1.data);
-        // setLoading(false);
-      } else {
+      } else if (result1.errorCode === 1) {
         // console.log("No organization details found.");
         setsidebarSite([]);
         // setLoading(false);
+      } else {
+        if (searchTerm) {
+          setsidebarSite([
+            {
+              id: 0,
+              name: 'No Data Found',
+            },
+          ]);
+        } else {
+          setsidebarSite([]);
+        }
       }
     } catch (error: any) {
-      setLoading(false);
+      // setLoading(false);
       // console.error("Error fetching Sidebar details:", error.message);
     }
   };
@@ -227,14 +275,13 @@ const Page: React.FC = () => {
       }
     }
   };
-  // console.log("this is site list", sidebarSite.data);
 
   ///////////////////for crud validations/////
   const validationSchema = Yup.object().shape({
     AddSiteName: SiteNameSchema,
     SelectedValueDropdown: TypeDropdownSchema,
     Address1: SiteAddressSchema,
-    Address2: SiteAddressSchema,
+    Address2: SiteAddress2Schema,
     SelectedValueCounrty: TypeDropdownSchema,
     SelectedValueState: TypeDropdownSchema,
     City: SiteCitySchema,
@@ -505,7 +552,7 @@ const Page: React.FC = () => {
         setLoading(true);
         const result = await addSites(data);
 
-        if (result.data != null) {
+        if (result.errorCode == 0) {
           setLoading(false);
           if (closeModalButtonRef.current) {
             closeModalButtonRef.current.click();
@@ -520,12 +567,17 @@ const Page: React.FC = () => {
           setSelectedValueState(undefined);
           setCity('');
           setMessageError('');
-          setPincodeError;
-          ('');
+          setPincodeError('');
           FetchSiteDetails();
           fetchData1();
+          toast.success(result.message, { autoClose: 3000 });
+        } else {
+          setLoading(false);
+
+          toast.error(result.message, { autoClose: 3000 });
         }
       } catch (error) {
+        setLoading(false);
         // console.error("API call failed:", error);
       }
     }
@@ -550,17 +602,11 @@ const Page: React.FC = () => {
     setFetchdropDCounrty(null);
     setSelectedValueState(undefined);
     setCity('');
+    setPincodeError('');
     setMessageError('');
     FetchSiteDetails();
     fetchData1();
   };
-
-  // this is for userprofile from redux
-
-  // const { user_id, user_role, user_firstname, user_lastname } = useSelector(
-  //   (state: RootState) => state.user
-  // );
-  const user_role = '1';
 
   const [tokenVerify, setTokenVerify] = useState(false);
   useLayoutEffect(() => {
@@ -580,12 +626,13 @@ const Page: React.FC = () => {
         {loading && <Loader />}
         {tokenVerify && (
           <>
+            <ToastContainer />
             <Seo title='Contacts' />
             <div className='grid grid-cols-12 gap-6 mt-5'>
               <div className='xl:col-span-3 col-span-12'>
                 <div className='box'>
                   <div className='box-body !p-0'>
-                    {user_role == '1' ? (
+                    {userrole2 == '1' || userrole2 == '2' ? (
                       <div className='p-4 grid border-b border-dashed dark:border-defaultborder/10'>
                         <Link
                           href='#!'
@@ -627,12 +674,13 @@ const Page: React.FC = () => {
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      Site Name
+                                      Site Name*
                                     </label>
                                     <input
                                       type='text'
                                       className='form-control w-full'
                                       id='task-name'
+                                      placeholder='Enter Site Name'
                                       onChange={handelAddSiteName}
                                       value={AddSiteName}
                                       maxLength={50}
@@ -667,8 +715,6 @@ const Page: React.FC = () => {
                                             {type.name}
                                           </option>
                                         ))}
-                                      {/* <option>Option 2</option> */}
-                                      <option />
                                     </select>
 
                                     {typeDropdownError && (
@@ -688,6 +734,7 @@ const Page: React.FC = () => {
                                       type='text'
                                       className='form-control w-full'
                                       id='task-name'
+                                      placeholder='Enter Address 1'
                                       onChange={handelchangeAddress1}
                                       value={Address1}
                                     />
@@ -702,12 +749,13 @@ const Page: React.FC = () => {
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      Addres 2*
+                                      Address 2
                                     </label>
                                     <input
                                       type='text'
                                       className='form-control w-full'
                                       id='task-name'
+                                      placeholder='Enter Address 2'
                                       onChange={handelchangeAddress2}
                                       value={Address2}
                                     />
@@ -739,7 +787,6 @@ const Page: React.FC = () => {
                                             {Contry.name}
                                           </option>
                                         ))}
-                                      <option />
                                     </select>
 
                                     {CountryListError && (
@@ -770,7 +817,6 @@ const Page: React.FC = () => {
                                             {state.name}
                                           </option>
                                         ))}
-                                      <option />
                                     </select>
 
                                     {stateListError && (
@@ -790,6 +836,7 @@ const Page: React.FC = () => {
                                       type='text'
                                       className='form-control w-full'
                                       id='task-name'
+                                      placeholder='Enter City'
                                       onChange={handelAddSiteCity}
                                       value={City}
                                     />
@@ -804,12 +851,13 @@ const Page: React.FC = () => {
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      Pin Code
+                                      Postal Code*
                                     </label>
                                     <input
                                       type='text'
                                       className='form-control w-full'
                                       id='task-name'
+                                      placeholder='Enter Pin Code'
                                       onChange={handelAddSitePincode}
                                       value={Pincode}
                                     />
@@ -824,12 +872,12 @@ const Page: React.FC = () => {
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      Description*
+                                      Description
                                     </label>
                                     <textarea
                                       className='form-control w-full'
                                       id='task-name'
-                                      placeholder='Task Name'
+                                      placeholder='Enter Description'
                                       // onKeyDown={handleKeyPress}
                                       onChange={handleMessageChange}
                                       value={message}
@@ -874,7 +922,7 @@ const Page: React.FC = () => {
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
                           className='form-control w-full !rounded-md !bg-light border-0 !rounded-e-none'
-                          placeholder='Search Task Here'
+                          placeholder='Search Site Here'
                           aria-describedby='button-addon2'
                         />
                         <button
@@ -897,9 +945,19 @@ const Page: React.FC = () => {
                                 style={{ cursor: 'pointer' }}
                                 key={site?.id}
                                 onClick={() => {
-                                  // localStorage.setItem("org_id", org.id);
-                                  // localStorage.setItem("org_name", org.name);
-                                  // history.push("/orgdashboard");
+                                  const encryptedsiteid = encryptData(site.id);
+                                  const encryptedsitename = encryptData(
+                                    site.name,
+                                  );
+                                  localStorage.setItem(
+                                    'site_id',
+                                    encryptedsiteid,
+                                  );
+                                  localStorage.setItem(
+                                    'site_name',
+                                    encryptedsitename,
+                                  );
+                                  navigate.push('/sitedashboard');
                                 }}
                               >
                                 <div className='flex items-center'>
@@ -928,11 +986,11 @@ const Page: React.FC = () => {
                             </h6>
                           </div>
                         </div>
-                        {/* {SitesList && SitesList.length == 0 && 
-                              <div className='col-md-12 w-100 mt-4 mb-4'>
-                                <p className='text-center'>No Data Found</p>{' '}
-                              </div>
-                            } */}
+                        {SitesList && SitesList.length == 0 && (
+                          <div className='col-md-12 w-100 mt-4 mb-4'>
+                            <p className='text-center'>No Data Found</p>{' '}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -948,10 +1006,21 @@ const Page: React.FC = () => {
                               style={{ cursor: 'pointer' }}
                               key={SingleSite?.site?.id}
                               onClick={() => {
-                                // localStorage.setItem("org_id", org.org_id);
-                                // localStorage.setItem("org_name", org.org_name);
-                                // history.push("/orgdashboard");
-                                // handleOrgRole(org.org_id);
+                                const encryptedsiteid = encryptData(
+                                  SingleSite.site.id,
+                                );
+                                const encryptedsitename = encryptData(
+                                  SingleSite.site.name,
+                                );
+                                localStorage.setItem(
+                                  'site_id',
+                                  encryptedsiteid,
+                                );
+                                localStorage.setItem(
+                                  'site_name',
+                                  encryptedsitename,
+                                );
+                                navigate.push('/sitedashboard');
                               }}
                             >
                               <div className='box task-pending-card'>
@@ -987,23 +1056,23 @@ const Page: React.FC = () => {
                                         <li className='list-group-item fw-semibold'>
                                           <i className='bx bx-map align-middle me-2 text-muted'></i>
                                           <b>Address </b>
-                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                          <span className='ms-1 over-text text-muted fw-normal d-inline-block'>
                                             {SingleSite?.site
-                                              ? SingleSite.site?.address1
+                                              ? SingleSite.site?.address1 + ','
                                               : ''}
-                                            ,
+
                                             {SingleSite?.site
-                                              ? SingleSite.site?.address2
+                                              ? SingleSite.site?.address2 + ','
                                               : ''}
-                                            ,
+
                                             {SingleSite?.site
-                                              ? SingleSite.site?.city
+                                              ? SingleSite.site?.city + ','
                                               : ''}
-                                            ,
+
                                             {SingleSite?.site
-                                              ? SingleSite.state
+                                              ? SingleSite.state + ','
                                               : ''}
-                                            ,
+
                                             {SingleSite?.site
                                               ? SingleSite.country
                                               : ''}
@@ -1031,7 +1100,7 @@ const Page: React.FC = () => {
                                           type='button'
                                           className='ti-btn bg-primary text-white !font-medium'
                                         >
-                                          Production
+                                          {SingleSite?.type_name}
                                         </button>
                                       </div>
                                     </div>

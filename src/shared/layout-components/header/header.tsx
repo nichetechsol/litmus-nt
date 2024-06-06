@@ -1,17 +1,19 @@
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import CryptoJS from 'crypto-js';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { Fragment, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import Swal from 'sweetalert2';
+import swal from 'sweetalert';
 
 import store from '@/shared/redux/store';
 // import Modalsearch from '../modal-search/modalsearch';
 // import { "" } from '@/next.config';
 import { getUserRole } from '@/supabase/org_details';
 import { getOrgUserRole } from '@/supabase/org_user';
+import { getSiteUserRole } from '@/supabase/site_users';
 
 import { ThemeChanger } from '../../redux/action';
 const Header = ({ local_varaiable, ThemeChanger }: any) => {
@@ -313,28 +315,63 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
       window.removeEventListener('DOMContentLoaded', stickyFn);
     };
   }, []);
+  /////////////////////////////////
+  const ENCRYPTION_KEY = 'pass123';
 
+  const decryptData = (
+    encryptedData: string | null,
+  ): string | number | null => {
+    if (!encryptedData) {
+      return null;
+    }
+    try {
+      const decryptedString = CryptoJS.AES.decrypt(
+        encryptedData,
+        ENCRYPTION_KEY,
+      ).toString(CryptoJS.enc.Utf8);
+      return !isNaN(Number(decryptedString))
+        ? Number(decryptedString)
+        : decryptedString;
+    } catch (error) {
+      // console.error('Decryption error:', error);
+      return null;
+    }
+  };
   const history = useRouter();
   const pathname = usePathname();
 
-  const [user_id, setuser_id] = useState('');
-  const [user_fname, setUser_fname] = useState('');
-  const [user_lname, setUserlname] = useState('');
-  const [user_role, setUserrole] = useState('');
-  const [org_id, setOrg_id] = useState('');
+  const [user_id, setuser_id] = useState<any>('');
+  const [user_fname, setUser_fname] = useState<any>('');
+  const [user_lname, setUserlname] = useState<any>('');
+  const [user_role, setUserrole] = useState<any>('');
+  const [org_id, setOrg_id] = useState<any>('');
+  const [site_id, setSite_id] = useState<any>('');
+  // useEffect(() => {
+  //   const userid: any = localStorage.getItem('user_id');
+  //   const userfname: any = localStorage.getItem('user_fname');
+  //   const userlname: any = localStorage.getItem('user_lname');
+  //   const userrole: any = localStorage.getItem('user_role');
+  //   const orgid: any = localStorage.getItem('org_id');
+  //   setuser_id(userid);
+  //   setUser_fname(userfname);
+  //   setUserlname(userlname);
+  //   setUserrole(userrole);
+  //   setOrg_id(orgid);
+  // }, [pathname]);
   useEffect(() => {
-    const userid: any = localStorage.getItem('user_id');
-    const userfname: any = localStorage.getItem('user_fname');
-    const userlname: any = localStorage.getItem('user_lname');
-    const userrole: any = localStorage.getItem('user_role');
-    const orgid: any = localStorage.getItem('org_id');
-    setuser_id(userid);
-    setUser_fname(userfname);
-    setUserlname(userlname);
-    setUserrole(userrole);
-    setOrg_id(orgid);
+    const decryptedUserId = decryptData(localStorage.getItem('user_id'));
+    const decryptedUserFname = decryptData(localStorage.getItem('user_fname'));
+    const decryptedUserLname = decryptData(localStorage.getItem('user_lname'));
+    const decryptedUserRole = decryptData(localStorage.getItem('user_role'));
+    const decryptedOrgId = decryptData(localStorage.getItem('org_id'));
+    const decryptedsiteId = decryptData(localStorage.getItem('site_id'));
+    setuser_id(decryptedUserId);
+    setUser_fname(decryptedUserFname);
+    setUserlname(decryptedUserLname);
+    setUserrole(decryptedUserRole);
+    setOrg_id(decryptedOrgId);
+    setSite_id(decryptedsiteId);
   }, [pathname]);
-
   const [userRoleName, setUserRoleName] = useState('');
   useEffect(() => {
     const fetchData2 = async () => {
@@ -378,7 +415,24 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
 
     fetchData2();
   }, [user_id, org_id, pathname]);
+  const [userrole3, setuserrole3] = useState('');
+  useEffect(() => {
+    const fetchData2 = async () => {
+      try {
+        const data: any = await getSiteUserRole(user_id, site_id);
 
+        if (data) {
+          setuserrole3(data.data.name);
+        } else {
+          // console.log("No Role Found.");
+        }
+      } catch (error: any) {
+        // console.error("Error fetching organization details:", error.message);
+      }
+    };
+
+    fetchData2();
+  }, [site_id, user_id, pathname]);
   const [roleToDisplay, setRoleToDisplay] = useState('');
 
   useEffect(() => {
@@ -387,8 +441,10 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
       setRoleToDisplay('');
     } else if (pathname === '/orgdashboard' || pathname === '/sites') {
       setRoleToDisplay(userrole2);
+    } else if (pathname === '/sitedashboard') {
+      setRoleToDisplay(userrole3);
     }
-  }, [userRoleName, org_id, userrole2, pathname]);
+  }, [userRoleName, org_id, userrole2, site_id, userrole3, pathname]);
 
   return (
     <Fragment>
@@ -470,18 +526,21 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                 >
                   <div className='avatar avatar-xl avatar-rounded '>
                     {' '}
-                    <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
+                    <span
+                      style={{ cursor: 'pointer' }}
+                      className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'
+                    >
                       {/* {SingleSite?.site?SingleSite?.site?.name[0].toUpperCase(): ""} */}
                       {user_fname
                         ? user_fname
                             .split(' ')
-                            .map((word) => word[0].toUpperCase())
+                            .map((word: any) => word[0].toUpperCase())
                             .join('')
                         : ''}
                       {user_lname
                         ? user_lname
                             .split(' ')
-                            .map((word) => word[0].toUpperCase())
+                            .map((word: any) => word[0].toUpperCase())
                             .join('')
                         : ''}
                     </span>
@@ -530,22 +589,35 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
 
                     <li
                       onClick={() => {
-                        Swal.fire({
+                        swal({
                           title: 'Are you sure?',
                           text: 'Do you really want to logout?',
                           icon: 'warning',
-                          showCancelButton: true,
-                          confirmButtonColor: '#3085d6',
-                          cancelButtonColor: '#d33',
-                          confirmButtonText: 'Yes, logout!',
-                          cancelButtonText: 'Cancel',
-                        }).then((result) => {
-                          if (result.isConfirmed) {
+                          buttons: {
+                            cancel: {
+                              text: 'Cancel',
+                              value: null,
+                              visible: true,
+                              className: '',
+                              closeModal: true,
+                            },
+                            confirm: {
+                              text: 'Yes, logout!',
+                              value: true,
+                              visible: true,
+                              className: '',
+                              closeModal: true,
+                            },
+                          },
+                        }).then((willLogout: any) => {
+                          if (willLogout) {
                             localStorage.removeItem(
                               'sb-emsjiuztcinhapaurcrl-auth-token',
                             );
                             localStorage.removeItem('org_id');
                             localStorage.removeItem('org_name');
+                            localStorage.removeItem('site_id');
+                            localStorage.removeItem('site_name');
                             history.push('/');
                           }
                         });

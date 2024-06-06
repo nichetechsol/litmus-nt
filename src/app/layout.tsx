@@ -64,7 +64,7 @@ interface LayoutComponent {
 const layouts: { [route: string]: LayoutComponent } = {
   '/landing': LandingLayout,
   '/auth/*': AuthenticationLayout,
-  // '/dashboard': ContentLayout,
+  '/sitedashboard': ContentLayout,
   '/organization': ContentLayout,
   '/orgdashboard': ContentLayout,
   '/sites': ContentLayout,

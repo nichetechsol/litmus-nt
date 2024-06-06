@@ -2,6 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
+import CryptoJS from 'crypto-js';
 import { redirect } from 'next/navigation';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Pagination from 'react-js-pagination';
@@ -17,6 +18,7 @@ import {
   orgEntitlementList,
   orgUserList,
 } from '@/supabase/dashboard';
+import { getLocationOfSites } from '@/supabase/org_dashboard';
 import { getUserRole } from '@/supabase/org_details';
 import {
   addUserToOrganization,
@@ -56,6 +58,27 @@ const validationSchema = Yup.object().shape({
   role: roleSchema,
 });
 const OrgDashboard = () => {
+  const ENCRYPTION_KEY = 'pass123';
+
+  const decryptData = (
+    encryptedData: string | null,
+  ): string | number | null => {
+    if (!encryptedData) {
+      return null;
+    }
+    try {
+      const decryptedString = CryptoJS.AES.decrypt(
+        encryptedData,
+        ENCRYPTION_KEY,
+      ).toString(CryptoJS.enc.Utf8);
+      return !isNaN(Number(decryptedString))
+        ? Number(decryptedString)
+        : decryptedString;
+    } catch (error) {
+      // console.error('Decryption error:', error);
+      return null;
+    }
+  };
   const [loading, setLoading] = useState<boolean>(false);
   const [tokenVerify, setTokenVerify] = useState(false);
 
@@ -70,34 +93,50 @@ const OrgDashboard = () => {
       }
     }
   }, []);
-  const [user_id, setuser_id] = useState('');
+  const [user_id, setuser_id] = useState<any>('');
   // const [user_fname, setUser_fname] = useState("")
   // const [user_lname, setUserlname] = useState("")
   // const [user_role, setUserrole] = useState('');
-  const [org_id, setorg_id] = useState('');
-  const [orgName, setorgName] = useState('');
+  const [org_id, setorg_id] = useState<any>('');
+  const [orgName, setorgName] = useState<any>('');
+  // useEffect(() => {
+  //   const userid: any = localStorage.getItem('user_id');
+  //   // const userfname: any = localStorage.getItem("user_fname");
+  //   // const userlname: any = localStorage.getItem("user_lname");
+  //   // const userrole: any = localStorage.getItem('user_role');
+  //   const org_id: any = localStorage.getItem('org_id');
+  //   const orgName: any = localStorage.getItem('org_name');
+  //   setuser_id(userid);
+  //   // setUser_fname(userfname);
+  //   // setUserlname(userlname);
+  //   // setUserrole(userrole);
+  //   setorg_id(org_id);
+  //   if (!org_id) {
+  //     swal('Please select organization', { icon: 'error' });
+  //     redirect('/organization');
+  //   }
+  //   setorgName(orgName);
+  // }, []);
+
+  // const user_id = localStorage.getItem('user_id');
+
   useEffect(() => {
-    const userid: any = localStorage.getItem('user_id');
-    // const userfname: any = localStorage.getItem("user_fname");
-    // const userlname: any = localStorage.getItem("user_lname");
-    // const userrole: any = localStorage.getItem('user_role');
-    const org_id: any = localStorage.getItem('org_id');
-    const orgName: any = localStorage.getItem('org_name');
-    setuser_id(userid);
-    // setUser_fname(userfname);
-    // setUserlname(userlname);
-    // setUserrole(userrole);
-    setorg_id(org_id);
-    if (!org_id) {
+    const decryptedUserId = decryptData(localStorage.getItem('user_id'));
+    const decryptedOrgId = decryptData(localStorage.getItem('org_id'));
+    const decryptedOrgName = decryptData(localStorage.getItem('org_name'));
+
+    setuser_id(decryptedUserId);
+    setorg_id(decryptedOrgId);
+    setorgName(decryptedOrgName);
+
+    if (!decryptedOrgId) {
       swal('Please select organization', { icon: 'error' });
       redirect('/organization');
     }
-    setorgName(orgName);
   }, []);
 
-  // const user_id = localStorage.getItem('user_id');
   const [activePage, setActivePage] = useState(1);
-  // const [search, setsearch] = useState("")
+  const [search, setsearch] = useState('');
   const [perPage] = useState(10); // Number of items per page
   const [totalItemsCount, setTotalItemsCount] = useState(0);
 
@@ -117,7 +156,7 @@ const OrgDashboard = () => {
   const [activePage2, setActivePage2] = useState(1);
   const [perPage2] = useState(10);
   const [totalItemsCount2, setTotalItemsCount2] = useState(0);
-
+  const [locationOfSites, setLocationOfSites] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -141,30 +180,30 @@ const OrgDashboard = () => {
   }, [org_id]);
   const fetchData2 = async () => {
     try {
-      setLoading(true);
+      // setLoading(true);
 
       const start: any = (activePage - 1) * perPage; // Calculate start index
       const end: any = start + perPage - 1; // Calculate end index
       if (org_id) {
-        const data: any = await orgUserList(org_id, start, end, '');
+        const data: any = await orgUserList(org_id, start, end, search);
 
         if (data) {
           setOrgUserData(data.data.userList);
           setTotalItemsCount(data.data?.totalCount); // Set total items count for pagination
-          setLoading(false);
+          // setLoading(false);
         } else {
-          setLoading(false);
+          // setLoading(false);
           // console.log("No organization details found.");
         }
       }
     } catch (error: any) {
-      setLoading(false);
+      // setLoading(false);
       // console.error("Error fetching organization details:", error.message);
     }
   };
   useEffect(() => {
     fetchData2();
-  }, [org_id, activePage]);
+  }, [org_id, activePage, search]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -191,6 +230,31 @@ const OrgDashboard = () => {
 
     fetchData();
   }, [org_id, activePage2, perPage2]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        if (org_id) {
+          const sets = { org_id: org_id };
+          const data: any = await getLocationOfSites(sets);
+
+          if (data) {
+            setLocationOfSites(data);
+            setLoading(false);
+          } else {
+            setLoading(false);
+            // console.log("No organization details found.");
+          }
+        }
+      } catch (error: any) {
+        setLoading(false);
+        // console.error("Error fetching organization details:", error.message);
+      }
+    };
+
+    fetchData();
+  }, [org_id]);
   const [changeFlage, setChangeFlage] = useState<boolean>(false);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -206,16 +270,16 @@ const OrgDashboard = () => {
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        setLoading(true);
+        // setLoading(true);
 
         const result1: any = await getUserRole(); // Replace with your actual API call
 
         if (result1 && result1.data) {
           setRoles(result1.data);
-          setLoading(false);
+          // setLoading(false);
         }
       } catch (error: any) {
-        setLoading(false);
+        // setLoading(false);
         // console.error("Error fetching roles:", error.message);
       }
     };
@@ -363,6 +427,12 @@ const OrgDashboard = () => {
             if (button) {
               button.click(); // Directly trigger click event on button
             }
+          } else {
+            toast.error('User was not in Central V2', { autoClose: 3000 });
+            const button = document.getElementById('close-modal-btn');
+            if (button) {
+              button.click(); // Directly trigger click event on button
+            }
           }
         } else {
           const userData = {
@@ -451,7 +521,7 @@ const OrgDashboard = () => {
                             <div>
                               <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
                                 {/* <i className='ti ti-users text-[1rem] text-white'></i> */}
-                                <i className='ri-group-line text-white'></i>
+                                <i className='ri-wallet-2-line text-white'></i>
                               </span>
                             </div>
                             <div className='flex-grow ms-4'>
@@ -477,7 +547,7 @@ const OrgDashboard = () => {
                             <div>
                               <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-secondary'>
                                 {/* <i className='ti ti-wallet text-[1rem] text-white'></i> */}
-                                <i className='ri-wallet-2-line text-white'></i>
+                                <i className='ri-group-line text-white'></i>
                               </span>
                             </div>
                             <div className='flex-grow ms-4'>
@@ -589,6 +659,17 @@ const OrgDashboard = () => {
                     <div className='box-header justify-between'>
                       <div className='box-title'>User Management</div>
                       <div className='flex flex-wrap gap-2'>
+                        <div>
+                          <input
+                            className='ti-form-control form-control-sm'
+                            type='text'
+                            placeholder='Search Here'
+                            aria-label='.form-control-sm example'
+                            onChange={(e) => {
+                              setsearch(e.target.value);
+                            }}
+                          />
+                        </div>
                         <div className='hs-dropdown ti-dropdown'>
                           {' '}
                           {userrole2 === 1 || userrole2 === 2 ? (

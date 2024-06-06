@@ -14,7 +14,8 @@ const DomainSchema = Yup.string()
   .min(2, 'The domain should be at least 2 characters long.')
   .max(255, 'The domain should not exceed 255 characters.')
   .matches(
-    /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+$/,
+    // /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+$/,
+    /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+,)*[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+$/,
     'Invalid domain format. Please enter a valid domain.',
   );
 
@@ -23,9 +24,9 @@ const TypeDropdownSchema = Yup.string().required(
 );
 
 const MessageSchema = Yup.string()
-  .required('Message field is required. Please enter a message.')
-  .min(1, 'Message must be at least 1 character long.')
-  .max(1000, 'Message must be at most 1000 characters long.');
+  // .required('It field is required.')
+  // .min(1, 'It must be at least 1 character long.')
+  .max(1000, 'It must be at most 1000 characters long.');
 const emailSchema = Yup.string()
   .email('Invalid email address format. Please enter a valid email address.')
   .required('Email address is required. Please enter your email address.')
@@ -38,8 +39,8 @@ const emailSchema = Yup.string()
 const nameSchema = Yup.string()
   .required('Please enter your name.')
   .min(2, 'Name must be at least 2 characters long.')
-  .matches(/^[a-zA-Z]+$/, 'Please enter a valid name.')
-  .max(255, 'Name must be at most 255 characters long.');
+  .max(255, 'Name must be at most 255 characters long.')
+  .matches(/^[a-zA-Z]+$/, 'Please enter a valid name.');
 
 const roleSchema = Yup.string().required(
   'Please select a role from the dropdown menu.',
@@ -65,6 +66,11 @@ const SiteAddressSchema = Yup.string()
   .max(255, 'The Site address should not exceed 255 characters.')
   .matches(/^[A-Za-z0-9'\.\-\s\,/]+$/, 'Please enter a valid address.');
 
+const SiteAddress2Schema = Yup.string().max(
+  255,
+  'The Site address should not exceed 255 characters.',
+);
+
 const SiteCitySchema = Yup.string()
   .required('Please enter your city.')
   .min(1, 'The city should be atleast 1 characters long.')
@@ -87,4 +93,10 @@ export {
   TypeDropdownSchema,
 };
 
-export { PincodeSchema, SiteAddressSchema, SiteCitySchema, SiteNameSchema };
+export {
+  PincodeSchema,
+  SiteAddress2Schema,
+  SiteAddressSchema,
+  SiteCitySchema,
+  SiteNameSchema,
+};

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
+import CryptoJS from 'crypto-js';
 import Link from 'next/link';
 import { redirect, useRouter } from 'next/navigation';
 import React, {
@@ -9,8 +10,11 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
 import swal from 'sweetalert';
 import * as Yup from 'yup';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 import {
   DomainSchema,
@@ -62,9 +66,37 @@ interface Typeor {
 }
 
 const LoginForm = () => {
-  const [tokenVerify, setTokenVerify] = useState(false);
-  const navigate = useRouter();
+  const ENCRYPTION_KEY = 'pass123';
+  const encryptData = (data: string | number | null | undefined): string => {
+    if (!data && data !== 0) {
+      return '';
+    }
+    const stringData = String(data); // Convert to string
+    return CryptoJS.AES.encrypt(stringData, ENCRYPTION_KEY).toString();
+  };
 
+  const decryptData = (
+    encryptedData: string | null,
+  ): string | number | null => {
+    if (!encryptedData) {
+      return null;
+    }
+    try {
+      const decryptedString = CryptoJS.AES.decrypt(
+        encryptedData,
+        ENCRYPTION_KEY,
+      ).toString(CryptoJS.enc.Utf8);
+      return !isNaN(Number(decryptedString))
+        ? Number(decryptedString)
+        : decryptedString;
+    } catch (error) {
+      // console.error('Decryption error:', error);
+      return null;
+    }
+  };
+  const [tokenVerify, setTokenVerify] = useState(false);
+  const [onlyToken, setOnlyToken] = useState('');
+  const navigate = useRouter();
   const [organizationName, setOrganizationName] = useState('');
   const [organizationNameError, setOrganizationNameError] = useState('');
   const [domains, setDomains] = useState<any[]>([]);
@@ -78,8 +110,8 @@ const LoginForm = () => {
   const closeModalButtonRef = useRef<HTMLButtonElement>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [user_id, setuser_id] = useState('');
-  const [user_role, setUserrole] = useState('');
+  const [user_id, setuser_id] = useState<any>('');
+  const [user_role, setUserrole] = useState<any>('');
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [searchTerm, setSearchTerm] = useState<any>('');
@@ -90,26 +122,42 @@ const LoginForm = () => {
 
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
-      if (!token) {
+      const tokens = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
+      if (!tokens) {
         setTokenVerify(false);
         redirect('/');
       } else {
         setTokenVerify(true);
+        const token = JSON.parse(tokens);
+        setOnlyToken(token.access_token);
       }
     }
   }, []);
 
+  // useEffect(() => {
+  //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //   const userid: any = localStorage.getItem('user_id');
+  //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //   const userrole: any = localStorage.getItem('user_role');
+  //   setuser_id(userid);
+
+  //   setUserrole(userrole);
+  // }, []);
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userid: any = localStorage.getItem('user_id');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userrole: any = localStorage.getItem('user_role');
-    setuser_id(userid);
+    const encryptedUserId = localStorage.getItem('user_id');
+    const encryptedUserRole = localStorage.getItem('user_role');
 
-    setUserrole(userrole);
+    const decryptedUserId = decryptData(encryptedUserId);
+    const decryptedUserRole = decryptData(encryptedUserRole);
+
+    if (decryptedUserId) {
+      setuser_id(decryptedUserId);
+    }
+
+    if (decryptedUserRole) {
+      setUserrole(decryptedUserRole);
+    }
   }, []);
-
   useEffect(() => {
     const fetchData2 = async () => {
       try {
@@ -135,7 +183,6 @@ const LoginForm = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const data: any = await fetchOrganizationAndSiteDetails(user_id);
 
       if (data) {
@@ -156,14 +203,32 @@ const LoginForm = () => {
     try {
       // setLoading(true);
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result1: any = await organizationSidebarList(searchTerm, user_id);
 
-      if (result1.errorCode === 0 && result1.data) {
+      if (result1.errorCode === 0 && result1.data.length > 0) {
         // setLoading(false);
+
         setSidebarOrgs({ data: result1.data });
-      } else {
+      } else if (result1.errorCode === 1) {
         setSidebarOrgs({ data: [] });
+      } else {
+        if (searchTerm) {
+          setSidebarOrgs({
+            data: [
+              {
+                id: 0,
+                name: 'No Data Found',
+                created_at: '',
+                description: '',
+                type_id: 0,
+                status: '',
+                updated_at: '',
+              },
+            ],
+          });
+        } else {
+          setSidebarOrgs({ data: [] });
+        }
       }
     } catch (error: unknown) {
       /* empty */
@@ -227,25 +292,25 @@ const LoginForm = () => {
         setMessageError(err.message);
       });
   };
-  const addDomain = async (domain: string) => {
-    if (domains.includes(domain)) {
-      setDomainError('Domain already added');
-    } else {
-      try {
-        await DomainSchema.validate(domain);
-        setDomains([...domains, domain]);
-        setDomainInput('');
-        setDomainError('');
-      } catch (error) {
-        if (error instanceof Error) {
-          setDomainError(error.message);
-        } else {
-          // Handle the case where the error might not be an instance of Error
-          setDomainError('An unknown error occurred');
-        }
-      }
-    }
-  };
+  // const addDomain = async (domain: string) => {
+  //   if (domains.includes(domain)) {
+  //     setDomainError('Domain already added');
+  //   } else {
+  //     try {
+  //       await DomainSchema.validate(domain);
+  //       setDomains([...domains, domain]);
+  //       setDomainInput('');
+  //       setDomainError('');
+  //     } catch (error) {
+  //       if (error instanceof Error) {
+  //         setDomainError(error.message);
+  //       } else {
+  //         // Handle the case where the error might not be an instance of Error
+  //         setDomainError('An unknown error occurred');
+  //       }
+  //     }
+  //   }
+  // };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -302,7 +367,6 @@ const LoginForm = () => {
       const selectedTypeId =
         typeDropdown?.find((type) => type.name === selectedType)?.id ?? null;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const data: any = {
         user_id: user_id,
         user_role: user_role,
@@ -311,17 +375,19 @@ const LoginForm = () => {
         type_id: selectedTypeId,
         status: 'Y',
         domain: domains,
+        token: onlyToken,
       };
       try {
         setLoading(true);
         const result = await addOrganization(data);
 
-        if (result.data != null) {
+        if (result.data != null && result.errorCode == 0) {
           setLoading(false);
+          toast.success('Successfully Added organization', { autoClose: 3000 });
         } else {
           setLoading(false);
           if (result.errorCode === 1) {
-            swal('Domain exists in Organization!', { icon: 'error' });
+            swal('It exists in Organization!', { icon: 'error' });
           }
         }
         if (closeModalButtonRef.current) {
@@ -346,12 +412,51 @@ const LoginForm = () => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleKeyPress = (e: any) => {
+  // const handleKeyPress = (e: any) => {
+  //   if (e.key === 'Enter') {
+  //     e.preventDefault();
+
+  //     if (domainError === '' && domainInput.trim() !== '') {
+  //       addDomain(domainInput.trim());
+  //     } else {
+  //       handleSubmit();
+  //     }
+  //   }
+  // };
+  const handleKeyPress = async (e: any) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-
       if (domainError === '' && domainInput.trim() !== '') {
-        addDomain(domainInput.trim());
+        const domainsArray = domainInput
+          .split(',')
+          .map((domain) => domain.trim());
+        const newDomains = [];
+        let errorMessage = '';
+
+        for (const domain of domainsArray) {
+          if (domains.includes(domain)) {
+            errorMessage += `Domain ${domain} already added. `;
+          } else {
+            try {
+              await DomainSchema.validate(domain);
+              newDomains.push(domain);
+            } catch (error) {
+              if (error instanceof Error) {
+                errorMessage += `${error.message} for domain ${domain}. `;
+              } else {
+                errorMessage += `An unknown error occurred for domain ${domain}. `;
+              }
+            }
+          }
+        }
+
+        if (errorMessage === '') {
+          setDomains([...domains, ...newDomains]);
+          setDomainInput('');
+          setDomainError('');
+        } else {
+          setDomainError(errorMessage.trim());
+        }
       } else {
         handleSubmit();
       }
@@ -384,6 +489,7 @@ const LoginForm = () => {
       {loading && <Loader />}
       {tokenVerify && (
         <>
+          <ToastContainer />
           <Seo title='organization' />
           <div className='grid grid-cols-12 gap-6 mt-5'>
             <div className='xl:col-span-3 col-span-12'>
@@ -401,9 +507,9 @@ const LoginForm = () => {
                     </Link>
                     <div
                       id='todo-compose'
-                      className='hs-overlay hidden ti-modal'
+                      className='hs-overlay hidden ti-modal open'
                     >
-                      <div className='hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out'>
+                      <div className='hs-overlay-open:mt-7  ti-modal-box mt-0 ease-out'>
                         <div className='ti-modal-content'>
                           <div className='ti-modal-header'>
                             <h6
@@ -572,7 +678,7 @@ const LoginForm = () => {
                                   htmlFor='task-name'
                                   className='ti-form-label'
                                 >
-                                  Message*
+                                  Message
                                 </label>
                                 <textarea
                                   className='form-control w-full'
@@ -661,12 +767,23 @@ const LoginForm = () => {
                               style={{ cursor: 'pointer' }}
                               key={org.id as number}
                               onClick={() => {
-                                localStorage.setItem(
-                                  'org_id',
+                                const encryptedOrgId = encryptData(
                                   org.id as string,
                                 );
-                                localStorage.setItem('org_name', org.name);
+                                const encryptedOrgName = encryptData(org.name);
+                                localStorage.setItem('org_id', encryptedOrgId);
+                                localStorage.setItem(
+                                  'org_name',
+                                  encryptedOrgName,
+                                );
                               }}
+                              // onClick={() => {
+                              //   localStorage.setItem(
+                              //     'org_id',
+                              //     org.id as string,
+                              //   );
+                              //   localStorage.setItem('org_name', org.name);
+                              // }}
                             >
                               <div className='flex items-center'>
                                 {/* <span className="me-2 leading-none">
@@ -681,43 +798,6 @@ const LoginForm = () => {
                           ))}
                         </div>
                       )}
-                      {/* <li className="active">
-                                        <Link href="#!">
-                                            <div className="flex items-center">
-                                                <span className="me-2 leading-none">
-                                                    <i className="ri-task-line align-middle text-[.875rem]"></i>
-                                                </span>
-                                                <span className="flex-grow whitespace-nowrap">
-                                                    All Tasks
-                                                </span>
-                                                <span className="badge bg-success/10 text-success rounded-full">167</span>
-                                            </div>
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link href="#!">
-                                            <div className="flex items-center">
-                                                <span className="me-2 leading-none">
-                                                    <i className="ri-star-line align-middle text-[.875rem]"></i>
-                                                </span>
-                                                <span className="flex-grow whitespace-nowrap">
-                                                    Starred
-                                                </span>
-                                            </div>
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link href="#!">
-                                            <div className="flex items-center">
-                                                <span className="me-2 leading-none">
-                                                    <i className="ri-delete-bin-5-line align-middle text-[.875rem]"></i>
-                                                </span>
-                                                <span className="flex-grow whitespace-nowrap">
-                                                    Trash
-                                                </span>
-                                            </div>
-                                        </Link>
-                                    </li> */}
                     </ul>
                   </div>
                 </div>
@@ -751,8 +831,12 @@ const LoginForm = () => {
                           style={{ cursor: 'pointer' }}
                           key={org.org_id}
                           onClick={() => {
-                            localStorage.setItem('org_id', org.org_id);
-                            localStorage.setItem('org_name', org.org_name);
+                            const encryptedOrgId = encryptData(org.org_id);
+                            const encryptedOrgName = encryptData(org.org_name);
+                            localStorage.setItem('org_id', encryptedOrgId);
+                            localStorage.setItem('org_name', encryptedOrgName);
+                            // localStorage.setItem('org_id', org.org_id);
+                            // localStorage.setItem('org_name', org.org_name);
                             navigate.push('/orgdashboard');
                           }}
                         >

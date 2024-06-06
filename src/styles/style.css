@@ -20037,3 +20037,11 @@ h6 {
   @apply w-[1.8rem];
   overflow: visible;
 }
+
+.signin-new {
+  @apply flex justify-between;
+  flex-direction: column;
+}
+.over-text {
+  word-break: break-all;
+}

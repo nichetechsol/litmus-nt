@@ -224,7 +224,7 @@ async function addOrganization(data: {
     }
     try {
       await sendEmailFunction(
-        'soumiya@nichetech.in',
+        'srishti@nichetech.in',
         'Add Organization',
         'add_org',
         data.token,
