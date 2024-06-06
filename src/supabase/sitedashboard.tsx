@@ -23,34 +23,16 @@ interface FunctionReturnLicence {
   data: any | null;
 }
 
-async function allSitesOfUsers(
-  user_id: any,
-  org_id: any,
-): Promise<FunctionReturn> {
-  // Validate inputs
-  if (!user_id || !org_id) {
-    return {
-      errorCode: 1,
-      message: 'Invalid input: user_id and org_id cannot be null or empty',
-      data: null,
-    };
-  }
-
+async function allSitesOfUsers(site_id: any): Promise<FunctionReturn> {
   try {
-    // Perform the join query
-    const { data, error } = await supabase
+    // Fetch site users
+    const { data: siteUserData, error: siteUserError } = await supabase
       .from('site_users')
-      .select(
-        `
-        *,
-        sites_detail (*)
-      `,
-      )
-      .eq('user_id', user_id)
-      .eq('sites_detail.org_id', org_id);
+      .select('*')
+      .eq('site_id', site_id);
 
-    // Handle potential errors from the query
-    if (error) {
+    // Handle potential errors from fetching site users
+    if (siteUserError) {
       return {
         errorCode: 1,
         message: 'Error while fetching site users',
@@ -58,12 +40,49 @@ async function allSitesOfUsers(
       };
     }
 
-    // Filter out entries where sites_detail is null
-    const filteredData = (data ?? []).filter(
-      (item) => item.sites_detail !== null,
-    );
+    // Extract user ids and role ids
+    const userIds = siteUserData.map((siteUser: any) => siteUser.user_id);
+    const roleIds = siteUserData.map((siteUser: any) => siteUser.role_id);
 
-    return { errorCode: 0, message: 'Success', data: filteredData };
+    // Fetch user details based on user ids
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('id, firstname, lastname, email')
+      .in('id', userIds);
+
+    // Fetch role details based on role ids
+    const { data: roleData, error: roleError } = await supabase
+      .from('user_role')
+      .select('id, name')
+      .in('id', roleIds);
+
+    // Handle potential errors from fetching user and role details
+    if (userError || roleError) {
+      return {
+        errorCode: 1,
+        message: 'Error while fetching user or role details',
+        data: null,
+      };
+    }
+
+    // Merge user details with site users data and role details
+    const mergedData = siteUserData.map((siteUser: any) => {
+      const userDetail = userData.find(
+        (user: any) => user.id === siteUser.user_id,
+      );
+      const roleDetail = roleData.find(
+        (role: any) => role.id === siteUser.role_id,
+      );
+      return {
+        ...siteUser,
+        role_name: roleDetail ? roleDetail.name : null,
+        firstname: userDetail ? userDetail.firstname : null,
+        lastname: userDetail ? userDetail.lastname : null,
+        email: userDetail ? userDetail.email : null,
+      };
+    });
+
+    return { errorCode: 0, message: 'Success', data: mergedData };
   } catch (err) {
     // Handle any other errors (e.g., network issues)
     return {
@@ -290,4 +309,88 @@ async function licenceData(site_id: any): Promise<FunctionReturnLicence> {
   }
 }
 
-export { allSitesOfUsers, licenceData, sitesCounts, sitesDetails };
+// Define the function to fetch entitlement data for a site
+async function entitlementSite(site_id: any) {
+  try {
+    // Validate the input
+    if (!site_id) {
+      return {
+        errorCode: 1,
+        message: 'Invalid input: site_id cannot be null or empty',
+        data: null,
+      };
+    }
+
+    // Fetch the licenses associated with the site
+    const { data: entitlements_package, error: entitlementsError } =
+      await supabase
+        .from('entitlements_package')
+        .select('*')
+        .eq('site_id', site_id);
+
+    // Check for errors during the fetch operation for licenses
+    if (entitlementsError) {
+      return {
+        errorCode: 1,
+        message: 'Error while fetching entitlement packages',
+        data: null,
+      };
+    }
+
+    const entitlementList = [];
+
+    for (const entitlement of entitlements_package) {
+      // Fetch the name of the entitlement
+      const { data: entitlementName, error: entitlementNameError } =
+        await supabase
+          .from('entitlements_name')
+          .select('name')
+          .eq('id', entitlement.entitlement_name_id)
+          .single();
+
+      // Fetch the value of the entitlement
+      const { data: entitlementValue, error: entitlementValueError } =
+        await supabase
+          .from('entitlements_values')
+          .select('value_number')
+          .eq('id', entitlement.entitlement_value_id)
+          .single();
+
+      // Handle errors for fetching entitlement details
+      if (entitlementNameError || entitlementValueError) {
+        continue;
+      }
+
+      // Create detailed entitlement object
+      const detailedEntitlement = {
+        ...entitlement,
+        entitlementName: entitlementName.name,
+        entitlementValue: entitlementValue.value_number,
+      };
+
+      entitlementList.push(detailedEntitlement);
+    }
+
+    // Return the license details with type names
+    return {
+      errorCode: 0,
+      message: 'Success',
+      data: entitlementList,
+    };
+  } catch (error) {
+    // Log any unexpected errors
+    return {
+      errorCode: -1,
+      message: 'Unexpected error during fetching license data',
+      data: null,
+    };
+  }
+}
+
+export {
+  allSitesOfUsers,
+  entitlementSite,
+  licenceData,
+  sitesCounts,
+  sitesDetails,
+};

@@ -227,7 +227,7 @@ async function addOrganization(data: {
         'soumiya@nichetech.in',
         'Add Organization',
         'add_org',
-        'eyJhbGciOiJIUzI1NiIsImtpZCI6ImpmZVZXUEovY3RVdElDRTYiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzE3NTcxMTc5LCJpYXQiOjE3MTc1Njc1NzksImlzcyI6Imh0dHBzOi8vZW1zaml1enRjaW5oYXBhdXJjcmwuc3VwYWJhc2UuY28vYXV0aC92MSIsInN1YiI6ImQ2MTA4ODVmLWU2Y2YtNDdmZi04ODBhLTkxN2YzN2Q2Y2EzOSIsImVtYWlsIjoicGFydGhyQG5pY2hldGVjaC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7fSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTcxNzUwNDkxMn1dLCJzZXNzaW9uX2lkIjoiNGU2YzAyMGMtMDE3Mi00M2VmLWE0YzYtYTYzMjdmMzliMDk0IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.lK5uoj3Csv3tSc_BwKsp90lWiSMvc5NX8zmfsBBg5Sw',
+        data.token,
       );
       // Clear input fields after successful email send
     } catch (error) {
