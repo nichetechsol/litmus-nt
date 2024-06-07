@@ -152,8 +152,11 @@ async function modifyUserOfSites(UserData: UserData): Promise<Result<any>> {
 }
 
 // Function to remove a user from the 'site_users' table based on user ID
-async function removeUserFromSites(id: any): Promise<Result<string>> {
-  if (!id) {
+async function removeUserFromSites(
+  user_id: any,
+  site_id: any,
+): Promise<Result<string>> {
+  if (!user_id || site_id) {
     return { errorCode: 1, data: null };
   }
 
@@ -161,12 +164,13 @@ async function removeUserFromSites(id: any): Promise<Result<string>> {
     const { error } = await supabase
       .from('site_users')
       .delete()
-      .eq('user_id', id);
+      .eq('user_id', user_id)
+      .eq('site_id', site_id);
 
     if (error) {
       return { errorCode: 1, data: null };
     } else {
-      return { errorCode: 0, data: 'User removed successfully' };
+      return { errorCode: 0, data: 'User sites removed successfully' };
     }
   } catch (error) {
     return { errorCode: -1, data: null };
