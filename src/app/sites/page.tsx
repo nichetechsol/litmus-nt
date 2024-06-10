@@ -95,6 +95,7 @@ const Page: React.FC = () => {
   const navigate = useRouter();
   const [org_id, Setorg_id] = useState<any>('');
   const [user_id, setuser_id] = useState<any>('');
+  const [orgName, setorgName] = useState<any>('');
   // const [user_role, setUserrole] = useState('');
   // useEffect(() => {
   //   const userid: any = localStorage.getItem('user_id');
@@ -111,9 +112,10 @@ const Page: React.FC = () => {
   useEffect(() => {
     const decryptedUserid = decryptData(localStorage.getItem('user_id'));
     const decryptedOrgId = decryptData(localStorage.getItem('org_id'));
+    const decryptedOrgName = decryptData(localStorage.getItem('org_name'));
     setuser_id(decryptedUserid);
     Setorg_id(decryptedOrgId);
-
+    setorgName(decryptedOrgName);
     if (!decryptedOrgId) {
       swal('Please select organization', { icon: 'error' });
       redirect('/organization');
@@ -219,8 +221,8 @@ const Page: React.FC = () => {
         if (searchTerm) {
           setsidebarSite([
             {
-              id: 0,
-              name: 'No Data Found',
+              id: -1,
+              name: "We couldn't find any sites",
             },
           ]);
         } else {
@@ -561,7 +563,7 @@ const Page: React.FC = () => {
   // for close model add and clear all values
   const handelclosemodel = () => {
     setAddSiteNameError('');
-    setTypeDropdownError('');
+    settypeDropdown(null);
     setTypeDropdownError('');
     setAddress2Error('');
     setAddress1Error('');
@@ -920,19 +922,23 @@ const Page: React.FC = () => {
                                 style={{ cursor: 'pointer' }}
                                 key={site?.id}
                                 onClick={() => {
-                                  const encryptedsiteid = encryptData(site.id);
-                                  const encryptedsitename = encryptData(
-                                    site.name,
-                                  );
-                                  localStorage.setItem(
-                                    'site_id',
-                                    encryptedsiteid,
-                                  );
-                                  localStorage.setItem(
-                                    'site_name',
-                                    encryptedsitename,
-                                  );
-                                  navigate.push('/sitedashboard');
+                                  if (site.id != -1) {
+                                    const encryptedsiteid = encryptData(
+                                      site.id,
+                                    );
+                                    const encryptedsitename = encryptData(
+                                      site.name,
+                                    );
+                                    localStorage.setItem(
+                                      'site_id',
+                                      encryptedsiteid,
+                                    );
+                                    localStorage.setItem(
+                                      'site_name',
+                                      encryptedsitename,
+                                    );
+                                    navigate.push('/sitedashboard');
+                                  }
                                 }}
                               >
                                 <div className='flex items-center'>
@@ -957,7 +963,7 @@ const Page: React.FC = () => {
                         <div className='md:flex px-4 py-6 items-center justify-between'>
                           <div>
                             <h6 className='font-semibold mb-0 text-[1rem]'>
-                              Sites
+                              Sites ({orgName})
                             </h6>
                           </div>
                         </div>

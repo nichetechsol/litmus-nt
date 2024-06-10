@@ -7,6 +7,7 @@ import { redirect } from 'next/navigation';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Pagination from 'react-js-pagination';
 import { toast, ToastContainer } from 'react-toastify';
+import swal from 'sweetalert';
 import * as Yup from 'yup';
 
 import 'react-toastify/dist/ReactToastify.css';
@@ -14,7 +15,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import { decryptData } from '@/helper/Encryption_Decryption';
 import { emailSchema, nameSchema, roleSchema } from '@/helper/ValidationHelper';
 import { getUserRole } from '@/supabase/org_details';
-import { addUserToSites, modifyUserOfSites } from '@/supabase/site_users';
+import {
+  addUserToSites,
+  modifyUserOfSites,
+  removeUserFromSites,
+} from '@/supabase/site_users';
 import {
   allSitesOfUsers,
   entitlementSite,
@@ -411,6 +416,34 @@ const Page = () => {
     setLastName('');
     setRole('');
     setChangeFlage(true);
+  };
+  const handleDelete = (id: any) => {
+    swal({
+      title: 'Confirm Delete',
+      text: 'Are you sure you want to delete?',
+      icon: 'warning',
+      buttons: ['Cancel', 'Delete'],
+      dangerMode: true,
+    }).then(async (willDelete: any) => {
+      if (willDelete) {
+        try {
+          setLoading(true);
+          const response = await removeUserFromSites(id, site_id);
+          if (response.errorCode === 0 && response.data) {
+            swal(response.data, { icon: 'success' });
+            fetchUserData();
+            setLoading(false);
+            // Optionally, update your state or refetch data here
+          } else {
+            swal('Error deleting record!', { icon: 'error' });
+            setLoading(false);
+          }
+        } catch (error) {
+          swal('Unexpected error occurred!', { icon: 'error' });
+          setLoading(false);
+        }
+      }
+    });
   };
   return (
     // <div>Page</div>
@@ -1694,7 +1727,7 @@ const Page = () => {
                                 className='!text-start !text-[0.85rem]'
                               >
                                 {' '}
-                                Organization
+                                Role
                               </th>
 
                               <th
@@ -1753,13 +1786,24 @@ const Page = () => {
                                         >
                                           <i className='ri-user-follow-line'></i>
                                         </Link>
-                                        <Link
+                                        {/* <Link
+                                        aria-label='anchor'
+                                        href=''
+                                        
+                                        className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-primary/10 text-primary hover:bg-primary hover:text-white hover:border-primary'
+                                      >
+                                        <i className='ri-user-unfollow-line'></i>
+                                      </Link> */}
+                                        <div
+                                          style={{ cursor: 'pointer' }}
                                           aria-label='anchor'
-                                          href=''
+                                          onClick={() => {
+                                            handleDelete(user.id);
+                                          }}
                                           className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-primary/10 text-primary hover:bg-primary hover:text-white hover:border-primary'
                                         >
-                                          <i className='ri-user-unfollow-line'></i>
-                                        </Link>
+                                          <i className='ri-delete-bin-line'></i>
+                                        </div>
                                       </div>
                                     </td>
                                   </tr>

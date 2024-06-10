@@ -801,7 +801,7 @@ const OrgDashboard = () => {
                                         onChange={handleRoleChange}
                                         value={role}
                                       >
-                                        <option value=''>Select a role</option>
+                                        <option value=''>Select a Role</option>
                                         {roles &&
                                           roles.map((role) => (
                                             <option

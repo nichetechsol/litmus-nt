@@ -156,7 +156,7 @@ async function removeUserFromSites(
   user_id: any,
   site_id: any,
 ): Promise<Result<string>> {
-  if (!user_id || site_id) {
+  if (!user_id || !site_id) {
     return { errorCode: 1, data: null };
   }
 

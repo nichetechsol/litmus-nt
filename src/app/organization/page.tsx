@@ -205,7 +205,7 @@ const LoginForm = () => {
           setSidebarOrgs({
             data: [
               {
-                id: 0,
+                id: -1,
                 name: "We couldn't find any organizations",
                 created_at: '',
                 description: '',
@@ -766,18 +766,25 @@ const LoginForm = () => {
                               style={{ cursor: 'pointer' }}
                               key={org.id as number}
                               onClick={() => {
-                                setLoading(true);
-                                const encryptedOrgId = encryptData(
-                                  org.id as string,
-                                );
-                                const encryptedOrgName = encryptData(org.name);
-                                localStorage.setItem('org_id', encryptedOrgId);
-                                localStorage.setItem(
-                                  'org_name',
-                                  encryptedOrgName,
-                                );
-                                navigate.push('/orgdashboard');
-                                setLoading(false);
+                                if (org.id != -1) {
+                                  setLoading(true);
+                                  const encryptedOrgId = encryptData(
+                                    org.id as string,
+                                  );
+                                  const encryptedOrgName = encryptData(
+                                    org.name,
+                                  );
+                                  localStorage.setItem(
+                                    'org_id',
+                                    encryptedOrgId,
+                                  );
+                                  localStorage.setItem(
+                                    'org_name',
+                                    encryptedOrgName,
+                                  );
+                                  navigate.push('/orgdashboard');
+                                  setLoading(false);
+                                }
                               }}
                               // onClick={() => {
                               //   localStorage.setItem(
