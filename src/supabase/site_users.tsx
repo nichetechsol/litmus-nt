@@ -5,6 +5,7 @@ import { supabase } from './db';
 
 // Define the interfaces for the input data and result
 interface UserData {
+  site_id: any;
   org_id?: any;
   email?: string;
   firstname?: string;
@@ -130,7 +131,7 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
 
 // Function to update a user's role in the 'site_users' table
 async function modifyUserOfSites(UserData: UserData): Promise<Result<any>> {
-  if (!UserData.user_id || !UserData.role_id) {
+  if (!UserData.user_id || !UserData.role_id || !UserData.site_id) {
     return { errorCode: 1, data: null };
   }
 
@@ -139,6 +140,7 @@ async function modifyUserOfSites(UserData: UserData): Promise<Result<any>> {
       .from('site_users')
       .update({ role_id: UserData.role_id })
       .eq('user_id', UserData.user_id)
+      .eq('site_id', UserData.site_id)
       .select();
 
     if (error) {

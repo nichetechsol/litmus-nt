@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 async function sendEmailFunction(
   to: string,
   subject: string,
   type: string,
   token: string,
+  data: any,
 ) {
   const url = 'https://emsjiuztcinhapaurcrl.supabase.co/functions/v1/email';
 
@@ -10,6 +12,7 @@ async function sendEmailFunction(
     to: to,
     subject: subject,
     type: type,
+    data: data,
   };
 
   try {

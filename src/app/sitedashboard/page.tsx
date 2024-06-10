@@ -335,7 +335,7 @@ const Page = () => {
       try {
         let result;
         if (changeFlage) {
-          const userData = {
+          const userData: any = {
             email: email,
             firstname: firstName,
             lastname: lastName,
@@ -358,7 +358,7 @@ const Page = () => {
             }
           }
         } else {
-          const userData = {
+          const userData: any = {
             email: email,
             firstname: firstName,
             lastname: lastName,

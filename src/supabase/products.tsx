@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import supabase from '@/supabase/db';
 interface FolderResult {
@@ -10,24 +11,123 @@ interface FolderResult {
   } | null;
 }
 
-async function listLitmusProducts() {
+async function listLitmusProducts(site_id: any) {
+  // Fetch entitlements package based on site_id
+  const { data: entitlements_package, error: errorEntitlement } = await supabase
+    .from('entitlements_package')
+    .select('*')
+    .eq('site_id', site_id);
+
+  // Check if there was an error in fetching entitlements package
+  if (errorEntitlement) {
+    return {
+      errorCode: 2,
+      message: 'Error fetching entitlements package',
+      data: null,
+    };
+  }
+
+  // Determine the relevant entitlements
+  const entitlement14 = entitlements_package.some(
+    (entitlement) => entitlement.entitlement_name_id === 14,
+  );
+  const entitlement15 = entitlements_package.some(
+    (entitlement) => entitlement.entitlement_name_id === 15,
+  );
+
+  // Fetch the list of Litmus Products from storage
   const { data, error } = await supabase.storage.from('Litmus_Products').list();
 
+  // Handle errors from fetching Litmus Products
   if (error) {
+    return {
+      errorCode: 1,
+      message: 'Error fetching Litmus Products',
+      data: null,
+    };
+  }
+
+  if (!data || data.length === 0) {
     return {
       errorCode: 1,
       message: 'No Data Available for this product',
       data: null,
     };
-  } else {
-    // Map the data to only include the names
-    const names = data.map((item) => item.name);
-    return {
-      errorCode: 0,
-      message: 'Success',
-      data: names,
-    };
   }
+
+  // Filter folders based on entitlements
+  const filteredFolders = data.filter((item) => {
+    if (
+      entitlement14 &&
+      (item.name === 'Litmus_Edge' || item.name === 'Litmus_Edge_Manager')
+    ) {
+      return true;
+    }
+    if (entitlement15 && item.name === 'Litmus_UNS') {
+      return true;
+    }
+    return false;
+  });
+
+  const results = [];
+  for (const item of filteredFolders) {
+    const { data: folderData, error: folderError } = await supabase.storage
+      .from('Litmus_Products')
+      .list(item.name);
+
+    if (folderError) {
+      results.push({
+        folder: item.name,
+        errorCode: 1,
+        message: 'Error retrieving folder contents',
+        data: null,
+      });
+    } else {
+      const currentFiles = folderData
+        .filter((subItem) => subItem.name.includes('_Current'))
+        .map((subItem) => subItem.name);
+
+      // Get the top file from the currentFiles array
+      const topFile = currentFiles.length > 0 ? currentFiles[0] : null;
+
+      // Generate a signed URL for the top file
+      let downloadLink = null;
+      let dataName = null;
+      if (topFile) {
+        const { data: fileData, error: signedURLError } = await supabase.storage
+          .from('Litmus_Products')
+          .list(`${item.name}/${topFile}`); // Adjust the expiration time as needed
+        if (fileData && fileData.length > 0) {
+          dataName = fileData[0].name;
+
+          const { data: download, error } = await supabase.storage
+            .from('Litmus_Products')
+            .createSignedUrl(`${item.name}/${topFile}/${dataName}`, 60);
+          if (error) {
+            downloadLink = null;
+          } else {
+            downloadLink = download.signedUrl;
+          }
+        }
+      }
+
+      results.push({
+        folder: item.name,
+        errorCode: 0,
+        message: 'Success',
+        data: {
+          FileName: dataName,
+          downloadLink: downloadLink,
+        },
+      });
+    }
+  }
+
+  return {
+    errorCode: 0,
+    message: 'Success',
+    data: results,
+  };
 }
 
 async function allCurrentfiles() {
