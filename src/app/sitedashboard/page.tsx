@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 'use client';
+import moment from 'moment';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -34,7 +35,7 @@ interface licenseData {
   type: number;
   created_at: string;
   created_by: number;
-  expiry: string;
+  exipry: string;
   licence_number: string;
   licence_type_name: string;
   site_id: number;
@@ -384,7 +385,7 @@ const Page = () => {
         if (closeModalButtonRef.current) {
           closeModalButtonRef.current.click();
         }
-        // fetchData2();
+        fetchUserData();
 
         setLoading(false);
       } catch (error) {
@@ -826,9 +827,18 @@ const Page = () => {
                                   <div className='font-semibold text-[0.9375rem] '>
                                     <h1>
                                       {' '}
-                                      <span className='badge bg-primary text-white'>
+                                      {moment().isAfter(user.exipry) ? (
+                                        <span className='badge bg-danger text-white'>
+                                          Expired
+                                        </span>
+                                      ) : (
+                                        <span className='badge bg-primary text-white'>
+                                          Active
+                                        </span>
+                                      )}
+                                      {/* <span className='badge bg-primary text-white'>
                                         Active
-                                      </span>
+                                      </span> */}
                                     </h1>
                                   </div>
                                 </div>
