@@ -2,7 +2,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import CryptoJS from 'crypto-js';
 import { redirect } from 'next/navigation';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Pagination from 'react-js-pagination';
@@ -12,6 +11,7 @@ import * as Yup from 'yup';
 
 import 'react-toastify/dist/ReactToastify.css';
 
+import { decryptData } from '@/helper/Encryption_Decryption';
 import { emailSchema, nameSchema, roleSchema } from '@/helper/ValidationHelper';
 import {
   orgDashboardCounts,
@@ -51,6 +51,10 @@ interface roles {
   name: string;
   created_at: any;
 }
+interface CountryCount {
+  country: string;
+  count: number;
+}
 const validationSchema = Yup.object().shape({
   email: emailSchema,
   firstName: nameSchema,
@@ -58,27 +62,6 @@ const validationSchema = Yup.object().shape({
   role: roleSchema,
 });
 const OrgDashboard = () => {
-  const ENCRYPTION_KEY = 'pass123';
-
-  const decryptData = (
-    encryptedData: string | null,
-  ): string | number | null => {
-    if (!encryptedData) {
-      return null;
-    }
-    try {
-      const decryptedString = CryptoJS.AES.decrypt(
-        encryptedData,
-        ENCRYPTION_KEY,
-      ).toString(CryptoJS.enc.Utf8);
-      return !isNaN(Number(decryptedString))
-        ? Number(decryptedString)
-        : decryptedString;
-    } catch (error) {
-      // console.error('Decryption error:', error);
-      return null;
-    }
-  };
   const [loading, setLoading] = useState<boolean>(false);
   const [tokenVerify, setTokenVerify] = useState(false);
 
@@ -156,7 +139,7 @@ const OrgDashboard = () => {
   const [activePage2, setActivePage2] = useState(1);
   const [perPage2] = useState(10);
   const [totalItemsCount2, setTotalItemsCount2] = useState(0);
-  const [locationOfSites, setLocationOfSites] = useState([]);
+  const [locationOfSites, setLocationOfSites] = useState<CountryCount[]>([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -203,7 +186,7 @@ const OrgDashboard = () => {
   };
   useEffect(() => {
     fetchData2();
-  }, [org_id, activePage, search]);
+  }, [search, org_id, activePage]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -240,7 +223,7 @@ const OrgDashboard = () => {
           const data: any = await getLocationOfSites(sets);
 
           if (data) {
-            setLocationOfSites(data);
+            setLocationOfSites(data.data);
             setLoading(false);
           } else {
             setLoading(false);
@@ -641,16 +624,30 @@ const OrgDashboard = () => {
                 <div className='xxl:col-span-6 xl:col-span-6  col-span-12'>
                   <div className='box'>
                     <div className='box-header justify-between'>
-                      <div className='box-title'>
-                        Location Of Sites And Users
-                      </div>
+                      <div className='box-title'>Location Of Sites</div>
                       <div className='hs-dropdown ti-dropdown'></div>
                     </div>
                     <div className='box-body overflow-hidden'>
-                      <div className='leads-source-chart flex items-center justify-center'>
-                        {/* <img src={imgMap} /> */}
-                      </div>
+                      {/* <div className='leads-source-chart flex items-center justify-center'> */}
+                      {/* <img src={imgMap} /> */}
+                      <ul className='list-none crm-top-deals mb-0'>
+                        {locationOfSites.map((item, index) => (
+                          <li className='mb-[0.9rem]' key={index}>
+                            <div className='flex items-start flex-wrap'>
+                              <div className='flex-grow'>
+                                <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                  {item.country}
+                                </p>
+                              </div>
+                              <div className='font-semibold text-[0.9375rem] '>
+                                {item.count}
+                              </div>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
+                    {/* </div> */}
                   </div>
                 </div>
 
@@ -913,6 +910,7 @@ const OrgDashboard = () => {
                                     <td>
                                       <div className='flex flex-row items-center !gap-2 text-[0.9375rem]'>
                                         <div
+                                          style={{ cursor: 'pointer' }}
                                           aria-label='anchor'
                                           data-bs-target='#formmodal'
                                           data-bs-toggle='modal'
@@ -927,6 +925,7 @@ const OrgDashboard = () => {
                                         </div>
 
                                         <div
+                                          style={{ cursor: 'pointer' }}
                                           aria-label='anchor'
                                           onClick={() => {
                                             handleDelete(user.id);

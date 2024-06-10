@@ -35,6 +35,9 @@ importers:
       next-themes:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      pnpm:
+        specifier: ^9.2.0
+        version: 9.2.0
       preline:
         specifier: ^1.9.0
         version: 1.9.0
@@ -3736,6 +3739,11 @@ packages:
   pkg-dir@7.0.0:
     resolution: {integrity: sha512-Ie9z/WINcxxLp27BKOCHGde4ITq9UklYKDzVo1nhk5sqGEXU3FpkwP5GM2voTGJkGd9B3Otl+Q4uwSOeSUtOBA==}
     engines: {node: '>=14.16'}
+
+  pnpm@9.2.0:
+    resolution: {integrity: sha512-mKgP0RwucJZ0d2IwQQZDKz3cZ9z1S1qMAck/aKLNXgXmghhJUioG+3YoTUGiZg1eM08u47vykYO/LnObHa+ncQ==}
+    engines: {node: '>=18.12'}
+    hasBin: true
 
   possible-typed-array-names@1.0.0:
     resolution: {integrity: sha512-d7Uw+eZoloe0EHDIYoe+bQ5WXnGMOpmiZFTuMWCwpjzzkL2nTjcKiAk4hh8TjnGye2TwWOk3UXucZ+3rbmBa8Q==}
@@ -9223,6 +9231,8 @@ snapshots:
   pkg-dir@7.0.0:
     dependencies:
       find-up: 6.3.0
+
+  pnpm@9.2.0: {}
 
   possible-typed-array-names@1.0.0: {}
 

@@ -29,6 +29,7 @@ const Sidebar = ({ local_varaiable, ThemeChanger }: any) => {
       active: p === '/organization' ? true : false,
       selected: p === '/organization' ? true : false,
       title: 'Organizations',
+      ico: 'ri-home-8-line',
     },
     {
       path: '/orgdashboard',
@@ -36,6 +37,7 @@ const Sidebar = ({ local_varaiable, ThemeChanger }: any) => {
       active: p === '/orgdashboard' ? true : false,
       selected: p === '/orgdashboard' ? true : false,
       title: 'Dashboard',
+      ico: 'ri-organization-chart',
     },
     {
       path: '/sites',
@@ -43,6 +45,7 @@ const Sidebar = ({ local_varaiable, ThemeChanger }: any) => {
       active: p === '/sites' ? true : false,
       selected: p === '/sites' ? true : false,
       title: 'Sites',
+      ico: 'ri-map-pin-line',
     },
   ];
   useEffect(() => {

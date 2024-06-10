@@ -93,7 +93,6 @@ async function orgUserList(
   search: any,
 ): Promise<Result<{ userList: UserList[]; totalCount: any }>> {
   try {
-    search = 'Parth';
     const { data: orgUsers, error: orgUsersError } = await supabase
       .from('org_users')
       .select('*')

@@ -7,6 +7,7 @@
 import Link from 'next/link';
 import CryptoJS from 'crypto-js';
 import { redirect, useRouter } from 'next/navigation';
+import InitialsComponent from '@/helper/NameHelper';
 import React, {
   ReactNode,
   useEffect,
@@ -40,7 +41,7 @@ import { fetchSiteType } from '@/supabase/site_type';
 import { stateList } from '@/supabase/state';
 import Loader from '@/utils/Loader/Loader';
 import { getOrgUserRole } from '@/supabase/org_user';
-
+import { decryptData, encryptData } from '@/helper/Encryption_Decryption';
 interface Country {
   id: number;
   name: string;
@@ -91,32 +92,6 @@ interface User {
 }
 
 const Page: React.FC = () => {
-  const ENCRYPTION_KEY = 'pass123';
-  const encryptData = (data: string | number | null | undefined): string => {
-    if (!data && data !== 0) {
-      return '';
-    }
-    const stringData = String(data); // Convert to string
-    return CryptoJS.AES.encrypt(stringData, ENCRYPTION_KEY).toString();
-  };
-  const decryptData = (
-    encryptedData: string | null,
-  ): string | number | null => {
-    if (!encryptedData) {
-      return null;
-    }
-    try {
-      const decryptedString = CryptoJS.AES.decrypt(
-        encryptedData,
-        ENCRYPTION_KEY,
-      ).toString(CryptoJS.enc.Utf8);
-      return !isNaN(Number(decryptedString))
-        ? Number(decryptedString)
-        : decryptedString;
-    } catch (error) {
-      return null;
-    }
-  };
   const navigate = useRouter();
   const [org_id, Setorg_id] = useState<any>('');
   const [user_id, setuser_id] = useState<any>('');
@@ -1002,7 +977,7 @@ const Page: React.FC = () => {
                       {SitesList && SitesList.length > 0
                         ? SitesList.map((SingleSite) => (
                             <div
-                              className='xl:col-span-4 col-span-12 task-card'
+                              className='xl:col-span-6 col-span-12 task-card'
                               style={{ cursor: 'pointer' }}
                               key={SingleSite?.site?.id}
                               onClick={() => {
@@ -1039,14 +1014,21 @@ const Page: React.FC = () => {
                                       {' '}
                                       <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
                                         {/* {SingleSite?.site?SingleSite?.site?.name[0].toUpperCase(): ""} */}
-                                        {SingleSite?.site
+                                        {/* {SingleSite?.site
                                           ? SingleSite?.site?.name
                                               .split(' ')
                                               .map((word) =>
                                                 word[0].toUpperCase(),
                                               )
                                               .join('')
-                                          : ''}
+                                          : ''} */}
+                                        <InitialsComponent
+                                          name={
+                                            SingleSite?.site
+                                              ? SingleSite?.site?.name
+                                              : ''
+                                          }
+                                        />
                                       </span>
                                     </div>
                                   </div>

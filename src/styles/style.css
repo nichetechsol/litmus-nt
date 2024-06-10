@@ -3958,7 +3958,7 @@ label {
 }
 
 .task-pending-card {
-  @apply border-s-[0.45rem] border-solid border-secondary/40;
+  @apply border-s-[0.45rem] border-solid border-primary/40;
 }
 
 .task-inprogress-card {
@@ -20044,4 +20044,12 @@ h6 {
 }
 .over-text {
   word-break: break-all;
+}
+
+.text-site-name {
+  @apply w-[125px];
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }

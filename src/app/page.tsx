@@ -334,6 +334,7 @@ const LoginForm = () => {
                               name='email'
                               className='form-control form-control-lg w-full !rounded-md'
                               id='email'
+                              placeholder='Email'
                               value={email}
                               onChange={handleEmailChange}
                               maxLength={320}
@@ -361,7 +362,7 @@ const LoginForm = () => {
                                 maxLength={16}
                                 className='form-control form-control-lg !rounded-s-md'
                                 id='signin-password'
-                                placeholder='password'
+                                placeholder='Password'
                               />
                               <button
                                 onClick={() => setpasswordshow1(!passwordshow1)}
@@ -385,6 +386,7 @@ const LoginForm = () => {
                             <div className='mt-2'>
                               <div className='form-check !ps-0'>
                                 <input
+                                  style={{ cursor: 'pointer' }}
                                   className='form-check-input'
                                   type='checkbox'
                                   value=''
