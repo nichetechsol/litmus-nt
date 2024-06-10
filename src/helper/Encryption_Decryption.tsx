@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import CryptoJS from 'crypto-js';
 
 export const ENCRYPTION_KEY = 'pass123';
@@ -10,9 +11,7 @@ export const encryptData = (
   const stringData = String(data); // Convert to string
   return CryptoJS.AES.encrypt(stringData, ENCRYPTION_KEY).toString();
 };
-export const decryptData = (
-  encryptedData: string | null,
-): string | number | null => {
+export const decryptData = (encryptedData: string | null): any => {
   if (!encryptedData) {
     return null;
   }

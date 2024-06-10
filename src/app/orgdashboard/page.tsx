@@ -896,7 +896,11 @@ const OrgDashboard = () => {
                                         {/* <img src={idx.src} alt="img"
                                     className="w-[1.75rem] h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full" /> */}
                                       </span>{' '}
-                                      {`${user.firstname} ${user.lastname}`}{' '}
+                                      {`${
+                                        user.firstname ? user.firstname : ''
+                                      } ${
+                                        user.lastname ? user.lastname : ''
+                                      }`}{' '}
                                     </div>
                                   </td>
 

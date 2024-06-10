@@ -17,6 +17,7 @@ import { getUserRole } from '@/supabase/org_details';
 import { addUserToSites, modifyUserOfSites } from '@/supabase/site_users';
 import {
   allSitesOfUsers,
+  entitlementSite,
   licenceData,
   sitesCounts,
 } from '@/supabase/sitedashboard';
@@ -32,6 +33,18 @@ interface licenseData {
   licence_number: string;
   licence_type_name: string;
   site_id: number;
+}
+interface Entitlement {
+  id: number;
+  entitlementName: string;
+  entitlementValue: number;
+  created_at: string;
+  entitlement_name_id: number;
+  entitlement_value_id: number;
+  licence_tier_id: number;
+  org_id: number;
+  site_id: number;
+  support_level_id: number;
 }
 interface OrgUser {
   id: any;
@@ -72,6 +85,13 @@ const Page = () => {
   const [activePage, setActivePage] = useState(1);
   const [perPage] = useState(10);
   const [totalItemsCount, setTotalItemsCount] = useState(0);
+
+  const [entitlementListData, setEntitlementListData] = useState<
+    Entitlement[] | null
+  >(null);
+  const [totalItemsCount2, setTotalItemsCount2] = useState(0);
+  const [activePage2, setActivePage2] = useState(1);
+  const [perPage2] = useState(10);
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
@@ -112,6 +132,30 @@ const Page = () => {
     errorCode: number;
     message: string;
   } | null>(null);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const start: any = (activePage2 - 1) * perPage2; // Calculate start index
+        const end: any = start + perPage2 - 1;
+        if (site_id) {
+          setLoading(true);
+          const data: any = await entitlementSite(site_id, start, end);
+          if (data) {
+            setEntitlementListData(data?.data);
+            setTotalItemsCount2(data.totalCount); // Set total items count for pagination
+            setLoading(false);
+          } else {
+            // console.log("No organization details found.");
+          }
+        }
+      } catch (error: any) {
+        // console.error("Error fetching organization details:", error.message);
+      }
+    };
+    fetchData();
+  }, [site_id, activePage2, perPage2]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -1145,6 +1189,40 @@ const Page = () => {
                     </div>
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>
+                        {entitlementListData &&
+                        entitlementListData.length > 0 ? (
+                          entitlementListData.map((entitlement: any) => (
+                            <li className='mb-[0.9rem]' key={entitlement.id}>
+                              <div className='flex items-start flex-wrap'>
+                                <div className='flex-grow'>
+                                  <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                    {entitlement.entitlementName}
+                                  </p>
+                                </div>
+                                <div className='font-semibold text-[0.9375rem] '>
+                                  {entitlement.entitlementValue}
+                                </div>
+                              </div>
+                            </li>
+                          ))
+                        ) : (
+                          <div className='col-md-12 w-100 mt-4'>
+                            <p className='text-center'>No Data Found</p>{' '}
+                          </div>
+                        )}
+                        <Pagination
+                          activePage={activePage2}
+                          itemsCountPerPage={perPage2}
+                          totalItemsCount={totalItemsCount2}
+                          pageRangeDisplayed={5}
+                          onChange={(page: React.SetStateAction<number>) =>
+                            setActivePage2(page)
+                          }
+                          itemClass='page-item pagination-custom'
+                          linkClass='page-link'
+                        />
+                      </ul>
+                      {/* <ul className='list-none crm-top-deals mb-0'>
                         <li className='mb-[0.9rem]'>
                           <div className='flex items-start flex-wrap'>
                             <div className='flex-grow'>
@@ -1205,7 +1283,7 @@ const Page = () => {
                             </div>
                           </div>
                         </li>
-                      </ul>
+                      </ul> */}
                     </div>
                   </div>
                 </div>
@@ -1702,7 +1780,7 @@ const Page = () => {
                         </table>
                       </div>
                     </div>
-                    <div className='box-footer'>
+                    {/* <div className='box-footer'>
                       <div className='sm:flex items-center'>
                         <div className='text-defaulttextcolor dark:text-defaulttextcolor/70'>
                           Showing 5 Entries{' '}
@@ -1741,7 +1819,7 @@ const Page = () => {
                           </nav>
                         </div>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import Link from 'next/link';
@@ -106,6 +107,22 @@ const LoginForm = () => {
     }
   }, []);
 
+  const getDefaultDomainFromEmail = () => {
+    const email = localStorage.getItem('rememberedEmail');
+    const decryptemail = decryptData(email);
+    if (decryptemail) {
+      const domain = decryptemail.split('@')[1];
+      return domain || '';
+    }
+    return '';
+  };
+  useEffect(() => {
+    // Set the default domain on component mount
+    const defaultDomain = getDefaultDomainFromEmail();
+    if (defaultDomain) {
+      setDomains([defaultDomain]);
+    }
+  }, []);
   // useEffect(() => {
   //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   //   const userid: any = localStorage.getItem('user_id');
@@ -226,7 +243,7 @@ const LoginForm = () => {
       });
   };
   const handleDomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newDomain = e.target.value.trim();
+    const newDomain = e.target.value.trimStart();
     // setDomain(newDomain);
     setDomainInput(newDomain);
     DomainSchema.validate(newDomain)
@@ -395,13 +412,17 @@ const LoginForm = () => {
   //     }
   //   }
   // };
+
   const handleKeyPress = async (e: any) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       if (domainError === '' && domainInput.trim() !== '') {
-        const domainsArray = domainInput
-          .split(',')
-          .map((domain) => domain.trim());
+        const domainsArray = domainInput.endsWith(',')
+          ? domainInput
+              .split(',')
+              .map((domain) => domain.trim())
+              .filter((domain) => domain !== '')
+          : domainInput.split(',').map((domain) => domain.trim());
         const newDomains = [];
         let errorMessage = '';
 
@@ -421,7 +442,6 @@ const LoginForm = () => {
             }
           }
         }
-
         if (errorMessage === '') {
           setDomains([...domains, ...newDomains]);
           setDomainInput('');
@@ -434,6 +454,7 @@ const LoginForm = () => {
       }
     }
   };
+
   //   const removeDomain = (domain: string) => {
   //     setDomains(domains.filter(d => d !== domain));
   //     // const updatedDomains = domains.filter(d => d !== domain);
@@ -444,6 +465,7 @@ const LoginForm = () => {
   //     //   setDomainError('');
   //     // }
   // };
+
   const removeDomain = (index: number) => {
     const newdom = domains.filter((i, idx) => idx != index);
     if (newdom.length == 0) {
