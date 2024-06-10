@@ -2,7 +2,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 
-import supabase from '@/supabase/db';
+import { allfiles } from '@/supabase/products';
 
 const OrgDashboard = () => {
   const [result, setResult] = useState(null);
@@ -12,19 +12,27 @@ const OrgDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data, error } = await supabase.storage
-          .from('Litmus_Products')
-          .list(); // replace 'folder-path' with the path inside your bucket
+        // const { data, error } = await supabase.storage
+        //   .from('Litmus_Products')
+        //   .list();
 
-        if (error) {
-          const error1: any = error;
-          setResult(error1);
-        } else {
-          const data1: any = data;
-          setResult(data1);
-          // }else {
-          //           setResult(data1);
-        }
+        // const { data, error } = await supabase.storage
+        //   .from('Litmus_Products')
+        //   .list('Litmus_Edge/LE_3-11-4', {
+        //     limit: 100,
+        //     offset: 0,
+        //     sortBy: { column: 'name', order: 'asc' },
+        //   });
+        // if (error) {
+        //   const error1: any = error;
+        //   setResult(error1);
+        // } else {
+        const data = await allfiles();
+        const data1: any = data;
+        setResult(data1);
+        // }else {
+        //           setResult(data1);
+        // }
       } catch (err: any) {
         setError(err);
       } finally {

@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabase } from './db';
 
@@ -17,13 +18,24 @@ interface FunctionReturn {
   message: string;
   data: any | null;
 }
+interface FunctionReturnUser {
+  errorCode: number;
+  message: string;
+  data: any | null;
+  totalCount: any;
+}
 interface FunctionReturnLicence {
   errorCode: number;
   message: string;
   data: any | null;
 }
 
-async function allSitesOfUsers(site_id: any): Promise<FunctionReturn> {
+async function allSitesOfUsers(
+  site_id: any,
+  search: any,
+  start: any,
+  end: any,
+): Promise<FunctionReturnUser> {
   try {
     // Fetch site users
     const { data: siteUserData, error: siteUserError } = await supabase
@@ -37,6 +49,7 @@ async function allSitesOfUsers(site_id: any): Promise<FunctionReturn> {
         errorCode: 1,
         message: 'Error while fetching site users',
         data: null,
+        totalCount: null,
       };
     }
 
@@ -50,24 +63,65 @@ async function allSitesOfUsers(site_id: any): Promise<FunctionReturn> {
       .select('id, firstname, lastname, email')
       .in('id', userIds);
 
-    // Fetch role details based on role ids
-    const { data: roleData, error: roleError } = await supabase
-      .from('user_role')
-      .select('id, name')
-      .in('id', roleIds);
-
-    // Handle potential errors from fetching user and role details
-    if (userError || roleError) {
+    // Handle potential errors from fetching user details
+    if (userError) {
       return {
         errorCode: 1,
-        message: 'Error while fetching user or role details',
+        message: 'Error while fetching user details',
         data: null,
+        totalCount: null,
       };
     }
 
-    // Merge user details with site users data and role details
-    const mergedData = siteUserData.map((siteUser: any) => {
-      const userDetail = userData.find(
+    // Filter user details based on search parameter
+    let totalCount: any;
+    let filteredUserData = userData;
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filteredUserData = userData.filter(
+        (user: any) =>
+          user.firstname && user.firstname.toLowerCase().includes(searchLower),
+      );
+      totalCount = filteredUserData.length;
+    } else {
+      totalCount = userData.length;
+    }
+
+    // Apply range to filtered users
+    const paginatedUserData = filteredUserData.slice(start, end + 1);
+
+    // Extract filtered user ids for merging with site user data
+    const filteredUserIds = paginatedUserData.map((user: any) => user.id);
+
+    // Filter site user data based on filtered user ids
+    const filteredSiteUserData = siteUserData.filter((siteUser: any) =>
+      filteredUserIds.includes(siteUser.user_id),
+    );
+
+    // Extract role ids from filtered site user data
+    const filteredRoleIds = filteredSiteUserData.map(
+      (siteUser: any) => siteUser.role_id,
+    );
+
+    // Fetch role details based on filtered role ids
+    const { data: roleData, error: roleError } = await supabase
+      .from('user_role')
+      .select('id, name')
+      .in('id', filteredRoleIds);
+
+    // Handle potential errors from fetching role details
+    if (roleError) {
+      return {
+        errorCode: 1,
+        message: 'Error while fetching role details',
+        data: null,
+        totalCount: null,
+      };
+    }
+
+    // Merge user details with filtered site users data and role details
+    const mergedData = filteredSiteUserData.map((siteUser: any) => {
+      const userDetail = paginatedUserData.find(
         (user: any) => user.id === siteUser.user_id,
       );
       const roleDetail = roleData.find(
@@ -82,13 +136,19 @@ async function allSitesOfUsers(site_id: any): Promise<FunctionReturn> {
       };
     });
 
-    return { errorCode: 0, message: 'Success', data: mergedData };
+    return {
+      errorCode: 0,
+      message: 'Success',
+      data: mergedData,
+      totalCount: totalCount,
+    };
   } catch (err) {
     // Handle any other errors (e.g., network issues)
     return {
       errorCode: -1,
       message: 'Unexpected error during fetching site users',
       data: null,
+      totalCount: null,
     };
   }
 }
@@ -310,7 +370,7 @@ async function licenceData(site_id: any): Promise<FunctionReturnLicence> {
 }
 
 // Define the function to fetch entitlement data for a site
-async function entitlementSite(site_id: any) {
+async function entitlementSite(site_id: any, start: any, end: any) {
   try {
     // Validate the input
     if (!site_id) {
@@ -320,13 +380,25 @@ async function entitlementSite(site_id: any) {
         data: null,
       };
     }
+    const { count: totalCount, error: countError } = await supabase
+      .from('entitlements_package')
+      .select('*', { count: 'exact', head: true })
+      .eq('site_id', site_id);
+
+    if (countError) {
+      return {
+        errorCode: 1,
+        data: null,
+      };
+    }
 
     // Fetch the licenses associated with the site
     const { data: entitlements_package, error: entitlementsError } =
       await supabase
         .from('entitlements_package')
         .select('*')
-        .eq('site_id', site_id);
+        .eq('site_id', site_id)
+        .range(start, end);
 
     // Check for errors during the fetch operation for licenses
     if (entitlementsError) {
@@ -376,6 +448,7 @@ async function entitlementSite(site_id: any) {
       errorCode: 0,
       message: 'Success',
       data: entitlementList,
+      totalCount: totalCount,
     };
   } catch (error) {
     // Log any unexpected errors
