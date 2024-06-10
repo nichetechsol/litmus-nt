@@ -2,7 +2,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 
-import { listLitmusProducts } from '@/supabase/products';
+import { modifyUserOfSites } from '@/supabase/site_users';
 
 const OrgDashboard = () => {
   const [result, setResult] = useState(null);
@@ -12,7 +12,15 @@ const OrgDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data: any = await listLitmusProducts(1);
+        const staticUserData = {
+          user_id: '1',
+          role_id: '3',
+          site_id: '1',
+          email: 'parthr@nichetech.com',
+          firstname: 'Parth',
+          lastname: 'Roka',
+        };
+        const data: any = await modifyUserOfSites(staticUserData);
         setResult(data);
       } catch (err: any) {
         setError(err);

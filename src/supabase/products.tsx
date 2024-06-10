@@ -7,7 +7,7 @@ interface FolderResult {
   message: string;
   data: {
     currentFiles: string[];
-    oldFiles: string[];
+    archivedFiles: string[];
   } | null;
 }
 
@@ -130,12 +130,50 @@ async function listLitmusProducts(site_id: any) {
   };
 }
 
-async function allCurrentfiles() {
-  const { data: rootData, error: rootError } = await supabase.storage
-    .from('Litmus_Products')
-    .list();
+async function allCurrentfiles(site_id: any, org_id: any, org_type_id: any) {
+  // Fetch entitlements package based on site_id
+  if (!site_id || !org_id || !org_type_id) {
+    return {
+      errorCode: 1,
+      message: 'Error fetching files',
+      data: null,
+    };
+  }
+  const { data: entitlements_package, error: errorEntitlement } = await supabase
+    .from('entitlements_package')
+    .select('*')
+    .eq('site_id', site_id);
 
-  if (rootError) {
+  // Check if there was an error in fetching entitlements package
+  if (errorEntitlement) {
+    return {
+      errorCode: 2,
+      message: 'Error fetching entitlements package',
+      data: null,
+    };
+  }
+
+  // Determine the relevant entitlements
+  const entitlement14 = entitlements_package.some(
+    (entitlement) => entitlement.entitlement_name_id === 14,
+  );
+  const entitlement15 = entitlements_package.some(
+    (entitlement) => entitlement.entitlement_name_id === 15,
+  );
+
+  // Fetch the list of Litmus Products from storage
+  const { data, error } = await supabase.storage.from('Litmus_Products').list();
+
+  // Handle errors from fetching Litmus Products
+  if (error) {
+    return {
+      errorCode: 1,
+      message: 'Error fetching Litmus Products',
+      data: null,
+    };
+  }
+
+  if (!data || data.length === 0) {
     return {
       errorCode: 1,
       message: 'No Data Available for this product',
@@ -143,41 +181,72 @@ async function allCurrentfiles() {
     };
   }
 
-  const results: FolderResult[] = [];
+  // Filter folders based on entitlements
+  const filteredFolders = data.filter((item) => {
+    if (
+      entitlement14 &&
+      (item.name === 'Litmus_Edge' || item.name === 'Litmus_Edge_Manager')
+    ) {
+      return true;
+    }
+    if (entitlement15 && item.name === 'Litmus_UNS') {
+      return true;
+    }
+    return false;
+  });
 
-  for (const item of rootData) {
+  const results = [];
+  for (const item of filteredFolders) {
     const { data: folderData, error: folderError } = await supabase.storage
       .from('Litmus_Products')
       .list(item.name);
 
     if (folderError) {
-      const errorResult: FolderResult = {
+      results.push({
         folder: item.name,
         errorCode: 1,
         message: 'Error retrieving folder contents',
         data: null,
-      };
-      results.push(errorResult);
+      });
     } else {
-      const currentFiles = folderData
-        .filter((subItem) => subItem.name.includes('_Current'))
-        .map((subItem) => subItem.name);
+      // Store all files and their download links
+      const filesWithLinks = [];
 
-      const notCurrentFiles = folderData
-        .filter((subItem) => !subItem.name.includes('_Current'))
-        .map((subItem) => subItem.name);
+      const allFiles = folderData.map((subItem) => ({
+        name: subItem.name,
+        status: subItem.name.includes('_Current') ? 'current' : 'archive',
+      }));
 
-      const folderResult: FolderResult = {
+      for (const file of allFiles) {
+        const { data: fileData, error: signedURLError } = await supabase.storage
+          .from('Litmus_Products')
+          .list(`${item.name}/${file.name}`);
+
+        if (fileData) {
+          for (const fileEntry of fileData) {
+            const dataName = fileEntry.name;
+
+            const { data: download, error } = await supabase.storage
+              .from('Litmus_Products')
+              .createSignedUrl(`${item.name}/${file.name}/${dataName}`, 60);
+
+            if (!error) {
+              filesWithLinks.push({
+                FileName: dataName,
+                downloadLink: download.signedUrl,
+                status: file.status,
+              });
+            }
+          }
+        }
+      }
+
+      results.push({
         folder: item.name,
         errorCode: 0,
         message: 'Success',
-        data: {
-          currentFiles: currentFiles,
-          oldFiles: notCurrentFiles,
-        },
-      };
-
-      results.push(folderResult);
+        data: filesWithLinks,
+      });
     }
   }
 
@@ -187,6 +256,7 @@ async function allCurrentfiles() {
     data: results,
   };
 }
+
 async function allfiles() {
   // Retrieve the list of items in the root directory
   const { data: rootData, error: rootError } = await supabase.storage

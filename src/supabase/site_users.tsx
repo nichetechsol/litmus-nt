@@ -13,9 +13,18 @@ interface UserData {
   user_id?: any;
   role_id?: any;
 }
+interface SiteUser {
+  user_id: any;
+  role_id: any;
+}
 
 interface Result<T> {
   errorCode: number;
+  data: T | null;
+}
+interface ModifyResult<T> {
+  errorCode: number;
+  message: any;
   data: T | null;
 }
 
@@ -130,12 +139,16 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
 }
 
 // Function to update a user's role in the 'site_users' table
-async function modifyUserOfSites(UserData: UserData): Promise<Result<any>> {
+async function modifyUserOfSites(
+  UserData: UserData,
+): Promise<ModifyResult<SiteUser[]>> {
+  // Check if required UserData properties are present
   if (!UserData.user_id || !UserData.role_id || !UserData.site_id) {
-    return { errorCode: 1, data: null };
+    return { errorCode: 1, message: 'Missing required fields', data: null };
   }
 
   try {
+    // Update the role_id for the specified user_id and site_id
     const { data, error } = await supabase
       .from('site_users')
       .update({ role_id: UserData.role_id })
@@ -143,13 +156,27 @@ async function modifyUserOfSites(UserData: UserData): Promise<Result<any>> {
       .eq('site_id', UserData.site_id)
       .select();
 
+    // Handle potential errors from the update operation
     if (error) {
-      return { errorCode: 1, data: null };
-    } else {
-      return { errorCode: 0, data: data };
+      return { errorCode: 1, message: error.message, data: null };
     }
+
+    if (data.length === 0) {
+      const message =
+        'No records were updated. Please check if the user_id and site_id are correct.';
+
+      return { errorCode: 1, message: message, data: null };
+    }
+
+    // Return success with the updated data
+    return {
+      errorCode: 0,
+      message: 'User role updated successfully',
+      data: data,
+    };
   } catch (error) {
-    return { errorCode: -1, data: null };
+    // Handle any unexpected errors
+    return { errorCode: -1, message: 'Unexpected error occurred', data: null };
   }
 }
 
