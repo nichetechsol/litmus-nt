@@ -15478,7 +15478,7 @@ input.gridjs-input {
 }
 
 .form-select {
-  @apply block w-full py-[0.375rem] pe-[2.25rem] ps-[0.75rem] text-[1rem] font-normal leading-[1.5];
+  @apply block w-full py-[0.5rem] pe-[2.25rem] ps-[0.75rem] text-[1rem] font-normal leading-[1.9];
 }
 
 .form-select {
@@ -15486,6 +15486,8 @@ input.gridjs-input {
 }
 .form-select option {
   @apply bg-white dark:bg-bodybg py-[0.35rem] px-3 rounded-sm border border-primary/10;
+  text-transform: capitalize;
+
 }
 .form-select option:checked {
   @apply bg-primary/20 text-primary;
