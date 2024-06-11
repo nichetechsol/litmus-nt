@@ -692,7 +692,8 @@ const OrgDashboard = () => {
                           )}
                           <div
                             id='todo-compose'
-                            className='hs-overlay hidden ti-modal'
+                            // className='hs-overlay hidden ti-modal'
+                            className='hs-overlay hidden ti-modal  [--overlay-backdrop:static]'
                           >
                             <div className='hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out'>
                               <div className='ti-modal-content'>

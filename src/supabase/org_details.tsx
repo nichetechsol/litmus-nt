@@ -75,6 +75,7 @@ async function fetchOrganizationAndSiteDetails(
         errorCode: 0,
         org_id: org.id,
         org_name: org.name,
+        org_type_id: org.type_id,
         sites_count: sitesCountForOrg,
       };
     });

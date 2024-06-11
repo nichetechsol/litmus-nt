@@ -16,6 +16,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { decryptData } from '@/helper/Encryption_Decryption';
 import { emailSchema, nameSchema, roleSchema } from '@/helper/ValidationHelper';
 import { getUserRole } from '@/supabase/org_details';
+import { listLitmusProducts } from '@/supabase/products';
 import {
   addUserToSites,
   modifyUserOfSites,
@@ -39,6 +40,14 @@ interface licenseData {
   licence_number: string;
   licence_type_name: string;
   site_id: number;
+}
+interface Products {
+  data: {
+    FileName: string;
+    downloadLink: string;
+  };
+  errorCode: number;
+  folder: string;
 }
 interface Entitlement {
   id: number;
@@ -98,6 +107,7 @@ const Page = () => {
   const [totalItemsCount2, setTotalItemsCount2] = useState(0);
   const [activePage2, setActivePage2] = useState(1);
   const [perPage2] = useState(10);
+  const [products, setProducts] = useState<Products[] | null>(null);
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
@@ -234,7 +244,26 @@ const Page = () => {
   useEffect(() => {
     fetchUserData();
   }, [site_id, activePage, search]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        if (site_id) {
+          const result1: any = await listLitmusProducts(site_id); // Replace with your actual API call
 
+          if (result1) {
+            setProducts(result1.data);
+            setLoading(false);
+          }
+        }
+      } catch (error: any) {
+        setLoading(false);
+        // console.error("Error fetching roles:", error.message);
+      }
+    };
+
+    fetchData();
+  }, [site_id]);
   const handleFiledClear = () => {
     setEmailError('');
     setFirstNameError('');
@@ -807,12 +836,8 @@ const Page = () => {
                               <li className='mb-[0.9rem]' key={index}>
                                 <div className='flex items-start flex-wrap'>
                                   <div className='me-2'>
-                                    <span className=' inline-flex items-center justify-center'>
-                                      <img
-                                        src='../../../assets/images/faces/10.jpg'
-                                        alt=''
-                                        className='w-[1.75rem] h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full'
-                                      />
+                                    <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
+                                      <i className='ri-profile-line text-[1rem] text-white'></i>
                                     </span>
                                   </div>
                                   <div className='flex-grow'>
@@ -1037,7 +1062,50 @@ const Page = () => {
                     </div>
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>
-                        <li className='mb-[0.9rem]'>
+                        {products && products.length > 0
+                          ? products.map((product, index) => (
+                              <li className='mb-[0.9rem]' key={index}>
+                                <div className='flex items-start flex-wrap'>
+                                  <div className='me-2'>
+                                    <span className=' inline-flex items-center justify-center'>
+                                      {/* <img
+                                  src='../../../assets/images/faces/10.jpg'
+                                  alt=''
+                                  className='w-[1.75rem] h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full'
+                                /> */}
+
+                                      <i className='ri-file-text-line'></i>
+                                    </span>
+                                  </div>
+                                  <div className='flex-grow'>
+                                    <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                      {product.folder}
+                                    </p>
+                                    <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
+                                      {product.data.FileName}
+                                    </p>
+                                  </div>
+                                  <div className='font-semibold text-[0.9375rem] '>
+                                    <button
+                                      type='button'
+                                      className='ti-btn ti-btn-primary-full label-ti-btn'
+                                      style={{ cursor: 'pointer' }}
+                                    >
+                                      <i className='ri-download-line label-ti-btn-icon  me-2'></i>
+                                      <a
+                                        href={product.data.downloadLink}
+                                        target='_blank'
+                                        rel='noopener noreferrer'
+                                      >
+                                        Download
+                                      </a>
+                                    </button>
+                                  </div>
+                                </div>
+                              </li>
+                            ))
+                          : null}
+                        {/* <li className='mb-[0.9rem]'>
                           <div className='flex items-start flex-wrap'>
                             <div className='me-2'>
                               <span className=' inline-flex items-center justify-center'>
@@ -1185,7 +1253,7 @@ const Page = () => {
                               </h1>
                             </div>
                           </div>
-                        </li>
+                        </li> */}
                       </ul>
                     </div>
                   </div>
@@ -1335,7 +1403,7 @@ const Page = () => {
                 <div className='xxl:col-span-6 xl:col-span-6  col-span-12'>
                   <div className='box'>
                     <div className='box-header flex justify-between'>
-                      <div className='box-title'>Files</div>
+                      <div className='box-title'>Soultion</div>
                       <div className='hs-dropdown ti-dropdown'>
                         <Link
                           aria-label='anchor'
@@ -1563,7 +1631,8 @@ const Page = () => {
                           </Link>
                           <div
                             id='todo-compose-user'
-                            className='hs-overlay hidden ti-modal'
+                            // className='hs-overlay hidden ti-modal'
+                            className='hs-overlay hidden ti-modal  [--overlay-backdrop:static]'
                           >
                             <div className='hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out'>
                               <div className='ti-modal-content'>
