@@ -203,7 +203,18 @@ async function sitesCounts(site_id: any, org_id: any): Promise<FunctionReturn> {
   }
 
   try {
+    let products1: any = 0;
+    const { data: products, error } = await supabase.storage
+      .from('Litmus_Products')
+      .list();
+    if (!error) {
+      products1 = products.length;
+    }
     // Fetch the users associated with the site
+    const { data: sites_details, error: siteDetailError } = await supabase
+      .from('sites_detail')
+      .select('*')
+      .eq('id', site_id);
     const { data: site_users, error: userError } = await supabase
       .from('site_users')
       .select('*')
@@ -279,6 +290,8 @@ async function sitesCounts(site_id: any, org_id: any): Promise<FunctionReturn> {
         usersCount: site_users.length,
         licencesCount: licence.length,
         sandboxesCount: entitlementsPackageCount,
+        productCount: products1,
+        sites_details: sites_details,
       },
     };
   } catch (error) {
