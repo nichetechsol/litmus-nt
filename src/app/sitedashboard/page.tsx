@@ -165,11 +165,11 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
+        // setLoading(true);
         if (site_id && org_id) {
           const data: any = await sitesCounts(site_id, org_id);
           setSiteCountData(data);
-          setLoading(false);
+          // setLoading(false);
         }
       } catch (error: any) {
         // console.error("Error fetching organization details:", error.message);
@@ -180,10 +180,10 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
+        // setLoading(true);
         const data: any = await licenceData(site_id);
         setLicence(data.data);
-        setLoading(false);
+        // setLoading(false);
       } catch (error: any) {
         // console.error("Error fetching organization details:", error.message);
       }
@@ -193,9 +193,9 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
+        // setLoading(true);
         // const data: any = await allSitesOfUsers(user_id, org_id);
-        setLoading(false);
+        // setLoading(false);
       } catch (error: any) {
         // console.error("Error fetching organization details:", error.message);
       }
@@ -205,9 +205,9 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
+        // setLoading(true);
         // const data: any = await sitesDetails(site_id);
-        setLoading(false);
+        // setLoading(false);
       } catch (error: any) {
         // console.error("Error fetching organization details:", error.message);
       }
@@ -220,11 +220,11 @@ const Page = () => {
       const start: any = (activePage - 1) * perPage; // Calculate start index
       const end: any = start + perPage - 1;
       if (site_id) {
-        setLoading(true);
+        // setLoading(true);
         const data: any = await allSitesOfUsers(site_id, search, start, end);
         setOrgUserData(data.data);
         setTotalItemsCount(data.totalCount);
-        setLoading(false);
+        // setLoading(false);
       }
     } catch (error: any) {
       // console.error("Error fetching organization details:", error.message);
@@ -365,6 +365,7 @@ const Page = () => {
             role_id: role,
             user_id: userNameId,
             org_id: org_id,
+            site_id: site_id,
           };
           result = await modifyUserOfSites(userData);
           if (result.errorCode == 0) {
@@ -410,6 +411,7 @@ const Page = () => {
     setFirstName(user.firstname);
     setLastName(user.lastname);
     setRole(user.role_id);
+    setsite_id(user.site_id);
   };
   const handleAddUser = () => {
     setEmail('');

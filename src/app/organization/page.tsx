@@ -532,8 +532,8 @@ const LoginForm = () => {
                                   setDomainError('');
                                   setTypeDropdownError('');
                                   setMessageError('');
-                                  fetchData();
-                                  fetchData1();
+                                  // fetchData();
+                                  // fetchData1();
                                 }}
                               >
                                 <span className='sr-only'>Close</span>
@@ -571,7 +571,11 @@ const LoginForm = () => {
                                     htmlFor='task-name'
                                     className='ti-form-label'
                                   >
-                                    Domains*
+                                    Domains*{' '}
+                                    <small className='form-text text-muted'>
+                                      (Separate Domain with a comma, and press
+                                      enter to add them to your list)
+                                    </small>
                                   </label>
                                   <input
                                     type='text'
@@ -712,8 +716,8 @@ const LoginForm = () => {
                                   setDomainError('');
                                   setTypeDropdownError('');
                                   setMessageError('');
-                                  fetchData();
-                                  fetchData1();
+                                  // fetchData();
+                                  // fetchData1();
                                 }}
                               >
                                 Cancel

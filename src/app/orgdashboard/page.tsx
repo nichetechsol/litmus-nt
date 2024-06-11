@@ -143,14 +143,14 @@ const OrgDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
+        // setLoading(true);
         if (org_id) {
           const data: any = await orgDashboardCounts(org_id);
-          setLoading(false);
+          // setLoading(false);
           if (data) {
             setOrgData(data.data);
           } else {
-            setLoading(false);
+            // setLoading(false);
             // console.log("No organization details found.");
           }
         }
@@ -216,7 +216,7 @@ const OrgDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
+        // setLoading(true);
 
         if (org_id) {
           const sets = { org_id: org_id };
@@ -224,14 +224,14 @@ const OrgDashboard = () => {
 
           if (data) {
             setLocationOfSites(data.data);
-            setLoading(false);
+            // setLoading(false);
           } else {
-            setLoading(false);
+            // setLoading(false);
             // console.log("No organization details found.");
           }
         }
       } catch (error: any) {
-        setLoading(false);
+        // setLoading(false);
         // console.error("Error fetching organization details:", error.message);
       }
     };

@@ -26,7 +26,10 @@ import {
   SiteAddress2Schema,
   SiteAddressSchema,
   SiteCitySchema,
+  SiteCountryDropdownSchema,
   SiteNameSchema,
+  SiteStateDropdownSchema,
+  SiteTypeDropdownSchema,
   TypeDropdownSchema,
 } from '@/helper/ValidationHelper';
 import Seo from '@/shared/layout-components/seo/seo';
@@ -209,7 +212,10 @@ const Page: React.FC = () => {
     try {
       // setLoading(true);
 
-      const result1: any = await fetchSiteSidebarList(searchTerm, org_id);
+      const result1: any = await fetchSiteSidebarList(
+        searchTerm ? searchTerm : null,
+        org_id,
+      );
 
       if (result1.errorCode === 0 && result1.data.length > 0) {
         setsidebarSite(result1.data);
@@ -256,11 +262,11 @@ const Page: React.FC = () => {
   ///////////////////for crud validations/////
   const validationSchema = Yup.object().shape({
     AddSiteName: SiteNameSchema,
-    SelectedValueDropdown: TypeDropdownSchema,
+    SelectedValueDropdown: SiteTypeDropdownSchema,
     Address1: SiteAddressSchema,
     Address2: SiteAddress2Schema,
-    SelectedValueCounrty: TypeDropdownSchema,
-    SelectedValueState: TypeDropdownSchema,
+    SelectedValueCounrty: SiteCountryDropdownSchema,
+    SelectedValueState: SiteStateDropdownSchema,
     City: SiteCitySchema,
     Pincode: PincodeSchema,
     message: MessageSchema,
@@ -314,7 +320,7 @@ const Page: React.FC = () => {
   ) => {
     const NewDropdownSelected = parseInt(e.target.value);
     setSelectedValueDropdown(NewDropdownSelected);
-    TypeDropdownSchema.validate(NewDropdownSelected)
+    SiteTypeDropdownSchema.validate(NewDropdownSelected)
       .then(() => {
         setTypeDropdownError('');
       })
@@ -367,7 +373,7 @@ const Page: React.FC = () => {
   const handelchangeState = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const NewStateselected = parseInt(e.target.value);
     setSelectedValueState(NewStateselected);
-    TypeDropdownSchema.validate(NewStateselected)
+    SiteStateDropdownSchema.validate(NewStateselected)
       .then(() => {
         setstateListError('');
       })
@@ -401,7 +407,7 @@ const Page: React.FC = () => {
     const Newcountryselected = parseInt(e.target.value);
     SetSelectedValueCounrty(Newcountryselected);
 
-    TypeDropdownSchema.validate(Newcountryselected)
+    SiteCountryDropdownSchema.validate(Newcountryselected)
       .then(() => {
         setCountryListError(''); // Clear error on successful validation
       })
@@ -455,8 +461,7 @@ const Page: React.FC = () => {
       setAddSiteNameError('');
       setTypeDropdownError('');
       setAddress2Error('');
-      setAddress1Error;
-      ('');
+      setAddress1Error('');
       setCountryListError('');
       setstateListError('');
       setCityError('');
@@ -581,8 +586,8 @@ const Page: React.FC = () => {
     setCity('');
     setPincodeError('');
     setMessageError('');
-    FetchSiteDetails();
-    fetchData1();
+    // FetchSiteDetails();
+    // fetchData1();
   };
 
   const [tokenVerify, setTokenVerify] = useState(false);
@@ -612,7 +617,7 @@ const Page: React.FC = () => {
                     {userrole2 == '1' || userrole2 == '2' ? (
                       <div className='p-4 grid border-b border-dashed dark:border-defaultborder/10'>
                         <Link
-                          href='#!'
+                          href=''
                           className='hs-dropdown-toggle py-2  px-3 ti-btn bg-primary text-white !font-medium w-full !mb-0'
                           data-hs-overlay='#todo-compose'
                         >
@@ -1080,18 +1085,28 @@ const Page: React.FC = () => {
                                             {SingleSite?.users?.length}
                                           </span>
                                         </li>
+                                        <li className='list-group-item fw-semibold'>
+                                          <i className='bx bx-user align-middle me-2 text-muted'></i>
+                                          <b>Site Name</b>
+                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                            {SingleSite?.type_name}
+                                          </span>
+                                        </li>
                                       </ul>
                                     </div>
-                                    <div>
-                                      <div className='btn-list text-center mt-5'>
-                                        <button
-                                          type='button'
-                                          className='ti-btn bg-primary text-white !font-medium'
-                                        >
-                                          {SingleSite?.type_name}
-                                        </button>
+                                    {/* <div>
+                                    <div className='btn-list text-center mt-5'>
+                                      <button
+                                      <div
+                                        className='ms-1 text-muted fw-normal d-inline-block'
+                                      className='ti-btn bg-primary text-white !font-medium'
+                                      >
+                                        <b>Site Name</b>{' '}
+                                        {SingleSite?.type_name}
                                       </div>
+                                      </button>
                                     </div>
+                                  </div> */}
                                   </div>
                                 </div>
                               </div>

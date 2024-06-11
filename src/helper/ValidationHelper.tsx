@@ -94,7 +94,55 @@ const PincodeSchema = Yup.string()
   .required('Please enter your  pincode')
   .min(5, 'The pincode should be at least 5 characters long')
   .max(6, 'The pincode should not exceed 6 characters');
+const SiteTypeDropdownSchema = Yup.string()
+  .required('Please select a type from the dropdown menu.')
+  .test('is-number', 'Please select a type from the dropdown menu', (value) => {
+    return !isNaN(parseInt(value, 10));
+  })
+  .test(
+    'is-positive',
+    'Please select a valid type from the dropdown menu.',
+    (value) => {
+      const parsedValue = parseInt(value, 10);
+      return parsedValue > 0;
+    },
+  );
 
+const SiteCountryDropdownSchema = Yup.string()
+  .required('Please select a Country from the dropdown menu.')
+  .test(
+    'is-number',
+    'Please select a Country from the dropdown menu',
+    (value) => {
+      return !isNaN(parseInt(value, 10));
+    },
+  )
+  .test(
+    'is-positive',
+    'Please select a valid Country from the dropdown menu.',
+    (value) => {
+      const parsedValue = parseInt(value, 10);
+      return parsedValue > 0;
+    },
+  );
+
+const SiteStateDropdownSchema = Yup.string()
+  .required('Please select a State from the dropdown menu.')
+  .test(
+    'is-number',
+    'Please select a State from the dropdown menu',
+    (value) => {
+      return !isNaN(parseInt(value, 10));
+    },
+  )
+  .test(
+    'is-positive',
+    'Please select a valid State from the dropdown menu.',
+    (value) => {
+      const parsedValue = parseInt(value, 10);
+      return parsedValue > 0;
+    },
+  );
 export {
   DomainSchema,
   emailSchema,
@@ -111,5 +159,8 @@ export {
   SiteAddress2Schema,
   SiteAddressSchema,
   SiteCitySchema,
+  SiteCountryDropdownSchema,
   SiteNameSchema,
+  SiteStateDropdownSchema,
+  SiteTypeDropdownSchema,
 };
