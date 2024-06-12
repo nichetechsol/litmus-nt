@@ -2,9 +2,7 @@
 import CryptoJS from 'crypto-js';
 
 export const ENCRYPTION_KEY = 'pass123';
-export const encryptData = (
-  data: string | number | null | undefined,
-): string => {
+export const encryptData = (data: any): string => {
   if (!data && data !== 0) {
     return '';
   }

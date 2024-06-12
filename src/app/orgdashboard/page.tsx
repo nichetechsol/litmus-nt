@@ -27,6 +27,7 @@ import {
   removeUserFromOrganization,
 } from '@/supabase/org_user';
 import Loader from '@/utils/Loader/Loader';
+
 interface OrgUser {
   id: any;
   firstname: any;
@@ -161,6 +162,27 @@ const OrgDashboard = () => {
 
     fetchData();
   }, [org_id]);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       // setLoading(true);
+  //       if (org_id) {
+  //         const data: any = await getActivitiesByOrgId(org_id);
+  //         // setLoading(false);
+  //         if (data) {
+  //           // setOrgData(data.data);
+  //         } else {
+  //           // setLoading(false);
+  //           // console.log("No organization details found.");
+  //         }
+  //       }
+  //     } catch (error: any) {
+  //       // console.error("Error fetching organization details:", error.message);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, [org_id]);
   const fetchData2 = async () => {
     try {
       // setLoading(true);

@@ -28,6 +28,7 @@ import {
   licenceData,
   sitesCounts,
 } from '@/supabase/sitedashboard';
+import listSolutions from '@/supabase/solutions';
 import Loader from '@/utils/Loader/Loader';
 
 import { TopCompanies } from '../../shared/data/dashboards/jobsdata';
@@ -67,11 +68,16 @@ interface OrgUser {
   lastname: any;
   email: React.ReactNode;
   role_name: React.ReactNode;
+  user_id: any;
 }
 interface roles {
   id: string;
   name: string;
   created_at: any;
+}
+interface about_site {
+  about_site: string;
+  created_at: string;
 }
 const validationSchema = Yup.object().shape({
   email: emailSchema,
@@ -108,6 +114,7 @@ const Page = () => {
   const [activePage2, setActivePage2] = useState(1);
   const [perPage2] = useState(10);
   const [products, setProducts] = useState<Products[] | null>(null);
+  const [solutions, setSolution] = useState<Products[] | null>(null);
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
@@ -123,28 +130,27 @@ const Page = () => {
   const [org_id, setorg_id] = useState<any>('');
   const [site_id, setsite_id] = useState<any>('');
   const [site_name, setSite_name] = useState<any>('');
-  // useEffect(() => {
-  //   // const userid: any = localStorage.getItem('user_id');
-  //   const orgid: any = localStorage.getItem('org_id');
-  //   const siteid: any = localStorage.getItem('site_id');
-  //   const sitename: any = localStorage.getItem('site_name');
-  //   // setuser_id(userid);
-  //   setorg_id(orgid);
-  //   setsite_id(siteid);
-  //   setSite_name(sitename);
-  // }, []);
+  const [site_owner_name, SetSite_owner_name] = useState<any>('');
   useEffect(() => {
     const userid = decryptData(localStorage.getItem('user_id'));
     const orgid = decryptData(localStorage.getItem('org_id'));
     const siteid = decryptData(localStorage.getItem('site_id'));
     const sitename = decryptData(localStorage.getItem('site_name'));
+    const siteownername = decryptData(localStorage.getItem('site_owner_name'));
     setuser_id(userid);
     setorg_id(orgid);
     setsite_id(siteid);
     setSite_name(sitename);
+    SetSite_owner_name(siteownername);
   }, []);
   const [siteCountData, setSiteCountData] = useState<{
-    data: { licencesCount: number; sandboxesCount: number; usersCount: number };
+    data: {
+      licencesCount: number;
+      sandboxesCount: number;
+      usersCount: number;
+      productCount: number;
+      sites_details: about_site[];
+    };
     errorCode: number;
     message: string;
   } | null>(null);
@@ -200,25 +206,18 @@ const Page = () => {
     };
     fetchData();
   }, [site_id]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // setLoading(true);
-        // const data: any = await allSitesOfUsers(user_id, org_id);
-        // setLoading(false);
+        setLoading(true);
+        const data: any = await listSolutions();
+        if (data) {
+          setSolution(data.data);
+        }
+        setLoading(false);
       } catch (error: any) {
-        // console.error("Error fetching organization details:", error.message);
-      }
-    };
-    fetchData();
-  }, []);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // setLoading(true);
-        // const data: any = await sitesDetails(site_id);
-        // setLoading(false);
-      } catch (error: any) {
+        setLoading(false);
         // console.error("Error fetching organization details:", error.message);
       }
     };
@@ -393,7 +392,6 @@ const Page = () => {
             lastname: lastName,
             role_id: role,
             user_id: userNameId,
-            org_id: org_id,
             site_id: site_id,
           };
           result = await modifyUserOfSites(userData);
@@ -435,7 +433,7 @@ const Page = () => {
   };
   const handleEdit = (user: any) => {
     setChangeFlage(false);
-    setUserNameId(user.id);
+    setUserNameId(user.user_id);
     setEmail(user.email);
     setFirstName(user.firstname);
     setLastName(user.lastname);
@@ -478,7 +476,6 @@ const Page = () => {
     });
   };
   return (
-    // <div>Page</div>
     <>
       {loading && <Loader />}
       {tokenVerify && (
@@ -567,7 +564,9 @@ const Page = () => {
                                     Number of Products
                                   </p>
                                   <h4 className='font-semibold text-[1.5rem] !mb-2 '>
-                                    0
+                                    {siteCountData
+                                      ? siteCountData.data.productCount
+                                      : 0}
                                   </h4>
                                 </div>
                               </div>
@@ -589,7 +588,7 @@ const Page = () => {
                               <div className='flex items-center justify-between flex-wrap'>
                                 <div>
                                   <p className='text-[#8c9097] dark:text-white/50 text-[0.813rem] mb-0'>
-                                    Number of Sendbox
+                                    Number of Sandbox
                                   </p>
                                   <h4 className='font-semibold text-[1.5rem] !mb-2 '>
                                     {siteCountData
@@ -609,27 +608,31 @@ const Page = () => {
                 <div className='xxl:col-span-12 xl:col-span-12  col-span-12'>
                   <div className='box'>
                     <div className='box-header flex justify-between'>
-                      <div className='box-title'>Licence</div>
+                      <div className='box-title'>About Site</div>
                     </div>
                     <div className='box-body'>
                       <div className='ms-6'>
-                        <h5 className='text-[1.25rem] text-defaulttextcolor dark:text-defaulttextcolor/70 font-medium'>
-                          High Standards in design !
-                        </h5>
+                        {siteCountData &&
+                        siteCountData.data.sites_details[0].about_site ? (
+                          <h5 className='text-[1.25rem] text-defaulttextcolor dark:text-defaulttextcolor/70 font-medium'>
+                            About Site
+                          </h5>
+                        ) : (
+                          ''
+                        )}
+
                         <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
+                          {siteCountData
+                            ? siteCountData.data.sites_details[0].about_site
+                            : ''}
+                        </p>
+                        {/* <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
                           Lorem ipsum dolor sit amet consectetur adipisicing
                           elit. Adipisci quos sint, officia vel ab perferendis,
                           dolores placeat dolor aliquam debitis eius, illum
                           ullam ratione blanditiis fugiat omnis beatae odio
                           vitae!
-                        </p>
-                        <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
-                          Lorem ipsum dolor sit amet consectetur adipisicing
-                          elit. Adipisci quos sint, officia vel ab perferendis,
-                          dolores placeat dolor aliquam debitis eius, illum
-                          ullam ratione blanditiis fugiat omnis beatae odio
-                          vitae!
-                        </p>
+                        </p> */}
                       </div>
                       <div className='xl:col-span-12 col-span-12  mt-5 container !mx-auto !justify-center !items-center '>
                         <div className='box text-default shadow border dark:border-defaulttextcolor/10'>
@@ -637,23 +640,16 @@ const Page = () => {
                             <div className='sm:grid grid-cols-12'>
                               <div className='xl:col-span-3 xxl:col-span-3 lg:col-span-3 md:col-span-3 col-span-3 about-company-stats-border'>
                                 <div className='text-center p-6 w-full h-full flex items-center justify-center'>
-                                  <div>
-                                    <span className='font-semibold'>
-                                      Project owner
-                                    </span>
-                                    <p className='text-dark text-[2rem] mb-0'>
-                                      <span
-                                        className='count-up'
-                                        data-count='21'
-                                      >
-                                        {' '}
-                                        123
-                                      </span>
-                                    </p>
-                                  </div>
+                                  <span className='font-semibold me-2'>
+                                    {site_owner_name ? 'Owner:' : ''}
+                                  </span>
+                                  <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
+                                    {' '}
+                                    {site_owner_name ? site_owner_name : ''}
+                                  </p>
                                 </div>
                               </div>
-                              <div className='xl:col-span-3 xxl:col-span-3 lg:col-span-3 md:col-span-3 col-span-3 about-company-stats-border'>
+                              {/* <div className='xl:col-span-3 xxl:col-span-3 lg:col-span-3 md:col-span-3 col-span-3 about-company-stats-border'>
                                 <div className='text-center p-6 w-full h-full flex items-center justify-center'>
                                   <div>
                                     <span className='font-semibold'>
@@ -670,26 +666,33 @@ const Page = () => {
                                     </p>
                                   </div>
                                 </div>
-                              </div>
+                              </div> */}
                               <div className='xl:col-span-3 xxl:col-span-3 lg:col-span-3 md:col-span-3 col-span-3'>
                                 <div className='text-center p-6 w-full h-full flex items-center justify-center'>
-                                  <div>
-                                    <span className='font-semibold'>
-                                      Start Date
-                                    </span>
-                                    <p className='text-dark text-[2rem] mb-0'>
+                                  <span className='font-semibold'>
+                                    {siteCountData &&
+                                    siteCountData.data.sites_details[0]
+                                      .created_at
+                                      ? 'Created:'
+                                      : ''}
+                                  </span>
+                                  {/* <p className='text-dark text-[2rem] mb-0'>
                                       <span
                                         className='count-up'
                                         data-count='21'
-                                      >
-                                        {' '}
-                                        123
-                                      </span>
-                                    </p>
-                                  </div>
+                                      > */}
+                                  <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
+                                    {' '}
+                                    {siteCountData
+                                      ? siteCountData.data.sites_details[0].created_at.split(
+                                          'T',
+                                        )[0]
+                                      : ''}
+                                    {/* </span> */}
+                                  </p>
                                 </div>
                               </div>
-                              <div className='xl:col-span-3 xxl:col-span-3 lg:col-span-3 md:col-span-3 col-span-3'>
+                              {/* <div className='xl:col-span-3 xxl:col-span-3 lg:col-span-3 md:col-span-3 col-span-3'>
                                 <div className='text-center p-6 w-full h-full flex items-center justify-center'>
                                   <div>
                                     <span className='font-semibold'>
@@ -706,7 +709,7 @@ const Page = () => {
                                     </p>
                                   </div>
                                 </div>
-                              </div>
+                              </div> */}
                             </div>
                           </div>
                         </div>
@@ -719,7 +722,7 @@ const Page = () => {
                   <div className='box'>
                     <div className='box-header flex justify-between'>
                       <div className='box-title'>Licence</div>
-                      <div className='hs-dropdown ti-dropdown'>
+                      {/* <div className='hs-dropdown ti-dropdown'>
                         <Link
                           href=''
                           className='hs-dropdown-toggle py-2  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
@@ -827,7 +830,7 @@ const Page = () => {
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </div> */}
                     </div>
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>
@@ -845,10 +848,7 @@ const Page = () => {
                                       {user.licence_number}
                                     </p>
                                     <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                      01/01/2024
-                                    </p>
-                                    <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                      2hr Ago
+                                      {user.exipry}
                                     </p>
                                   </div>
                                   <div className='font-semibold text-[0.9375rem] '>
@@ -959,7 +959,7 @@ const Page = () => {
                           <i className='ri-add-circle-line !text-[1rem]'></i>Add
                           Product
                         </Link>
-                        <div
+                        {/* <div
                           id='todo-compose'
                           className='hs-overlay hidden ti-modal'
                         >
@@ -1057,7 +1057,7 @@ const Page = () => {
                               </div>
                             </div>
                           </div>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                     <div className='box-body'>
@@ -1065,195 +1065,30 @@ const Page = () => {
                         {products && products.length > 0
                           ? products.map((product, index) => (
                               <li className='mb-[0.9rem]' key={index}>
-                                <div className='flex items-start flex-wrap'>
-                                  <div className='me-2'>
-                                    <span className=' inline-flex items-center justify-center'>
-                                      {/* <img
-                                  src='../../../assets/images/faces/10.jpg'
-                                  alt=''
-                                  className='w-[1.75rem] h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full'
-                                /> */}
-
-                                      <i className='ri-file-text-line'></i>
+                                <h5 className='box-title'>{product.folder}</h5>
+                                <div className='flex items-center flex-wrap'>
+                                  <div className='me-2 ic-product'>
+                                    <span className='text-[1rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
+                                      <i className='ri-folder-line text-[1rem]  text-white'></i>
                                     </span>
                                   </div>
-                                  <div className='flex-grow'>
+                                  <div className='flex-grow ic-product-p'>
                                     <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                      {product.folder}
-                                    </p>
-                                    <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
                                       {product.data.FileName}
                                     </p>
                                   </div>
                                   <div className='font-semibold text-[0.9375rem] '>
-                                    <button
-                                      type='button'
-                                      className='ti-btn ti-btn-primary-full label-ti-btn'
-                                      style={{ cursor: 'pointer' }}
+                                    <a
+                                      href={product.data.downloadLink}
+                                      className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
                                     >
-                                      <i className='ri-download-line label-ti-btn-icon  me-2'></i>
-                                      <a
-                                        href={product.data.downloadLink}
-                                        target='_blank'
-                                        rel='noopener noreferrer'
-                                      >
-                                        Download
-                                      </a>
-                                    </button>
+                                      <i className='ri-download-2-line  text-[.8rem]  text-white'></i>
+                                    </a>
                                   </div>
                                 </div>
                               </li>
                             ))
                           : null}
-                        {/* <li className='mb-[0.9rem]'>
-                          <div className='flex items-start flex-wrap'>
-                            <div className='me-2'>
-                              <span className=' inline-flex items-center justify-center'>
-                                <img
-                                  src='../../../assets/images/faces/10.jpg'
-                                  alt=''
-                                  className='w-[1.75rem] h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full'
-                                />
-                              </span>
-                            </div>
-                            <div className='flex-grow'>
-                              <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                Michael Jordan
-                              </p>
-                              <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                01/01/2024
-                              </p>
-                              <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                2hr Ago
-                              </p>
-                            </div>
-                            <div className='font-semibold text-[0.9375rem] '>
-                              <h1>
-                                {' '}
-                                <span className='badge bg-primary text-white'>
-                                  Active
-                                </span>
-                              </h1>
-                            </div>
-                          </div>
-                        </li>
-                        <li className='mb-[0.9rem]'>
-                          <div className='flex items-start flex-wrap'>
-                            <div className='me-2'>
-                              <span className='inline-flex items-center justify-center !w-[1.75rem] !h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full text-warning  bg-warning/10 font-semibold'>
-                                EK
-                              </span>
-                            </div>
-                            <div className='flex-grow'>
-                              <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                Emigo Kiaren
-                              </p>
-                              <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                01/01/2024
-                              </p>
-                              <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                2hr Ago
-                              </p>
-                            </div>
-                            <div className='font-semibold text-[0.9375rem] '>
-                              <h1>
-                                {' '}
-                                <span className='badge bg-danger text-white'>
-                                  Expired
-                                </span>
-                              </h1>
-                            </div>
-                          </div>
-                        </li>
-                        <li className='mb-[0.9rem]'>
-                          <div className='flex items-top flex-wrap'>
-                            <div className='me-2'>
-                              <span className='inline-flex items-center justify-center'>
-                                <img
-                                  src='../../../assets/images/faces/12.jpg'
-                                  alt=''
-                                  className='!w-[1.75rem] !h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full'
-                                />
-                              </span>
-                            </div>
-                            <div className='flex-grow'>
-                              <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                Randy Origoan
-                              </p>
-                              <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                01/01/2024
-                              </p>
-                              <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                2hr Ago
-                              </p>
-                            </div>
-                            <div className='font-semibold text-[0.9375rem] '>
-                              <h1>
-                                {' '}
-                                <span className='badge bg-danger text-white'>
-                                  Expired
-                                </span>
-                              </h1>
-                            </div>
-                          </div>
-                        </li>
-                        <li className='mb-[0.9rem]'>
-                          <div className='flex items-top flex-wrap'>
-                            <div className='me-2'>
-                              <span className='inline-flex items-center justify-center !w-[1.75rem] !h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full text-success bg-success/10 font-semibold'>
-                                GP
-                              </span>
-                            </div>
-                            <div className='flex-grow'>
-                              <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                George Pieterson
-                              </p>
-                              <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                george.pieterson@gmail.com
-                              </p>
-                              <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                kiaraadvain214@gmail.com
-                              </p>
-                            </div>
-                            <div className='font-semibold text-[0.9375rem] '>
-                              <h1>
-                                {' '}
-                                <span className='badge bg-warning text-white'>
-                                  Renew
-                                </span>
-                              </h1>
-                            </div>
-                          </div>
-                        </li>
-                        <li>
-                          <div className='flex items-top flex-wrap'>
-                            <div className='me-2'>
-                              <span className='inline-flex items-center justify-center !w-[1.75rem] !h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full text-primary bg-primary/10 font-semibold'>
-                                KA
-                              </span>
-                            </div>
-                            <div className='flex-grow'>
-                              <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                Kiara Advain
-                              </p>
-                              <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                kiaraadvain214@gmail.com
-                              </p>
-                              <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                kiaraadvain214@gmail.com
-                              </p>
-                            </div>
-                            <div className='font-semibold text-[0.9375rem] '>
-                              {' '}
-                              <h1>
-                                {' '}
-                                <span className='badge bg-danger text-white'>
-                                  Expired
-                                </span>
-                              </h1>
-                            </div>
-                          </div>
-                        </li> */}
                       </ul>
                     </div>
                   </div>
@@ -1335,268 +1170,82 @@ const Page = () => {
                           linkClass='page-link'
                         />
                       </ul>
-                      {/* <ul className='list-none crm-top-deals mb-0'>
-                        <li className='mb-[0.9rem]'>
-                          <div className='flex items-start flex-wrap'>
-                            <div className='flex-grow'>
-                              <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                Michael Jordan
-                              </p>
-                            </div>
-                            <div className='font-semibold text-[0.9375rem] '>
-                              $2,893
-                            </div>
-                          </div>
-                        </li>
-                        <li className='mb-[0.9rem]'>
-                          <div className='flex items-start flex-wrap'>
-                            <div className='flex-grow'>
-                              <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                Emigo Kiaren
-                              </p>
-                            </div>
-                            <div className='font-semibold text-[0.9375rem] '>
-                              $4,289
-                            </div>
-                          </div>
-                        </li>
-                        <li className='mb-[0.9rem]'>
-                          <div className='flex items-top flex-wrap'>
-                            <div className='flex-grow'>
-                              <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                Randy Origoan
-                              </p>
-                            </div>
-                            <div className='font-semibold text-[0.9375rem] '>
-                              $6,347
-                            </div>
-                          </div>
-                        </li>
-                        <li className='mb-[0.9rem]'>
-                          <div className='flex items-top flex-wrap'>
-                            <div className='flex-grow'>
-                              <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                George Pieterson
-                              </p>
-                            </div>
-                            <div className='font-semibold text-[0.9375rem] '>
-                              $3,894
-                            </div>
-                          </div>
-                        </li>
-                        <li>
-                          <div className='flex items-top flex-wrap'>
-                            <div className='flex-grow'>
-                              <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                Kiara Advain
-                              </p>
-                            </div>
-                            <div className='font-semibold text-[0.9375rem] '>
-                              $2,679
-                            </div>
-                          </div>
-                        </li>
-                      </ul> */}
                     </div>
                   </div>
                 </div>
                 <div className='xxl:col-span-6 xl:col-span-6  col-span-12'>
                   <div className='box'>
                     <div className='box-header flex justify-between'>
-                      <div className='box-title'>Soultion</div>
-                      <div className='hs-dropdown ti-dropdown'>
-                        <Link
-                          aria-label='anchor'
-                          href=''
-                          className='flex items-center justify-center w-[1.75rem] h-[1.75rem]  !text-[0.8rem] !py-1 !px-2 rounded-sm bg-light border-light shadow-none !font-medium'
-                          aria-expanded='false'
-                        >
-                          <i className='fe fe-more-vertical text-[0.8rem]'></i>
-                        </Link>
-                        <ul className='hs-dropdown-menu ti-dropdown-menu hidden'>
-                          <li>
-                            <Link
-                              className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
-                              href=''
-                            >
-                              Week
-                            </Link>
-                          </li>
-                          <li>
-                            <Link
-                              className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
-                              href=''
-                            >
-                              Month
-                            </Link>
-                          </li>
-                          <li>
-                            <Link
-                              className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
-                              href=''
-                            >
-                              Year
-                            </Link>
-                          </li>
-                        </ul>
-                      </div>
+                      <div className='box-title'>Solutions</div>
                     </div>
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>
-                        <li className='mb-[0.9rem]'>
-                          <div className='flex items-start flex-wrap'>
-                            <div className='me-2'>
-                              <span className=' inline-flex items-center justify-center'>
-                                <img
-                                  src='../../../assets/images/faces/10.jpg'
-                                  alt=''
-                                  className='w-[1.75rem] h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full'
-                                />
-                              </span>
-                            </div>
-                            <div className='flex-grow'>
-                              <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                Michael Jordan
-                              </p>
-                              <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                01/01/2024
-                              </p>
-                              <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                2hr Ago
-                              </p>
-                            </div>
-                            <div className='font-semibold text-[0.9375rem] '>
-                              <button
-                                type='button'
-                                className='ti-btn ti-btn-primary-full label-ti-btn'
-                              >
-                                <i className='ri-download-line label-ti-btn-icon  me-2'></i>
-                                Download
-                              </button>
-                            </div>
-                          </div>
-                        </li>
-                        <li className='mb-[0.9rem]'>
-                          <div className='flex items-start flex-wrap'>
-                            <div className='me-2'>
-                              <span className='inline-flex items-center justify-center !w-[1.75rem] !h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full text-warning  bg-warning/10 font-semibold'>
-                                EK
-                              </span>
-                            </div>
-                            <div className='flex-grow'>
-                              <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                Emigo Kiaren
-                              </p>
-                              <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                01/01/2024
-                              </p>
-                              <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                2hr Ago
-                              </p>
-                            </div>
-                            <div className='font-semibold text-[0.9375rem] '>
-                              <button
-                                type='button'
-                                className='ti-btn ti-btn-primary-full label-ti-btn'
-                              >
-                                <i className='ri-download-line label-ti-btn-icon  me-2'></i>
-                                Download
-                              </button>
-                            </div>
-                          </div>
-                        </li>
-                        <li className='mb-[0.9rem]'>
-                          <div className='flex items-top flex-wrap'>
-                            <div className='me-2'>
-                              <span className='inline-flex items-center justify-center'>
-                                <img
-                                  src='../../../assets/images/faces/12.jpg'
-                                  alt=''
-                                  className='!w-[1.75rem] !h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full'
-                                />
-                              </span>
-                            </div>
-                            <div className='flex-grow'>
-                              <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                Randy Origoan
-                              </p>
-                              <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                01/01/2024
-                              </p>
-                              <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                2hr Ago
-                              </p>
-                            </div>
-                            <div className='font-semibold text-[0.9375rem] '>
-                              <button
-                                type='button'
-                                className='ti-btn ti-btn-primary-full label-ti-btn'
-                              >
-                                <i className='ri-download-line label-ti-btn-icon  me-2'></i>
-                                Download
-                              </button>
-                            </div>
-                          </div>
-                        </li>
-                        <li className='mb-[0.9rem]'>
-                          <div className='flex items-top flex-wrap'>
-                            <div className='me-2'>
-                              <span className='inline-flex items-center justify-center !w-[1.75rem] !h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full text-success bg-success/10 font-semibold'>
-                                GP
-                              </span>
-                            </div>
-                            <div className='flex-grow'>
-                              <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                George Pieterson
-                              </p>
-                              <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                george.pieterson@gmail.com
-                              </p>
-                              <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                kiaraadvain214@gmail.com
-                              </p>
-                            </div>
-                            <div className='font-semibold text-[0.9375rem] '>
-                              <button
-                                type='button'
-                                className='ti-btn ti-btn-primary-full label-ti-btn'
-                              >
-                                <i className='ri-download-line label-ti-btn-icon  me-2'></i>
-                                Download
-                              </button>
-                            </div>
-                          </div>
-                        </li>
-                        <li>
-                          <div className='flex items-top flex-wrap'>
-                            <div className='me-2'>
-                              <span className='inline-flex items-center justify-center !w-[1.75rem] !h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full text-primary bg-primary/10 font-semibold'>
-                                KA
-                              </span>
-                            </div>
-                            <div className='flex-grow'>
-                              <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                Kiara Advain
-                              </p>
-                              <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                kiaraadvain214@gmail.com
-                              </p>
-                              <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                kiaraadvain214@gmail.com
-                              </p>
-                            </div>
-                            <div className='font-semibold text-[0.9375rem] '>
-                              {' '}
-                              <button
-                                type='button'
-                                className='ti-btn ti-btn-primary-full label-ti-btn'
-                              >
-                                <i className='ri-download-line label-ti-btn-icon  me-2'></i>
-                                Download
-                              </button>
-                            </div>
-                          </div>
-                        </li>
+                        {/* {solutions && solutions.length > 0
+                          ? solutions.map((solution, index) => (
+                              <li className='mb-[0.9rem]' key={index}>
+                                  <div className='flex items-start flex-wrap'>
+                                  <div className='me-2 ic-product'>
+                                    <span className=' inline-flex items-center justify-center'>
+                                      <i className='ri-file-text-line'></i>
+                                    </span>
+                                  </div>
+                                  <div className='flex-grow ic-product-p'>
+                                    <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                      {solution.folder}
+                                    </p>
+                                    <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
+                                      {solution.data.FileName}
+                                    </p>
+                                  </div>
+                                  <div className='font-semibold text-[0.9375rem] '>
+                                    <button
+                                      type='button'
+                                      className='ti-btn ti-btn-primary-full label-ti-btn'
+                                      style={{ cursor: 'pointer' }}
+                                    >
+                                      <i className='ri-download-line label-ti-btn-icon  me-2'></i>
+                                      <a
+                                        href={solution.data.downloadLink}
+                                        target='_blank'
+                                        rel='noopener noreferrer'
+                                      >
+                                        Download
+                                      </a>
+                                    </button>
+                                  </div>
+                                </div>
+                              </li>
+                            ))
+                          : null} */}
+                        {solutions && solutions.length > 0
+                          ? solutions.map((solution, index) => (
+                              <li className='mb-[0.9rem]' key={index}>
+                                <div className='flex items-center flex-wrap'>
+                                  <div className='me-2 ic-product'>
+                                    <span className='text-[1rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
+                                      <i className='ri-folder-line text-[1rem]  text-white'></i>
+                                    </span>
+                                  </div>
+                                  <div className='flex-grow ic-product-p'>
+                                    <h5 className='box-title items-start'>
+                                      {solution.folder}
+                                    </h5>
+                                    <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                      {solution.data.FileName}
+                                    </p>
+                                  </div>
+                                  <div className='font-semibold text-[0.9375rem] '>
+                                    <a
+                                      href={solution.data.downloadLink}
+                                      className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
+                                    >
+                                      <i className='ri-download-line  text-[.8rem]  text-white'></i>
+                                    </a>
+                                  </div>
+                                </div>
+                              </li>
+                            ))
+                          : null}
                       </ul>
                     </div>
                   </div>
@@ -1660,7 +1309,7 @@ const Page = () => {
                                   <div className='grid grid-cols-12 gap-2'>
                                     <div className='xl:col-span-12 col-span-12'>
                                       <label
-                                        htmlFor='task-name'
+                                        htmlFor='Email'
                                         className='ti-form-label'
                                       >
                                         Email*
@@ -1668,7 +1317,7 @@ const Page = () => {
                                       <input
                                         type='text'
                                         className='form-control w-full'
-                                        id='task-name'
+                                        id='Email'
                                         placeholder='Enter Email'
                                         onChange={handleEmailChange}
                                         onKeyDown={handleKeyPress}
@@ -1879,7 +1528,7 @@ const Page = () => {
                                           style={{ cursor: 'pointer' }}
                                           aria-label='anchor'
                                           onClick={() => {
-                                            handleDelete(user.id);
+                                            handleDelete(user.user_id);
                                           }}
                                           className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-primary/10 text-primary hover:bg-primary hover:text-white hover:border-primary'
                                         >

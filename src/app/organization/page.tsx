@@ -44,6 +44,7 @@ const validationSchema = Yup.object().shape({
 
 interface OrganizationWithSiteCount {
   org_id: string;
+  org_type_id: string;
   org_name: string;
   sites_count: number;
 }
@@ -386,7 +387,10 @@ const LoginForm = () => {
         setDomainInput('');
         setOrganizationName('');
         setSelectedType('');
-        setDomains([]);
+        const defaultDomain = getDefaultDomainFromEmail();
+        if (defaultDomain) {
+          setDomains([defaultDomain]);
+        }
         setMessage('');
         setOrganizationNameError('');
         setDomainError('');
@@ -527,7 +531,11 @@ const LoginForm = () => {
                                   setDomainInput('');
                                   setOrganizationName('');
                                   setSelectedType('');
-                                  setDomains([]);
+                                  const defaultDomain =
+                                    getDefaultDomainFromEmail();
+                                  if (defaultDomain) {
+                                    setDomains([defaultDomain]);
+                                  }
                                   setMessage('');
                                   setOrganizationNameError('');
                                   setDomainError('');
@@ -711,7 +719,11 @@ const LoginForm = () => {
                                   setDomainInput('');
                                   setOrganizationName('');
                                   setSelectedType('');
-                                  setDomains([]);
+                                  const defaultDomain =
+                                    getDefaultDomainFromEmail();
+                                  if (defaultDomain) {
+                                    setDomains([defaultDomain]);
+                                  }
                                   setMessage('');
                                   setOrganizationNameError('');
                                   setDomainError('');
@@ -847,10 +859,15 @@ const LoginForm = () => {
                           onClick={() => {
                             const encryptedOrgId = encryptData(org.org_id);
                             const encryptedOrgName = encryptData(org.org_name);
+                            const encryptOrgTypeId = encryptData(
+                              org.org_type_id,
+                            );
                             localStorage.setItem('org_id', encryptedOrgId);
                             localStorage.setItem('org_name', encryptedOrgName);
-                            // localStorage.setItem('org_id', org.org_id);
-                            // localStorage.setItem('org_name', org.org_name);
+                            localStorage.setItem(
+                              'org_type_id',
+                              encryptOrgTypeId,
+                            );
                             navigate.push('/orgdashboard');
                           }}
                         >
