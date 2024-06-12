@@ -186,6 +186,8 @@ const LoginForm = () => {
       setLoading(true);
       const result: any = await Login(email, password);
       if (result?.errorCode === 0) {
+        const encryptedEmail1 = encryptData(email);
+        localStorage.setItem('user_email', encryptedEmail1);
         const user_id: any = result.user[0]?.id;
         const user_role: any = result.user[0]?.user_role;
         const user_firstname: any = result.user[0]?.firstname;

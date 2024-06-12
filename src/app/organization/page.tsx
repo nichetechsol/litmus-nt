@@ -109,7 +109,7 @@ const LoginForm = () => {
   }, []);
 
   const getDefaultDomainFromEmail = () => {
-    const email = localStorage.getItem('rememberedEmail');
+    const email = localStorage.getItem('user_email');
     const decryptemail = decryptData(email);
     if (decryptemail) {
       const domain = decryptemail.split('@')[1];
