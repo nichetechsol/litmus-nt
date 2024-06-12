@@ -273,7 +273,7 @@ const Page: React.FC = () => {
   });
   /////
   const handelAddSiteName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const NewSiteName = e.target.value;
+    const NewSiteName = e.target.value.trim();
     setAddSiteName(NewSiteName);
     SiteNameSchema.validate(NewSiteName)
       .then(() => {
@@ -331,7 +331,7 @@ const Page: React.FC = () => {
   };
 
   const handelchangeAddress1 = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newaddres1 = e.target.value;
+    const newaddres1 = e.target.value.trimStart();
     setAddress1(newaddres1);
     SiteAddressSchema.validate(newaddres1)
       .then(() => {
@@ -342,7 +342,7 @@ const Page: React.FC = () => {
       });
   };
   const handelchangeAddress2 = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newaddres2 = e.target.value;
+    const newaddres2 = e.target.value.trimStart();
     setAddress2(newaddres2);
     SiteAddress2Schema.validate(newaddres2)
       .then(() => {
@@ -418,7 +418,7 @@ const Page: React.FC = () => {
 
   // for city
   const handelAddSiteCity = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const NewSiteCity = e.target.value;
+    const NewSiteCity = e.target.value.trimStart();
     setCity(NewSiteCity);
     SiteCitySchema.validate(NewSiteCity)
       .then(() => {
@@ -430,7 +430,7 @@ const Page: React.FC = () => {
   };
   // for pincode
   const handelAddSitePincode = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const Newpincode = e.target.value;
+    const Newpincode = e.target.value.trim();
     setPincode(Newpincode);
     PincodeSchema.validate(Newpincode)
       .then(() => {
@@ -540,16 +540,17 @@ const Page: React.FC = () => {
             closeModalButtonRef.current.click();
           }
 
-          setAddSiteName('');
-          setSelectedValueDropdown(undefined);
-          setAddress1('');
-          setAddress2('');
-          setMessage('');
-          setFetchdropDCounrty(null);
-          setSelectedValueState(undefined);
-          setCity('');
-          setMessageError('');
-          setPincodeError('');
+          // setAddSiteName('');
+          // setSelectedValueDropdown(undefined);
+          // setAddress1('');
+          // setAddress2('');
+          // setMessage('');
+          // setFetchdropDCounrty(null);
+          // setSelectedValueState(undefined);
+          // setCity('');
+          // setMessageError('');
+          // setPincodeError('');
+          handelclosemodel();
           FetchSiteDetails();
           fetchData1();
           toast.success(result.message, { autoClose: 3000 });
@@ -579,6 +580,7 @@ const Page: React.FC = () => {
     setAddSiteName('');
     setSelectedValueDropdown(undefined);
     setAddress1('');
+    setPincode('');
     setAddress2('');
     setMessage('');
     setFetchdropDCounrty(null);
@@ -720,6 +722,7 @@ const Page: React.FC = () => {
                                       placeholder='Enter Address 1'
                                       onChange={handelchangeAddress1}
                                       value={Address1}
+                                      maxLength={255}
                                     />
                                     {Address1Error && (
                                       <div className='text-danger'>
@@ -822,6 +825,7 @@ const Page: React.FC = () => {
                                       placeholder='Enter City'
                                       onChange={handelAddSiteCity}
                                       value={City}
+                                      maxLength={100}
                                     />
                                     {CityError && (
                                       <div className='text-danger'>
@@ -843,6 +847,7 @@ const Page: React.FC = () => {
                                       placeholder='Enter Pin Code'
                                       onChange={handelAddSitePincode}
                                       value={Pincode}
+                                      maxLength={6}
                                     />
                                     {PincodeError && (
                                       <div className='text-danger'>
@@ -859,6 +864,7 @@ const Page: React.FC = () => {
                                     </label>
                                     <textarea
                                       className='form-control w-full'
+                                      style={{ resize: 'none' }}
                                       id='task-name'
                                       placeholder='Enter Description'
                                       // onKeyDown={handleKeyPress}
@@ -929,6 +935,7 @@ const Page: React.FC = () => {
                                 key={site?.id}
                                 onClick={() => {
                                   if (site.id != -1) {
+                                    setLoading(true);
                                     const encryptedsiteid = encryptData(
                                       site.id,
                                     );
@@ -944,6 +951,7 @@ const Page: React.FC = () => {
                                       encryptedsitename,
                                     );
                                     navigate.push('/sitedashboard');
+                                    setLoading(false);
                                   }
                                 }}
                               >
@@ -1086,7 +1094,7 @@ const Page: React.FC = () => {
                                         </li>
                                         <li className='list-group-item fw-semibold'>
                                           <i className='bx bx-user align-middle me-2 text-muted'></i>
-                                          <b>Site Name</b>
+                                          <b>Type</b>
                                           <span className='ms-1 text-muted fw-normal d-inline-block'>
                                             {SingleSite?.type_name}
                                           </span>

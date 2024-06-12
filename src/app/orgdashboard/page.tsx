@@ -767,6 +767,7 @@ const OrgDashboard = () => {
                                         type='text'
                                         className='form-control w-full'
                                         id='Email'
+                                        disabled={!changeFlage}
                                         placeholder='Enter Email'
                                         onChange={handleEmailChange}
                                         onKeyDown={handleKeyPress}
@@ -791,6 +792,7 @@ const OrgDashboard = () => {
                                         type='text'
                                         className='form-control w-full'
                                         id='task-name'
+                                        disabled={!changeFlage}
                                         placeholder='Enter First Name'
                                         onChange={handleFirstNameChange}
                                         onKeyDown={handleKeyPress}
@@ -814,6 +816,7 @@ const OrgDashboard = () => {
                                         type='text'
                                         className='form-control w-full'
                                         id='Last Name'
+                                        disabled={!changeFlage}
                                         placeholder='Enter Last Name'
                                         onChange={handleLastNameChange}
                                         onKeyDown={handleKeyPress}
@@ -865,6 +868,7 @@ const OrgDashboard = () => {
                                     className='hs-dropdown-toggle ti-btn  ti-btn-light align-middle'
                                     data-hs-overlay='#todo-compose'
                                     ref={closeModalButtonRef}
+                                    onClick={() => handleFiledClear()}
                                   >
                                     Cancel
                                   </button>

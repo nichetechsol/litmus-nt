@@ -18,6 +18,7 @@ import { emailSchema, nameSchema, roleSchema } from '@/helper/ValidationHelper';
 import { getActivitiesBySiteID } from '@/supabase/activity';
 import { getUserRole } from '@/supabase/org_details';
 import { listLitmusProducts } from '@/supabase/products';
+import { refreshToken } from '@/supabase/session';
 import {
   addUserToSites,
   modifyUserOfSites,
@@ -144,16 +145,19 @@ const Page = () => {
   const [site_id, setsite_id] = useState<any>('');
   const [site_name, setSite_name] = useState<any>('');
   const [site_owner_name, SetSite_owner_name] = useState<any>('');
+  const [orgName, setorgName] = useState<any>('');
   useEffect(() => {
     const userid = decryptData(localStorage.getItem('user_id'));
     const orgid = decryptData(localStorage.getItem('org_id'));
     const siteid = decryptData(localStorage.getItem('site_id'));
     const sitename = decryptData(localStorage.getItem('site_name'));
+    const decryptedOrgName = decryptData(localStorage.getItem('org_name'));
     const siteownername = decryptData(localStorage.getItem('site_owner_name'));
     setuser_id(userid);
     setorg_id(orgid);
     setsite_id(siteid);
     setSite_name(sitename);
+    setorgName(decryptedOrgName);
     SetSite_owner_name(siteownername);
   }, []);
   const [siteCountData, setSiteCountData] = useState<{
@@ -175,6 +179,7 @@ const Page = () => {
         const end: any = start + perPage2 - 1;
         if (site_id) {
           const data: any = await entitlementSite(site_id, start, end);
+          await refreshToken();
           if (data) {
             setEntitlementListData(data?.data);
             setTotalItemsCount2(data.totalCount); // Set total items count for pagination
@@ -641,17 +646,17 @@ const Page = () => {
                       <div className='ms-6'>
                         {siteCountData &&
                         siteCountData.data.sites_details[0].about_site ? (
-                          <h5 className='text-[1.25rem] text-defaulttextcolor dark:text-defaulttextcolor/70 font-medium'>
-                            About Site
-                          </h5>
-                        ) : (
                           ''
+                        ) : (
+                          <h5 className='text-[1.25rem] text-defaulttextcolor dark:text-defaulttextcolor/70 font-medium'>
+                            Description :
+                          </h5>
                         )}
 
                         <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
                           {siteCountData
                             ? siteCountData.data.sites_details[0].about_site
-                            : ''}
+                            : '--'}
                         </p>
                       </div>
                       <div className='xl:col-span-12 col-span-12  mt-5 container !mx-auto !justify-center !items-center '>
@@ -661,15 +666,25 @@ const Page = () => {
                               <div className='xl:col-span-3 xxl:col-span-3 lg:col-span-3 md:col-span-3 col-span-3 about-company-stats-border'>
                                 <div className='text-center p-6 w-full h-full flex items-center justify-center'>
                                   <span className='font-semibold me-2'>
-                                    {site_owner_name ? 'Owner:' : ''}
+                                    Owner:
                                   </span>
                                   <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
                                     {' '}
-                                    {site_owner_name ? site_owner_name : ''}
+                                    {site_owner_name ? site_owner_name : '--'}
                                   </p>
                                 </div>
                               </div>
-
+                              <div className='xl:col-span-3 xxl:col-span-3 lg:col-span-3 md:col-span-3 col-span-3 about-company-stats-border'>
+                                <div className='text-center p-6 w-full h-full flex items-center justify-center'>
+                                  <span className='font-semibold me-2'>
+                                    Organization Name:
+                                  </span>
+                                  <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
+                                    {' '}
+                                    {orgName ? orgName : '--'}
+                                  </p>
+                                </div>
+                              </div>
                               <div className='xl:col-span-3 xxl:col-span-3 lg:col-span-3 md:col-span-3 col-span-3'>
                                 <div className='text-center p-6 w-full h-full flex items-center justify-center'>
                                   <span className='font-semibold'>
@@ -953,7 +968,8 @@ const Page = () => {
                   <div className='box'>
                     <div className='box-header flex justify-between'>
                       <div className='box-title'>Products</div>
-                      <div className='hs-dropdown ti-dropdown'>
+                      {/* <div className='hs-dropdown ti-dropdown'> */}
+                      <div className='p-4 grid border-b border-dashed'>
                         <button
                           onClick={() => {
                             navigate.push('/products');
@@ -1331,6 +1347,7 @@ const Page = () => {
                                         type='text'
                                         className='form-control w-full'
                                         id='Email'
+                                        disabled={!changeFlage}
                                         placeholder='Enter Email'
                                         onChange={handleEmailChange}
                                         onKeyDown={handleKeyPress}
@@ -1355,6 +1372,7 @@ const Page = () => {
                                         type='text'
                                         className='form-control w-full'
                                         id='task-name'
+                                        disabled={!changeFlage}
                                         placeholder='Enter First Name'
                                         onChange={handleFirstNameChange}
                                         onKeyDown={handleKeyPress}
@@ -1379,6 +1397,7 @@ const Page = () => {
                                         className='form-control w-full'
                                         id='task-name'
                                         placeholder='Enter Last Name'
+                                        disabled={!changeFlage}
                                         onChange={handleLastNameChange}
                                         onKeyDown={handleKeyPress}
                                         maxLength={255}
@@ -1428,6 +1447,7 @@ const Page = () => {
                                     className='hs-dropdown-toggle ti-btn  ti-btn-light align-middle'
                                     data-hs-overlay='#todo-compose-user'
                                     ref={closeModalButtonRef}
+                                    onClick={() => handleFiledClear()}
                                   >
                                     Cancel
                                   </button>

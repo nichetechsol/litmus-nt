@@ -699,6 +699,7 @@ const LoginForm = () => {
                                     onChange={handleMessageChange}
                                     onKeyDown={handleKeyPress}
                                     value={message}
+                                    style={{ resize: 'none' }}
                                     maxLength={1000}
                                   />
                                   {messageError && (
