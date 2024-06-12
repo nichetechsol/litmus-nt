@@ -516,7 +516,7 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
               {/* <div className="header-element md:px-[0.325rem] !items-center" onClick={() => toggleSidebar()}>
                 <Link aria-label="Hide Sidebar"
                   className="sidemenu-toggle animated-arrow  hor-toggle horizontal-navtoggle inline-flex items-center" href=""><span></span></Link>
-              </div> */}
+              </div> */}{' '}
             </div>
             <div className='header-content-right'>
               <div className='header-element md:!px-[0.65rem] px-2 hs-dropdown !items-center ti-dropdown [--placement:bottom-left]'>
