@@ -227,8 +227,6 @@ export default function reducer(state = initialState, action: any) {
       state = payload;
       return state;
 
-      return state;
-
     case 'PRODUCT':
       state.ecommercedata = state.ecommercedata.filter((idx) => {
         return idx.id == payload;

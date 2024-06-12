@@ -5,16 +5,31 @@
 
 'use client';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import CryptoJS from 'crypto-js';
+import { redirect, useRouter } from 'next/navigation';
+import InitialsComponent from '@/helper/NameHelper';
+import React, {
+  ReactNode,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import * as Yup from 'yup';
 import swal from 'sweetalert';
+
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
   MessageSchema,
   PincodeSchema,
+  SiteAddress2Schema,
   SiteAddressSchema,
   SiteCitySchema,
+  SiteCountryDropdownSchema,
   SiteNameSchema,
+  SiteStateDropdownSchema,
+  SiteTypeDropdownSchema,
   TypeDropdownSchema,
 } from '@/helper/ValidationHelper';
 import Seo from '@/shared/layout-components/seo/seo';
@@ -28,13 +43,8 @@ import { addSites } from '@/supabase/site_details_crud';
 import { fetchSiteType } from '@/supabase/site_type';
 import { stateList } from '@/supabase/state';
 import Loader from '@/utils/Loader/Loader';
-import { toast } from 'react-toastify';
-
-import 'react-toastify/dist/ReactToastify.css';
-// interface SiteSearch {
-//   id: string;
-//   name: string;
-// }
+import { getOrgUserRole } from '@/supabase/org_user';
+import { decryptData, encryptData } from '@/helper/Encryption_Decryption';
 interface Country {
   id: number;
   name: string;
@@ -56,6 +66,7 @@ interface SiteTpesDropDown {
 }
 
 interface SiteDetailsWithUsers {
+  type_name: string | null;
   site: SiteDetails;
   users: User[];
   ownerNames: string[];
@@ -63,7 +74,7 @@ interface SiteDetailsWithUsers {
   state: string | null;
 }
 interface SiteDetails {
-  id: number;
+  id: string;
   org_id: number;
   name: string;
   type_id: number;
@@ -84,28 +95,45 @@ interface User {
 }
 
 const Page: React.FC = () => {
-  const [org_id, Setorg_id] = useState('');
-  // const [userRoleName, setUserRoleName] = useState("");
-  //   const user_role: any = localStorage.getItem("user_role");
+  const navigate = useRouter();
+  const [org_id, Setorg_id] = useState<any>('');
+  const [user_id, setuser_id] = useState<any>('');
+  const [orgName, setorgName] = useState<any>('');
+  // const [user_role, setUserrole] = useState('');
+  // useEffect(() => {
+  //   const userid: any = localStorage.getItem('user_id');
+  //   // const userrole: any = localStorage.getItem('user_role');
+  //   const orgid: any = localStorage.getItem('org_id');
+  //   setuser_id(userid);
+  //   // setUserrole(userrole);
+  //   Setorg_id(orgid);
+  //   if (!orgid) {
+  //     swal('Please select organization', { icon: 'error' });
+  //     redirect('/organization');
+  //   }
+  // }, []);
+  useEffect(() => {
+    const decryptedUserid = decryptData(localStorage.getItem('user_id'));
+    const decryptedOrgId = decryptData(localStorage.getItem('org_id'));
+    const decryptedOrgName = decryptData(localStorage.getItem('org_name'));
+    setuser_id(decryptedUserid);
+    Setorg_id(decryptedOrgId);
+    setorgName(decryptedOrgName);
+    if (!decryptedOrgId) {
+      swal('Please select organization', { icon: 'error' });
+      redirect('/organization');
+    }
+  }, []);
+  const [userrole2, setuserrole2] = useState('');
   useEffect(() => {
     const fetchData2 = async () => {
       try {
-        // setLoading(true);
-        const data: any = await getUserRole();
+        const data: any = await getOrgUserRole(user_id, org_id);
 
-        if (data && data.data && data.data.length > 0) {
-          for (let i = 0; i < data.data.length; i++) {
-            // setLoading(false);
-            // if (data.data[i].id == user_role) {
-            //   console.log("Matching user role found. Name:", data.data[i].name);
-            //   setUserRoleName(data.data[i].name);
-            // } else {
-            //   console.log("Not found");
-            // }
-          }
+        if (data) {
+          setuserrole2(data.data.id);
         } else {
-          // setLoading(false);
-          // console.log("No organization details found.");
+          // console.log("No Role Found.");
         }
       } catch (error: any) {
         // console.error("Error fetching organization details:", error.message);
@@ -113,8 +141,7 @@ const Page: React.FC = () => {
     };
 
     fetchData2();
-  }, []);
-
+  }, [user_id, org_id]);
   const [loading, setLoading] = useState<boolean>(false);
   const [SitesList, setOSitesList] = useState<SiteDetailsWithUsers[] | null>(
     null,
@@ -156,28 +183,22 @@ const Page: React.FC = () => {
 
   const closeModalButtonRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    const orgid: any = localStorage.getItem('org_id');
-    Setorg_id(orgid);
-    if (!orgid) {
-      swal('Please select organization', { icon: 'error' });
-      redirect('/organization');
-    }
-  }, []);
   /// for getting details of site
   const FetchSiteDetails = async () => {
     try {
       setLoading(true);
       const data1 = await fetchSiteDetails(org_id);
+      if (org_id) {
+        if (data1) {
+          setOSitesList(data1.data ? data1.data : []);
 
-      if (data1) {
-        setOSitesList(data1.data ? data1.data : []);
-        setLoading(false);
-      } else {
-        setLoading(false);
-        // console.log("No Sites details found.");
+          setLoading(false);
+        } else {
+          setLoading(false);
+          // console.log("No Sites details found.");
+        }
       }
-    } catch (error: unknown) {
+    } catch (error: any) {
       setLoading(false);
       // console.error("Error fetching Sites details:", error.message);
     }
@@ -191,21 +212,31 @@ const Page: React.FC = () => {
     try {
       // setLoading(true);
 
-      const result1 = await fetchSiteSidebarList(
-        searchTerm !== '' ? searchTerm : null,
+      const result1: any = await fetchSiteSidebarList(
+        searchTerm ? searchTerm : null,
         org_id,
       );
 
-      if (result1.errorCode === 0 && result1.data) {
+      if (result1.errorCode === 0 && result1.data.length > 0) {
         setsidebarSite(result1.data);
-        // setLoading(false);
-      } else {
+      } else if (result1.errorCode === 1) {
         // console.log("No organization details found.");
         setsidebarSite([]);
         // setLoading(false);
+      } else {
+        if (searchTerm) {
+          setsidebarSite([
+            {
+              id: -1,
+              name: "We couldn't find any sites",
+            },
+          ]);
+        } else {
+          setsidebarSite([]);
+        }
       }
     } catch (error: any) {
-      setLoading(false);
+      // setLoading(false);
       // console.error("Error fetching Sidebar details:", error.message);
     }
   };
@@ -227,23 +258,22 @@ const Page: React.FC = () => {
       }
     }
   };
-  // console.log("this is site list", sidebarSite.data);
 
   ///////////////////for crud validations/////
   const validationSchema = Yup.object().shape({
     AddSiteName: SiteNameSchema,
-    SelectedValueDropdown: TypeDropdownSchema,
+    SelectedValueDropdown: SiteTypeDropdownSchema,
     Address1: SiteAddressSchema,
-    Address2: SiteAddressSchema,
-    SelectedValueCounrty: TypeDropdownSchema,
-    SelectedValueState: TypeDropdownSchema,
+    Address2: SiteAddress2Schema,
+    SelectedValueCounrty: SiteCountryDropdownSchema,
+    SelectedValueState: SiteStateDropdownSchema,
     City: SiteCitySchema,
     Pincode: PincodeSchema,
     message: MessageSchema,
   });
   /////
   const handelAddSiteName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const NewSiteName = e.target.value;
+    const NewSiteName = e.target.value.trim();
     setAddSiteName(NewSiteName);
     SiteNameSchema.validate(NewSiteName)
       .then(() => {
@@ -290,7 +320,7 @@ const Page: React.FC = () => {
   ) => {
     const NewDropdownSelected = parseInt(e.target.value);
     setSelectedValueDropdown(NewDropdownSelected);
-    TypeDropdownSchema.validate(NewDropdownSelected)
+    SiteTypeDropdownSchema.validate(NewDropdownSelected)
       .then(() => {
         setTypeDropdownError('');
       })
@@ -301,7 +331,7 @@ const Page: React.FC = () => {
   };
 
   const handelchangeAddress1 = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newaddres1 = e.target.value;
+    const newaddres1 = e.target.value.trimStart();
     setAddress1(newaddres1);
     SiteAddressSchema.validate(newaddres1)
       .then(() => {
@@ -312,9 +342,9 @@ const Page: React.FC = () => {
       });
   };
   const handelchangeAddress2 = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newaddres2 = e.target.value;
+    const newaddres2 = e.target.value.trimStart();
     setAddress2(newaddres2);
-    SiteAddressSchema.validate(newaddres2)
+    SiteAddress2Schema.validate(newaddres2)
       .then(() => {
         setAddress2Error('');
       })
@@ -343,7 +373,7 @@ const Page: React.FC = () => {
   const handelchangeState = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const NewStateselected = parseInt(e.target.value);
     setSelectedValueState(NewStateselected);
-    TypeDropdownSchema.validate(NewStateselected)
+    SiteStateDropdownSchema.validate(NewStateselected)
       .then(() => {
         setstateListError('');
       })
@@ -377,7 +407,7 @@ const Page: React.FC = () => {
     const Newcountryselected = parseInt(e.target.value);
     SetSelectedValueCounrty(Newcountryselected);
 
-    TypeDropdownSchema.validate(Newcountryselected)
+    SiteCountryDropdownSchema.validate(Newcountryselected)
       .then(() => {
         setCountryListError(''); // Clear error on successful validation
       })
@@ -388,7 +418,7 @@ const Page: React.FC = () => {
 
   // for city
   const handelAddSiteCity = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const NewSiteCity = e.target.value;
+    const NewSiteCity = e.target.value.trimStart();
     setCity(NewSiteCity);
     SiteCitySchema.validate(NewSiteCity)
       .then(() => {
@@ -400,7 +430,7 @@ const Page: React.FC = () => {
   };
   // for pincode
   const handelAddSitePincode = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const Newpincode = e.target.value;
+    const Newpincode = e.target.value.trim();
     setPincode(Newpincode);
     PincodeSchema.validate(Newpincode)
       .then(() => {
@@ -431,8 +461,7 @@ const Page: React.FC = () => {
       setAddSiteNameError('');
       setTypeDropdownError('');
       setAddress2Error('');
-      setAddress1Error;
-      ('');
+      setAddress1Error('');
       setCountryListError('');
       setstateListError('');
       setCityError('');
@@ -505,27 +534,33 @@ const Page: React.FC = () => {
         setLoading(true);
         const result = await addSites(data);
 
-        if (result.data != null) {
+        if (result.errorCode == 0) {
           setLoading(false);
           if (closeModalButtonRef.current) {
             closeModalButtonRef.current.click();
           }
 
-          setAddSiteName('');
-          setSelectedValueDropdown(undefined);
-          setAddress1('');
-          setAddress2('');
-          setMessage('');
-          setFetchdropDCounrty(null);
-          setSelectedValueState(undefined);
-          setCity('');
-          setMessageError('');
-          setPincodeError;
-          ('');
+          // setAddSiteName('');
+          // setSelectedValueDropdown(undefined);
+          // setAddress1('');
+          // setAddress2('');
+          // setMessage('');
+          // setFetchdropDCounrty(null);
+          // setSelectedValueState(undefined);
+          // setCity('');
+          // setMessageError('');
+          // setPincodeError('');
+          handelclosemodel();
           FetchSiteDetails();
           fetchData1();
+          toast.success(result.message, { autoClose: 3000 });
+        } else {
+          setLoading(false);
+
+          toast.error(result.message, { autoClose: 3000 });
         }
       } catch (error) {
+        setLoading(false);
         // console.error("API call failed:", error);
       }
     }
@@ -534,7 +569,7 @@ const Page: React.FC = () => {
   // for close model add and clear all values
   const handelclosemodel = () => {
     setAddSiteNameError('');
-    setTypeDropdownError('');
+    settypeDropdown(null);
     setTypeDropdownError('');
     setAddress2Error('');
     setAddress1Error('');
@@ -545,22 +580,17 @@ const Page: React.FC = () => {
     setAddSiteName('');
     setSelectedValueDropdown(undefined);
     setAddress1('');
+    setPincode('');
     setAddress2('');
     setMessage('');
     setFetchdropDCounrty(null);
     setSelectedValueState(undefined);
     setCity('');
+    setPincodeError('');
     setMessageError('');
-    FetchSiteDetails();
-    fetchData1();
+    // FetchSiteDetails();
+    // fetchData1();
   };
-
-  // this is for userprofile from redux
-
-  // const { user_id, user_role, user_firstname, user_lastname } = useSelector(
-  //   (state: RootState) => state.user
-  // );
-  const user_role = '1';
 
   const [tokenVerify, setTokenVerify] = useState(false);
   useLayoutEffect(() => {
@@ -580,15 +610,16 @@ const Page: React.FC = () => {
         {loading && <Loader />}
         {tokenVerify && (
           <>
+            <ToastContainer />
             <Seo title='Contacts' />
             <div className='grid grid-cols-12 gap-6 mt-5'>
               <div className='xl:col-span-3 col-span-12'>
                 <div className='box'>
                   <div className='box-body !p-0'>
-                    {user_role == '1' ? (
+                    {userrole2 == '1' || userrole2 == '2' ? (
                       <div className='p-4 grid border-b border-dashed dark:border-defaultborder/10'>
                         <Link
-                          href='#!'
+                          href=''
                           className='hs-dropdown-toggle py-2  px-3 ti-btn bg-primary text-white !font-medium w-full !mb-0'
                           data-hs-overlay='#todo-compose'
                         >
@@ -597,9 +628,10 @@ const Page: React.FC = () => {
                         </Link>
                         <div
                           id='todo-compose'
-                          className='hs-overlay hidden ti-modal'
+                          // className='hs-overlay hidden ti-modal'
+                          className='hs-overlay hidden ti-modal  [--overlay-backdrop:static]'
                         >
-                          <div className='hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out'>
+                          <div className='hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto'>
                             <div className='ti-modal-content'>
                               <div className='ti-modal-header'>
                                 <h6
@@ -622,17 +654,18 @@ const Page: React.FC = () => {
 
                               <div className='ti-modal-body !overflow-visible px-4'>
                                 <div className='grid grid-cols-12 gap-2'>
-                                  <div className='xl:col-span-12 col-span-12'>
+                                  <div className='xl:col-span-6 col-span-6'>
                                     <label
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      Site Name
+                                      Site Name*
                                     </label>
                                     <input
                                       type='text'
                                       className='form-control w-full'
                                       id='task-name'
+                                      placeholder='Enter Site Name'
                                       onChange={handelAddSiteName}
                                       value={AddSiteName}
                                       maxLength={50}
@@ -643,12 +676,12 @@ const Page: React.FC = () => {
                                       </div>
                                     )}
                                   </div>
-                                  <div className='flex justify-between mt-4'>
-                                    {/* <div className="alert alert-solid-primary alert-dismissible !ms-2 fade show flex" role="alert" id="dismiss-alert2"><div className="sm:flex-shrink-0"> A simple </div><div className="ms-auto"><div className="mx-1 my-1"><button type="button" className="inline-flex bg-teal-50 rounded-sm text-teal-500 focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-offset-teal-50 focus:ring-teal-600" data-hs-remove-element="#dismiss-alert2"><span className="sr-only">Dismiss</span><svg className="h-3 w-3" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M0.92524 0.687069C1.126 0.486219 1.39823 0.373377 1.68209 0.373377C1.96597 0.373377 2.2382 0.486219 2.43894 0.687069L8.10514 6.35813L13.7714 0.687069C13.8701 0.584748 13.9882 0.503105 14.1188 0.446962C14.2494 0.39082 14.3899 0.361248 14.5321 0.360026C14.6742 0.358783 14.8151 0.38589 14.9468 0.439762C15.0782 0.493633 15.1977 0.573197 15.2983 0.673783C15.3987 0.774389 15.4784 0.894026 15.5321 1.02568C15.5859 1.15736 15.6131 1.29845 15.6118 1.44071C15.6105 1.58297 15.5809 1.72357 15.5248 1.85428C15.4688 1.98499 15.3872 2.10324 15.2851 2.20206L9.61883 7.87312L15.2851 13.5441C15.4801 13.7462 15.588 14.0168 15.5854 14.2977C15.5831 14.5787 15.4705 14.8474 15.272 15.046C15.0735 15.2449 14.805 15.3574 14.5244 15.3599C14.2437 15.3623 13.9733 15.2543 13.7714 15.0591L8.10514 9.38812L2.43894 15.0591C2.23704 15.2543 1.96663 15.3623 1.68594 15.3599C1.40526 15.3574 1.13677 15.2449 0.938279 15.046C0.739807 14.8474 0.627232 14.5787 0.624791 14.2977C0.62235 14.0168 0.730236 13.7462 0.92524 13.5441L6.59144 7.87312L0.92524 2.20206C0.724562 2.00115 0.611816 1.72867 0.611816 1.44457C0.611816 1.16047 0.724562 0.887983 0.92524 0.687069Z" fill="currentColor"></path></svg></button></div></div></div>
-                                                        <div className="alert alert-solid-primary alert-dismissible !ms-2 fade show flex" role="alert" id="dismiss-alert2"><div className="sm:flex-shrink-0"> A simple </div><div className="ms-auto"><div className="mx-1 my-1"><button type="button" className="inline-flex bg-teal-50 rounded-sm text-teal-500 focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-offset-teal-50 focus:ring-teal-600" data-hs-remove-element="#dismiss-alert2"><span className="sr-only">Dismiss</span><svg className="h-3 w-3" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M0.92524 0.687069C1.126 0.486219 1.39823 0.373377 1.68209 0.373377C1.96597 0.373377 2.2382 0.486219 2.43894 0.687069L8.10514 6.35813L13.7714 0.687069C13.8701 0.584748 13.9882 0.503105 14.1188 0.446962C14.2494 0.39082 14.3899 0.361248 14.5321 0.360026C14.6742 0.358783 14.8151 0.38589 14.9468 0.439762C15.0782 0.493633 15.1977 0.573197 15.2983 0.673783C15.3987 0.774389 15.4784 0.894026 15.5321 1.02568C15.5859 1.15736 15.6131 1.29845 15.6118 1.44071C15.6105 1.58297 15.5809 1.72357 15.5248 1.85428C15.4688 1.98499 15.3872 2.10324 15.2851 2.20206L9.61883 7.87312L15.2851 13.5441C15.4801 13.7462 15.588 14.0168 15.5854 14.2977C15.5831 14.5787 15.4705 14.8474 15.272 15.046C15.0735 15.2449 14.805 15.3574 14.5244 15.3599C14.2437 15.3623 13.9733 15.2543 13.7714 15.0591L8.10514 9.38812L2.43894 15.0591C2.23704 15.2543 1.96663 15.3623 1.68594 15.3599C1.40526 15.3574 1.13677 15.2449 0.938279 15.046C0.739807 14.8474 0.627232 14.5787 0.624791 14.2977C0.62235 14.0168 0.730236 13.7462 0.92524 13.5441L6.59144 7.87312L0.92524 2.20206C0.724562 2.00115 0.611816 1.72867 0.611816 1.44457C0.611816 1.16047 0.724562 0.887983 0.92524 0.687069Z" fill="currentColor"></path></svg></button></div></div></div> */}
-                                  </div>
+                                  {/* <div className='flex justify-between mt-4'>
+                                    <div className="alert alert-solid-primary alert-dismissible !ms-2 fade show flex" role="alert" id="dismiss-alert2"><div className="sm:flex-shrink-0"> A simple </div><div className="ms-auto"><div className="mx-1 my-1"><button type="button" className="inline-flex bg-teal-50 rounded-sm text-teal-500 focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-offset-teal-50 focus:ring-teal-600" data-hs-remove-element="#dismiss-alert2"><span className="sr-only">Dismiss</span><svg className="h-3 w-3" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M0.92524 0.687069C1.126 0.486219 1.39823 0.373377 1.68209 0.373377C1.96597 0.373377 2.2382 0.486219 2.43894 0.687069L8.10514 6.35813L13.7714 0.687069C13.8701 0.584748 13.9882 0.503105 14.1188 0.446962C14.2494 0.39082 14.3899 0.361248 14.5321 0.360026C14.6742 0.358783 14.8151 0.38589 14.9468 0.439762C15.0782 0.493633 15.1977 0.573197 15.2983 0.673783C15.3987 0.774389 15.4784 0.894026 15.5321 1.02568C15.5859 1.15736 15.6131 1.29845 15.6118 1.44071C15.6105 1.58297 15.5809 1.72357 15.5248 1.85428C15.4688 1.98499 15.3872 2.10324 15.2851 2.20206L9.61883 7.87312L15.2851 13.5441C15.4801 13.7462 15.588 14.0168 15.5854 14.2977C15.5831 14.5787 15.4705 14.8474 15.272 15.046C15.0735 15.2449 14.805 15.3574 14.5244 15.3599C14.2437 15.3623 13.9733 15.2543 13.7714 15.0591L8.10514 9.38812L2.43894 15.0591C2.23704 15.2543 1.96663 15.3623 1.68594 15.3599C1.40526 15.3574 1.13677 15.2449 0.938279 15.046C0.739807 14.8474 0.627232 14.5787 0.624791 14.2977C0.62235 14.0168 0.730236 13.7462 0.92524 13.5441L6.59144 7.87312L0.92524 2.20206C0.724562 2.00115 0.611816 1.72867 0.611816 1.44457C0.611816 1.16047 0.724562 0.887983 0.92524 0.687069Z" fill="currentColor"></path></svg></button></div></div></div>
+                                                        <div className="alert alert-solid-primary alert-dismissible !ms-2 fade show flex" role="alert" id="dismiss-alert2"><div className="sm:flex-shrink-0"> A simple </div><div className="ms-auto"><div className="mx-1 my-1"><button type="button" className="inline-flex bg-teal-50 rounded-sm text-teal-500 focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-offset-teal-50 focus:ring-teal-600" data-hs-remove-element="#dismiss-alert2"><span className="sr-only">Dismiss</span><svg className="h-3 w-3" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M0.92524 0.687069C1.126 0.486219 1.39823 0.373377 1.68209 0.373377C1.96597 0.373377 2.2382 0.486219 2.43894 0.687069L8.10514 6.35813L13.7714 0.687069C13.8701 0.584748 13.9882 0.503105 14.1188 0.446962C14.2494 0.39082 14.3899 0.361248 14.5321 0.360026C14.6742 0.358783 14.8151 0.38589 14.9468 0.439762C15.0782 0.493633 15.1977 0.573197 15.2983 0.673783C15.3987 0.774389 15.4784 0.894026 15.5321 1.02568C15.5859 1.15736 15.6131 1.29845 15.6118 1.44071C15.6105 1.58297 15.5809 1.72357 15.5248 1.85428C15.4688 1.98499 15.3872 2.10324 15.2851 2.20206L9.61883 7.87312L15.2851 13.5441C15.4801 13.7462 15.588 14.0168 15.5854 14.2977C15.5831 14.5787 15.4705 14.8474 15.272 15.046C15.0735 15.2449 14.805 15.3574 14.5244 15.3599C14.2437 15.3623 13.9733 15.2543 13.7714 15.0591L8.10514 9.38812L2.43894 15.0591C2.23704 15.2543 1.96663 15.3623 1.68594 15.3599C1.40526 15.3574 1.13677 15.2449 0.938279 15.046C0.739807 14.8474 0.627232 14.5787 0.624791 14.2977C0.62235 14.0168 0.730236 13.7462 0.92524 13.5441L6.59144 7.87312L0.92524 2.20206C0.724562 2.00115 0.611816 1.72867 0.611816 1.44457C0.611816 1.16047 0.724562 0.887983 0.92524 0.687069Z" fill="currentColor"></path></svg></button></div></div></div>
+                                  </div> */}
 
-                                  <div className='xl:col-span-12 col-span-12'>
+                                  <div className='xl:col-span-6 col-span-6'>
                                     <label
                                       htmlFor='task-name'
                                       className='ti-form-label'
@@ -667,8 +700,6 @@ const Page: React.FC = () => {
                                             {type.name}
                                           </option>
                                         ))}
-                                      {/* <option>Option 2</option> */}
-                                      <option />
                                     </select>
 
                                     {typeDropdownError && (
@@ -677,7 +708,7 @@ const Page: React.FC = () => {
                                       </div>
                                     )}
                                   </div>
-                                  <div className='xl:col-span-12 col-span-12'>
+                                  <div className='xl:col-span-6 col-span-6'>
                                     <label
                                       htmlFor='task-name'
                                       className='ti-form-label'
@@ -688,8 +719,10 @@ const Page: React.FC = () => {
                                       type='text'
                                       className='form-control w-full'
                                       id='task-name'
+                                      placeholder='Enter Address 1'
                                       onChange={handelchangeAddress1}
                                       value={Address1}
+                                      maxLength={255}
                                     />
                                     {Address1Error && (
                                       <div className='text-danger'>
@@ -697,17 +730,18 @@ const Page: React.FC = () => {
                                       </div>
                                     )}
                                   </div>
-                                  <div className='xl:col-span-12 col-span-12'>
+                                  <div className='xl:col-span-6 col-span-6'>
                                     <label
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      Addres 2*
+                                      Address 2
                                     </label>
                                     <input
                                       type='text'
                                       className='form-control w-full'
                                       id='task-name'
+                                      placeholder='Enter Address 2'
                                       onChange={handelchangeAddress2}
                                       value={Address2}
                                     />
@@ -717,7 +751,7 @@ const Page: React.FC = () => {
                                       </div>
                                     )}
                                   </div>
-                                  <div className='xl:col-span-12 col-span-12'>
+                                  <div className='xl:col-span-6 col-span-6'>
                                     <label
                                       htmlFor='task-name'
                                       className='ti-form-label'
@@ -739,7 +773,6 @@ const Page: React.FC = () => {
                                             {Contry.name}
                                           </option>
                                         ))}
-                                      <option />
                                     </select>
 
                                     {CountryListError && (
@@ -748,7 +781,7 @@ const Page: React.FC = () => {
                                       </div>
                                     )}
                                   </div>
-                                  <div className='xl:col-span-12 col-span-12'>
+                                  <div className='xl:col-span-6 col-span-6'>
                                     <label
                                       htmlFor='task-name'
                                       className='ti-form-label'
@@ -770,7 +803,6 @@ const Page: React.FC = () => {
                                             {state.name}
                                           </option>
                                         ))}
-                                      <option />
                                     </select>
 
                                     {stateListError && (
@@ -779,7 +811,7 @@ const Page: React.FC = () => {
                                       </div>
                                     )}
                                   </div>
-                                  <div className='xl:col-span-12 col-span-12'>
+                                  <div className='xl:col-span-6 col-span-6'>
                                     <label
                                       htmlFor='task-name'
                                       className='ti-form-label'
@@ -790,8 +822,10 @@ const Page: React.FC = () => {
                                       type='text'
                                       className='form-control w-full'
                                       id='task-name'
+                                      placeholder='Enter City'
                                       onChange={handelAddSiteCity}
                                       value={City}
+                                      maxLength={100}
                                     />
                                     {CityError && (
                                       <div className='text-danger'>
@@ -799,19 +833,21 @@ const Page: React.FC = () => {
                                       </div>
                                     )}
                                   </div>
-                                  <div className='xl:col-span-12 col-span-12'>
+                                  <div className='xl:col-span-6 col-span-6'>
                                     <label
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      Pin Code
+                                      Postal Code*
                                     </label>
                                     <input
                                       type='text'
                                       className='form-control w-full'
                                       id='task-name'
+                                      placeholder='Enter Pin Code'
                                       onChange={handelAddSitePincode}
                                       value={Pincode}
+                                      maxLength={6}
                                     />
                                     {PincodeError && (
                                       <div className='text-danger'>
@@ -824,12 +860,13 @@ const Page: React.FC = () => {
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      Description*
+                                      Description
                                     </label>
                                     <textarea
                                       className='form-control w-full'
+                                      style={{ resize: 'none' }}
                                       id='task-name'
-                                      placeholder='Task Name'
+                                      placeholder='Enter Description'
                                       // onKeyDown={handleKeyPress}
                                       onChange={handleMessageChange}
                                       value={message}
@@ -874,7 +911,7 @@ const Page: React.FC = () => {
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
                           className='form-control w-full !rounded-md !bg-light border-0 !rounded-e-none'
-                          placeholder='Search Task Here'
+                          placeholder='Search Site Here'
                           aria-describedby='button-addon2'
                         />
                         <button
@@ -897,9 +934,25 @@ const Page: React.FC = () => {
                                 style={{ cursor: 'pointer' }}
                                 key={site?.id}
                                 onClick={() => {
-                                  // localStorage.setItem("org_id", org.id);
-                                  // localStorage.setItem("org_name", org.name);
-                                  // history.push("/orgdashboard");
+                                  if (site.id != -1) {
+                                    setLoading(true);
+                                    const encryptedsiteid = encryptData(
+                                      site.id,
+                                    );
+                                    const encryptedsitename = encryptData(
+                                      site.name,
+                                    );
+                                    localStorage.setItem(
+                                      'site_id',
+                                      encryptedsiteid,
+                                    );
+                                    localStorage.setItem(
+                                      'site_name',
+                                      encryptedsitename,
+                                    );
+                                    navigate.push('/sitedashboard');
+                                    setLoading(false);
+                                  }
                                 }}
                               >
                                 <div className='flex items-center'>
@@ -924,15 +977,15 @@ const Page: React.FC = () => {
                         <div className='md:flex px-4 py-6 items-center justify-between'>
                           <div>
                             <h6 className='font-semibold mb-0 text-[1rem]'>
-                              Sites
+                              Sites ({orgName})
                             </h6>
                           </div>
                         </div>
-                        {/* {SitesList && SitesList.length == 0 && 
-                              <div className='col-md-12 w-100 mt-4 mb-4'>
-                                <p className='text-center'>No Data Found</p>{' '}
-                              </div>
-                            } */}
+                        {SitesList && SitesList.length == 0 && (
+                          <div className='col-md-12 w-100 mt-4 mb-4'>
+                            <p className='text-center'>No Data Found</p>{' '}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -944,14 +997,32 @@ const Page: React.FC = () => {
                       {SitesList && SitesList.length > 0
                         ? SitesList.map((SingleSite) => (
                             <div
-                              className='xl:col-span-4 col-span-12 task-card'
+                              className='xl:col-span-6 col-span-12 task-card'
                               style={{ cursor: 'pointer' }}
                               key={SingleSite?.site?.id}
                               onClick={() => {
-                                // localStorage.setItem("org_id", org.org_id);
-                                // localStorage.setItem("org_name", org.org_name);
-                                // history.push("/orgdashboard");
-                                // handleOrgRole(org.org_id);
+                                const encryptedsiteid = encryptData(
+                                  SingleSite.site.id,
+                                );
+                                const encryptedsitename = encryptData(
+                                  SingleSite.site.name,
+                                );
+                                const encryptedsiteOwnerName = encryptData(
+                                  SingleSite.ownerNames,
+                                );
+                                localStorage.setItem(
+                                  'site_id',
+                                  encryptedsiteid,
+                                );
+                                localStorage.setItem(
+                                  'site_name',
+                                  encryptedsitename,
+                                );
+                                localStorage.setItem(
+                                  'site_owner_name',
+                                  encryptedsiteOwnerName,
+                                );
+                                navigate.push('/sitedashboard');
                               }}
                             >
                               <div className='box task-pending-card'>
@@ -969,15 +1040,13 @@ const Page: React.FC = () => {
                                     <div className='avatar avatar-xl avatar-rounded '>
                                       {' '}
                                       <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
-                                        {/* {SingleSite?.site?SingleSite?.site?.name[0].toUpperCase(): ""} */}
-                                        {SingleSite?.site
-                                          ? SingleSite?.site?.name
-                                              .split(' ')
-                                              .map((word) =>
-                                                word[0].toUpperCase(),
-                                              )
-                                              .join('')
-                                          : ''}
+                                        <InitialsComponent
+                                          name={
+                                            SingleSite?.site
+                                              ? SingleSite?.site?.name
+                                              : ''
+                                          }
+                                        />
                                       </span>
                                     </div>
                                   </div>
@@ -987,23 +1056,23 @@ const Page: React.FC = () => {
                                         <li className='list-group-item fw-semibold'>
                                           <i className='bx bx-map align-middle me-2 text-muted'></i>
                                           <b>Address </b>
-                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                          <span className='ms-1 over-text text-muted fw-normal d-inline-block'>
                                             {SingleSite?.site
-                                              ? SingleSite.site?.address1
+                                              ? SingleSite.site?.address1 + ','
                                               : ''}
-                                            ,
+
                                             {SingleSite?.site
-                                              ? SingleSite.site?.address2
+                                              ? SingleSite.site?.address2 + ','
                                               : ''}
-                                            ,
+
                                             {SingleSite?.site
-                                              ? SingleSite.site?.city
+                                              ? SingleSite.site?.city + ','
                                               : ''}
-                                            ,
+
                                             {SingleSite?.site
-                                              ? SingleSite.state
+                                              ? SingleSite.state + ','
                                               : ''}
-                                            ,
+
                                             {SingleSite?.site
                                               ? SingleSite.country
                                               : ''}
@@ -1023,17 +1092,14 @@ const Page: React.FC = () => {
                                             {SingleSite?.users?.length}
                                           </span>
                                         </li>
+                                        <li className='list-group-item fw-semibold'>
+                                          <i className='bx bx-user align-middle me-2 text-muted'></i>
+                                          <b>Type</b>
+                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                            {SingleSite?.type_name}
+                                          </span>
+                                        </li>
                                       </ul>
-                                    </div>
-                                    <div>
-                                      <div className='btn-list text-center mt-5'>
-                                        <button
-                                          type='button'
-                                          className='ti-btn bg-primary text-white !font-medium'
-                                        >
-                                          Production
-                                        </button>
-                                      </div>
                                     </div>
                                   </div>
                                 </div>

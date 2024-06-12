@@ -35,6 +35,7 @@ interface SiteDetailsWithUsers {
   ownerNames: string[];
   country: string | null;
   state: string | null;
+  type_name: string | null;
 }
 
 async function fetchSiteDetails(
@@ -55,13 +56,14 @@ async function fetchSiteDetails(
 
     // Fetch user details for each site
     for (const site of siteDetails as SiteDetails[]) {
-      const [users, country, state, owners] = await Promise.all([
+      const [users, country, state, type, owners] = await Promise.all([
         supabase
           .from('site_users')
           .select('*', { count: 'exact' })
           .eq('site_id', site.id),
         supabase.from('country').select('name').eq('id', site.country_id),
         supabase.from('state').select('name').eq('id', site.state_id),
+        supabase.from('site_types').select('name').eq('id', site.type_id),
         supabase
           .from('site_users')
           .select('user_id')
@@ -77,6 +79,9 @@ async function fetchSiteDetails(
       }
       if (state.error) {
         throw state.error;
+      }
+      if (type.error) {
+        throw type.error;
       }
       if (owners.error) {
         throw owners.error;
@@ -107,6 +112,7 @@ async function fetchSiteDetails(
         ownerNames,
         country: country.data.length > 0 ? country.data[0].name : null,
         state: state.data.length > 0 ? state.data[0].name : null,
+        type_name: type.data.length > 0 ? type.data[0].name : null,
       });
     }
 

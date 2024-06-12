@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabase } from './db';
-
+import { sendEmailFunction } from './email';
 interface OrgDetail {
   id: number;
   name: string;
@@ -75,6 +75,7 @@ async function fetchOrganizationAndSiteDetails(
         errorCode: 0,
         org_id: org.id,
         org_name: org.name,
+        org_type_id: org.type_id,
         sites_count: sitesCountForOrg,
       };
     });
@@ -101,7 +102,7 @@ async function organizationSidebarList(
     }
 
     // Extract the org_ids from userOrgs
-    const orgIds = userOrgs.map((org) => org.org_id);
+    const orgIds = userOrgs.map((org: any) => org.org_id);
 
     let orgDetails: OrgDetail[] = [];
 
@@ -170,6 +171,7 @@ async function addOrganization(data: {
   type_id: any;
   status: string;
   domain: string[];
+  token: any;
 }): Promise<Result<any>> {
   try {
     // Insert organization details
@@ -195,7 +197,7 @@ async function addOrganization(data: {
       .insert([
         {
           user_id: data.user_id,
-          role_id: data.role_id,
+          role_id: 1,
           org_id: insertData[0].id,
         },
       ])
@@ -220,6 +222,22 @@ async function addOrganization(data: {
       } else {
         domainInsertResults.push({ success: true, data: insertDomain });
       }
+    }
+    try {
+      const emaildata: any = {
+        org_id: orgId,
+        user_id: data.user_id,
+      };
+      await sendEmailFunction(
+        'srishti@nichetech.in',
+        'Add Organization',
+        'add_org',
+        data.token,
+        emaildata,
+      );
+      // Clear input fields after successful email send
+    } catch (error) {
+      // Handle error here
     }
     return {
       errorCode: 0,

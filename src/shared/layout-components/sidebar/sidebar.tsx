@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import React, { Fragment, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import SimpleBar from 'simplebar-react';
@@ -11,11 +11,49 @@ import SimpleBar from 'simplebar-react';
 import store from '@/shared/redux/store';
 
 import Menuloop from './menuloop';
-import MenuItems from './nav';
+// import MenuItems from './nav';
 import { ThemeChanger } from '../../redux/action';
 
 const Sidebar = ({ local_varaiable, ThemeChanger }: any) => {
   // const result = MenuItems.slice(0, 1);
+  /* eslint-disable no-constant-condition */
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  /* eslint-disable unused-imports/no-unused-vars */
+
+  const p = usePathname();
+
+  const MenuItems: any = [
+    {
+      path: '/organization',
+      type: 'link',
+      active: p === '/organization' ? true : false,
+      selected: p === '/organization' ? true : false,
+      title: 'Organizations',
+      ico: 'ri-home-8-line',
+    },
+    {
+      path: '/orgdashboard',
+      type: 'link',
+      active: p === '/orgdashboard' ? true : false,
+      selected: p === '/orgdashboard' ? true : false,
+      title: 'Dashboard',
+      ico: 'ri-organization-chart',
+    },
+    {
+      path: '/sites',
+      type: 'link',
+      active: p === '/sites' ? true : false,
+      selected: p === '/sites' ? true : false,
+      title: 'Sites',
+      ico: 'ri-map-pin-line',
+    },
+  ];
+  useEffect(() => {
+    if (p) {
+      setMenuitems(MenuItems);
+    }
+  }, [p]);
+
   const [menuitems, setMenuitems] = useState(MenuItems);
   // const [orgid, setorgid] = useState<any | null>(null);
   function closeMenu() {

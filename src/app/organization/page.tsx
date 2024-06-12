@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import Link from 'next/link';
@@ -9,9 +10,14 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
 import swal from 'sweetalert';
 import * as Yup from 'yup';
 
+import 'react-toastify/dist/ReactToastify.css';
+
+import { decryptData, encryptData } from '@/helper/Encryption_Decryption';
+import InitialsComponent from '@/helper/NameHelper';
 import {
   DomainSchema,
   MessageSchema,
@@ -27,7 +33,6 @@ import {
   organizationSidebarList,
 } from '@/supabase/org_details';
 import Loader from '@/utils/Loader/Loader';
-
 const validationSchema = Yup.object().shape({
   organizationName: OrganizationNameSchema,
   domains: Yup.array()
@@ -39,6 +44,7 @@ const validationSchema = Yup.object().shape({
 
 interface OrganizationWithSiteCount {
   org_id: string;
+  org_type_id: string;
   org_name: string;
   sites_count: number;
 }
@@ -63,8 +69,8 @@ interface Typeor {
 
 const LoginForm = () => {
   const [tokenVerify, setTokenVerify] = useState(false);
+  const [onlyToken, setOnlyToken] = useState('');
   const navigate = useRouter();
-
   const [organizationName, setOrganizationName] = useState('');
   const [organizationNameError, setOrganizationNameError] = useState('');
   const [domains, setDomains] = useState<any[]>([]);
@@ -77,9 +83,9 @@ const LoginForm = () => {
   const [messageError, setMessageError] = useState('');
   const closeModalButtonRef = useRef<HTMLButtonElement>(null);
   const [loading, setLoading] = useState<boolean>(false);
-
-  const [user_id, setuser_id] = useState('');
-  const [user_role, setUserrole] = useState('');
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [user_id, setuser_id] = useState<any>('');
+  const [user_role, setUserrole] = useState<any>('');
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [searchTerm, setSearchTerm] = useState<any>('');
@@ -90,26 +96,58 @@ const LoginForm = () => {
 
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
-      if (!token) {
+      const tokens = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
+      if (!tokens) {
         setTokenVerify(false);
         redirect('/');
       } else {
         setTokenVerify(true);
+        const token = JSON.parse(tokens);
+        setOnlyToken(token.access_token);
       }
     }
   }, []);
 
+  const getDefaultDomainFromEmail = () => {
+    const email = localStorage.getItem('user_email');
+    const decryptemail = decryptData(email);
+    if (decryptemail) {
+      const domain = decryptemail.split('@')[1];
+      return domain || '';
+    }
+    return '';
+  };
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userid: any = localStorage.getItem('user_id');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userrole: any = localStorage.getItem('user_role');
-    setuser_id(userid);
-
-    setUserrole(userrole);
+    // Set the default domain on component mount
+    const defaultDomain = getDefaultDomainFromEmail();
+    if (defaultDomain) {
+      setDomains([defaultDomain]);
+    }
   }, []);
+  // useEffect(() => {
+  //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //   const userid: any = localStorage.getItem('user_id');
+  //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //   const userrole: any = localStorage.getItem('user_role');
+  //   setuser_id(userid);
 
+  //   setUserrole(userrole);
+  // }, []);
+  useEffect(() => {
+    const encryptedUserId = localStorage.getItem('user_id');
+    const encryptedUserRole = localStorage.getItem('user_role');
+
+    const decryptedUserId = decryptData(encryptedUserId);
+    const decryptedUserRole = decryptData(encryptedUserRole);
+
+    if (decryptedUserId) {
+      setuser_id(decryptedUserId);
+    }
+
+    if (decryptedUserRole) {
+      setUserrole(decryptedUserRole);
+    }
+  }, []);
   useEffect(() => {
     const fetchData2 = async () => {
       try {
@@ -135,7 +173,6 @@ const LoginForm = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const data: any = await fetchOrganizationAndSiteDetails(user_id);
 
       if (data) {
@@ -156,14 +193,32 @@ const LoginForm = () => {
     try {
       // setLoading(true);
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result1: any = await organizationSidebarList(searchTerm, user_id);
 
-      if (result1.errorCode === 0 && result1.data) {
+      if (result1.errorCode === 0 && result1.data.length > 0) {
         // setLoading(false);
+
         setSidebarOrgs({ data: result1.data });
-      } else {
+      } else if (result1.errorCode === 1) {
         setSidebarOrgs({ data: [] });
+      } else {
+        if (searchTerm) {
+          setSidebarOrgs({
+            data: [
+              {
+                id: -1,
+                name: "We couldn't find any organizations",
+                created_at: '',
+                description: '',
+                type_id: 0,
+                status: '',
+                updated_at: '',
+              },
+            ],
+          });
+        } else {
+          setSidebarOrgs({ data: [] });
+        }
       }
     } catch (error: unknown) {
       /* empty */
@@ -189,7 +244,7 @@ const LoginForm = () => {
       });
   };
   const handleDomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newDomain = e.target.value.trim();
+    const newDomain = e.target.value.trimStart();
     // setDomain(newDomain);
     setDomainInput(newDomain);
     DomainSchema.validate(newDomain)
@@ -227,25 +282,25 @@ const LoginForm = () => {
         setMessageError(err.message);
       });
   };
-  const addDomain = async (domain: string) => {
-    if (domains.includes(domain)) {
-      setDomainError('Domain already added');
-    } else {
-      try {
-        await DomainSchema.validate(domain);
-        setDomains([...domains, domain]);
-        setDomainInput('');
-        setDomainError('');
-      } catch (error) {
-        if (error instanceof Error) {
-          setDomainError(error.message);
-        } else {
-          // Handle the case where the error might not be an instance of Error
-          setDomainError('An unknown error occurred');
-        }
-      }
-    }
-  };
+  // const addDomain = async (domain: string) => {
+  //   if (domains.includes(domain)) {
+  //     setDomainError('Domain already added');
+  //   } else {
+  //     try {
+  //       await DomainSchema.validate(domain);
+  //       setDomains([...domains, domain]);
+  //       setDomainInput('');
+  //       setDomainError('');
+  //     } catch (error) {
+  //       if (error instanceof Error) {
+  //         setDomainError(error.message);
+  //       } else {
+  //         // Handle the case where the error might not be an instance of Error
+  //         setDomainError('An unknown error occurred');
+  //       }
+  //     }
+  //   }
+  // };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -302,7 +357,6 @@ const LoginForm = () => {
       const selectedTypeId =
         typeDropdown?.find((type) => type.name === selectedType)?.id ?? null;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const data: any = {
         user_id: user_id,
         user_role: user_role,
@@ -311,17 +365,19 @@ const LoginForm = () => {
         type_id: selectedTypeId,
         status: 'Y',
         domain: domains,
+        token: onlyToken,
       };
       try {
         setLoading(true);
         const result = await addOrganization(data);
 
-        if (result.data != null) {
+        if (result.data != null && result.errorCode == 0) {
           setLoading(false);
+          toast.success('Successfully Added organization', { autoClose: 3000 });
         } else {
           setLoading(false);
           if (result.errorCode === 1) {
-            swal('Domain exists in Organization!', { icon: 'error' });
+            swal('It exists in Organization!', { icon: 'error' });
           }
         }
         if (closeModalButtonRef.current) {
@@ -331,7 +387,10 @@ const LoginForm = () => {
         setDomainInput('');
         setOrganizationName('');
         setSelectedType('');
-        setDomains([]);
+        const defaultDomain = getDefaultDomainFromEmail();
+        if (defaultDomain) {
+          setDomains([defaultDomain]);
+        }
         setMessage('');
         setOrganizationNameError('');
         setDomainError('');
@@ -346,17 +405,60 @@ const LoginForm = () => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleKeyPress = (e: any) => {
+  // const handleKeyPress = (e: any) => {
+  //   if (e.key === 'Enter') {
+  //     e.preventDefault();
+
+  //     if (domainError === '' && domainInput.trim() !== '') {
+  //       addDomain(domainInput.trim());
+  //     } else {
+  //       handleSubmit();
+  //     }
+  //   }
+  // };
+
+  const handleKeyPress = async (e: any) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-
       if (domainError === '' && domainInput.trim() !== '') {
-        addDomain(domainInput.trim());
+        const domainsArray = domainInput.endsWith(',')
+          ? domainInput
+              .split(',')
+              .map((domain) => domain.trim())
+              .filter((domain) => domain !== '')
+          : domainInput.split(',').map((domain) => domain.trim());
+        const newDomains = [];
+        let errorMessage = '';
+
+        for (const domain of domainsArray) {
+          if (domains.includes(domain)) {
+            errorMessage += `Domain ${domain} already added. `;
+          } else {
+            try {
+              await DomainSchema.validate(domain);
+              newDomains.push(domain);
+            } catch (error) {
+              if (error instanceof Error) {
+                errorMessage += `${error.message} for domain ${domain}. `;
+              } else {
+                errorMessage += `An unknown error occurred for domain ${domain}. `;
+              }
+            }
+          }
+        }
+        if (errorMessage === '') {
+          setDomains([...domains, ...newDomains]);
+          setDomainInput('');
+          setDomainError('');
+        } else {
+          setDomainError(errorMessage.trim());
+        }
       } else {
         handleSubmit();
       }
     }
   };
+
   //   const removeDomain = (domain: string) => {
   //     setDomains(domains.filter(d => d !== domain));
   //     // const updatedDomains = domains.filter(d => d !== domain);
@@ -367,6 +469,7 @@ const LoginForm = () => {
   //     //   setDomainError('');
   //     // }
   // };
+
   const removeDomain = (index: number) => {
     const newdom = domains.filter((i, idx) => idx != index);
     if (newdom.length == 0) {
@@ -384,252 +487,273 @@ const LoginForm = () => {
       {loading && <Loader />}
       {tokenVerify && (
         <>
+          <ToastContainer />
           <Seo title='organization' />
           <div className='grid grid-cols-12 gap-6 mt-5'>
             <div className='xl:col-span-3 col-span-12'>
               <div className='box'>
                 <div className='box-body !p-0'>
-                  {/* {user_role == '1' ? ( */}
-                  <div className='p-4 grid border-b border-dashed dark:border-defaultborder/10'>
-                    <Link
-                      href=''
-                      className='hs-dropdown-toggle py-2  px-3 ti-btn bg-primary text-white !font-medium w-full !mb-0'
-                      data-hs-overlay='#todo-compose'
-                    >
-                      <i className='ri-add-circle-line !text-[1rem]'></i>Add
-                      Organization
-                    </Link>
-                    <div
-                      id='todo-compose'
-                      className='hs-overlay hidden ti-modal'
-                    >
-                      <div className='hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out'>
-                        <div className='ti-modal-content'>
-                          <div className='ti-modal-header'>
-                            <h6
-                              className='modal-title text-[1rem] font-semibold'
-                              id='mail-ComposeLabel'
-                            >
-                              Add Organization
-                            </h6>
-                            <button
-                              type='button'
-                              className='hs-dropdown-toggle !text-[1rem] !font-semibold !text-defaulttextcolor'
-                              data-hs-overlay='#todo-compose'
-                              ref={closeModalButtonRef}
-                              onClick={() => {
-                                setDomainInput('');
-                                setOrganizationName('');
-                                setSelectedType('');
-                                setDomains([]);
-                                setMessage('');
-                                setOrganizationNameError('');
-                                setDomainError('');
-                                setTypeDropdownError('');
-                                setMessageError('');
-                                fetchData();
-                                fetchData1();
-                              }}
-                            >
-                              <span className='sr-only'>Close</span>
-                              <i className='ri-close-line'></i>
-                            </button>
-                          </div>
+                  {orgsWithSites && orgsWithSites.length == 0 && (
+                    <div className='p-4 grid border-b border-dashed dark:border-defaultborder/10'>
+                      <Link
+                        href=''
+                        className='hs-dropdown-toggle py-2  px-3 ti-btn bg-primary text-white !font-medium w-full !mb-0'
+                        data-hs-overlay='#todo-compose'
+                        onClick={() => setModalOpen(true)}
+                      >
+                        <i className='ri-add-circle-line !text-[1rem]'></i>Add
+                        Organization
+                      </Link>
+                      {modalOpen && modalOpen ? (
+                        <div
+                          id='todo-compose'
+                          // className='hs-overlay hidden ti-modal open'
+                          className='hs-overlay hidden ti-modal  [--overlay-backdrop:static]'
+                        >
+                          <div className='hs-overlay-open:mt-7  ti-modal-box mt-0 ease-out'>
+                            <div className='ti-modal-content'>
+                              <div className='ti-modal-header'>
+                                <h6
+                                  className='modal-title text-[1rem] font-semibold'
+                                  id='mail-ComposeLabel'
+                                >
+                                  Add Organization
+                                </h6>
+                                <button
+                                  type='button'
+                                  className='hs-dropdown-toggle !text-[1rem] !font-semibold !text-defaulttextcolor'
+                                  data-hs-overlay='#todo-compose'
+                                  ref={closeModalButtonRef}
+                                  onClick={() => {
+                                    setDomainInput('');
+                                    setOrganizationName('');
+                                    setSelectedType('');
+                                    const defaultDomain =
+                                      getDefaultDomainFromEmail();
+                                    if (defaultDomain) {
+                                      setDomains([defaultDomain]);
+                                    }
+                                    setMessage('');
+                                    setOrganizationNameError('');
+                                    setDomainError('');
+                                    setTypeDropdownError('');
+                                    setMessageError('');
+                                    // fetchData();
+                                    // fetchData1();
+                                  }}
+                                >
+                                  <span className='sr-only'>Close</span>
+                                  <i className='ri-close-line'></i>
+                                </button>
+                              </div>
 
-                          <div className='ti-modal-body !overflow-visible px-4'>
-                            <div className='grid grid-cols-12 gap-2'>
-                              <div className='xl:col-span-12 col-span-12'>
-                                <label
-                                  htmlFor='task-name'
-                                  className='ti-form-label'
-                                >
-                                  Organization Name*
-                                </label>
-                                <input
-                                  type='text'
-                                  className='form-control w-full'
-                                  id='task-name'
-                                  placeholder='Enter Organization Name'
-                                  onChange={handleorganizationNameChange}
-                                  onKeyDown={handleKeyPress}
-                                  value={organizationName}
-                                  maxLength={100}
-                                />
-                                {organizationNameError && (
-                                  <div className='text-danger'>
-                                    {organizationNameError}
-                                  </div>
-                                )}
-                              </div>
-                              <div className='xl:col-span-12 col-span-12'>
-                                <label
-                                  htmlFor='task-name'
-                                  className='ti-form-label'
-                                >
-                                  Domains*
-                                </label>
-                                <input
-                                  type='text'
-                                  className='form-control w-full'
-                                  id='task-name'
-                                  placeholder='Enter Domain'
-                                  onChange={handleDomainChange}
-                                  onKeyDown={handleKeyPress}
-                                  value={domainInput}
-                                  maxLength={255}
-                                />
-                                {domainError && (
-                                  <div className='text-danger'>
-                                    {domainError}
-                                  </div>
-                                )}
-                              </div>
-                              {/* <div className='flex justify-between mt-4'> */}
-                              <div className='xl:col-span-12 col-span-12'>
+                              <div className='ti-modal-body !overflow-visible px-4'>
                                 <div className='grid grid-cols-12 gap-2'>
-                                  {domains &&
-                                    domains.map((domain: any, index) => (
-                                      // eslint-disable-next-line react/jsx-key
-                                      <div
-                                        key={index}
-                                        className='xl:col-span-6 col-span-6 alert alert-solid-primary alert-dismissible fade show flex'
-                                        role='alert'
-                                        id='dismiss-alert2'
-                                      >
-                                        <div className='sm:flex-shrink-0 domain-name-div'>
-                                          {domain}
-                                        </div>
-                                        <div className='ms-auto'>
-                                          <div className='mx-1 my-1'>
-                                            <button
-                                              type='button'
-                                              className='inline-flex bg-teal-50 rounded-sm text-teal-500 focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-offset-teal-50 focus:ring-teal-600'
-                                              // data-hs-remove-element='#dismiss-alert2'
-                                              onClick={() =>
-                                                removeDomain(index)
-                                              }
-                                              //   onClick={()=>{
-                                              //     domains.splice(index, 1);
-                                              //   setDomains(domains);
-                                              // }}
-                                            >
-                                              <span className='sr-only'>
-                                                Dismiss
-                                              </span>
-                                              <svg
-                                                className='h-3 w-3'
-                                                width='16'
-                                                height='16'
-                                                viewBox='0 0 16 16'
-                                                fill='none'
-                                                xmlns='http://www.w3.org/2000/svg'
-                                                aria-hidden='true'
-                                              >
-                                                <path
-                                                  d='M0.92524 0.687069C1.126 0.486219 1.39823 0.373377 1.68209 0.373377C1.96597 0.373377 2.2382 0.486219 2.43894 0.687069L8.10514 6.35813L13.7714 0.687069C13.8701 0.584748 13.9882 0.503105 14.1188 0.446962C14.2494 0.39082 14.3899 0.361248 14.5321 0.360026C14.6742 0.358783 14.8151 0.38589 14.9468 0.439762C15.0782 0.493633 15.1977 0.573197 15.2983 0.673783C15.3987 0.774389 15.4784 0.894026 15.5321 1.02568C15.5859 1.15736 15.6131 1.29845 15.6118 1.44071C15.6105 1.58297 15.5809 1.72357 15.5248 1.85428C15.4688 1.98499 15.3872 2.10324 15.2851 2.20206L9.61883 7.87312L15.2851 13.5441C15.4801 13.7462 15.588 14.0168 15.5854 14.2977C15.5831 14.5787 15.4705 14.8474 15.272 15.046C15.0735 15.2449 14.805 15.3574 14.5244 15.3599C14.2437 15.3623 13.9733 15.2543 13.7714 15.0591L8.10514 9.38812L2.43894 15.0591C2.23704 15.2543 1.96663 15.3623 1.68594 15.3599C1.40526 15.3574 1.13677 15.2449 0.938279 15.046C0.739807 14.8474 0.627232 14.5787 0.624791 14.2977C0.62235 14.0168 0.730236 13.7462 0.92524 13.5441L6.59144 7.87312L0.92524 2.20206C0.724562 2.00115 0.611816 1.72867 0.611816 1.44457C0.611816 1.16047 0.724562 0.887983 0.92524 0.687069Z'
-                                                  fill='currentColor'
-                                                ></path>
-                                              </svg>
-                                            </button>
-                                          </div>
-                                        </div>
+                                  <div className='xl:col-span-12 col-span-12'>
+                                    <label
+                                      htmlFor='task-name'
+                                      className='ti-form-label'
+                                    >
+                                      Organization Name*
+                                    </label>
+                                    <input
+                                      type='text'
+                                      className='form-control w-full'
+                                      id='task-name'
+                                      placeholder='Enter Organization Name'
+                                      onChange={handleorganizationNameChange}
+                                      onKeyDown={handleKeyPress}
+                                      value={organizationName}
+                                      maxLength={100}
+                                    />
+                                    {organizationNameError && (
+                                      <div className='text-danger'>
+                                        {organizationNameError}
                                       </div>
-                                    ))}
-                                  {/* <div className="alert alert-solid-primary alert-dismissible !ms-2 fade show flex" role="alert" id="dismiss-alert2"><div className="sm:flex-shrink-0"> A simple </div><div className="ms-auto"><div className="mx-1 my-1"><button type="button" className="inline-flex bg-teal-50 rounded-sm text-teal-500 focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-offset-teal-50 focus:ring-teal-600" data-hs-remove-element="#dismiss-alert2"><span className="sr-only">Dismiss</span><svg className="h-3 w-3" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M0.92524 0.687069C1.126 0.486219 1.39823 0.373377 1.68209 0.373377C1.96597 0.373377 2.2382 0.486219 2.43894 0.687069L8.10514 6.35813L13.7714 0.687069C13.8701 0.584748 13.9882 0.503105 14.1188 0.446962C14.2494 0.39082 14.3899 0.361248 14.5321 0.360026C14.6742 0.358783 14.8151 0.38589 14.9468 0.439762C15.0782 0.493633 15.1977 0.573197 15.2983 0.673783C15.3987 0.774389 15.4784 0.894026 15.5321 1.02568C15.5859 1.15736 15.6131 1.29845 15.6118 1.44071C15.6105 1.58297 15.5809 1.72357 15.5248 1.85428C15.4688 1.98499 15.3872 2.10324 15.2851 2.20206L9.61883 7.87312L15.2851 13.5441C15.4801 13.7462 15.588 14.0168 15.5854 14.2977C15.5831 14.5787 15.4705 14.8474 15.272 15.046C15.0735 15.2449 14.805 15.3574 14.5244 15.3599C14.2437 15.3623 13.9733 15.2543 13.7714 15.0591L8.10514 9.38812L2.43894 15.0591C2.23704 15.2543 1.96663 15.3623 1.68594 15.3599C1.40526 15.3574 1.13677 15.2449 0.938279 15.046C0.739807 14.8474 0.627232 14.5787 0.624791 14.2977C0.62235 14.0168 0.730236 13.7462 0.92524 13.5441L6.59144 7.87312L0.92524 2.20206C0.724562 2.00115 0.611816 1.72867 0.611816 1.44457C0.611816 1.16047 0.724562 0.887983 0.92524 0.687069Z" fill="currentColor"></path></svg></button></div></div></div>
-                                                        <div className="alert alert-solid-primary alert-dismissible !ms-2 fade show flex" role="alert" id="dismiss-alert2"><div className="sm:flex-shrink-0"> A simple </div><div className="ms-auto"><div className="mx-1 my-1"><button type="button" className="inline-flex bg-teal-50 rounded-sm text-teal-500 focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-offset-teal-50 focus:ring-teal-600" data-hs-remove-element="#dismiss-alert2"><span className="sr-only">Dismiss</span><svg className="h-3 w-3" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M0.92524 0.687069C1.126 0.486219 1.39823 0.373377 1.68209 0.373377C1.96597 0.373377 2.2382 0.486219 2.43894 0.687069L8.10514 6.35813L13.7714 0.687069C13.8701 0.584748 13.9882 0.503105 14.1188 0.446962C14.2494 0.39082 14.3899 0.361248 14.5321 0.360026C14.6742 0.358783 14.8151 0.38589 14.9468 0.439762C15.0782 0.493633 15.1977 0.573197 15.2983 0.673783C15.3987 0.774389 15.4784 0.894026 15.5321 1.02568C15.5859 1.15736 15.6131 1.29845 15.6118 1.44071C15.6105 1.58297 15.5809 1.72357 15.5248 1.85428C15.4688 1.98499 15.3872 2.10324 15.2851 2.20206L9.61883 7.87312L15.2851 13.5441C15.4801 13.7462 15.588 14.0168 15.5854 14.2977C15.5831 14.5787 15.4705 14.8474 15.272 15.046C15.0735 15.2449 14.805 15.3574 14.5244 15.3599C14.2437 15.3623 13.9733 15.2543 13.7714 15.0591L8.10514 9.38812L2.43894 15.0591C2.23704 15.2543 1.96663 15.3623 1.68594 15.3599C1.40526 15.3574 1.13677 15.2449 0.938279 15.046C0.739807 14.8474 0.627232 14.5787 0.624791 14.2977C0.62235 14.0168 0.730236 13.7462 0.92524 13.5441L6.59144 7.87312L0.92524 2.20206C0.724562 2.00115 0.611816 1.72867 0.611816 1.44457C0.611816 1.16047 0.724562 0.887983 0.92524 0.687069Z" fill="currentColor"></path></svg></button></div></div></div> */}
+                                    )}
+                                  </div>
+                                  <div className='xl:col-span-12 col-span-12'>
+                                    <label
+                                      htmlFor='task-name'
+                                      className='ti-form-label'
+                                    >
+                                      Domains*{' '}
+                                      <small className='form-text text-muted'>
+                                        (Separate Domain with a comma, and press
+                                        enter to add them to your list)
+                                      </small>
+                                    </label>
+                                    <input
+                                      type='text'
+                                      className='form-control w-full'
+                                      id='task-name'
+                                      placeholder='Enter Domain'
+                                      onChange={handleDomainChange}
+                                      onKeyDown={handleKeyPress}
+                                      value={domainInput}
+                                      maxLength={255}
+                                    />
+                                    {domainError && (
+                                      <div className='text-danger'>
+                                        {domainError}
+                                      </div>
+                                    )}
+                                  </div>
+                                  {/* <div className='flex justify-between mt-4'> */}
+                                  <div className='xl:col-span-12 col-span-12'>
+                                    <div className='grid grid-cols-12 gap-2'>
+                                      {domains &&
+                                        domains.map((domain: any, index) => (
+                                          // eslint-disable-next-line react/jsx-key
+                                          <div
+                                            key={index}
+                                            className='xl:col-span-6 col-span-6 alert alert-solid-primary alert-dismissible fade show flex'
+                                            role='alert'
+                                            id='dismiss-alert2'
+                                          >
+                                            <div className='sm:flex-shrink-0 domain-name-div'>
+                                              {domain}
+                                            </div>
+                                            <div className='ms-auto'>
+                                              <div className='mx-1 my-1'>
+                                                <button
+                                                  type='button'
+                                                  className='inline-flex bg-teal-50 rounded-sm text-teal-500 focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-offset-teal-50 focus:ring-teal-600'
+                                                  // data-hs-remove-element='#dismiss-alert2'
+                                                  onClick={() =>
+                                                    removeDomain(index)
+                                                  }
+                                                  //   onClick={()=>{
+                                                  //     domains.splice(index, 1);
+                                                  //   setDomains(domains);
+                                                  // }}
+                                                >
+                                                  <span className='sr-only'>
+                                                    Dismiss
+                                                  </span>
+                                                  <svg
+                                                    className='h-3 w-3'
+                                                    width='16'
+                                                    height='16'
+                                                    viewBox='0 0 16 16'
+                                                    fill='none'
+                                                    xmlns='http://www.w3.org/2000/svg'
+                                                    aria-hidden='true'
+                                                  >
+                                                    <path
+                                                      d='M0.92524 0.687069C1.126 0.486219 1.39823 0.373377 1.68209 0.373377C1.96597 0.373377 2.2382 0.486219 2.43894 0.687069L8.10514 6.35813L13.7714 0.687069C13.8701 0.584748 13.9882 0.503105 14.1188 0.446962C14.2494 0.39082 14.3899 0.361248 14.5321 0.360026C14.6742 0.358783 14.8151 0.38589 14.9468 0.439762C15.0782 0.493633 15.1977 0.573197 15.2983 0.673783C15.3987 0.774389 15.4784 0.894026 15.5321 1.02568C15.5859 1.15736 15.6131 1.29845 15.6118 1.44071C15.6105 1.58297 15.5809 1.72357 15.5248 1.85428C15.4688 1.98499 15.3872 2.10324 15.2851 2.20206L9.61883 7.87312L15.2851 13.5441C15.4801 13.7462 15.588 14.0168 15.5854 14.2977C15.5831 14.5787 15.4705 14.8474 15.272 15.046C15.0735 15.2449 14.805 15.3574 14.5244 15.3599C14.2437 15.3623 13.9733 15.2543 13.7714 15.0591L8.10514 9.38812L2.43894 15.0591C2.23704 15.2543 1.96663 15.3623 1.68594 15.3599C1.40526 15.3574 1.13677 15.2449 0.938279 15.046C0.739807 14.8474 0.627232 14.5787 0.624791 14.2977C0.62235 14.0168 0.730236 13.7462 0.92524 13.5441L6.59144 7.87312L0.92524 2.20206C0.724562 2.00115 0.611816 1.72867 0.611816 1.44457C0.611816 1.16047 0.724562 0.887983 0.92524 0.687069Z'
+                                                      fill='currentColor'
+                                                    ></path>
+                                                  </svg>
+                                                </button>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      {/* <div className="alert alert-solid-primary alert-dismissible !ms-2 fade show flex" role="alert" id="dismiss-alert2"><div className="sm:flex-shrink-0"> A simple </div><div className="ms-auto"><div className="mx-1 my-1"><button type="button" className="inline-flex bg-teal-50 rounded-sm text-teal-500 focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-offset-teal-50 focus:ring-teal-600" data-hs-remove-element="#dismiss-alert2"><span className="sr-only">Dismiss</span><svg className="h-3 w-3" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M0.92524 0.687069C1.126 0.486219 1.39823 0.373377 1.68209 0.373377C1.96597 0.373377 2.2382 0.486219 2.43894 0.687069L8.10514 6.35813L13.7714 0.687069C13.8701 0.584748 13.9882 0.503105 14.1188 0.446962C14.2494 0.39082 14.3899 0.361248 14.5321 0.360026C14.6742 0.358783 14.8151 0.38589 14.9468 0.439762C15.0782 0.493633 15.1977 0.573197 15.2983 0.673783C15.3987 0.774389 15.4784 0.894026 15.5321 1.02568C15.5859 1.15736 15.6131 1.29845 15.6118 1.44071C15.6105 1.58297 15.5809 1.72357 15.5248 1.85428C15.4688 1.98499 15.3872 2.10324 15.2851 2.20206L9.61883 7.87312L15.2851 13.5441C15.4801 13.7462 15.588 14.0168 15.5854 14.2977C15.5831 14.5787 15.4705 14.8474 15.272 15.046C15.0735 15.2449 14.805 15.3574 14.5244 15.3599C14.2437 15.3623 13.9733 15.2543 13.7714 15.0591L8.10514 9.38812L2.43894 15.0591C2.23704 15.2543 1.96663 15.3623 1.68594 15.3599C1.40526 15.3574 1.13677 15.2449 0.938279 15.046C0.739807 14.8474 0.627232 14.5787 0.624791 14.2977C0.62235 14.0168 0.730236 13.7462 0.92524 13.5441L6.59144 7.87312L0.92524 2.20206C0.724562 2.00115 0.611816 1.72867 0.611816 1.44457C0.611816 1.16047 0.724562 0.887983 0.92524 0.687069Z" fill="currentColor"></path></svg></button></div></div></div>
+                                                             <div className="alert alert-solid-primary alert-dismissible !ms-2 fade show flex" role="alert" id="dismiss-alert2"><div className="sm:flex-shrink-0"> A simple </div><div className="ms-auto"><div className="mx-1 my-1"><button type="button" className="inline-flex bg-teal-50 rounded-sm text-teal-500 focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-offset-teal-50 focus:ring-teal-600" data-hs-remove-element="#dismiss-alert2"><span className="sr-only">Dismiss</span><svg className="h-3 w-3" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M0.92524 0.687069C1.126 0.486219 1.39823 0.373377 1.68209 0.373377C1.96597 0.373377 2.2382 0.486219 2.43894 0.687069L8.10514 6.35813L13.7714 0.687069C13.8701 0.584748 13.9882 0.503105 14.1188 0.446962C14.2494 0.39082 14.3899 0.361248 14.5321 0.360026C14.6742 0.358783 14.8151 0.38589 14.9468 0.439762C15.0782 0.493633 15.1977 0.573197 15.2983 0.673783C15.3987 0.774389 15.4784 0.894026 15.5321 1.02568C15.5859 1.15736 15.6131 1.29845 15.6118 1.44071C15.6105 1.58297 15.5809 1.72357 15.5248 1.85428C15.4688 1.98499 15.3872 2.10324 15.2851 2.20206L9.61883 7.87312L15.2851 13.5441C15.4801 13.7462 15.588 14.0168 15.5854 14.2977C15.5831 14.5787 15.4705 14.8474 15.272 15.046C15.0735 15.2449 14.805 15.3574 14.5244 15.3599C14.2437 15.3623 13.9733 15.2543 13.7714 15.0591L8.10514 9.38812L2.43894 15.0591C2.23704 15.2543 1.96663 15.3623 1.68594 15.3599C1.40526 15.3574 1.13677 15.2449 0.938279 15.046C0.739807 14.8474 0.627232 14.5787 0.624791 14.2977C0.62235 14.0168 0.730236 13.7462 0.92524 13.5441L6.59144 7.87312L0.92524 2.20206C0.724562 2.00115 0.611816 1.72867 0.611816 1.44457C0.611816 1.16047 0.724562 0.887983 0.92524 0.687069Z" fill="currentColor"></path></svg></button></div></div></div> */}
+                                    </div>
+                                  </div>
+                                  <div className='xl:col-span-12 col-span-12'>
+                                    <label
+                                      htmlFor='task-name'
+                                      className='ti-form-label'
+                                    >
+                                      Type*
+                                    </label>
+                                    <select
+                                      className='form-select'
+                                      value={selectedType}
+                                      onChange={handleTypeDropdownChange}
+                                    >
+                                      <option value=''>Select Type</option>
+                                      {typeDropdown &&
+                                        typeDropdown.map((type) => (
+                                          <option
+                                            key={type.id}
+                                            value={type.name}
+                                          >
+                                            {type.name}
+                                          </option>
+                                        ))}
+                                    </select>
+
+                                    {typeDropdownError && (
+                                      <div className='text-danger'>
+                                        {typeDropdownError}
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  <div className='xl:col-span-12 col-span-12'>
+                                    <label
+                                      htmlFor='task-name'
+                                      className='ti-form-label'
+                                    >
+                                      Message
+                                    </label>
+                                    <textarea
+                                      className='form-control w-full'
+                                      id='task-name'
+                                      placeholder='Enter Message'
+                                      onChange={handleMessageChange}
+                                      onKeyDown={handleKeyPress}
+                                      value={message}
+                                      style={{ resize: 'none' }}
+                                      maxLength={1000}
+                                    />
+                                    {messageError && (
+                                      <div className='text-danger'>
+                                        {messageError}
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
-                              <div className='xl:col-span-12 col-span-12'>
-                                <label
-                                  htmlFor='task-name'
-                                  className='ti-form-label'
+                              <div className='ti-modal-footer'>
+                                <button
+                                  type='button'
+                                  className='hs-dropdown-toggle ti-btn  ti-btn-light align-middle'
+                                  data-hs-overlay='#todo-compose'
+                                  ref={closeModalButtonRef}
+                                  onClick={() => {
+                                    setDomainInput('');
+                                    setOrganizationName('');
+                                    setSelectedType('');
+                                    const defaultDomain =
+                                      getDefaultDomainFromEmail();
+                                    if (defaultDomain) {
+                                      setDomains([defaultDomain]);
+                                    }
+                                    setMessage('');
+                                    setOrganizationNameError('');
+                                    setDomainError('');
+                                    setTypeDropdownError('');
+                                    setMessageError('');
+                                    // fetchData();
+                                    // fetchData1();
+                                  }}
                                 >
-                                  Type*
-                                </label>
-                                <select
-                                  className='form-select'
-                                  value={selectedType}
-                                  onChange={handleTypeDropdownChange}
+                                  Cancel
+                                </button>
+                                <button
+                                  type='button'
+                                  className='ti-btn bg-primary text-white !font-medium'
+                                  onClick={handleSubmit}
                                 >
-                                  <option value=''>Select Type</option>
-                                  {typeDropdown &&
-                                    typeDropdown.map((type) => (
-                                      <option key={type.id} value={type.name}>
-                                        {type.name}
-                                      </option>
-                                    ))}
-                                </select>
-
-                                {typeDropdownError && (
-                                  <div className='text-danger'>
-                                    {typeDropdownError}
-                                  </div>
-                                )}
-                              </div>
-
-                              <div className='xl:col-span-12 col-span-12'>
-                                <label
-                                  htmlFor='task-name'
-                                  className='ti-form-label'
-                                >
-                                  Message*
-                                </label>
-                                <textarea
-                                  className='form-control w-full'
-                                  id='task-name'
-                                  placeholder='Enter Message'
-                                  onChange={handleMessageChange}
-                                  onKeyDown={handleKeyPress}
-                                  value={message}
-                                  maxLength={1000}
-                                />
-                                {messageError && (
-                                  <div className='text-danger'>
-                                    {messageError}
-                                  </div>
-                                )}
+                                  Create
+                                </button>
                               </div>
                             </div>
                           </div>
-                          <div className='ti-modal-footer'>
-                            <button
-                              type='button'
-                              className='hs-dropdown-toggle ti-btn  ti-btn-light align-middle'
-                              data-hs-overlay='#todo-compose'
-                              ref={closeModalButtonRef}
-                              onClick={() => {
-                                setDomainInput('');
-                                setOrganizationName('');
-                                setSelectedType('');
-                                setDomains([]);
-                                setMessage('');
-                                setOrganizationNameError('');
-                                setDomainError('');
-                                setTypeDropdownError('');
-                                setMessageError('');
-                                fetchData();
-                                fetchData1();
-                              }}
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              type='button'
-                              className='ti-btn bg-primary text-white !font-medium'
-                              onClick={handleSubmit}
-                            >
-                              Create
-                            </button>
-                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        <></>
+                      )}
                     </div>
-                  </div>
-                  {/* ) : (
-                    <div></div>
-                  )} */}
+                  )}
                   <div className='p-4 border-b border-dashed dark:border-defaultborder/10'>
-                    <div className='input-group'>
+                    <div className='input-group' style={{ cursor: 'pointer' }}>
                       <input
                         type='text'
                         value={searchTerm ?? ''}
@@ -656,17 +780,37 @@ const LoginForm = () => {
                       {sidebarOrgs && (
                         <div>
                           {sidebarOrgs.data.map((org) => (
-                            // ; navigate.push('/orgdashboard')
                             <li
                               style={{ cursor: 'pointer' }}
                               key={org.id as number}
                               onClick={() => {
-                                localStorage.setItem(
-                                  'org_id',
-                                  org.id as string,
-                                );
-                                localStorage.setItem('org_name', org.name);
+                                if (org.id != -1) {
+                                  setLoading(true);
+                                  const encryptedOrgId = encryptData(
+                                    org.id as string,
+                                  );
+                                  const encryptedOrgName = encryptData(
+                                    org.name,
+                                  );
+                                  localStorage.setItem(
+                                    'org_id',
+                                    encryptedOrgId,
+                                  );
+                                  localStorage.setItem(
+                                    'org_name',
+                                    encryptedOrgName,
+                                  );
+                                  navigate.push('/orgdashboard');
+                                  setLoading(false);
+                                }
                               }}
+                              // onClick={() => {
+                              //   localStorage.setItem(
+                              //     'org_id',
+                              //     org.id as string,
+                              //   );
+                              //   localStorage.setItem('org_name', org.name);
+                              // }}
                             >
                               <div className='flex items-center'>
                                 {/* <span className="me-2 leading-none">
@@ -681,43 +825,6 @@ const LoginForm = () => {
                           ))}
                         </div>
                       )}
-                      {/* <li className="active">
-                                        <Link href="#!">
-                                            <div className="flex items-center">
-                                                <span className="me-2 leading-none">
-                                                    <i className="ri-task-line align-middle text-[.875rem]"></i>
-                                                </span>
-                                                <span className="flex-grow whitespace-nowrap">
-                                                    All Tasks
-                                                </span>
-                                                <span className="badge bg-success/10 text-success rounded-full">167</span>
-                                            </div>
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link href="#!">
-                                            <div className="flex items-center">
-                                                <span className="me-2 leading-none">
-                                                    <i className="ri-star-line align-middle text-[.875rem]"></i>
-                                                </span>
-                                                <span className="flex-grow whitespace-nowrap">
-                                                    Starred
-                                                </span>
-                                            </div>
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link href="#!">
-                                            <div className="flex items-center">
-                                                <span className="me-2 leading-none">
-                                                    <i className="ri-delete-bin-5-line align-middle text-[.875rem]"></i>
-                                                </span>
-                                                <span className="flex-grow whitespace-nowrap">
-                                                    Trash
-                                                </span>
-                                            </div>
-                                        </Link>
-                                    </li> */}
                     </ul>
                   </div>
                 </div>
@@ -751,8 +858,17 @@ const LoginForm = () => {
                           style={{ cursor: 'pointer' }}
                           key={org.org_id}
                           onClick={() => {
-                            localStorage.setItem('org_id', org.org_id);
-                            localStorage.setItem('org_name', org.org_name);
+                            const encryptedOrgId = encryptData(org.org_id);
+                            const encryptedOrgName = encryptData(org.org_name);
+                            const encryptOrgTypeId = encryptData(
+                              org.org_type_id,
+                            );
+                            localStorage.setItem('org_id', encryptedOrgId);
+                            localStorage.setItem('org_name', encryptedOrgName);
+                            localStorage.setItem(
+                              'org_type_id',
+                              encryptOrgTypeId,
+                            );
                             navigate.push('/orgdashboard');
                           }}
                         >
@@ -763,14 +879,13 @@ const LoginForm = () => {
                                   <div className='avatar avatar-xl avatar-rounded me-3'>
                                     <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
                                       {/* {SingleSite?.site?SingleSite?.site?.name[0].toUpperCase(): ""} */}
-                                      {org.org_name
-                                        ? org.org_name
-                                            .split(' ')
-                                            .map((word) =>
-                                              word[0].toUpperCase(),
-                                            )
-                                            .join('')
-                                        : ''}
+                                      {org.org_name ? (
+                                        <InitialsComponent
+                                          name={org.org_name}
+                                        />
+                                      ) : (
+                                        ''
+                                      )}
                                     </span>
                                     {/* <img src="../../../assets/images/faces/4.jpg" alt={org.org_name?org.org_name[0].toUpperCase(): ""} /> */}
                                     {/* <h4>
@@ -779,7 +894,7 @@ const LoginForm = () => {
                                     </h4> */}
                                   </div>
                                   <div>
-                                    <h6 className=' mb-1 font-semibold text-[1rem]'>
+                                    <h6 className=' mb-1 font-semibold text-[1rem] text-site-name'>
                                       {' '}
                                       {org.org_name}{' '}
                                     </h6>

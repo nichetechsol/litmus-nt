@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -11,12 +12,15 @@ import * as Yup from 'yup';
 
 import 'react-toastify/dist/ReactToastify.css';
 
+import { decryptData } from '@/helper/Encryption_Decryption';
 import { emailSchema, nameSchema, roleSchema } from '@/helper/ValidationHelper';
+import { getActivitiesByOrgId } from '@/supabase/activity';
 import {
   orgDashboardCounts,
   orgEntitlementList,
   orgUserList,
 } from '@/supabase/dashboard';
+import { getLocationOfSites } from '@/supabase/org_dashboard';
 import { getUserRole } from '@/supabase/org_details';
 import {
   addUserToOrganization,
@@ -25,6 +29,7 @@ import {
   removeUserFromOrganization,
 } from '@/supabase/org_user';
 import Loader from '@/utils/Loader/Loader';
+
 interface OrgUser {
   id: any;
   firstname: any;
@@ -49,6 +54,20 @@ interface roles {
   name: string;
   created_at: any;
 }
+interface CountryCount {
+  country: string;
+  count: number;
+}
+interface activitylogs {
+  activity_date: string;
+  activity_type: string;
+  target_user_role: object;
+  target_user_id: { email: string; firstname: string; lastname: string };
+  org_id: { name: string };
+  details: string;
+  site_id: string;
+  user_id: { email: string; firstname: string; lastname: string };
+}
 const validationSchema = Yup.object().shape({
   email: emailSchema,
   firstName: nameSchema,
@@ -70,34 +89,50 @@ const OrgDashboard = () => {
       }
     }
   }, []);
-  const [user_id, setuser_id] = useState('');
+  const [user_id, setuser_id] = useState<any>('');
   // const [user_fname, setUser_fname] = useState("")
   // const [user_lname, setUserlname] = useState("")
   // const [user_role, setUserrole] = useState('');
-  const [org_id, setorg_id] = useState('');
-  const [orgName, setorgName] = useState('');
+  const [org_id, setorg_id] = useState<any>('');
+  const [orgName, setorgName] = useState<any>('');
+  // useEffect(() => {
+  //   const userid: any = localStorage.getItem('user_id');
+  //   // const userfname: any = localStorage.getItem("user_fname");
+  //   // const userlname: any = localStorage.getItem("user_lname");
+  //   // const userrole: any = localStorage.getItem('user_role');
+  //   const org_id: any = localStorage.getItem('org_id');
+  //   const orgName: any = localStorage.getItem('org_name');
+  //   setuser_id(userid);
+  //   // setUser_fname(userfname);
+  //   // setUserlname(userlname);
+  //   // setUserrole(userrole);
+  //   setorg_id(org_id);
+  //   if (!org_id) {
+  //     swal('Please select organization', { icon: 'error' });
+  //     redirect('/organization');
+  //   }
+  //   setorgName(orgName);
+  // }, []);
+
+  // const user_id = localStorage.getItem('user_id');
+
   useEffect(() => {
-    const userid: any = localStorage.getItem('user_id');
-    // const userfname: any = localStorage.getItem("user_fname");
-    // const userlname: any = localStorage.getItem("user_lname");
-    // const userrole: any = localStorage.getItem('user_role');
-    const org_id: any = localStorage.getItem('org_id');
-    const orgName: any = localStorage.getItem('org_name');
-    setuser_id(userid);
-    // setUser_fname(userfname);
-    // setUserlname(userlname);
-    // setUserrole(userrole);
-    setorg_id(org_id);
-    if (!org_id) {
+    const decryptedUserId = decryptData(localStorage.getItem('user_id'));
+    const decryptedOrgId = decryptData(localStorage.getItem('org_id'));
+    const decryptedOrgName = decryptData(localStorage.getItem('org_name'));
+
+    setuser_id(decryptedUserId);
+    setorg_id(decryptedOrgId);
+    setorgName(decryptedOrgName);
+
+    if (!decryptedOrgId) {
       swal('Please select organization', { icon: 'error' });
       redirect('/organization');
     }
-    setorgName(orgName);
   }, []);
 
-  // const user_id = localStorage.getItem('user_id');
   const [activePage, setActivePage] = useState(1);
-  // const [search, setsearch] = useState("")
+  const [search, setsearch] = useState('');
   const [perPage] = useState(10); // Number of items per page
   const [totalItemsCount, setTotalItemsCount] = useState(0);
 
@@ -117,18 +152,19 @@ const OrgDashboard = () => {
   const [activePage2, setActivePage2] = useState(1);
   const [perPage2] = useState(10);
   const [totalItemsCount2, setTotalItemsCount2] = useState(0);
-
+  const [locationOfSites, setLocationOfSites] = useState<CountryCount[]>([]);
+  const [activity_log, setActivity_log] = useState<activitylogs[] | null>(null);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
+        // setLoading(true);
         if (org_id) {
           const data: any = await orgDashboardCounts(org_id);
-          setLoading(false);
+          // setLoading(false);
           if (data) {
             setOrgData(data.data);
           } else {
-            setLoading(false);
+            // setLoading(false);
             // console.log("No organization details found.");
           }
         }
@@ -139,32 +175,54 @@ const OrgDashboard = () => {
 
     fetchData();
   }, [org_id]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // setLoading(true);
+        if (org_id) {
+          const data: any = await getActivitiesByOrgId(org_id);
+          // setLoading(false);
+          if (data) {
+            setActivity_log(data);
+          } else {
+            // setLoading(false);
+            // console.log("No organization details found.");
+          }
+        }
+      } catch (error: any) {
+        // console.error("Error fetching organization details:", error.message);
+      }
+    };
+
+    fetchData();
+  }, [org_id]);
+
   const fetchData2 = async () => {
     try {
-      setLoading(true);
+      // setLoading(true);
 
       const start: any = (activePage - 1) * perPage; // Calculate start index
       const end: any = start + perPage - 1; // Calculate end index
       if (org_id) {
-        const data: any = await orgUserList(org_id, start, end, '');
+        const data: any = await orgUserList(org_id, start, end, search);
 
         if (data) {
           setOrgUserData(data.data.userList);
           setTotalItemsCount(data.data?.totalCount); // Set total items count for pagination
-          setLoading(false);
+          // setLoading(false);
         } else {
-          setLoading(false);
+          // setLoading(false);
           // console.log("No organization details found.");
         }
       }
     } catch (error: any) {
-      setLoading(false);
+      // setLoading(false);
       // console.error("Error fetching organization details:", error.message);
     }
   };
   useEffect(() => {
     fetchData2();
-  }, [org_id, activePage]);
+  }, [search, org_id, activePage]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -191,6 +249,31 @@ const OrgDashboard = () => {
 
     fetchData();
   }, [org_id, activePage2, perPage2]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // setLoading(true);
+
+        if (org_id) {
+          const sets = { org_id: org_id };
+          const data: any = await getLocationOfSites(sets);
+
+          if (data) {
+            setLocationOfSites(data.data);
+            // setLoading(false);
+          } else {
+            // setLoading(false);
+            // console.log("No organization details found.");
+          }
+        }
+      } catch (error: any) {
+        // setLoading(false);
+        // console.error("Error fetching organization details:", error.message);
+      }
+    };
+
+    fetchData();
+  }, [org_id]);
   const [changeFlage, setChangeFlage] = useState<boolean>(false);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -206,16 +289,16 @@ const OrgDashboard = () => {
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        setLoading(true);
+        // setLoading(true);
 
         const result1: any = await getUserRole(); // Replace with your actual API call
 
         if (result1 && result1.data) {
           setRoles(result1.data);
-          setLoading(false);
+          // setLoading(false);
         }
       } catch (error: any) {
-        setLoading(false);
+        // setLoading(false);
         // console.error("Error fetching roles:", error.message);
       }
     };
@@ -363,6 +446,12 @@ const OrgDashboard = () => {
             if (button) {
               button.click(); // Directly trigger click event on button
             }
+          } else {
+            toast.error('User was not in Central V2', { autoClose: 3000 });
+            const button = document.getElementById('close-modal-btn');
+            if (button) {
+              button.click(); // Directly trigger click event on button
+            }
           }
         } else {
           const userData = {
@@ -451,7 +540,7 @@ const OrgDashboard = () => {
                             <div>
                               <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
                                 {/* <i className='ti ti-users text-[1rem] text-white'></i> */}
-                                <i className='ri-group-line text-white'></i>
+                                <i className='ri-wallet-2-line text-white'></i>
                               </span>
                             </div>
                             <div className='flex-grow ms-4'>
@@ -477,7 +566,7 @@ const OrgDashboard = () => {
                             <div>
                               <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-secondary'>
                                 {/* <i className='ti ti-wallet text-[1rem] text-white'></i> */}
-                                <i className='ri-wallet-2-line text-white'></i>
+                                <i className='ri-group-line text-white'></i>
                               </span>
                             </div>
                             <div className='flex-grow ms-4'>
@@ -571,16 +660,30 @@ const OrgDashboard = () => {
                 <div className='xxl:col-span-6 xl:col-span-6  col-span-12'>
                   <div className='box'>
                     <div className='box-header justify-between'>
-                      <div className='box-title'>
-                        Location Of Sites And Users
-                      </div>
+                      <div className='box-title'>Location Of Sites</div>
                       <div className='hs-dropdown ti-dropdown'></div>
                     </div>
                     <div className='box-body overflow-hidden'>
-                      <div className='leads-source-chart flex items-center justify-center'>
-                        {/* <img src={imgMap} /> */}
-                      </div>
+                      {/* <div className='leads-source-chart flex items-center justify-center'> */}
+                      {/* <img src={imgMap} /> */}
+                      <ul className='list-none crm-top-deals mb-0'>
+                        {locationOfSites.map((item, index) => (
+                          <li className='mb-[0.9rem]' key={index}>
+                            <div className='flex items-start flex-wrap'>
+                              <div className='flex-grow'>
+                                <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                  {item.country}
+                                </p>
+                              </div>
+                              <div className='font-semibold text-[0.9375rem] '>
+                                {item.count}
+                              </div>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
+                    {/* </div> */}
                   </div>
                 </div>
 
@@ -589,7 +692,19 @@ const OrgDashboard = () => {
                     <div className='box-header justify-between'>
                       <div className='box-title'>User Management</div>
                       <div className='flex flex-wrap gap-2'>
-                        <div className='hs-dropdown ti-dropdown'>
+                        <div>
+                          <input
+                            className='ti-form-control form-control-sm'
+                            type='text'
+                            placeholder='Search Here'
+                            aria-label='.form-control-sm example'
+                            onChange={(e) => {
+                              setsearch(e.target.value);
+                            }}
+                          />
+                        </div>
+                        {/* <div className='hs-dropdown ti-dropdown'> */}
+                        <div className='p-4 grid border-b border-dashed dark:border-defaultborder/10'>
                           {' '}
                           {userrole2 === 1 || userrole2 === 2 ? (
                             <button
@@ -614,7 +729,8 @@ const OrgDashboard = () => {
                           )}
                           <div
                             id='todo-compose'
-                            className='hs-overlay hidden ti-modal'
+                            // className='hs-overlay hidden ti-modal'
+                            className='hs-overlay hidden ti-modal  [--overlay-backdrop:static]'
                           >
                             <div className='hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out'>
                               <div className='ti-modal-content'>
@@ -651,6 +767,7 @@ const OrgDashboard = () => {
                                         type='text'
                                         className='form-control w-full'
                                         id='Email'
+                                        disabled={!changeFlage}
                                         placeholder='Enter Email'
                                         onChange={handleEmailChange}
                                         onKeyDown={handleKeyPress}
@@ -675,6 +792,7 @@ const OrgDashboard = () => {
                                         type='text'
                                         className='form-control w-full'
                                         id='task-name'
+                                        disabled={!changeFlage}
                                         placeholder='Enter First Name'
                                         onChange={handleFirstNameChange}
                                         onKeyDown={handleKeyPress}
@@ -698,6 +816,7 @@ const OrgDashboard = () => {
                                         type='text'
                                         className='form-control w-full'
                                         id='Last Name'
+                                        disabled={!changeFlage}
                                         placeholder='Enter Last Name'
                                         onChange={handleLastNameChange}
                                         onKeyDown={handleKeyPress}
@@ -723,7 +842,7 @@ const OrgDashboard = () => {
                                         onChange={handleRoleChange}
                                         value={role}
                                       >
-                                        <option value=''>Select a role</option>
+                                        <option value=''>Select a Role</option>
                                         {roles &&
                                           roles.map((role) => (
                                             <option
@@ -749,6 +868,7 @@ const OrgDashboard = () => {
                                     className='hs-dropdown-toggle ti-btn  ti-btn-light align-middle'
                                     data-hs-overlay='#todo-compose'
                                     ref={closeModalButtonRef}
+                                    onClick={() => handleFiledClear()}
                                   >
                                     Cancel
                                   </button>
@@ -818,7 +938,11 @@ const OrgDashboard = () => {
                                         {/* <img src={idx.src} alt="img"
                                     className="w-[1.75rem] h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full" /> */}
                                       </span>{' '}
-                                      {`${user.firstname} ${user.lastname}`}{' '}
+                                      {`${
+                                        user.firstname ? user.firstname : ''
+                                      } ${
+                                        user.lastname ? user.lastname : ''
+                                      }`}{' '}
                                     </div>
                                   </td>
 
@@ -832,6 +956,7 @@ const OrgDashboard = () => {
                                     <td>
                                       <div className='flex flex-row items-center !gap-2 text-[0.9375rem]'>
                                         <div
+                                          style={{ cursor: 'pointer' }}
                                           aria-label='anchor'
                                           data-bs-target='#formmodal'
                                           data-bs-toggle='modal'
@@ -840,17 +965,18 @@ const OrgDashboard = () => {
                                           onClick={() => {
                                             handleEdit(user);
                                           }}
-                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-primary/10 text-primary hover:bg-primary hover:text-white hover:border-primary'
+                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
                                         >
                                           <i className='ri-edit-line'></i>
                                         </div>
 
                                         <div
+                                          style={{ cursor: 'pointer' }}
                                           aria-label='anchor'
                                           onClick={() => {
                                             handleDelete(user.id);
                                           }}
-                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-primary/10 text-primary hover:bg-primary hover:text-white hover:border-primary'
+                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
                                         >
                                           <i className='ri-delete-bin-line'></i>
                                         </div>
@@ -909,32 +1035,99 @@ const OrgDashboard = () => {
                                 </ul>
                             </div> */}
                     </div>
-                    {/* <div className="box-body !p-0">
-                            <div className="table-responsive">
-                                <table className="table table-hover whitespace-nowrap min-w-full">
-                                    
-                                    <tbody>
-                                        {TopCompanies.map((idx) => (
-                                            <tr className="border hover:bg-gray-100 dark:hover:bg-light dark:border-defaultborder/10 border-defaultborder !border-x-0" key={Math.random()}>
-                                                <th scope="col">
-                                                    <div className="flex items-center">
-                                                        <img src={idx.src} alt="" className="avatar avatar-md p-1 bg-light avatar-rounded me-2 !mb-0" />
-                                                        <div>
-                                                            <p className="font-semibold mb-0">Sarah Thompson updated the support entitlements for 'ABC Corporation,' increasing the number of hosted sandboxes allowed to be deployed from 5 to 10.
+                    <div className='box-body !p-0'>
+                      <div className='table-responsive'>
+                        <table className='table table-hover whitespace-nowrap min-w-full'>
+                          <tbody>
+                            {activity_log ? (
+                              activity_log.map((activity, index) => (
+                                <tr
+                                  className='border hover:bg-gray-100 dark:hover:bg-light dark:border-defaultborder/10 border-defaultborder !border-x-0'
+                                  key={index}
+                                >
+                                  <th scope='col'>
+                                    <div className='flex items-center'>
+                                      {/* <img src={idx.src} alt="" className="avatar avatar-md p-1 bg-light avatar-rounded me-2 !mb-0" /> */}
+                                      <div>
+                                        <p className='font-semibold mb-0'>
+                                          {activity?.activity_type ===
+                                          'create_org'
+                                            ? `${
+                                                activity.user_id.firstname &&
+                                                activity.user_id.lastname
+                                                  ? activity.user_id.firstname +
+                                                    ' ' +
+                                                    activity.user_id.lastname
+                                                  : activity.user_id.email
+                                              } created a new org. named ${
+                                                activity.org_id.name
+                                              }`
+                                            : activity?.activity_type ===
+                                              'add_user'
+                                            ? `${
+                                                activity.user_id.firstname &&
+                                                activity.user_id.lastname
+                                                  ? activity.user_id.firstname +
+                                                    ' ' +
+                                                    activity.user_id.lastname
+                                                  : activity.user_id.email
+                                              } added a new user named '${
+                                                activity.target_user_id
+                                                  .firstname &&
+                                                activity.target_user_id.lastname
+                                                  ? activity.target_user_id
+                                                      .firstname +
+                                                    ' ' +
+                                                    activity.target_user_id
+                                                      .lastname
+                                                  : activity.target_user_id
+                                                      .email
+                                              }' within the organization ${
+                                                activity.org_id.name
+                                              }`
+                                            : activity?.activity_type ===
+                                              'remove_user'
+                                            ? `${
+                                                activity.user_id.firstname &&
+                                                activity.user_id.lastname
+                                                  ? activity.user_id.firstname +
+                                                    ' ' +
+                                                    activity.user_id.lastname
+                                                  : activity.user_id.email
+                                              } removed a user named '${
+                                                activity.target_user_id
+                                                  .firstname &&
+                                                activity.target_user_id.lastname
+                                                  ? activity.target_user_id
+                                                      .firstname +
+                                                    ' ' +
+                                                    activity.target_user_id
+                                                      .lastname
+                                                  : activity.target_user_id
+                                                      .email
+                                              }' within the organization ${
+                                                activity.org_id.name
+                                              }`
+                                            : ''}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </th>
 
-</p>
-                                                            
-                                                        </div>
-                                                    </div>
-                                                </th>
-                                                
-                                                <td className='f-end'>{idx.date}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div> */}
+                                  <td className='f-end'>
+                                    {activity.activity_date.split('T')[0]}
+                                  </td>
+                                </tr>
+                              ))
+                            ) : (
+                              <div className='col-md-12 w-100 mt-4'>
+                                <p className='text-center'>No Log Found</p>{' '}
+                              </div>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
