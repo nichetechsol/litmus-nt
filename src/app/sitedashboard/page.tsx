@@ -4,7 +4,7 @@
 'use client';
 import moment from 'moment';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Pagination from 'react-js-pagination';
 import { toast, ToastContainer } from 'react-toastify';
@@ -88,6 +88,7 @@ const validationSchema = Yup.object().shape({
 const Page = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [tokenVerify, setTokenVerify] = useState(false);
+  const navigate = useRouter();
   const [licence, setLicence] = useState<licenseData[] | null>(null);
   const [orgUserData, setOrgUserData] = useState<OrgUser[]>([]);
   const [changeFlage, setChangeFlage] = useState<boolean>(false);
@@ -161,12 +162,10 @@ const Page = () => {
         const start: any = (activePage2 - 1) * perPage2; // Calculate start index
         const end: any = start + perPage2 - 1;
         if (site_id) {
-          setLoading(true);
           const data: any = await entitlementSite(site_id, start, end);
           if (data) {
             setEntitlementListData(data?.data);
             setTotalItemsCount2(data.totalCount); // Set total items count for pagination
-            setLoading(false);
           } else {
             // console.log("No organization details found.");
           }
@@ -951,14 +950,15 @@ const Page = () => {
                     <div className='box-header flex justify-between'>
                       <div className='box-title'>Products</div>
                       <div className='hs-dropdown ti-dropdown'>
-                        <Link
-                          href=''
+                        <button
+                          onClick={() => {
+                            navigate.push('/products');
+                          }}
                           className='hs-dropdown-toggle py-2  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
-                          data-hs-overlay='#todo-compose'
                         >
                           <i className='ri-add-circle-line !text-[1rem]'></i>Add
                           Product
-                        </Link>
+                        </button>
                         {/* <div
                           id='todo-compose'
                           className='hs-overlay hidden ti-modal'
@@ -1082,7 +1082,7 @@ const Page = () => {
                                       href={product.data.downloadLink}
                                       className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
                                     >
-                                      <i className='ri-download-2-line  text-[.8rem]  text-white'></i>
+                                      <i className='ri-download-line  text-[.8rem]  text-white'></i>
                                     </a>
                                   </div>
                                 </div>
@@ -1098,7 +1098,7 @@ const Page = () => {
                   <div className='box'>
                     <div className='box-header flex justify-between'>
                       <div className='box-title'>List Of Entitlement</div>
-                      <div className='hs-dropdown ti-dropdown'>
+                      {/* <div className='hs-dropdown ti-dropdown'>
                         <Link
                           aria-label='anchor'
                           href=''
@@ -1133,7 +1133,7 @@ const Page = () => {
                             </Link>
                           </li>
                         </ul>
-                      </div>
+                      </div> */}
                     </div>
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>

@@ -20063,3 +20063,6 @@ h6 {
   @apply w-[18.5rem];
   word-break: break-all;
 }
+.list-group-item.checkforactive {
+  @apply bg-light text-primary;
+}
