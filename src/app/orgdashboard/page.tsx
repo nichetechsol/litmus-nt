@@ -608,7 +608,7 @@ const OrgDashboard = () => {
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>
                         {entitlementListData &&
-                        entitlementListData.length > 0 ? (
+                          entitlementListData.length > 0 ? (
                           entitlementListData.map((entitlement) => (
                             <li className='mb-[0.9rem]' key={entitlement.id}>
                               <div className='flex items-start flex-wrap'>
@@ -919,11 +919,9 @@ const OrgDashboard = () => {
                                         {/* <img src={idx.src} alt="img"
                                     className="w-[1.75rem] h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full" /> */}
                                       </span>{' '}
-                                      {`${
-                                        user.firstname ? user.firstname : ''
-                                      } ${
-                                        user.lastname ? user.lastname : ''
-                                      }`}{' '}
+                                      {`${user.firstname ? user.firstname : ''
+                                        } ${user.lastname ? user.lastname : ''
+                                        }`}{' '}
                                     </div>
                                   </td>
 
@@ -946,7 +944,7 @@ const OrgDashboard = () => {
                                           onClick={() => {
                                             handleEdit(user);
                                           }}
-                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-primary/10 text-primary hover:bg-primary hover:text-white hover:border-primary'
+                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
                                         >
                                           <i className='ri-edit-line'></i>
                                         </div>
@@ -957,7 +955,7 @@ const OrgDashboard = () => {
                                           onClick={() => {
                                             handleDelete(user.id);
                                           }}
-                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-primary/10 text-primary hover:bg-primary hover:text-white hover:border-primary'
+                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
                                         >
                                           <i className='ri-delete-bin-line'></i>
                                         </div>

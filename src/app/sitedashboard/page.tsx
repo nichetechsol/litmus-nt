@@ -612,7 +612,7 @@ const Page = () => {
                     <div className='box-body'>
                       <div className='ms-6'>
                         {siteCountData &&
-                        siteCountData.data.sites_details[0].about_site ? (
+                          siteCountData.data.sites_details[0].about_site ? (
                           <h5 className='text-[1.25rem] text-defaulttextcolor dark:text-defaulttextcolor/70 font-medium'>
                             About Site
                           </h5>
@@ -670,8 +670,8 @@ const Page = () => {
                                 <div className='text-center p-6 w-full h-full flex items-center justify-center'>
                                   <span className='font-semibold'>
                                     {siteCountData &&
-                                    siteCountData.data.sites_details[0]
-                                      .created_at
+                                      siteCountData.data.sites_details[0]
+                                        .created_at
                                       ? 'Created:'
                                       : ''}
                                   </span>
@@ -684,8 +684,8 @@ const Page = () => {
                                     {' '}
                                     {siteCountData
                                       ? siteCountData.data.sites_details[0].created_at.split(
-                                          'T',
-                                        )[0]
+                                        'T',
+                                      )[0]
                                       : ''}
                                     {/* </span> */}
                                   </p>
@@ -835,41 +835,41 @@ const Page = () => {
                       <ul className='list-none crm-top-deals mb-0'>
                         {licence && licence.length > 0
                           ? licence.map((user, index) => (
-                              <li className='mb-[0.9rem]' key={index}>
-                                <div className='flex items-start flex-wrap'>
-                                  <div className='me-2'>
-                                    <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
-                                      <i className='ri-profile-line text-[1rem] text-white'></i>
-                                    </span>
-                                  </div>
-                                  <div className='flex-grow'>
-                                    <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                      {user.licence_number}
-                                    </p>
-                                    <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                      {user.exipry}
-                                    </p>
-                                  </div>
-                                  <div className='font-semibold text-[0.9375rem] '>
-                                    <h1>
-                                      {' '}
-                                      {moment().isAfter(user.exipry) ? (
-                                        <span className='badge bg-danger text-white'>
-                                          Expired
-                                        </span>
-                                      ) : (
-                                        <span className='badge bg-primary text-white'>
-                                          Active
-                                        </span>
-                                      )}
-                                      {/* <span className='badge bg-primary text-white'>
+                            <li className='mb-[0.9rem]' key={index}>
+                              <div className='flex items-start flex-wrap'>
+                                <div className='me-2'>
+                                  <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
+                                    <i className='ri-profile-line text-[1rem] text-white'></i>
+                                  </span>
+                                </div>
+                                <div className='flex-grow'>
+                                  <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                    {user.licence_number}
+                                  </p>
+                                  <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
+                                    {user.exipry}
+                                  </p>
+                                </div>
+                                <div className='font-semibold text-[0.9375rem] '>
+                                  <h1>
+                                    {' '}
+                                    {moment().isAfter(user.exipry) ? (
+                                      <span className='badge bg-danger text-white'>
+                                        Expired
+                                      </span>
+                                    ) : (
+                                      <span className='badge bg-primary text-white'>
+                                        Active
+                                      </span>
+                                    )}
+                                    {/* <span className='badge bg-primary text-white'>
                                         Active
                                       </span> */}
-                                    </h1>
-                                  </div>
+                                  </h1>
                                 </div>
-                              </li>
-                            ))
+                              </div>
+                            </li>
+                          ))
                           : null}
 
                         {/* <li className="mb-[0.9rem]">
@@ -1064,30 +1064,30 @@ const Page = () => {
                       <ul className='list-none crm-top-deals mb-0'>
                         {products && products.length > 0
                           ? products.map((product, index) => (
-                              <li className='mb-[0.9rem]' key={index}>
-                                <h5 className='box-title'>{product.folder}</h5>
-                                <div className='flex items-center flex-wrap'>
-                                  <div className='me-2 ic-product'>
-                                    <span className='text-[1rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
-                                      <i className='ri-folder-line text-[1rem]  text-white'></i>
-                                    </span>
-                                  </div>
-                                  <div className='flex-grow ic-product-p'>
-                                    <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                      {product.data.FileName}
-                                    </p>
-                                  </div>
-                                  <div className='font-semibold text-[0.9375rem] '>
-                                    <a
-                                      href={product.data.downloadLink}
-                                      className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
-                                    >
-                                      <i className='ri-download-line  text-[.8rem]  text-white'></i>
-                                    </a>
-                                  </div>
+                            <li className='mb-[0.9rem]' key={index}>
+                              <h5 className='box-title'>{product.folder}</h5>
+                              <div className='flex items-center flex-wrap'>
+                                <div className='me-2 ic-product'>
+                                  <span className='text-[1rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
+                                    <i className='ri-folder-line text-[1rem]  text-white'></i>
+                                  </span>
                                 </div>
-                              </li>
-                            ))
+                                <div className='flex-grow ic-product-p'>
+                                  <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                    {product.data.FileName}
+                                  </p>
+                                </div>
+                                <div className='font-semibold text-[0.9375rem] '>
+                                  <a
+                                    href={product.data.downloadLink}
+                                    className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
+                                  >
+                                    <i className='ri-download-line  text-[.8rem]  text-white'></i>
+                                  </a>
+                                </div>
+                              </div>
+                            </li>
+                          ))
                           : null}
                       </ul>
                     </div>
@@ -1138,7 +1138,7 @@ const Page = () => {
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>
                         {entitlementListData &&
-                        entitlementListData.length > 0 ? (
+                          entitlementListData.length > 0 ? (
                           entitlementListData.map((entitlement: any) => (
                             <li className='mb-[0.9rem]' key={entitlement.id}>
                               <div className='flex items-start flex-wrap'>
@@ -1219,32 +1219,32 @@ const Page = () => {
                           : null} */}
                         {solutions && solutions.length > 0
                           ? solutions.map((solution, index) => (
-                              <li className='mb-[0.9rem]' key={index}>
-                                <div className='flex items-center flex-wrap'>
-                                  <div className='me-2 ic-product'>
-                                    <span className='text-[1rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
-                                      <i className='ri-folder-line text-[1rem]  text-white'></i>
-                                    </span>
-                                  </div>
-                                  <div className='flex-grow ic-product-p'>
-                                    <h5 className='box-title items-start'>
-                                      {solution.folder}
-                                    </h5>
-                                    <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                      {solution.data.FileName}
-                                    </p>
-                                  </div>
-                                  <div className='font-semibold text-[0.9375rem] '>
-                                    <a
-                                      href={solution.data.downloadLink}
-                                      className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
-                                    >
-                                      <i className='ri-download-line  text-[.8rem]  text-white'></i>
-                                    </a>
-                                  </div>
+                            <li className='mb-[0.9rem]' key={index}>
+                              <div className='flex items-center flex-wrap'>
+                                <div className='me-2 ic-product'>
+                                  <span className='text-[1rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
+                                    <i className='ri-folder-line text-[1rem]  text-white'></i>
+                                  </span>
                                 </div>
-                              </li>
-                            ))
+                                <div className='flex-grow ic-product-p'>
+                                  <h5 className='box-title items-start'>
+                                    {solution.folder}
+                                  </h5>
+                                  <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                    {solution.data.FileName}
+                                  </p>
+                                </div>
+                                <div className='font-semibold text-[0.9375rem] '>
+                                  <a
+                                    href={solution.data.downloadLink}
+                                    className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
+                                  >
+                                    <i className='ri-download-line  text-[.8rem]  text-white'></i>
+                                  </a>
+                                </div>
+                              </div>
+                            </li>
+                          ))
                           : null}
                       </ul>
                     </div>
@@ -1472,51 +1472,49 @@ const Page = () => {
                             {/* {Dealsstatistics.map((idx) => ( */}
                             {orgUserData && orgUserData.length > 0
                               ? orgUserData.map((user, index) => (
-                                  <tr
-                                    className='border border-inherit border-solid hover:bg-gray-100 dark:border-defaultborder/10 dark:hover:bg-light'
-                                    key={index}
-                                  >
-                                    <td>
-                                      <div className='flex items-center font-semibold'>
-                                        {/* <span className='!me-2 inline-flex justify-center items-center'>
+                                <tr
+                                  className='border border-inherit border-solid hover:bg-gray-100 dark:border-defaultborder/10 dark:hover:bg-light'
+                                  key={index}
+                                >
+                                  <td>
+                                    <div className='flex items-center font-semibold'>
+                                      {/* <span className='!me-2 inline-flex justify-center items-center'>
                                         <img
                                           src={user.src}
                                           alt='img'
                                           className='w-[1.75rem] h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full'
                                         />
                                       </span> */}
-                                        {`${
-                                          user.firstname ? user.firstname : ''
-                                        } ${
-                                          user.lastname ? user.lastname : ''
+                                      {`${user.firstname ? user.firstname : ''
+                                        } ${user.lastname ? user.lastname : ''
                                         }`}{' '}
-                                      </div>
-                                    </td>
+                                    </div>
+                                  </td>
 
-                                    <td>{user.email}</td>
-                                    <td>
-                                      <span
-                                      // className={`inline-flex text-${user.color} !py-[0.15rem] !px-[0.45rem] rounded-sm !font-semibold !text-[0.75em] bg-${user.color}/10`}
+                                  <td>{user.email}</td>
+                                  <td>
+                                    <span
+                                    // className={`inline-flex text-${user.color} !py-[0.15rem] !px-[0.45rem] rounded-sm !font-semibold !text-[0.75em] bg-${user.color}/10`}
+                                    >
+                                      {user.role_name}
+                                    </span>
+                                  </td>
+
+                                  <td>
+                                    <div className='flex flex-row items-center !gap-2 text-[0.9375rem]'>
+                                      <Link
+                                        aria-label='anchor'
+                                        href=''
+                                        style={{ cursor: 'pointer' }}
+                                        data-hs-overlay='#todo-compose-user'
+                                        onClick={() => {
+                                          handleEdit(user);
+                                        }}
+                                        className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
                                       >
-                                        {user.role_name}
-                                      </span>
-                                    </td>
-
-                                    <td>
-                                      <div className='flex flex-row items-center !gap-2 text-[0.9375rem]'>
-                                        <Link
-                                          aria-label='anchor'
-                                          href=''
-                                          style={{ cursor: 'pointer' }}
-                                          data-hs-overlay='#todo-compose-user'
-                                          onClick={() => {
-                                            handleEdit(user);
-                                          }}
-                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
-                                        >
-                                          <i className='ri-user-follow-line'></i>
-                                        </Link>
-                                        {/* <Link
+                                        <i className='ri-edit-line'></i>
+                                      </Link>
+                                      {/* <Link
                                         aria-label='anchor'
                                         href=''
                                         
@@ -1524,20 +1522,20 @@ const Page = () => {
                                       >
                                         <i className='ri-user-unfollow-line'></i>
                                       </Link> */}
-                                        <div
-                                          style={{ cursor: 'pointer' }}
-                                          aria-label='anchor'
-                                          onClick={() => {
-                                            handleDelete(user.user_id);
-                                          }}
-                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-primary/10 text-primary hover:bg-primary hover:text-white hover:border-primary'
-                                        >
-                                          <i className='ri-delete-bin-line'></i>
-                                        </div>
+                                      <div
+                                        style={{ cursor: 'pointer' }}
+                                        aria-label='anchor'
+                                        onClick={() => {
+                                          handleDelete(user.user_id);
+                                        }}
+                                        className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
+                                      >
+                                        <i className='ri-delete-bin-line'></i>
                                       </div>
-                                    </td>
-                                  </tr>
-                                ))
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))
                               : null}
                             <Pagination
                               activePage={activePage}
