@@ -608,7 +608,7 @@ const OrgDashboard = () => {
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>
                         {entitlementListData &&
-                          entitlementListData.length > 0 ? (
+                        entitlementListData.length > 0 ? (
                           entitlementListData.map((entitlement) => (
                             <li className='mb-[0.9rem]' key={entitlement.id}>
                               <div className='flex items-start flex-wrap'>
@@ -919,9 +919,11 @@ const OrgDashboard = () => {
                                         {/* <img src={idx.src} alt="img"
                                     className="w-[1.75rem] h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full" /> */}
                                       </span>{' '}
-                                      {`${user.firstname ? user.firstname : ''
-                                        } ${user.lastname ? user.lastname : ''
-                                        }`}{' '}
+                                      {`${
+                                        user.firstname ? user.firstname : ''
+                                      } ${
+                                        user.lastname ? user.lastname : ''
+                                      }`}{' '}
                                     </div>
                                   </td>
 
