@@ -692,12 +692,12 @@ const LoginForm = () => {
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      Message
+                                      Description
                                     </label>
                                     <textarea
                                       className='form-control w-full'
                                       id='task-name'
-                                      placeholder='Enter Message'
+                                      placeholder='Enter Description'
                                       onChange={handleMessageChange}
                                       onKeyDown={handleKeyPress}
                                       value={message}
