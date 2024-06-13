@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { logActivity } from '@/supabase/activity';
@@ -18,6 +19,7 @@ interface SiteData {
   country_id: any;
   state_id: any;
   user_id: any;
+  description: any;
 }
 
 interface UpdateSiteData {
@@ -107,13 +109,14 @@ interface Result<T> {
 async function addSites(data: SiteData): Promise<Result<any>> {
   try {
     // Check for duplicate site names in the organization
-    const { data: existingSite, error: duplicateCheckError } = await supabase
+    const { data: existingSite, error } = await supabase
       .from('sites_detail')
       .select('*')
       .eq('org_id', data.org_id)
-      .eq('name', data.name); // Assuming a single record is expected
-    // If a duplicate is found, return an error
-    if (existingSite) {
+      .eq('name', data.name); // Assuming a single record is expected or handle appropriately
+
+    // Handle the case where no duplicate is found
+    if (existingSite && existingSite.length > 0) {
       return {
         errorCode: 1,
         message: 'Duplicate site name',
@@ -121,9 +124,9 @@ async function addSites(data: SiteData): Promise<Result<any>> {
       };
     }
 
-    // Check for errors during the duplicate check
-    if (duplicateCheckError && duplicateCheckError.code !== 'PGRST116') {
-      // PGRST116: No rows found
+    // Handle the case where no rows are found (PGRST116 error)
+    if (error) {
+      // Handle other errors during duplicate check
       return {
         errorCode: 1,
         message: 'Error checking for duplicate site name',
@@ -134,7 +137,21 @@ async function addSites(data: SiteData): Promise<Result<any>> {
     // Insert new site details if no duplicate is found
     const { data: siteDetails, error: insertError } = await supabase
       .from('sites_detail')
-      .insert([data])
+      .insert([
+        {
+          org_id: data.org_id,
+          name: data.name,
+          type_id: data.type_id,
+          address1: data.address1,
+          address2: data.address2,
+          city: data.city,
+          pin_code: data.pin_code,
+          about_site: data.about_site,
+          status: data.status,
+          country_id: data.country_id,
+          state_id: data.state_id,
+        },
+      ])
       .select();
 
     // Check for errors during the insert operation
@@ -145,6 +162,24 @@ async function addSites(data: SiteData): Promise<Result<any>> {
         data: null,
       };
     } else {
+      const { data: userInsertData, error: userInsertError } = await supabase
+        .from('site_users')
+        .insert([
+          {
+            user_id: data.user_id,
+            role_id: 1,
+            site_id: siteDetails[0].id,
+          },
+        ])
+        .select();
+
+      if (userInsertError) {
+        return {
+          errorCode: 1,
+          message: 'User not added successfully',
+          data: null,
+        };
+      }
       await logActivity({
         org_id: data.org_id,
         site_id: siteDetails[0].id,
@@ -159,6 +194,7 @@ async function addSites(data: SiteData): Promise<Result<any>> {
       };
     }
   } catch (error) {
+    console.error('Error adding site:', error);
     return {
       errorCode: 1,
       message: 'Unexpected error',
@@ -166,6 +202,7 @@ async function addSites(data: SiteData): Promise<Result<any>> {
     };
   }
 }
+
 // async function addSites(data: SiteData): Promise<Result<any>> {
 //   try {
 //     // Check for duplicate site name
