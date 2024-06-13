@@ -1208,10 +1208,11 @@ const OrgDashboard = () => {
                               )
                             ) : (
                               <>
-                                <div className='col-md-12 w-100 mt-4'>
-                                  <p className='text-center'>No Log Found</p>{' '}
-                                </div>
-                                <></>
+                                <tr>
+                                  <div className='col-md-12 w-100 mt-4'>
+                                    <p className='text-center'>No Log Found</p>{' '}
+                                  </div>
+                                </tr>
                               </>
                             )}
                           </tbody>

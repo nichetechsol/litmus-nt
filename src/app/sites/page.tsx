@@ -273,7 +273,7 @@ const Page: React.FC = () => {
   });
   /////
   const handelAddSiteName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const NewSiteName = e.target.value.trim();
+    const NewSiteName = e.target.value.trimStart();
     setAddSiteName(NewSiteName);
     SiteNameSchema.validate(NewSiteName)
       .then(() => {
