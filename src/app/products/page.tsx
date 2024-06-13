@@ -4,6 +4,7 @@
 
 import { redirect } from 'next/navigation';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
+import swal from 'sweetalert';
 
 import { decryptData } from '@/helper/Encryption_Decryption';
 import { allCurrentfiles } from '@/supabase/products';
@@ -50,6 +51,10 @@ const Page = () => {
     if (decrytedOrgTypeId) {
       setOrg_type_id(decrytedOrgTypeId);
     }
+    if (!decryptedSiteId) {
+      swal('Please select a Site or Organization', { icon: 'error' });
+      redirect('/organization');
+    }
   }, []);
 
   // const [currentfiles, setCurrentfiles] = useState<any>('');
@@ -70,6 +75,9 @@ const Page = () => {
           // }
           setLoading(false);
         }
+        // else{
+        //   setLoading(false)
+        // }
       } catch (error: any) {
         setLoading(false);
       }

@@ -837,8 +837,11 @@ const Page = () => {
                             <li className='mb-[0.9rem]' key={index}>
                               <div className='flex items-start flex-wrap'>
                                 <div className='me-2'>
-                                  <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
+                                  {/* <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
                                     <i className='ri-profile-line text-[1rem] text-white'></i>
+                                  </span> */}
+                                  <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
+                                    <i className='ri-profile-line text-[1rem]  text-white'></i>
                                   </span>
                                 </div>
                                 <div className='flex-grow'>
@@ -1090,9 +1093,12 @@ const Page = () => {
                               <h5 className='box-title'>{product.folder}</h5>
                               <div className='flex items-center flex-wrap'>
                                 <div className='me-2 ic-product'>
-                                  <span className='text-[1rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
+                                  <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
                                     <i className='ri-folder-line text-[1rem]  text-white'></i>
                                   </span>
+                                  {/* <span className='text-[1rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
+                                    <i className='ri-folder-line text-[1rem]  text-white'></i>
+                                  </span> */}
                                 </div>
                                 <div className='flex-grow ic-product-p'>
                                   <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
@@ -1254,9 +1260,12 @@ const Page = () => {
                               </h5>
                               <div className='flex items-center flex-wrap'>
                                 <div className='me-2 ic-product'>
-                                  <span className='text-[1rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
+                                  <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
                                     <i className='ri-folder-line text-[1rem]  text-white'></i>
                                   </span>
+                                  {/* <span className='text-[1rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
+                                    <i className='ri-folder-line text-[1rem]  text-white'></i>
+                                  </span> */}
                                 </div>
 
                                 <div className='flex-grow ic-product-p'>
@@ -1585,17 +1594,21 @@ const Page = () => {
                               </div>
                             )}
                             {orgUserData && orgUserData.length > 0 && (
-                              <Pagination
-                                activePage={activePage}
-                                itemsCountPerPage={perPage}
-                                totalItemsCount={totalItemsCount}
-                                pageRangeDisplayed={5} // Adjust as needed
-                                onChange={(
-                                  page: React.SetStateAction<number>,
-                                ) => setActivePage(page)}
-                                itemClass='page-item'
-                                linkClass='page-link'
-                              />
+                              <tr>
+                                <td colSpan={5}>
+                                  <Pagination
+                                    activePage={activePage}
+                                    itemsCountPerPage={perPage}
+                                    totalItemsCount={totalItemsCount}
+                                    pageRangeDisplayed={5} // Adjust as needed
+                                    onChange={(
+                                      page: React.SetStateAction<number>,
+                                    ) => setActivePage(page)}
+                                    itemClass='page-item'
+                                    linkClass='page-link'
+                                  />
+                                </td>
+                              </tr>
                             )}
                           </tbody>
                         </table>
@@ -1693,121 +1706,144 @@ const Page = () => {
                         <table className='table table-hover whitespace-nowrap min-w-full'>
                           <tbody>
                             {activity_log && activity_log.length > 0 ? (
-                              activity_log.map((activity, index) => (
-                                <tr
-                                  className='border hover:bg-gray-100 dark:hover:bg-light dark:border-defaultborder/10 border-defaultborder !border-x-0'
-                                  key={index}
-                                >
-                                  <th scope='col'>
-                                    <div className='flex items-center'>
-                                      {/* <img
-                                      src={idx.src}
-                                      alt=''
-                                      className='avatar avatar-md p-1 bg-light avatar-rounded me-2 !mb-0'
-                                    /> */}
-                                      <div>
-                                        <p className='font-semibold mb-0'>
-                                          {activity?.activity_type ===
-                                          'create_site'
-                                            ? `${
-                                                activity.user_id.firstname &&
-                                                activity.user_id.lastname
-                                                  ? activity.user_id.firstname +
-                                                    ' ' +
+                              activity_log.map(
+                                (activity, index) =>
+                                  (activity?.activity_type === 'create_site' ||
+                                    activity?.activity_type === 'add_user' ||
+                                    activity?.activity_type === 'remove_user' ||
+                                    activity?.activity_type === 'add_licence' ||
+                                    activity?.activity_type ===
+                                      'download_file') && (
+                                    <tr
+                                      className='border hover:bg-gray-100 dark:hover:bg-light dark:border-defaultborder/10 border-defaultborder !border-x-0'
+                                      key={index}
+                                    >
+                                      <th scope='col'>
+                                        <div className='flex items-center'>
+                                          <div>
+                                            <p className='font-semibold mb-0'>
+                                              {activity?.activity_type ===
+                                              'create_site'
+                                                ? `${
+                                                    activity.user_id
+                                                      .firstname &&
                                                     activity.user_id.lastname
-                                                  : activity.user_id.email
-                                              } created a new site named ${
-                                                activity.site_id.name
-                                              } within the organization '${
-                                                activity.org_id.name
-                                              }'`
-                                            : activity?.activity_type ===
-                                              'add_user'
-                                            ? `${
-                                                activity.user_id.firstname &&
-                                                activity.user_id.lastname
-                                                  ? activity.user_id.firstname +
-                                                    ' ' +
+                                                      ? activity.user_id
+                                                          .firstname +
+                                                        ' ' +
+                                                        activity.user_id
+                                                          .lastname
+                                                      : activity.user_id.email
+                                                  } created a new site named ${
+                                                    activity.site_id.name
+                                                  } within the organization '${
+                                                    activity.org_id.name
+                                                  }'`
+                                                : activity?.activity_type ===
+                                                  'add_user'
+                                                ? `${
+                                                    activity.user_id
+                                                      .firstname &&
                                                     activity.user_id.lastname
-                                                  : activity.user_id.email
-                                              } added a new user named '${
-                                                activity.target_user_id
-                                                  .firstname &&
-                                                activity.target_user_id.lastname
-                                                  ? activity.target_user_id
-                                                      .firstname +
-                                                    ' ' +
+                                                      ? activity.user_id
+                                                          .firstname +
+                                                        ' ' +
+                                                        activity.user_id
+                                                          .lastname
+                                                      : activity.user_id.email
+                                                  } added a new user named '${
+                                                    activity.target_user_id
+                                                      .firstname &&
                                                     activity.target_user_id
                                                       .lastname
-                                                  : activity.target_user_id
-                                                      .email
-                                              }' within the site '${
-                                                activity.site_id.name
-                                              }'`
-                                            : activity?.activity_type ===
-                                              'remove_user'
-                                            ? `${
-                                                activity.user_id.firstname &&
-                                                activity.user_id.lastname
-                                                  ? activity.user_id.firstname +
-                                                    ' ' +
+                                                      ? activity.target_user_id
+                                                          .firstname +
+                                                        ' ' +
+                                                        activity.target_user_id
+                                                          .lastname
+                                                      : activity.target_user_id
+                                                          .email
+                                                  }' within the site '${
+                                                    activity.site_id.name
+                                                  }'`
+                                                : activity?.activity_type ===
+                                                  'remove_user'
+                                                ? `${
+                                                    activity.user_id
+                                                      .firstname &&
                                                     activity.user_id.lastname
-                                                  : activity.user_id.email
-                                              } removed a user named '${
-                                                activity.target_user_id
-                                                  .firstname &&
-                                                activity.target_user_id.lastname
-                                                  ? activity.target_user_id
-                                                      .firstname +
-                                                    ' ' +
+                                                      ? activity.user_id
+                                                          .firstname +
+                                                        ' ' +
+                                                        activity.user_id
+                                                          .lastname
+                                                      : activity.user_id.email
+                                                  } removed a user named '${
+                                                    activity.target_user_id
+                                                      .firstname &&
                                                     activity.target_user_id
                                                       .lastname
-                                                  : activity.target_user_id
-                                                      .email
-                                              }' within the site '${
-                                                activity.site_id.name
-                                              }'`
-                                            : activity?.activity_type ===
-                                              'add_licence'
-                                            ? `${
-                                                activity.user_id.firstname &&
-                                                activity.user_id.lastname
-                                                  ? activity.user_id.firstname +
-                                                    ' ' +
+                                                      ? activity.target_user_id
+                                                          .firstname +
+                                                        ' ' +
+                                                        activity.target_user_id
+                                                          .lastname
+                                                      : activity.target_user_id
+                                                          .email
+                                                  }' within the site '${
+                                                    activity.site_id.name
+                                                  }'`
+                                                : activity?.activity_type ===
+                                                  'add_licence'
+                                                ? `${
+                                                    activity.user_id
+                                                      .firstname &&
                                                     activity.user_id.lastname
-                                                  : activity.user_id.email
-                                              } added a new license within the organization ${
-                                                activity.org_id.name
-                                              }`
-                                            : activity?.activity_type ===
-                                              'download_file'
-                                            ? `${
-                                                activity.user_id.firstname &&
-                                                activity.user_id.lastname
-                                                  ? activity.user_id.firstname +
-                                                    ' ' +
+                                                      ? activity.user_id
+                                                          .firstname +
+                                                        ' ' +
+                                                        activity.user_id
+                                                          .lastname
+                                                      : activity.user_id.email
+                                                  } added a new license within the organization ${
+                                                    activity.org_id.name
+                                                  }`
+                                                : activity?.activity_type ===
+                                                  'download_file'
+                                                ? `${
+                                                    activity.user_id
+                                                      .firstname &&
                                                     activity.user_id.lastname
-                                                  : activity.user_id.email
-                                              }  downloaded a file named '${
-                                                activity.details.filename
-                                              }' within the site ${
-                                                activity.org_id.name
-                                              }`
-                                            : ''}
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </th>
+                                                      ? activity.user_id
+                                                          .firstname +
+                                                        ' ' +
+                                                        activity.user_id
+                                                          .lastname
+                                                      : activity.user_id.email
+                                                  }  downloaded a file named '${
+                                                    activity.details.filename
+                                                  }' within the site ${
+                                                    activity.org_id.name
+                                                  }`
+                                                : ''}
+                                            </p>
+                                          </div>
+                                        </div>
+                                      </th>
 
-                                  <td className='f-end'>
-                                    {activity.activity_date.split('T')[0]}
-                                  </td>
-                                </tr>
-                              ))
+                                      <td className='f-end'>
+                                        {activity.activity_date.split('T')[0]}
+                                      </td>
+                                    </tr>
+                                  ),
+                              )
                             ) : (
-                              <div className='col-md-12 w-100 mt-4'>
-                                <p className='text-center'>No Log Found</p>{' '}
-                              </div>
+                              <>
+                                <div className='col-md-12 w-100 mt-4'>
+                                  <p className='text-center'>No Data Found</p>{' '}
+                                </div>
+                                <></>
+                              </>
                             )}
                           </tbody>
                         </table>
