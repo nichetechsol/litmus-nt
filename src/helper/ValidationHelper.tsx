@@ -7,7 +7,7 @@ const OrganizationNameSchema = Yup.string()
   )
   .min(2, 'The organization name should be at least two characters long.')
   .max(100, 'The organization name should not exceed 100 characters.');
-// .matches(/^[a-zA-Z0-9\s\-_.,]+$/, 'Please enter a valid organization name.');
+// .matches(/^[a-zA-Z0-9\s\-_.,]+$/, "Please enter a valid organization name.");
 
 const DomainSchema = Yup.string()
   .required('Domain is required. Please enter a domain.')
@@ -41,8 +41,10 @@ const MessageSchema = Yup.string()
   // .min(1, 'It must be at least 1 character long.')
   .max(1000, 'It must be at most 1000 characters long.');
 const emailSchema = Yup.string()
-  .email('Invalid email address format. Please enter a valid email address.')
   .required('Email address is required. Please enter your email address.')
+  .min(5, 'Email address must be at least 5 characters long.')
+  .max(320, 'It must be at most 320 characters long.')
+  .email('Invalid email address format. Please enter a valid email address.')
   .matches(
     /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|co.in|in)$/,
     // /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
@@ -50,10 +52,16 @@ const emailSchema = Yup.string()
   );
 
 const nameSchema = Yup.string()
-  .required('Please enter your name.')
+  .required('Please enter your First name.')
   .min(2, 'Name must be at least two characters long.')
   .max(255, 'Name must be at most 255 characters long.')
-  .matches(/^[a-zA-Z]+$/, 'Please enter a valid name.');
+  .matches(/^[a-zA-Z]+$/, 'Please enter a valid First name.');
+
+const nameSchema2 = Yup.string()
+  .required('Please enter your Last Name.')
+  .min(2, 'Name must be at least two characters long.')
+  .max(255, 'Name must be at most 255 characters long.')
+  .matches(/^[a-zA-Z]+$/, 'Please enter a valid Last name.');
 
 const roleSchema = Yup.string().required(
   'Please select a role from the dropdown menu.',
@@ -68,10 +76,10 @@ const passwordSchema = Yup.string().required(
 
 /////////////////////////////////////////////
 const SiteNameSchema = Yup.string()
-  .required('Site name is required. Please enter a Site name.')
+  .required('Site name is required. Please enter a site name.')
   .min(3, 'The Site name should be at least three characters long.')
   .max(50, 'The Site name should not exceed 50 characters.')
-  .matches(/^[a-zA-Z0-9\s\-_.]+$/, 'Please enter a valid Site name.');
+  .matches(/^[a-zA-Z0-9\s\-_.]+$/, 'Please enter a valid site name.');
 
 const SiteAddressSchema = Yup.string()
   .required('Please enter your address.')
@@ -89,13 +97,14 @@ const SiteCitySchema = Yup.string()
   .min(1, 'The city should be atleast one characters long.')
   .max(100, 'The city should not exceed 100 characters.')
   // .matches(/^[a-zA-Z0-9\s\-]+$/, 'Please enter a valid address name.');
-  .matches(/^[a-zA-Z\s\-_.]+$/, 'Please enter a valid address name.');
+  .matches(/^[a-zA-Z\s-]+$/, 'Please enter a valid city.');
 
 const PincodeSchema = Yup.string()
   .required('Please enter your zip code.')
   .min(5, 'The pincode should be at least five characters long')
-  .max(6, 'The pincode should not exceed six characters')
-  .matches(/^[0-9]+$/, 'The pincode should contain only numeric characters');
+  .max(10, 'The pincode should not exceed ten characters')
+  .matches(/^[0-9]+$/, 'Please enter a valid zip code.');
+
 const SiteTypeDropdownSchema = Yup.string()
   .required('Please select a type from the dropdown menu.')
   .test('is-number', 'Please select a type from the dropdown menu', (value) => {
@@ -111,14 +120,10 @@ const SiteTypeDropdownSchema = Yup.string()
   );
 
 const SiteCountryDropdownSchema = Yup.string()
-  .required('Please select a Country from the dropdown menu.')
-  .test(
-    'is-number',
-    'Please select a Country from the dropdown menu',
-    (value) => {
-      return !isNaN(parseInt(value, 10));
-    },
-  )
+  .required(' Please select your country.')
+  .test('is-number', 'Please select a valid country.', (value) => {
+    return !isNaN(parseInt(value, 10));
+  })
   .test(
     'is-positive',
     'Please select a valid Country from the dropdown menu.',
@@ -129,14 +134,10 @@ const SiteCountryDropdownSchema = Yup.string()
   );
 
 const SiteStateDropdownSchema = Yup.string()
-  .required('Please select a State from the dropdown menu.')
-  .test(
-    'is-number',
-    'Please select a State from the dropdown menu',
-    (value) => {
-      return !isNaN(parseInt(value, 10));
-    },
-  )
+  .required('Please select your state.')
+  .test('is-number', 'Please select a valid state.', (value) => {
+    return !isNaN(parseInt(value, 10));
+  })
   .test(
     'is-positive',
     'Please select a valid State from the dropdown menu.',
@@ -150,6 +151,7 @@ export {
   emailSchema,
   MessageSchema,
   nameSchema,
+  nameSchema2,
   OrganizationNameSchema,
   passwordSchema,
   roleSchema,

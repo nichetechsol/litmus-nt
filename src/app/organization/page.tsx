@@ -377,7 +377,7 @@ const LoginForm = () => {
         } else {
           setLoading(false);
           if (result.errorCode === 1) {
-            swal('It exists in Organization!', { icon: 'error' });
+            swal('The organization name already exists.', { icon: 'error' });
           }
         }
         if (closeModalButtonRef.current) {

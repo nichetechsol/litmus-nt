@@ -13,7 +13,12 @@ import * as Yup from 'yup';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { decryptData } from '@/helper/Encryption_Decryption';
-import { emailSchema, nameSchema, roleSchema } from '@/helper/ValidationHelper';
+import {
+  emailSchema,
+  nameSchema,
+  nameSchema2,
+  roleSchema,
+} from '@/helper/ValidationHelper';
 import { getActivitiesByOrgId } from '@/supabase/activity';
 import {
   orgDashboardCounts,
@@ -71,7 +76,7 @@ interface activitylogs {
 const validationSchema = Yup.object().shape({
   email: emailSchema,
   firstName: nameSchema,
-  lastName: nameSchema,
+  lastName: nameSchema2,
   role: roleSchema,
 });
 const OrgDashboard = () => {
@@ -328,7 +333,7 @@ const OrgDashboard = () => {
     const newLastName = e.target.value.trim().replace(/[^a-zA-Z]/g, '');
     setLastName(newLastName);
 
-    nameSchema
+    nameSchema2
       .validate(newLastName)
       .then(() => setLastNameError(''))
       .catch((err: Yup.ValidationError) => setLastNameError(err.message));

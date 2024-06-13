@@ -367,7 +367,6 @@ const Page: React.FC = () => {
         // console.error("Error fetching stateList:", error.message);
       }
     };
-
     AddstateDropdown();
   }, [SelectedValueCounrty]);
   const handelchangeState = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -854,7 +853,8 @@ const Page: React.FC = () => {
                                       placeholder='Enter Zip Code'
                                       onChange={handelAddSitePincode}
                                       value={Pincode}
-                                      maxLength={6}
+                                      minLength={5}
+                                      maxLength={10}
                                     />
                                     {PincodeError && (
                                       <div className='text-danger'>
