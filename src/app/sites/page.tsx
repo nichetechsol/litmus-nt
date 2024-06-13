@@ -672,7 +672,7 @@ const Page: React.FC = () => {
                                       placeholder='Enter Site Name'
                                       onChange={handelAddSiteName}
                                       value={AddSiteName}
-                                      maxLength={50}
+                                      maxLength={256}
                                     />
                                     {AddSiteNameError && (
                                       <div className='text-danger'>

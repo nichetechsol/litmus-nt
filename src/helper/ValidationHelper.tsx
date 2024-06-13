@@ -6,7 +6,7 @@ const OrganizationNameSchema = Yup.string()
     'Organization name is required. Please enter your organization name.',
   )
   .min(2, 'The organization name should be at least two characters long.')
-  .max(100, 'The organization name should not exceed 100 characters.');
+  .max(256, 'The organization name should not exceed 256 characters.');
 // .matches(/^[a-zA-Z0-9\s\-_.,]+$/, "Please enter a valid organization name.");
 
 const DomainSchema = Yup.string()
@@ -78,7 +78,7 @@ const passwordSchema = Yup.string().required(
 const SiteNameSchema = Yup.string()
   .required('Site name is required. Please enter a site name.')
   .min(3, 'The Site name should be at least three characters long.')
-  .max(50, 'The Site name should not exceed 50 characters.')
+  .max(256, 'The Site name should not exceed 256 characters.')
   .matches(/^[a-zA-Z0-9\s\-_.]+$/, 'Please enter a valid site name.');
 
 const SiteAddressSchema = Yup.string()

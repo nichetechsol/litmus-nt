@@ -692,6 +692,14 @@ const OrgDashboard = () => {
                             </div>
                           </li>
                         ))}
+                        {locationOfSites && locationOfSites.length == 0 && (
+                          <>
+                            <div className='col-md-12 w-100 mt-4'>
+                              <p className='text-center'>No Location Found</p>{' '}
+                            </div>
+                            <></>
+                          </>
+                        )}
                       </ul>
                     </div>
                     {/* </div> */}
@@ -1098,9 +1106,9 @@ const OrgDashboard = () => {
                                                         activity.user_id
                                                           .lastname
                                                       : activity.user_id.email
-                                                  } created a new org. named ${
+                                                  } created a new org. named '${
                                                     activity.org_id.name
-                                                  }`
+                                                  }'`
                                                 : activity?.activity_type ===
                                                   'add_user'
                                                 ? `${

@@ -564,7 +564,7 @@ const LoginForm = () => {
                                       onChange={handleorganizationNameChange}
                                       onKeyDown={handleKeyPress}
                                       value={organizationName}
-                                      maxLength={100}
+                                      maxLength={256}
                                     />
                                     {organizationNameError && (
                                       <div className='text-danger'>
