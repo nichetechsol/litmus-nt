@@ -27,7 +27,7 @@ const DomainSchema = Yup.string()
       if (!value) return true; // If the value is empty, don't perform validation
       const domains = value.split(',').map((domain) => domain.trim());
       const domainRegex =
-        /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+)*$/;
+        /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,250}[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+)*$/;
       return domains.every((domain) => domainRegex.test(domain));
     },
   );

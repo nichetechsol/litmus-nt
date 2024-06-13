@@ -648,7 +648,7 @@ const OrgDashboard = () => {
                           ))
                         ) : (
                           <div className='col-md-12 w-100 mt-4'>
-                            <p className='text-center'>No Data Found</p>{' '}
+                            <p className='text-center'>No Entitlement Found</p>{' '}
                           </div>
                         )}
                         {entitlementListData &&
