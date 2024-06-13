@@ -15002,7 +15002,7 @@ input.gridjs-input {
   @apply cursor-not-allowed opacity-[0.65];
 }
 .ti-btn.ti-btn-sm {
-  @apply w-[1.75rem] h-[1.75rem] text-[0.8rem];
+  @apply w-[1.75rem] h-[1.80rem] text-[0.8rem];
 }
 .ti-btn.ti-btn-lg {
   @apply py-[0.65rem] px-4 text-[0.95rem] rounded-md;
@@ -15012,7 +15012,7 @@ input.gridjs-input {
   @apply min-w-[5.625rem];
 }
 .ti-btn.ti-btn-w-sm {
-  @apply min-w-[6.975rem];
+  @apply min-w-[9.975rem];
 }
 .ti-btn.ti-btn-w-md {
   @apply min-w-[8.125rem];
@@ -20065,4 +20065,8 @@ h6 {
 }
 .list-group-item.checkforactive {
   @apply bg-light text-primary;
+}
+
+.box-title{
+  word-break: break-all;
 }

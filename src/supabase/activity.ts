@@ -76,6 +76,7 @@ const getActivitiesByOrgId = async (orgId: number): Promise<any> => {
       .select(
         `
         activity_type,
+        activity_date,
         details,
         org_id (
           name
@@ -87,10 +88,14 @@ const getActivitiesByOrgId = async (orgId: number): Promise<any> => {
           name
         ),
         user_id (
-          email
+          email,
+          firstname,
+          lastname
         ),
         target_user_id (
-          email
+          email,
+          firstname,
+          lastname
         )
       `,
       )
@@ -114,6 +119,7 @@ const getActivitiesBySiteID = async (siteID: number): Promise<any> => {
       .select(
         `
         activity_type,
+        activity_date,
         details,
         org_id (
           name
@@ -121,17 +127,18 @@ const getActivitiesBySiteID = async (siteID: number): Promise<any> => {
         site_id (
           name
         ),
-        site_details (
-          name
-        ),
         target_user_role (
           name
         ),
         user_id (
-          email
+          email,
+          firstname,
+          lastname
         ),
         target_user_id (
-          email
+          email,
+          firstname,
+          lastname
         )
       `,
       )

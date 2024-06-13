@@ -7,6 +7,7 @@ import React, { useEffect, useLayoutEffect, useState } from 'react';
 
 import { decryptData } from '@/helper/Encryption_Decryption';
 import { allCurrentfiles } from '@/supabase/products';
+import { refreshToken } from '@/supabase/session';
 import Loader from '@/utils/Loader/Loader';
 
 const Page = () => {
@@ -59,6 +60,7 @@ const Page = () => {
         setLoading(true);
         if (site_id && org_id && org_type_id) {
           const data: any = await allCurrentfiles(site_id, org_id, org_type_id);
+          await refreshToken();
           if (data.data.length >= 0) {
             setFolder(data.data);
           }
@@ -112,6 +114,7 @@ const Page = () => {
                         ? folder.map((folder: any) => (
                             <>
                               <li
+                                style={{ cursor: 'pointer' }}
                                 key={folder.folder}
                                 className={`list-group-item ${
                                   selectedFolder === folder

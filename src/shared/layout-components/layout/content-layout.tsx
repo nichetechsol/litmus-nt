@@ -4,6 +4,7 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 
 import store from '@/shared/redux/store';
+import { refreshToken } from '@/supabase/session';
 
 import Footer from '../footer/footer';
 import Header from '../header/header';
@@ -25,7 +26,16 @@ const ContentLayout = ({ children }: any) => {
   useEffect(() => {
     import('preline');
   }, []);
-
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await refreshToken();
+      } catch (error: any) {
+        // console.error("Error fetching organization details:", error.message);
+      }
+    };
+    fetchData();
+  }, []);
   const Bodyclickk = () => {
     if (window.innerWidth > 992) {
       const html = document.documentElement;

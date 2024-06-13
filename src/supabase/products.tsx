@@ -131,6 +131,8 @@ async function listLitmusProducts(site_id: any) {
 }
 
 async function allCurrentfiles(site_id: any, org_id: any, org_type_id: any) {
+  let fileTypes = []; // Declare fileTypes variable
+
   // Fetch entitlements package based on site_id
   if (!site_id || !org_id || !org_type_id) {
     return {
@@ -161,6 +163,59 @@ async function allCurrentfiles(site_id: any, org_id: any, org_type_id: any) {
     (entitlement) => entitlement.entitlement_name_id === 15,
   );
 
+  // If org_type_id is 1 and entitlement_name_id is not 14, return an error
+  if (org_type_id === 1 && !entitlement14) {
+    return {
+      errorCode: 3,
+      message: 'Entitlement 14 is required for org_type_id 1',
+      data: null,
+    };
+  } else {
+    // Find the entitlement with entitlement_name_id === 14
+    const entitlementValue = entitlements_package.find(
+      (entitlement) => entitlement.entitlement_name_id === 14,
+    );
+
+    // Get the entitlement_value_id if it exists, otherwise set to null
+    const entitlement_value_id_14 = entitlementValue
+      ? entitlementValue.entitlement_value_id
+      : null;
+
+    // Fetch the entitlements values from the Supabase table based on the entitlement_value_id_14
+    const { data: entitlements_values, error } = await supabase
+      .from('entitlements_values')
+      .select('*')
+      .eq('id', entitlement_value_id_14);
+
+    // If there is an error in fetching, log it or handle it accordingly
+    if (error) {
+      // Handle the error as needed, possibly return or throw
+    }
+
+    // Extract the value_text from the fetched data, ensure entitlements_values is not null
+    const values = entitlements_values
+      ? entitlements_values[0]?.value_text
+      : null;
+
+    const {
+      data: filedownload_permissions,
+      error: filedownload_permissions_error,
+    } = await supabase
+      .from('filedownload_permissions')
+      .select('*')
+      .eq('org_type_id', org_type_id)
+      .eq('entitlement_value', values);
+    if (filedownload_permissions_error) {
+      // Handle error
+    } else {
+      // Extracting file_type from each object in filedownload_permissions
+      fileTypes = filedownload_permissions.map(
+        (permission) => permission.file_type,
+      );
+
+      // Now you have an array of file types in fileTypes
+    }
+  }
   // Fetch the list of Litmus Products from storage
   const { data, error } = await supabase.storage.from('Litmus_Products').list();
 
@@ -225,6 +280,12 @@ async function allCurrentfiles(site_id: any, org_id: any, org_type_id: any) {
         if (fileData) {
           for (const fileEntry of fileData) {
             const dataName = fileEntry.name;
+            const fileExtension = dataName.split('.').pop(); // Get the file extension
+
+            // Check if the file extension is included in the fileTypes array
+            const extensionIncluded = fileTypes.includes(fileExtension)
+              ? 'Y'
+              : 'N';
 
             const { data: download, error } = await supabase.storage
               .from('Litmus_Products')
@@ -235,6 +296,7 @@ async function allCurrentfiles(site_id: any, org_id: any, org_type_id: any) {
                 FileName: dataName,
                 downloadLink: download.signedUrl,
                 status: file.status,
+                disabled: extensionIncluded, // Add extensionIncluded to the result
               });
             }
           }

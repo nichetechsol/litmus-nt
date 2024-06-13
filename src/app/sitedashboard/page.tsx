@@ -15,8 +15,10 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { decryptData } from '@/helper/Encryption_Decryption';
 import { emailSchema, nameSchema, roleSchema } from '@/helper/ValidationHelper';
+import { getActivitiesBySiteID } from '@/supabase/activity';
 import { getUserRole } from '@/supabase/org_details';
 import { listLitmusProducts } from '@/supabase/products';
+import { refreshToken } from '@/supabase/session';
 import {
   addUserToSites,
   modifyUserOfSites,
@@ -28,16 +30,15 @@ import {
   licenceData,
   sitesCounts,
 } from '@/supabase/sitedashboard';
-import listSolutions from '@/supabase/solutions';
+import { listSolutions } from '@/supabase/solutions';
 import Loader from '@/utils/Loader/Loader';
 
-import { TopCompanies } from '../../shared/data/dashboards/jobsdata';
 interface licenseData {
   id: number;
   type: number;
   created_at: string;
   created_by: number;
-  exipry: string;
+  expiry: string;
   licence_number: string;
   licence_type_name: string;
   site_id: number;
@@ -79,6 +80,16 @@ interface about_site {
   about_site: string;
   created_at: string;
 }
+interface activitylogs {
+  activity_date: string;
+  activity_type: string;
+  target_user_role: object;
+  target_user_id: { email: string; firstname: string; lastname: string };
+  org_id: { name: string };
+  details: { filename: string };
+  site_id: { name: string };
+  user_id: { email: string; firstname: string; lastname: string };
+}
 const validationSchema = Yup.object().shape({
   email: emailSchema,
   firstName: nameSchema,
@@ -116,6 +127,8 @@ const Page = () => {
   const [perPage2] = useState(10);
   const [products, setProducts] = useState<Products[] | null>(null);
   const [solutions, setSolution] = useState<Products[] | null>(null);
+
+  const [activity_log, setActivity_log] = useState<activitylogs[] | null>(null);
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
@@ -132,16 +145,19 @@ const Page = () => {
   const [site_id, setsite_id] = useState<any>('');
   const [site_name, setSite_name] = useState<any>('');
   const [site_owner_name, SetSite_owner_name] = useState<any>('');
+  const [orgName, setorgName] = useState<any>('');
   useEffect(() => {
     const userid = decryptData(localStorage.getItem('user_id'));
     const orgid = decryptData(localStorage.getItem('org_id'));
     const siteid = decryptData(localStorage.getItem('site_id'));
     const sitename = decryptData(localStorage.getItem('site_name'));
+    const decryptedOrgName = decryptData(localStorage.getItem('org_name'));
     const siteownername = decryptData(localStorage.getItem('site_owner_name'));
     setuser_id(userid);
     setorg_id(orgid);
     setsite_id(siteid);
     setSite_name(sitename);
+    setorgName(decryptedOrgName);
     SetSite_owner_name(siteownername);
   }, []);
   const [siteCountData, setSiteCountData] = useState<{
@@ -163,6 +179,7 @@ const Page = () => {
         const end: any = start + perPage2 - 1;
         if (site_id) {
           const data: any = await entitlementSite(site_id, start, end);
+          await refreshToken();
           if (data) {
             setEntitlementListData(data?.data);
             setTotalItemsCount2(data.totalCount); // Set total items count for pagination
@@ -196,16 +213,32 @@ const Page = () => {
     const fetchData = async () => {
       try {
         // setLoading(true);
-        const data: any = await licenceData(site_id);
-        setLicence(data.data);
-        // setLoading(false);
+        if (site_id) {
+          const data: any = await licenceData(site_id);
+          setLicence(data.data);
+          // setLoading(false);
+        }
       } catch (error: any) {
         // console.error("Error fetching organization details:", error.message);
       }
     };
     fetchData();
   }, [site_id]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // setLoading(true);
+        if (site_id) {
+          const data: any = await getActivitiesBySiteID(site_id);
 
+          setActivity_log(data);
+        }
+      } catch (error: any) {
+        // console.error("Error fetching organization details:", error.message);
+      }
+    };
+    fetchData();
+  }, [site_id]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -533,7 +566,7 @@ const Page = () => {
                               <div className='flex items-center justify-between flex-wrap'>
                                 <div>
                                   <p className='text-[#8c9097] dark:text-white/50 text-[0.813rem] mb-0'>
-                                    Number of Licences
+                                    Number of Licenses
                                   </p>
                                   <h4 className='font-semibold  text-[1.5rem] !mb-2 '>
                                     {siteCountData
@@ -612,26 +645,19 @@ const Page = () => {
                     <div className='box-body'>
                       <div className='ms-6'>
                         {siteCountData &&
-                        siteCountData.data.sites_details[0].about_site ? (
-                          <h5 className='text-[1.25rem] text-defaulttextcolor dark:text-defaulttextcolor/70 font-medium'>
-                            About Site
-                          </h5>
-                        ) : (
+                          siteCountData.data.sites_details[0].about_site ? (
                           ''
+                        ) : (
+                          <h5 className='text-[1.25rem] text-defaulttextcolor dark:text-defaulttextcolor/70 font-medium'>
+                            Description :
+                          </h5>
                         )}
 
                         <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
                           {siteCountData
                             ? siteCountData.data.sites_details[0].about_site
-                            : ''}
+                            : '--'}
                         </p>
-                        {/* <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
-                          Lorem ipsum dolor sit amet consectetur adipisicing
-                          elit. Adipisci quos sint, officia vel ab perferendis,
-                          dolores placeat dolor aliquam debitis eius, illum
-                          ullam ratione blanditiis fugiat omnis beatae odio
-                          vitae!
-                        </p> */}
                       </div>
                       <div className='xl:col-span-12 col-span-12  mt-5 container !mx-auto !justify-center !items-center '>
                         <div className='box text-default shadow border dark:border-defaulttextcolor/10'>
@@ -640,75 +666,46 @@ const Page = () => {
                               <div className='xl:col-span-3 xxl:col-span-3 lg:col-span-3 md:col-span-3 col-span-3 about-company-stats-border'>
                                 <div className='text-center p-6 w-full h-full flex items-center justify-center'>
                                   <span className='font-semibold me-2'>
-                                    {site_owner_name ? 'Owner:' : ''}
+                                    Owner:
                                   </span>
                                   <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
                                     {' '}
-                                    {site_owner_name ? site_owner_name : ''}
+                                    {site_owner_name ? site_owner_name : '--'}
                                   </p>
                                 </div>
                               </div>
-                              {/* <div className='xl:col-span-3 xxl:col-span-3 lg:col-span-3 md:col-span-3 col-span-3 about-company-stats-border'>
+                              <div className='xl:col-span-3 xxl:col-span-3 lg:col-span-3 md:col-span-3 col-span-3 about-company-stats-border'>
                                 <div className='text-center p-6 w-full h-full flex items-center justify-center'>
-                                  <div>
-                                    <span className='font-semibold'>
-                                      Budget
-                                    </span>
-                                    <p className='text-dark text-[2rem] mb-0'>
-                                      <span
-                                        className='count-up'
-                                        data-count='21'
-                                      >
-                                        {' '}
-                                        123
-                                      </span>
-                                    </p>
-                                  </div>
+                                  <span className='font-semibold me-2'>
+                                    Organization Name:
+                                  </span>
+                                  <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
+                                    {' '}
+                                    {orgName ? orgName : '--'}
+                                  </p>
                                 </div>
-                              </div> */}
+                              </div>
                               <div className='xl:col-span-3 xxl:col-span-3 lg:col-span-3 md:col-span-3 col-span-3'>
                                 <div className='text-center p-6 w-full h-full flex items-center justify-center'>
                                   <span className='font-semibold'>
                                     {siteCountData &&
-                                    siteCountData.data.sites_details[0]
-                                      .created_at
+                                      siteCountData.data.sites_details[0]
+                                        .created_at
                                       ? 'Created:'
                                       : ''}
                                   </span>
-                                  {/* <p className='text-dark text-[2rem] mb-0'>
-                                      <span
-                                        className='count-up'
-                                        data-count='21'
-                                      > */}
+
                                   <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
                                     {' '}
                                     {siteCountData
                                       ? siteCountData.data.sites_details[0].created_at.split(
-                                          'T',
-                                        )[0]
+                                        'T',
+                                      )[0]
                                       : ''}
                                     {/* </span> */}
                                   </p>
                                 </div>
                               </div>
-                              {/* <div className='xl:col-span-3 xxl:col-span-3 lg:col-span-3 md:col-span-3 col-span-3'>
-                                <div className='text-center p-6 w-full h-full flex items-center justify-center'>
-                                  <div>
-                                    <span className='font-semibold'>
-                                      End Date
-                                    </span>
-                                    <p className='text-dark text-[2rem] mb-0'>
-                                      <span
-                                        className='count-up'
-                                        data-count='21'
-                                      >
-                                        {' '}
-                                        123
-                                      </span>
-                                    </p>
-                                  </div>
-                                </div>
-                              </div> */}
                             </div>
                           </div>
                         </div>
@@ -720,7 +717,7 @@ const Page = () => {
                 <div className='xxl:col-span-6 xl:col-span-6  col-span-12'>
                   <div className='box'>
                     <div className='box-header flex justify-between'>
-                      <div className='box-title'>Licence</div>
+                      <div className='box-title'>License</div>
                       {/* <div className='hs-dropdown ti-dropdown'>
                         <Link
                           href=''
@@ -833,44 +830,66 @@ const Page = () => {
                     </div>
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>
-                        {licence && licence.length > 0
-                          ? licence.map((user, index) => (
-                              <li className='mb-[0.9rem]' key={index}>
-                                <div className='flex items-start flex-wrap'>
-                                  <div className='me-2'>
-                                    <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
-                                      <i className='ri-profile-line text-[1rem] text-white'></i>
-                                    </span>
-                                  </div>
-                                  <div className='flex-grow'>
-                                    <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                      {user.licence_number}
-                                    </p>
-                                    <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                      {user.exipry}
-                                    </p>
-                                  </div>
-                                  <div className='font-semibold text-[0.9375rem] '>
-                                    <h1>
-                                      {' '}
-                                      {moment().isAfter(user.exipry) ? (
+                        {licence && licence.length > 0 ? (
+                          licence.map((user, index) => (
+                            <li className='mb-[0.9rem]' key={index}>
+                              <div className='flex items-start flex-wrap'>
+                                <div className='me-2'>
+                                  <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
+                                    <i className='ri-profile-line text-[1rem] text-white'></i>
+                                  </span>
+                                </div>
+                                <div className='flex-grow'>
+                                  <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                    {user.licence_number}
+                                  </p>
+                                  <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
+                                    {user.expiry.split('T')[0]}
+                                  </p>
+                                </div>
+                                <div className='font-semibold text-[0.9375rem] '>
+                                  <h1>
+                                    {' '}
+                                    {/* {moment().isAfter(user.expiry) ? (
                                         <span className='badge bg-danger text-white'>
                                           Expired
                                         </span>
-                                      ) : (
+                                      ) : moment(user.expiry).isBefore(moment().add(1, 'month'))?
+                                      (
+                                        <span className='badge bg-warning text-white'>
+                                          Soon to Expire
+                                        </span>
+                                      ) 
+                                      : (
                                         <span className='badge bg-primary text-white'>
                                           Active
                                         </span>
-                                      )}
-                                      {/* <span className='badge bg-primary text-white'>
+                                      )} */}
+                                    {moment().isAfter(user.expiry) ? (
+                                      <span className='badge bg-danger text-white'>
+                                        Expired
+                                      </span>
+                                    ) : moment(user.expiry).isBefore(
+                                      moment().add(1, 'month'),
+                                    ) ? (
+                                      <span className='badge bg-warning text-white'>
+                                        Soon to Expire
+                                      </span>
+                                    ) : (
+                                      <span className='badge bg-primary text-white'>
                                         Active
-                                      </span> */}
-                                    </h1>
-                                  </div>
+                                      </span>
+                                    )}
+                                  </h1>
                                 </div>
-                              </li>
-                            ))
-                          : null}
+                              </div>
+                            </li>
+                          ))
+                        ) : (
+                          <div className='col-md-12 w-100 mt-4'>
+                            <p className='text-center'>No License Found</p>{' '}
+                          </div>
+                        )}
 
                         {/* <li className="mb-[0.9rem]">
                           <div className="flex items-start flex-wrap">
@@ -949,12 +968,13 @@ const Page = () => {
                   <div className='box'>
                     <div className='box-header flex justify-between'>
                       <div className='box-title'>Products</div>
-                      <div className='hs-dropdown ti-dropdown'>
+                      {/* <div className='hs-dropdown ti-dropdown'> */}
+                      <div className='grid border-b border-dashed'>
                         <button
                           onClick={() => {
                             navigate.push('/products');
                           }}
-                          className='hs-dropdown-toggle py-2  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
+                          className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
                         >
                           <i className='ri-add-circle-line !text-[1rem]'></i>Add
                           Product
@@ -1062,33 +1082,37 @@ const Page = () => {
                     </div>
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>
-                        {products && products.length > 0
-                          ? products.map((product, index) => (
-                              <li className='mb-[0.9rem]' key={index}>
-                                <h5 className='box-title'>{product.folder}</h5>
-                                <div className='flex items-center flex-wrap'>
-                                  <div className='me-2 ic-product'>
-                                    <span className='text-[1rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
-                                      <i className='ri-folder-line text-[1rem]  text-white'></i>
-                                    </span>
-                                  </div>
-                                  <div className='flex-grow ic-product-p'>
-                                    <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                      {product.data.FileName}
-                                    </p>
-                                  </div>
-                                  <div className='font-semibold text-[0.9375rem] '>
-                                    <a
-                                      href={product.data.downloadLink}
-                                      className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
-                                    >
-                                      <i className='ri-download-line  text-[.8rem]  text-white'></i>
-                                    </a>
-                                  </div>
+                        {products && products.length > 0 ? (
+                          products.map((product, index) => (
+                            <li className='mb-[0.9rem]' key={index}>
+                              <h5 className='box-title'>{product.folder}</h5>
+                              <div className='flex items-center flex-wrap'>
+                                <div className='me-2 ic-product'>
+                                  <span className='text-[1rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
+                                    <i className='ri-folder-line text-[1rem]  text-white'></i>
+                                  </span>
                                 </div>
-                              </li>
-                            ))
-                          : null}
+                                <div className='flex-grow ic-product-p'>
+                                  <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                    {product.data.FileName}
+                                  </p>
+                                </div>
+                                <div className='font-semibold text-[0.9375rem] '>
+                                  <a
+                                    href={product.data.downloadLink}
+                                    className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
+                                  >
+                                    <i className='ri-download-line  text-[.8rem]  text-white'></i>
+                                  </a>
+                                </div>
+                              </div>
+                            </li>
+                          ))
+                        ) : (
+                          <div className='col-md-12 w-100 mt-4'>
+                            <p className='text-center'>No Product Found</p>{' '}
+                          </div>
+                        )}
                       </ul>
                     </div>
                   </div>
@@ -1138,7 +1162,7 @@ const Page = () => {
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>
                         {entitlementListData &&
-                        entitlementListData.length > 0 ? (
+                          entitlementListData.length > 0 ? (
                           entitlementListData.map((entitlement: any) => (
                             <li className='mb-[0.9rem]' key={entitlement.id}>
                               <div className='flex items-start flex-wrap'>
@@ -1217,35 +1241,41 @@ const Page = () => {
                               </li>
                             ))
                           : null} */}
-                        {solutions && solutions.length > 0
-                          ? solutions.map((solution, index) => (
-                              <li className='mb-[0.9rem]' key={index}>
-                                <div className='flex items-center flex-wrap'>
-                                  <div className='me-2 ic-product'>
-                                    <span className='text-[1rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
-                                      <i className='ri-folder-line text-[1rem]  text-white'></i>
-                                    </span>
-                                  </div>
-                                  <div className='flex-grow ic-product-p'>
-                                    <h5 className='box-title items-start'>
-                                      {solution.folder}
-                                    </h5>
-                                    <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                      {solution.data.FileName}
-                                    </p>
-                                  </div>
-                                  <div className='font-semibold text-[0.9375rem] '>
-                                    <a
-                                      href={solution.data.downloadLink}
-                                      className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
-                                    >
-                                      <i className='ri-download-line  text-[.8rem]  text-white'></i>
-                                    </a>
-                                  </div>
+                        {solutions && solutions.length > 0 ? (
+                          solutions.map((solution, index) => (
+                            <li className='mb-[0.9rem]' key={index}>
+                              <h5 className='box-title items-start'>
+                                {solution.folder}
+                              </h5>
+                              <div className='flex items-center flex-wrap'>
+                                <div className='me-2 ic-product'>
+                                  <span className='text-[1rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
+                                    <i className='ri-folder-line text-[1rem]  text-white'></i>
+                                  </span>
                                 </div>
-                              </li>
-                            ))
-                          : null}
+
+                                <div className='flex-grow ic-product-p'>
+
+                                  <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                    {solution.data.FileName}
+                                  </p>
+                                </div>
+                                <div className='font-semibold text-[0.9375rem] '>
+                                  <a
+                                    href={solution.data.downloadLink}
+                                    className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
+                                  >
+                                    <i className='ri-download-line  text-[.8rem]  text-white'></i>
+                                  </a>
+                                </div>
+                              </div>
+                            </li>
+                          ))
+                        ) : (
+                          <div className='col-md-12 w-100 mt-4'>
+                            <p className='text-center'>No Solution Found</p>{' '}
+                          </div>
+                        )}
                       </ul>
                     </div>
                   </div>
@@ -1267,11 +1297,12 @@ const Page = () => {
                             }}
                           />
                         </div>
-                        <div className='hs-dropdown ti-dropdown'>
+                        {/* <div className='hs-dropdown ti-dropdown'> */}
+                        <div className='grid border-b border-dashed dark:border-defaultborder/10'>
                           <Link
                             style={{ cursor: 'pointer' }}
                             href=''
-                            className='hs-dropdown-toggle py-2  px-3 ti-btn bg-primary text-white !font-medium w-full !mb-0'
+                            className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
                             data-hs-overlay='#todo-compose-user'
                             onClick={() => handleAddUser()}
                           >
@@ -1318,6 +1349,7 @@ const Page = () => {
                                         type='text'
                                         className='form-control w-full'
                                         id='Email'
+                                        disabled={!changeFlage}
                                         placeholder='Enter Email'
                                         onChange={handleEmailChange}
                                         onKeyDown={handleKeyPress}
@@ -1342,6 +1374,7 @@ const Page = () => {
                                         type='text'
                                         className='form-control w-full'
                                         id='task-name'
+                                        disabled={!changeFlage}
                                         placeholder='Enter First Name'
                                         onChange={handleFirstNameChange}
                                         onKeyDown={handleKeyPress}
@@ -1366,6 +1399,7 @@ const Page = () => {
                                         className='form-control w-full'
                                         id='task-name'
                                         placeholder='Enter Last Name'
+                                        disabled={!changeFlage}
                                         onChange={handleLastNameChange}
                                         onKeyDown={handleKeyPress}
                                         maxLength={255}
@@ -1415,6 +1449,7 @@ const Page = () => {
                                     className='hs-dropdown-toggle ti-btn  ti-btn-light align-middle'
                                     data-hs-overlay='#todo-compose-user'
                                     ref={closeModalButtonRef}
+                                    onClick={() => handleFiledClear()}
                                   >
                                     Cancel
                                   </button>
@@ -1470,53 +1505,51 @@ const Page = () => {
                           </thead>
                           <tbody>
                             {/* {Dealsstatistics.map((idx) => ( */}
-                            {orgUserData && orgUserData.length > 0
-                              ? orgUserData.map((user, index) => (
-                                  <tr
-                                    className='border border-inherit border-solid hover:bg-gray-100 dark:border-defaultborder/10 dark:hover:bg-light'
-                                    key={index}
-                                  >
-                                    <td>
-                                      <div className='flex items-center font-semibold'>
-                                        {/* <span className='!me-2 inline-flex justify-center items-center'>
+                            {orgUserData && orgUserData.length > 0 ? (
+                              orgUserData.map((user, index) => (
+                                <tr
+                                  className='border border-inherit border-solid hover:bg-gray-100 dark:border-defaultborder/10 dark:hover:bg-light'
+                                  key={index}
+                                >
+                                  <td>
+                                    <div className='flex items-center font-semibold'>
+                                      {/* <span className='!me-2 inline-flex justify-center items-center'>
                                         <img
                                           src={user.src}
                                           alt='img'
                                           className='w-[1.75rem] h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full'
                                         />
                                       </span> */}
-                                        {`${
-                                          user.firstname ? user.firstname : ''
-                                        } ${
-                                          user.lastname ? user.lastname : ''
+                                      {`${user.firstname ? user.firstname : ''
+                                        } ${user.lastname ? user.lastname : ''
                                         }`}{' '}
-                                      </div>
-                                    </td>
+                                    </div>
+                                  </td>
 
-                                    <td>{user.email}</td>
-                                    <td>
-                                      <span
-                                      // className={`inline-flex text-${user.color} !py-[0.15rem] !px-[0.45rem] rounded-sm !font-semibold !text-[0.75em] bg-${user.color}/10`}
+                                  <td>{user.email}</td>
+                                  <td>
+                                    <span
+                                    // className={`inline-flex text-${user.color} !py-[0.15rem] !px-[0.45rem] rounded-sm !font-semibold !text-[0.75em] bg-${user.color}/10`}
+                                    >
+                                      {user.role_name}
+                                    </span>
+                                  </td>
+
+                                  <td>
+                                    <div className='flex flex-row items-center !gap-2 text-[0.9375rem]'>
+                                      <Link
+                                        aria-label='anchor'
+                                        href=''
+                                        style={{ cursor: 'pointer' }}
+                                        data-hs-overlay='#todo-compose-user'
+                                        onClick={() => {
+                                          handleEdit(user);
+                                        }}
+                                        className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
                                       >
-                                        {user.role_name}
-                                      </span>
-                                    </td>
-
-                                    <td>
-                                      <div className='flex flex-row items-center !gap-2 text-[0.9375rem]'>
-                                        <Link
-                                          aria-label='anchor'
-                                          href=''
-                                          style={{ cursor: 'pointer' }}
-                                          data-hs-overlay='#todo-compose-user'
-                                          onClick={() => {
-                                            handleEdit(user);
-                                          }}
-                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
-                                        >
-                                          <i className='ri-edit-line'></i>
-                                        </Link>
-                                        {/* <Link
+                                        <i className='ri-edit-line'></i>
+                                      </Link>
+                                      {/* <Link
                                         aria-label='anchor'
                                         href=''
                                         
@@ -1524,21 +1557,25 @@ const Page = () => {
                                       >
                                         <i className='ri-user-unfollow-line'></i>
                                       </Link> */}
-                                        <div
-                                          style={{ cursor: 'pointer' }}
-                                          aria-label='anchor'
-                                          onClick={() => {
-                                            handleDelete(user.user_id);
-                                          }}
-                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
-                                        >
-                                          <i className='ri-delete-bin-line'></i>
-                                        </div>
+                                      <div
+                                        style={{ cursor: 'pointer' }}
+                                        aria-label='anchor'
+                                        onClick={() => {
+                                          handleDelete(user.user_id);
+                                        }}
+                                        className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
+                                      >
+                                        <i className='ri-delete-bin-line'></i>
                                       </div>
-                                    </td>
-                                  </tr>
-                                ))
-                              : null}
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))
+                            ) : (
+                              <div className='col-md-12 w-100 mt-4'>
+                                <p className='text-center'>No User Found</p>{' '}
+                              </div>
+                            )}
                             <Pagination
                               activePage={activePage}
                               itemsCountPerPage={perPage}
@@ -1601,7 +1638,7 @@ const Page = () => {
                   <div className='box overflow-hidden'>
                     <div className='box-header justify-between'>
                       <div className='box-title'>Activity Logs</div>
-                      <div className='hs-dropdown ti-dropdown'>
+                      {/* <div className='hs-dropdown ti-dropdown'>
                         <Link
                           href=''
                           className='text-[0.75rem] px-2 font-normal text-[#8c9097] dark:text-white/50'
@@ -1639,39 +1676,115 @@ const Page = () => {
                             </Link>
                           </li>
                         </ul>
-                      </div>
+                      </div> */}
                     </div>
                     <div className='box-body !p-0'>
                       <div className='table-responsive'>
                         <table className='table table-hover whitespace-nowrap min-w-full'>
                           <tbody>
-                            {TopCompanies.map((idx) => (
-                              <tr
-                                className='border hover:bg-gray-100 dark:hover:bg-light dark:border-defaultborder/10 border-defaultborder !border-x-0'
-                                key={Math.random()}
-                              >
-                                <th scope='col'>
-                                  <div className='flex items-center'>
-                                    <img
+                            {activity_log && activity_log.length > 0 ? (
+                              activity_log.map((activity, index) => (
+                                <tr
+                                  className='border hover:bg-gray-100 dark:hover:bg-light dark:border-defaultborder/10 border-defaultborder !border-x-0'
+                                  key={index}
+                                >
+                                  <th scope='col'>
+                                    <div className='flex items-center'>
+                                      {/* <img
                                       src={idx.src}
                                       alt=''
                                       className='avatar avatar-md p-1 bg-light avatar-rounded me-2 !mb-0'
-                                    />
-                                    <div>
-                                      <p className='font-semibold mb-0'>
-                                        Sarah Thompson updated the support
-                                        entitlements for 'ABC Corporation,'
-                                        increasing the number of hosted
-                                        sandboxes allowed to be deployed from 5
-                                        to 10.
-                                      </p>
+                                    /> */}
+                                      <div>
+                                        <p className='font-semibold mb-0'>
+                                          {activity?.activity_type ===
+                                            'create_site'
+                                            ? `${activity.user_id.firstname &&
+                                              activity.user_id.lastname
+                                              ? activity.user_id.firstname +
+                                              ' ' +
+                                              activity.user_id.lastname
+                                              : activity.user_id.email
+                                            } created a new site named ${activity.site_id.name
+                                            } within the organization '${activity.org_id.name
+                                            }'`
+                                            : activity?.activity_type ===
+                                              'add_user'
+                                              ? `${activity.user_id.firstname &&
+                                                activity.user_id.lastname
+                                                ? activity.user_id.firstname +
+                                                ' ' +
+                                                activity.user_id.lastname
+                                                : activity.user_id.email
+                                              } added a new user named '${activity.target_user_id
+                                                .firstname &&
+                                                activity.target_user_id.lastname
+                                                ? activity.target_user_id
+                                                  .firstname +
+                                                ' ' +
+                                                activity.target_user_id
+                                                  .lastname
+                                                : activity.target_user_id
+                                                  .email
+                                              }' within the site '${activity.site_id.name
+                                              }'`
+                                              : activity?.activity_type ===
+                                                'remove_user'
+                                                ? `${activity.user_id.firstname &&
+                                                  activity.user_id.lastname
+                                                  ? activity.user_id.firstname +
+                                                  ' ' +
+                                                  activity.user_id.lastname
+                                                  : activity.user_id.email
+                                                } removed a user named '${activity.target_user_id
+                                                  .firstname &&
+                                                  activity.target_user_id.lastname
+                                                  ? activity.target_user_id
+                                                    .firstname +
+                                                  ' ' +
+                                                  activity.target_user_id
+                                                    .lastname
+                                                  : activity.target_user_id
+                                                    .email
+                                                }' within the site '${activity.site_id.name
+                                                }'`
+                                                : activity?.activity_type ===
+                                                  'add_licence'
+                                                  ? `${activity.user_id.firstname &&
+                                                    activity.user_id.lastname
+                                                    ? activity.user_id.firstname +
+                                                    ' ' +
+                                                    activity.user_id.lastname
+                                                    : activity.user_id.email
+                                                  } added a new license within the organization ${activity.org_id.name
+                                                  }`
+                                                  : activity?.activity_type ===
+                                                    'download_file'
+                                                    ? `${activity.user_id.firstname &&
+                                                      activity.user_id.lastname
+                                                      ? activity.user_id.firstname +
+                                                      ' ' +
+                                                      activity.user_id.lastname
+                                                      : activity.user_id.email
+                                                    }  downloaded a file named '${activity.details.filename
+                                                    }' within the site ${activity.org_id.name
+                                                    }`
+                                                    : ''}
+                                        </p>
+                                      </div>
                                     </div>
-                                  </div>
-                                </th>
+                                  </th>
 
-                                <td className='f-end'>{idx.date}</td>
-                              </tr>
-                            ))}
+                                  <td className='f-end'>
+                                    {activity.activity_date.split('T')[0]}
+                                  </td>
+                                </tr>
+                              ))
+                            ) : (
+                              <div className='col-md-12 w-100 mt-4'>
+                                <p className='text-center'>No Log Found</p>{' '}
+                              </div>
+                            )}
                           </tbody>
                         </table>
                       </div>

@@ -2,7 +2,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 
-import { sitesCounts } from '@/supabase/sitedashboard';
+import { listOfAllSolutions } from '@/supabase/solutions';
 
 const OrgDashboard = () => {
   const [result, setResult] = useState(null);
@@ -20,7 +20,7 @@ const OrgDashboard = () => {
         //   firstname: 'Parth',
         //   lastname: 'Roka',
         // };
-        const data: any = await sitesCounts(1, 14);
+        const data: any = await listOfAllSolutions();
 
         // const { data, error } = await supabase
         //   .from('site_users')
