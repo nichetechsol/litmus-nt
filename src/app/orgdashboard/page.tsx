@@ -622,7 +622,7 @@ const OrgDashboard = () => {
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>
                         {entitlementListData &&
-                        entitlementListData.length > 0 ? (
+                          entitlementListData.length > 0 ? (
                           entitlementListData.map((entitlement) => (
                             <li className='mb-[0.9rem]' key={entitlement.id}>
                               <div className='flex items-start flex-wrap'>
@@ -704,7 +704,7 @@ const OrgDashboard = () => {
                           />
                         </div>
                         {/* <div className='hs-dropdown ti-dropdown'> */}
-                        <div className='p-4 grid border-b border-dashed dark:border-defaultborder/10'>
+                        <div className=' grid border-b border-dashed dark:border-defaultborder/10'>
                           {' '}
                           {userrole2 === 1 || userrole2 === 2 ? (
                             <button
@@ -717,7 +717,7 @@ const OrgDashboard = () => {
                               ref={closeModalButtonRef}
                             >
                               <div
-                                className='hs-dropdown-toggle py-2  px-3 ti-btn bg-primary text-white !font-medium w-full !mb-0'
+                                className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
                                 data-hs-overlay='#todo-compose'
                               >
                                 <i className='ri-add-circle-line !text-[1rem]'></i>
@@ -938,11 +938,9 @@ const OrgDashboard = () => {
                                         {/* <img src={idx.src} alt="img"
                                     className="w-[1.75rem] h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full" /> */}
                                       </span>{' '}
-                                      {`${
-                                        user.firstname ? user.firstname : ''
-                                      } ${
-                                        user.lastname ? user.lastname : ''
-                                      }`}{' '}
+                                      {`${user.firstname ? user.firstname : ''
+                                        } ${user.lastname ? user.lastname : ''
+                                        }`}{' '}
                                     </div>
                                   </td>
 
@@ -1051,64 +1049,56 @@ const OrgDashboard = () => {
                                       <div>
                                         <p className='font-semibold mb-0'>
                                           {activity?.activity_type ===
-                                          'create_org'
-                                            ? `${
-                                                activity.user_id.firstname &&
-                                                activity.user_id.lastname
-                                                  ? activity.user_id.firstname +
-                                                    ' ' +
-                                                    activity.user_id.lastname
-                                                  : activity.user_id.email
-                                              } created a new org. named ${
-                                                activity.org_id.name
-                                              }`
+                                            'create_org'
+                                            ? `${activity.user_id.firstname &&
+                                              activity.user_id.lastname
+                                              ? activity.user_id.firstname +
+                                              ' ' +
+                                              activity.user_id.lastname
+                                              : activity.user_id.email
+                                            } created a new org. named ${activity.org_id.name
+                                            }`
                                             : activity?.activity_type ===
                                               'add_user'
-                                            ? `${
-                                                activity.user_id.firstname &&
+                                              ? `${activity.user_id.firstname &&
                                                 activity.user_id.lastname
-                                                  ? activity.user_id.firstname +
-                                                    ' ' +
-                                                    activity.user_id.lastname
-                                                  : activity.user_id.email
-                                              } added a new user named '${
-                                                activity.target_user_id
-                                                  .firstname &&
-                                                activity.target_user_id.lastname
-                                                  ? activity.target_user_id
-                                                      .firstname +
-                                                    ' ' +
-                                                    activity.target_user_id
-                                                      .lastname
-                                                  : activity.target_user_id
-                                                      .email
-                                              }' within the organization ${
-                                                activity.org_id.name
-                                              }`
-                                            : activity?.activity_type ===
-                                              'remove_user'
-                                            ? `${
-                                                activity.user_id.firstname &&
+                                                ? activity.user_id.firstname +
+                                                ' ' +
                                                 activity.user_id.lastname
-                                                  ? activity.user_id.firstname +
-                                                    ' ' +
-                                                    activity.user_id.lastname
-                                                  : activity.user_id.email
-                                              } removed a user named '${
-                                                activity.target_user_id
-                                                  .firstname &&
+                                                : activity.user_id.email
+                                              } added a new user named '${activity.target_user_id
+                                                .firstname &&
                                                 activity.target_user_id.lastname
-                                                  ? activity.target_user_id
-                                                      .firstname +
-                                                    ' ' +
-                                                    activity.target_user_id
-                                                      .lastname
-                                                  : activity.target_user_id
-                                                      .email
-                                              }' within the organization ${
-                                                activity.org_id.name
+                                                ? activity.target_user_id
+                                                  .firstname +
+                                                ' ' +
+                                                activity.target_user_id
+                                                  .lastname
+                                                : activity.target_user_id
+                                                  .email
+                                              }' within the organization ${activity.org_id.name
                                               }`
-                                            : ''}
+                                              : activity?.activity_type ===
+                                                'remove_user'
+                                                ? `${activity.user_id.firstname &&
+                                                  activity.user_id.lastname
+                                                  ? activity.user_id.firstname +
+                                                  ' ' +
+                                                  activity.user_id.lastname
+                                                  : activity.user_id.email
+                                                } removed a user named '${activity.target_user_id
+                                                  .firstname &&
+                                                  activity.target_user_id.lastname
+                                                  ? activity.target_user_id
+                                                    .firstname +
+                                                  ' ' +
+                                                  activity.target_user_id
+                                                    .lastname
+                                                  : activity.target_user_id
+                                                    .email
+                                                }' within the organization ${activity.org_id.name
+                                                }`
+                                                : ''}
                                         </p>
                                       </div>
                                     </div>
