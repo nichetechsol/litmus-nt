@@ -30,7 +30,7 @@ import {
   licenceData,
   sitesCounts,
 } from '@/supabase/sitedashboard';
-import listSolutions from '@/supabase/solutions';
+import { listSolutions } from '@/supabase/solutions';
 import Loader from '@/utils/Loader/Loader';
 
 interface licenseData {
