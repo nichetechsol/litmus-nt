@@ -101,8 +101,8 @@ const SiteCitySchema = Yup.string()
 
 const PincodeSchema = Yup.string()
   .required('Please enter your zip code.')
-  .min(5, 'The pincode should be at least five characters long')
-  .max(10, 'The pincode should not exceed ten characters')
+  .min(5, 'The zipcode should be at least five characters long')
+  .max(10, 'The zipcode should not exceed ten characters')
   .matches(/^[0-9]+$/, 'Please enter a valid zip code.');
 
 const SiteTypeDropdownSchema = Yup.string()

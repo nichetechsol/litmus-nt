@@ -20067,16 +20067,23 @@ h6 {
   @apply bg-light text-primary;
 }
 
-.box-title{
+.box-title {
   word-break: break-all;
 }
-.pricing-li{
+.pricing-li {
   @apply hover:text-white hover:bg-success  hover:border-primary;
 }
-[data-vertical-style=overlay][data-toggled=icon-overlay-close]:not([icon-overlay=open]) .app-sidebar .side-menu__item i {
+[data-vertical-style='overlay'][data-toggled='icon-overlay-close']:not(
+    [icon-overlay='open']
+  )
+  .app-sidebar
+  .side-menu__item
+  i {
   margin: 0 !important;
 }
-[data-vertical-style=overlay][data-toggled=icon-overlay-close] a.sidemenu-toggle span {
+[data-vertical-style='overlay'][data-toggled='icon-overlay-close']
+  a.sidemenu-toggle
+  span {
   background: transparent;
   background-image: none;
 }

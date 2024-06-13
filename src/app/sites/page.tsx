@@ -558,6 +558,10 @@ const Page: React.FC = () => {
           setLoading(false);
 
           toast.error(result.message, { autoClose: 3000 });
+          if (closeModalButtonRef.current) {
+            closeModalButtonRef.current.click();
+          }
+          handelclosemodel();
         }
       } catch (error) {
         setLoading(false);
@@ -624,7 +628,7 @@ const Page: React.FC = () => {
                           data-hs-overlay='#todo-compose'
                         >
                           <i className='ri-add-circle-line !text-[1rem]'></i>Add
-                          Sites
+                          Site
                         </Link>
                         <div
                           id='todo-compose'
@@ -990,7 +994,7 @@ const Page: React.FC = () => {
                         </div>
                         {SitesList && SitesList.length == 0 && (
                           <div className='col-md-12 w-100 mt-4 mb-4'>
-                            <p className='text-center'>No Data Found</p>{' '}
+                            <p className='text-center'>No Site Found</p>{' '}
                           </div>
                         )}
                       </div>
@@ -1035,7 +1039,15 @@ const Page: React.FC = () => {
                               <div className='box task-pending-card'>
                                 <div className='box-body'>
                                   <div className='flex justify-between align-center flex-wrap gap-2'>
-                                    <p className='font-semibold mb-4 flex items-center'>
+                                    <h1
+                                      style={{
+                                        fontSize: '1.1rem', // Adjust size as needed
+                                        fontWeight: 'bold',
+                                        marginBottom: '0.5rem', // Equivalent to mb-4
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                      }}
+                                    >
                                       <Link
                                         aria-label='anchor'
                                         href='#!'
@@ -1043,7 +1055,7 @@ const Page: React.FC = () => {
                                       {SingleSite?.site
                                         ? SingleSite?.site?.name
                                         : ''}
-                                    </p>
+                                    </h1>
                                     <div className='avatar avatar-xl avatar-rounded '>
                                       {' '}
                                       <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
@@ -1060,10 +1072,10 @@ const Page: React.FC = () => {
                                   <div className=''>
                                     <div>
                                       <ul className='list-group list-group-flush'>
-                                        <li className='list-group-item fw-semibold'>
+                                        <li className='flex list-group-item fw-semibold'>
                                           <i className='bx bx-map align-middle me-2 text-muted'></i>
                                           <b>Address </b>
-                                          <span className='ms-1 over-text text-muted fw-normal d-inline-block'>
+                                          <p className='ms-1 over-text text-muted fw-normal d-inline-block'>
                                             {SingleSite?.site
                                               ? SingleSite.site?.address1 + ','
                                               : ''}
@@ -1083,7 +1095,7 @@ const Page: React.FC = () => {
                                             {SingleSite?.site
                                               ? SingleSite.country
                                               : ''}
-                                          </span>
+                                          </p>
                                         </li>
                                         <li className='list-group-item fw-semibold'>
                                           <i className='bx bx-briefcase align-middle me-2 text-muted'></i>

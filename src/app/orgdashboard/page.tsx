@@ -180,26 +180,25 @@ const OrgDashboard = () => {
 
     fetchData();
   }, [org_id]);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // setLoading(true);
-        if (org_id) {
-          const data: any = await getActivitiesByOrgId(org_id);
+  const fetchData7 = async () => {
+    try {
+      // setLoading(true);
+      if (org_id) {
+        const data: any = await getActivitiesByOrgId(org_id);
+        // setLoading(false);
+        if (data) {
+          setActivity_log(data);
+        } else {
           // setLoading(false);
-          if (data) {
-            setActivity_log(data);
-          } else {
-            // setLoading(false);
-            // console.log("No organization details found.");
-          }
+          // console.log("No organization details found.");
         }
-      } catch (error: any) {
-        // console.error("Error fetching organization details:", error.message);
       }
-    };
-
-    fetchData();
+    } catch (error: any) {
+      // console.error("Error fetching organization details:", error.message);
+    }
+  };
+  useEffect(() => {
+    fetchData7();
   }, [org_id]);
 
   const fetchData2 = async () => {
@@ -1202,7 +1201,7 @@ const OrgDashboard = () => {
                             ) : (
                               <>
                                 <div className='col-md-12 w-100 mt-4'>
-                                  <p className='text-center'>No Data Found</p>{' '}
+                                  <p className='text-center'>No Log Found</p>{' '}
                                 </div>
                                 <></>
                               </>

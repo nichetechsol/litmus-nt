@@ -40,16 +40,78 @@ interface Result<T> {
 }
 
 // Function to add a site
+// async function addSites(data: SiteData): Promise<Result<any>> {
+//   try {
+//     // Check for duplicate site names in the organization
+//     const { data: existingSite, error: duplicateCheckError } = await supabase
+//       .from('sites_detail')
+//       .select('id')
+//       .eq('org_id', data.org_id)
+//       .eq('name', data.name)
+//       .single(); // Assuming a single record is expected
+
+//     // If a duplicate is found, return an error
+//     if (existingSite) {
+//       return {
+//         errorCode: 1,
+//         message: 'Duplicate site name',
+//         data: null,
+//       };
+//     }
+
+//     // Check for errors during the duplicate check
+//     if (duplicateCheckError && duplicateCheckError.code !== 'PGRST116') {
+//       // PGRST116: No rows found
+//       return {
+//         errorCode: 1,
+//         message: 'Error checking for duplicate site name',
+//         data: null,
+//       };
+//     }
+
+//     // Insert new site details if no duplicate is found
+//     const { data: siteDetails, error: insertError } = await supabase
+//       .from('sites_detail')
+//       .insert([data])
+//       .select();
+
+//     // Check for errors during the insert operation
+//     if (insertError) {
+//       return {
+//         errorCode: 1,
+//         message: 'Error inserting site details',
+//         data: null,
+//       };
+//     } else {
+//       await logActivity({
+//         org_id: data.org_id,
+//         site_id: siteDetails[0].id,
+//         user_id: data.user_id,
+//         activity_type: 'create_site',
+//       });
+
+//       return {
+//         errorCode: 0,
+//         message: 'Site details inserted successfully',
+//         data: siteDetails,
+//       };
+//     }
+//   } catch (error) {
+//     return {
+//       errorCode: 1,
+//       message: 'Unexpected error',
+//       data: null,
+//     };
+//   }
+// }
 async function addSites(data: SiteData): Promise<Result<any>> {
   try {
     // Check for duplicate site names in the organization
     const { data: existingSite, error: duplicateCheckError } = await supabase
       .from('sites_detail')
-      .select('id')
+      .select('*')
       .eq('org_id', data.org_id)
-      .eq('name', data.name)
-      .single(); // Assuming a single record is expected
-
+      .eq('name', data.name); // Assuming a single record is expected
     // If a duplicate is found, return an error
     if (existingSite) {
       return {
@@ -104,7 +166,6 @@ async function addSites(data: SiteData): Promise<Result<any>> {
     };
   }
 }
-
 // async function addSites(data: SiteData): Promise<Result<any>> {
 //   try {
 //     // Check for duplicate site name

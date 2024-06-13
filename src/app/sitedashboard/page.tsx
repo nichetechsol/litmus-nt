@@ -229,20 +229,20 @@ const Page = () => {
     };
     fetchData();
   }, [site_id]);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // setLoading(true);
-        if (site_id) {
-          const data: any = await getActivitiesBySiteID(site_id);
+  const fetchData8 = async () => {
+    try {
+      // setLoading(true);
+      if (site_id) {
+        const data: any = await getActivitiesBySiteID(site_id);
 
-          setActivity_log(data);
-        }
-      } catch (error: any) {
-        // console.error("Error fetching organization details:", error.message);
+        setActivity_log(data);
       }
-    };
-    fetchData();
+    } catch (error: any) {
+      // console.error("Error fetching organization details:", error.message);
+    }
+  };
+  useEffect(() => {
+    fetchData8();
   }, [site_id]);
   useEffect(() => {
     const fetchData = async () => {
@@ -652,18 +652,17 @@ const Page = () => {
                     <div className='box-body'>
                       <div className='ms-6'>
                         {siteCountData &&
-                        siteCountData.data.sites_details[0].about_site ? (
-                          ''
-                        ) : (
-                          <h5 className='text-[1.25rem] text-defaulttextcolor dark:text-defaulttextcolor/70 font-medium'>
-                            Description : --
-                          </h5>
-                        )}
+                        siteCountData.data.sites_details[0].about_site
+                          ? ''
+                          : // <h5 className='text-[1.25rem] text-defaulttextcolor dark:text-defaulttextcolor/70 font-medium'>
+
+                            // </h5>
+                            ''}
 
                         <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
                           {siteCountData
                             ? siteCountData.data.sites_details[0].about_site
-                            : ''}
+                            : 'No Description'}
                         </p>
                       </div>
                       <div className='xl:col-span-12 col-span-12  mt-5 container !mx-auto !justify-center !items-center '>
@@ -698,17 +697,21 @@ const Page = () => {
                                     {siteCountData &&
                                     siteCountData.data.sites_details[0]
                                       .created_at
-                                      ? 'Created:'
+                                      ? 'Created: '
                                       : ''}
                                   </span>
 
                                   <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
                                     {' '}
                                     {siteCountData
-                                      ? siteCountData.data.sites_details[0].created_at.split(
-                                          'T',
-                                        )[0]
-                                      : ''}
+                                      ? moment(
+                                          siteCountData.data.sites_details[0]
+                                            .created_at,
+                                        ).format('MM/DD/YY HH:mm:ss')
+                                      : //  siteCountData.data.sites_details[0].created_at.split(
+                                        //     'T',
+                                        //   )[0]
+                                        ''}
                                     {/* </span> */}
                                   </p>
                                 </div>
@@ -1192,7 +1195,7 @@ const Page = () => {
                           ))
                         ) : (
                           <div className='col-md-12 w-100 mt-4'>
-                            <p className='text-center'>No Data Found</p>{' '}
+                            <p className='text-center'>No Entitlements Found</p>{' '}
                           </div>
                         )}
                         {entitlementListData &&
@@ -1594,9 +1597,13 @@ const Page = () => {
                                 </tr>
                               ))
                             ) : (
-                              <div className='col-md-12 w-100 mt-4'>
-                                <p className='text-center'>No User Found</p>{' '}
-                              </div>
+                              <tr>
+                                <td colSpan={4}>
+                                  <div className='col-md-12 w-100 mt-4'>
+                                    <p className='text-center'>No User Found</p>{' '}
+                                  </div>
+                                </td>
+                              </tr>
                             )}
                             {orgUserData && orgUserData.length > 0 && (
                               <tr>
@@ -1845,7 +1852,7 @@ const Page = () => {
                             ) : (
                               <>
                                 <div className='col-md-12 w-100 mt-4'>
-                                  <p className='text-center'>No Data Found</p>{' '}
+                                  <p className='text-center'>No Log Found</p>{' '}
                                 </div>
                                 <></>
                               </>
