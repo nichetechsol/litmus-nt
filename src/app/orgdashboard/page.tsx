@@ -1077,7 +1077,7 @@ const OrgDashboard = () => {
                       <div className='table-responsive'>
                         <table className='table table-hover whitespace-nowrap min-w-full'>
                           <tbody>
-                            {activity_log ? (
+                            {activity_log && activity_log.length > 0 ? (
                               activity_log.map(
                                 (activity, index) =>
                                   (activity?.activity_type === 'create_org' ||
