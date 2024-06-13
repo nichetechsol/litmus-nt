@@ -83,14 +83,13 @@ async function addSites(data: SiteData): Promise<Result<any>> {
         data: null,
       };
     } else {
-      const logResult = await logActivity({
+      await logActivity({
         org_id: data.org_id,
         site_id: siteDetails[0].id,
         user_id: data.user_id,
         activity_type: 'create_site',
       });
 
-      console.log('Activity log result:', logResult);
       return {
         errorCode: 0,
         message: 'Site details inserted successfully',
