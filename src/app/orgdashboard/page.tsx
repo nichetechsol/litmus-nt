@@ -996,17 +996,18 @@ const OrgDashboard = () => {
                                 </td>
                               </tr>
                             )}
-                            <Pagination
-                              activePage={activePage}
-                              itemsCountPerPage={perPage}
-                              totalItemsCount={totalItemsCount}
-                              pageRangeDisplayed={5} // Adjust as needed
-                              onChange={(page: React.SetStateAction<number>) =>
-                                setActivePage(page)
-                              }
-                              itemClass='page-item'
-                              linkClass='page-link'
-                            />
+                            <tr>
+                              <td colSpan={5} ><Pagination
+                                activePage={activePage}
+                                itemsCountPerPage={perPage}
+                                totalItemsCount={totalItemsCount}
+                                pageRangeDisplayed={5} // Adjust as needed
+                                onChange={(page: React.SetStateAction<number>) =>
+                                  setActivePage(page)
+                                }
+                                itemClass='page-item'
+                                linkClass='page-link'
+                              /></td></tr>
                           </tbody>
                         </table>
                       </div>

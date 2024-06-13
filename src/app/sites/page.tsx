@@ -996,116 +996,116 @@ const Page: React.FC = () => {
                     >
                       {SitesList && SitesList.length > 0
                         ? SitesList.map((SingleSite) => (
-                            <div
-                              className='xl:col-span-6 col-span-12 task-card'
-                              style={{ cursor: 'pointer' }}
-                              key={SingleSite?.site?.id}
-                              onClick={() => {
-                                const encryptedsiteid = encryptData(
-                                  SingleSite.site.id,
-                                );
-                                const encryptedsitename = encryptData(
-                                  SingleSite.site.name,
-                                );
-                                const encryptedsiteOwnerName = encryptData(
-                                  SingleSite.ownerNames,
-                                );
-                                localStorage.setItem(
-                                  'site_id',
-                                  encryptedsiteid,
-                                );
-                                localStorage.setItem(
-                                  'site_name',
-                                  encryptedsitename,
-                                );
-                                localStorage.setItem(
-                                  'site_owner_name',
-                                  encryptedsiteOwnerName,
-                                );
-                                navigate.push('/sitedashboard');
-                              }}
-                            >
-                              <div className='box task-pending-card'>
-                                <div className='box-body'>
-                                  <div className='flex justify-between align-center flex-wrap gap-2'>
-                                    <p className='font-semibold mb-4 flex items-center'>
-                                      <Link
-                                        aria-label='anchor'
-                                        href='#!'
-                                      ></Link>
-                                      {SingleSite?.site
-                                        ? SingleSite?.site?.name
-                                        : ''}
-                                    </p>
-                                    <div className='avatar avatar-xl avatar-rounded '>
-                                      {' '}
-                                      <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
-                                        <InitialsComponent
-                                          name={
-                                            SingleSite?.site
-                                              ? SingleSite?.site?.name
-                                              : ''
-                                          }
-                                        />
-                                      </span>
-                                    </div>
+                          <div
+                            className='xl:col-span-6 col-span-12 task-card'
+                            style={{ cursor: 'pointer' }}
+                            key={SingleSite?.site?.id}
+                            onClick={() => {
+                              const encryptedsiteid = encryptData(
+                                SingleSite.site.id,
+                              );
+                              const encryptedsitename = encryptData(
+                                SingleSite.site.name,
+                              );
+                              const encryptedsiteOwnerName = encryptData(
+                                SingleSite.ownerNames,
+                              );
+                              localStorage.setItem(
+                                'site_id',
+                                encryptedsiteid,
+                              );
+                              localStorage.setItem(
+                                'site_name',
+                                encryptedsitename,
+                              );
+                              localStorage.setItem(
+                                'site_owner_name',
+                                encryptedsiteOwnerName,
+                              );
+                              navigate.push('/sitedashboard');
+                            }}
+                          >
+                            <div className='box task-pending-card'>
+                              <div className='box-body'>
+                                <div className='flex justify-between align-center flex-wrap gap-2'>
+                                  <p className='font-semibold mb-4 flex items-center'>
+                                    <Link
+                                      aria-label='anchor'
+                                      href='#!'
+                                    ></Link>
+                                    {SingleSite?.site
+                                      ? SingleSite?.site?.name
+                                      : ''}
+                                  </p>
+                                  <div className='avatar avatar-xl avatar-rounded '>
+                                    {' '}
+                                    <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
+                                      <InitialsComponent
+                                        name={
+                                          SingleSite?.site
+                                            ? SingleSite?.site?.name
+                                            : ''
+                                        }
+                                      />
+                                    </span>
                                   </div>
-                                  <div className=''>
-                                    <div>
-                                      <ul className='list-group list-group-flush'>
-                                        <li className='list-group-item fw-semibold'>
-                                          <i className='bx bx-map align-middle me-2 text-muted'></i>
-                                          <b>Address </b>
-                                          <span className='ms-1 over-text text-muted fw-normal d-inline-block'>
-                                            {SingleSite?.site
-                                              ? SingleSite.site?.address1 + ','
-                                              : ''}
+                                </div>
+                                <div className=''>
+                                  <div>
+                                    <ul className='list-group list-group-flush'>
+                                      <li className='flex items-start list-group-item fw-semibold'>
+                                        <i className='bx bx-map align-middle me-2 text-muted'></i>
+                                        <b>Address </b>
+                                        <p className='ms-2 over-text text-muted fw-normal d-inline-block'>
+                                          {SingleSite?.site
+                                            ? SingleSite.site?.address1 + ','
+                                            : ''}
 
-                                            {SingleSite?.site
-                                              ? SingleSite.site?.address2 + ','
-                                              : ''}
+                                          {SingleSite?.site
+                                            ? SingleSite.site?.address2 + ','
+                                            : ''}
 
-                                            {SingleSite?.site
-                                              ? SingleSite.site?.city + ','
-                                              : ''}
+                                          {SingleSite?.site
+                                            ? SingleSite.site?.city + ','
+                                            : ''}
 
-                                            {SingleSite?.site
-                                              ? SingleSite.state + ','
-                                              : ''}
+                                          {SingleSite?.site
+                                            ? SingleSite.state + ','
+                                            : ''}
 
-                                            {SingleSite?.site
-                                              ? SingleSite.country
-                                              : ''}
-                                          </span>
-                                        </li>
-                                        <li className='list-group-item fw-semibold'>
-                                          <i className='bx bx-briefcase align-middle me-2 text-muted'></i>
-                                          <b>Owner</b>
-                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
-                                            {SingleSite?.ownerNames}
-                                          </span>
-                                        </li>
-                                        <li className='list-group-item fw-semibold'>
-                                          <i className='bx bx-user align-middle me-2 text-muted'></i>
-                                          <b>Number of users</b>
-                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
-                                            {SingleSite?.users?.length}
-                                          </span>
-                                        </li>
-                                        <li className='list-group-item fw-semibold'>
-                                          <i className='bx bx-user align-middle me-2 text-muted'></i>
-                                          <b>Type</b>
-                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
-                                            {SingleSite?.type_name}
-                                          </span>
-                                        </li>
-                                      </ul>
-                                    </div>
+                                          {SingleSite?.site
+                                            ? SingleSite.country
+                                            : ''}
+                                        </p>
+                                      </li>
+                                      <li className='list-group-item fw-semibold'>
+                                        <i className='bx bx-briefcase align-middle me-2 text-muted'></i>
+                                        <b>Owner</b>
+                                        <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                          {SingleSite?.ownerNames}
+                                        </span>
+                                      </li>
+                                      <li className='list-group-item fw-semibold'>
+                                        <i className='bx bx-user align-middle me-2 text-muted'></i>
+                                        <b>Number of users</b>
+                                        <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                          {SingleSite?.users?.length}
+                                        </span>
+                                      </li>
+                                      <li className='list-group-item fw-semibold'>
+                                        <i className='bx bx-user align-middle me-2 text-muted'></i>
+                                        <b>Type</b>
+                                        <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                          {SingleSite?.type_name}
+                                        </span>
+                                      </li>
+                                    </ul>
                                   </div>
                                 </div>
                               </div>
                             </div>
-                          ))
+                          </div>
+                        ))
                         : null}
                     </div>
                   </div>
