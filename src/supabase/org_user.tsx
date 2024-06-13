@@ -1,4 +1,7 @@
+/* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { logActivity } from '@/supabase/activity';
+
 import { supabase } from './db';
 
 // Define interfaces for the data structures used
@@ -35,6 +38,8 @@ async function addUserToOrganization(
   UserData: UserData,
 ): Promise<Result<string>> {
   try {
+    // Test logActivity with static data
+
     let users: User[] | null = null;
     let selectError: any = null;
 
@@ -85,6 +90,14 @@ async function addUserToOrganization(
       } else {
         // If user is not in the organization, send an invitation
         if (!org_users || org_users.length === 0) {
+          // Log the activity before sending the invitation
+          const logResult = await logActivity({
+            org_id: UserData.org_id,
+            user_id: UserData.user_id,
+            target_user_id: users[0].id,
+            activity_type: 'add_user',
+          });
+
           // Add email function here to send an invitation to the user
           // email logic goes here
           return { errorCode: 0, data: 'Invitation sent' };
@@ -134,6 +147,7 @@ async function modifyUserOfOrganization(
 async function removeUserFromOrganization(
   id: any,
   org_id: any,
+  user_id: any,
 ): Promise<Result<null>> {
   // Validate the input
   if (!id || !org_id) {
@@ -152,6 +166,13 @@ async function removeUserFromOrganization(
     if (error) {
       return { errorCode: 1, data: null };
     } else {
+      const logResult = await logActivity({
+        org_id: org_id,
+        user_id: user_id, // You might want to pass the admin's user_id who is performing the removal
+        target_user_id: id,
+        activity_type: 'remove_user',
+      });
+
       return { errorCode: 0, data: null };
     }
   } catch (error) {

@@ -1,5 +1,9 @@
+/* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { logActivity } from '@/supabase/activity';
+
 import { supabase } from './db';
 import { sendEmailFunction } from './email';
 interface OrgDetail {
@@ -239,6 +243,13 @@ async function addOrganization(data: {
     } catch (error) {
       // Handle error here
     }
+    // Log activity
+    const logResult = await logActivity({
+      org_id: orgId,
+      user_id: data.user_id,
+      activity_type: 'create_org',
+    });
+
     return {
       errorCode: 0,
       data: { insertData, userInsertData, domainInsertResults },

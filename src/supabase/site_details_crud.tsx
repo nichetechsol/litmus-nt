@@ -1,4 +1,7 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { logActivity } from '@/supabase/activity';
+
 import { supabase } from './db';
 
 // Define interfaces for the site data and result structure
@@ -14,6 +17,7 @@ interface SiteData {
   status: string;
   country_id: any;
   state_id: any;
+  user_id: any;
 }
 
 interface UpdateSiteData {
@@ -79,6 +83,14 @@ async function addSites(data: SiteData): Promise<Result<any>> {
         data: null,
       };
     } else {
+      const logResult = await logActivity({
+        org_id: data.org_id,
+        site_id: siteDetails[0].id,
+        user_id: data.user_id,
+        activity_type: 'create_site',
+      });
+
+      console.log('Activity log result:', logResult);
       return {
         errorCode: 0,
         message: 'Site details inserted successfully',
@@ -93,6 +105,124 @@ async function addSites(data: SiteData): Promise<Result<any>> {
     };
   }
 }
+
+// async function addSites(data: SiteData): Promise<Result<any>> {
+//   try {
+//     // Check for duplicate site name
+//     const { data: existingSite, error: duplicateCheckError } = await supabase
+//       .from('sites_detail')
+//       .select('id')
+//       .eq('org_id', data.org_id)
+//       .eq('name', data.name)
+//       .single();
+
+//     if (duplicateCheckError && duplicateCheckError.code !== 'PGRST116') {
+//       return {
+//         errorCode: 1,
+//         message: 'Error checking for duplicate site name',
+//         data: null,
+//       };
+//     }
+//     if (existingSite) {
+//       return {
+//         errorCode: 1,
+//         message: 'Duplicate site name',
+//         data: null,
+//       };
+//     }
+
+//     // Check current site count for the organization
+//     const { data: currentSites, error: countError } = await supabase
+//       .from('sites_detail')
+//       .select('id')
+//       .eq('org_id', data.org_id);
+
+//     if (countError) {
+//       return {
+//         errorCode: 1,
+//         message: 'Error retrieving current site count',
+//         data: null,
+//       };
+//     }
+
+//     // Get entitlement limit for the organization
+//     const { data: entitlement, error: entitlementError } = await supabase
+//       .from('entitlements_package')
+//       .select('entitlement_value_id')
+//       .eq('org_id', data.org_id)
+//       .eq('entitlement_name_id', 14);
+
+//     if (entitlementError) {
+//       return {
+//         errorCode: 1,
+//         message: 'Error retrieving entitlement limit',
+//         data: null,
+//       };
+//     }
+
+//     if (!entitlement || entitlement.length === 0) {
+//       return {
+//         errorCode: 1,
+//         message: 'No entitlement found for the organization',
+//         data: null,
+//       };
+//     }
+
+//     // Check entitlement value
+//     const { data: entitlementValue, error: valueError } = await supabase
+//       .from('entitlements_values')
+//       .select('value_number')
+//       .eq('id', entitlement[0].entitlement_value_id)
+//       .single();
+
+//     if (valueError) {
+//       return {
+//         errorCode: 1,
+//         message: 'Error retrieving entitlement value',
+//         data: null,
+//       };
+//     }
+
+//     // Check if current number of sites exceeds entitlement limit
+//     if (currentSites.length >= (entitlementValue.value_number ?? 0)) {
+//       return {
+//         errorCode: 1,
+//         message: 'Entitlement limit exceeded',
+//         data: null,
+//       };
+//     }
+
+//     // Insert new site details
+//     const { data: insertedSite, error: insertError } = await supabase
+//       .from('sites_detail')
+//       .insert([data])
+//       .single();
+
+//     if (insertError) {
+//       return {
+//         errorCode: 1,
+//         message: 'Error inserting site details',
+//         data: null,
+//       };
+//     }
+
+//     return {
+//       errorCode: 0,
+//       message: 'Site details inserted successfully',
+//       data: insertedSite,
+//     };
+//   } catch (error) {
+//     let errorMessage = 'Unexpected error';
+//     if (error instanceof Error) {
+//       errorMessage = error.message;
+//     }
+//     return {
+//       errorCode: 1,
+//       message: errorMessage,
+//       data: null,
+//     };
+//   }
+// }
 
 // Function to update a site
 async function updateSite(

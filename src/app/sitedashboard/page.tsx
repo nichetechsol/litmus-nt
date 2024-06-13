@@ -492,7 +492,7 @@ const Page = () => {
       if (willDelete) {
         try {
           setLoading(true);
-          const response = await removeUserFromSites(id, site_id);
+          const response = await removeUserFromSites(id, site_id, user_id);
           if (response.errorCode === 0 && response.data) {
             swal(response.data, { icon: 'success' });
             fetchUserData();

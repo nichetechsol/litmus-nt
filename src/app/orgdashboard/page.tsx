@@ -376,7 +376,11 @@ const OrgDashboard = () => {
       if (willDelete) {
         try {
           setLoading(true);
-          const response = await removeUserFromOrganization(id, org_id);
+          const response = await removeUserFromOrganization(
+            id,
+            org_id,
+            user_id,
+          );
 
           if (response.errorCode === 0) {
             swal('Record deleted!', { icon: 'success' });
