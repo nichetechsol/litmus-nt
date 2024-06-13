@@ -179,7 +179,7 @@ const Page = () => {
         const end: any = start + perPage2 - 1;
         if (site_id) {
           const data: any = await entitlementSite(site_id, start, end);
-          await refreshToken();
+
           if (data) {
             setEntitlementListData(data?.data);
             setTotalItemsCount2(data.totalCount); // Set total items count for pagination
@@ -242,6 +242,7 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        await refreshToken();
         setLoading(true);
         const data: any = await listSolutions();
         if (data) {
@@ -278,6 +279,7 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        await refreshToken();
         setLoading(true);
         if (site_id) {
           const result1: any = await listLitmusProducts(site_id); // Replace with your actual API call
@@ -649,14 +651,14 @@ const Page = () => {
                           ''
                         ) : (
                           <h5 className='text-[1.25rem] text-defaulttextcolor dark:text-defaulttextcolor/70 font-medium'>
-                            Description :
+                            Description : --
                           </h5>
                         )}
 
                         <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
                           {siteCountData
                             ? siteCountData.data.sites_details[0].about_site
-                            : '--'}
+                            : ''}
                         </p>
                       </div>
                       <div className='xl:col-span-12 col-span-12  mt-5 container !mx-auto !justify-center !items-center '>
@@ -1182,17 +1184,20 @@ const Page = () => {
                             <p className='text-center'>No Data Found</p>{' '}
                           </div>
                         )}
-                        <Pagination
-                          activePage={activePage2}
-                          itemsCountPerPage={perPage2}
-                          totalItemsCount={totalItemsCount2}
-                          pageRangeDisplayed={5}
-                          onChange={(page: React.SetStateAction<number>) =>
-                            setActivePage2(page)
-                          }
-                          itemClass='page-item pagination-custom'
-                          linkClass='page-link'
-                        />
+                        {entitlementListData &&
+                          entitlementListData.length > 0 && (
+                            <Pagination
+                              activePage={activePage2}
+                              itemsCountPerPage={perPage2}
+                              totalItemsCount={totalItemsCount2}
+                              pageRangeDisplayed={5}
+                              onChange={(page: React.SetStateAction<number>) =>
+                                setActivePage2(page)
+                              }
+                              itemClass='page-item pagination-custom'
+                              linkClass='page-link'
+                            />
+                          )}
                       </ul>
                     </div>
                   </div>
@@ -1423,7 +1428,9 @@ const Page = () => {
                                         onChange={handleRoleChange}
                                         value={role}
                                       >
-                                        <option value=''>Select a role</option>
+                                        <option value='' hidden>
+                                          Select a role
+                                        </option>
                                         {roles &&
                                           roles.map((role) => (
                                             <option
@@ -1577,17 +1584,19 @@ const Page = () => {
                                 <p className='text-center'>No User Found</p>{' '}
                               </div>
                             )}
-                            <Pagination
-                              activePage={activePage}
-                              itemsCountPerPage={perPage}
-                              totalItemsCount={totalItemsCount}
-                              pageRangeDisplayed={5} // Adjust as needed
-                              onChange={(page: React.SetStateAction<number>) =>
-                                setActivePage(page)
-                              }
-                              itemClass='page-item'
-                              linkClass='page-link'
-                            />
+                            {orgUserData && orgUserData.length > 0 && (
+                              <Pagination
+                                activePage={activePage}
+                                itemsCountPerPage={perPage}
+                                totalItemsCount={totalItemsCount}
+                                pageRangeDisplayed={5} // Adjust as needed
+                                onChange={(
+                                  page: React.SetStateAction<number>,
+                                ) => setActivePage(page)}
+                                itemClass='page-item'
+                                linkClass='page-link'
+                              />
+                            )}
                           </tbody>
                         </table>
                       </div>

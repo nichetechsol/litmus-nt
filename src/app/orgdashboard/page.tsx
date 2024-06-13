@@ -642,17 +642,20 @@ const OrgDashboard = () => {
                             <p className='text-center'>No Data Found</p>{' '}
                           </div>
                         )}
-                        <Pagination
-                          activePage={activePage2}
-                          itemsCountPerPage={perPage2}
-                          totalItemsCount={totalItemsCount2}
-                          pageRangeDisplayed={5}
-                          onChange={(page: React.SetStateAction<number>) =>
-                            setActivePage2(page)
-                          }
-                          itemClass='page-item pagination-custom'
-                          linkClass='page-link'
-                        />
+                        {entitlementListData &&
+                          entitlementListData.length > 0 && (
+                            <Pagination
+                              activePage={activePage2}
+                              itemsCountPerPage={perPage2}
+                              totalItemsCount={totalItemsCount2}
+                              pageRangeDisplayed={5}
+                              onChange={(page: React.SetStateAction<number>) =>
+                                setActivePage2(page)
+                              }
+                              itemClass='page-item pagination-custom'
+                              linkClass='page-link'
+                            />
+                          )}
                       </ul>
                     </div>
                   </div>
@@ -842,7 +845,9 @@ const OrgDashboard = () => {
                                         onChange={handleRoleChange}
                                         value={role}
                                       >
-                                        <option value=''>Select a Role</option>
+                                        <option value='' hidden>
+                                          Select a Role
+                                        </option>
                                         {roles &&
                                           roles.map((role) => (
                                             <option
@@ -998,21 +1003,34 @@ const OrgDashboard = () => {
                                 </td>
                               </tr>
                             )}
-                            <tr>
-                              <td colSpan={5}>
-                                <Pagination
-                                  activePage={activePage}
-                                  itemsCountPerPage={perPage}
-                                  totalItemsCount={totalItemsCount}
-                                  pageRangeDisplayed={5} // Adjust as needed
-                                  onChange={(
-                                    page: React.SetStateAction<number>,
-                                  ) => setActivePage(page)}
-                                  itemClass='page-item'
-                                  linkClass='page-link'
-                                />
-                              </td>
-                            </tr>
+                            {orgUserData && orgUserData.length > 0 && (
+                              <tr>
+                                <td colSpan={5}>
+                                  <Pagination
+                                    activePage={activePage}
+                                    itemsCountPerPage={perPage}
+                                    totalItemsCount={totalItemsCount}
+                                    pageRangeDisplayed={5} // Adjust as needed
+                                    onChange={(
+                                      page: React.SetStateAction<number>,
+                                    ) => setActivePage(page)}
+                                    itemClass='page-item'
+                                    linkClass='page-link'
+                                  />
+                                </td>
+                              </tr>
+                            )}
+                            {/* <Pagination
+                              activePage={activePage}
+                              itemsCountPerPage={perPage}
+                              totalItemsCount={totalItemsCount}
+                              pageRangeDisplayed={5} // Adjust as needed
+                              onChange={(page: React.SetStateAction<number>) =>
+                                setActivePage(page)
+                              }
+                              itemClass='page-item'
+                              linkClass='page-link'
+                            /> */}
                           </tbody>
                         </table>
                       </div>
@@ -1112,20 +1130,6 @@ const OrgDashboard = () => {
                                               }' within the organization ${
                                                 activity.org_id.name
                                               }`
-                                            : activity?.activity_type ===
-                                              'create_site'
-                                            ? `${
-                                                activity.user_id.firstname &&
-                                                activity.user_id.lastname
-                                                  ? activity.user_id.firstname +
-                                                    ' ' +
-                                                    activity.user_id.lastname
-                                                  : activity.user_id.email
-                                              } created a new site named '${
-                                                activity.site_id.name
-                                              }' within the organization '${
-                                                activity.org_id.name
-                                              }'`
                                             : ''}
                                         </p>
                                       </div>

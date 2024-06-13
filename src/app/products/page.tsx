@@ -57,10 +57,11 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        await refreshToken();
         setLoading(true);
         if (site_id && org_id && org_type_id) {
           const data: any = await allCurrentfiles(site_id, org_id, org_type_id);
-          await refreshToken();
+
           if (data.data.length >= 0) {
             setFolder(data.data);
           }
@@ -200,23 +201,29 @@ const Page = () => {
                                   </p> */}
                                   </div>
                                   <div className='font-semibold text-[0.9375rem] '>
-                                    <a
+                                    {/* <a
                                       href={files.downloadLink}
                                       className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
                                     >
                                       <i className='ri-download-line  text-[.8rem]  text-white'></i>
                                     </a>
+                                  </div>                                   */}
+                                    {files.disabled === 'Y' ? (
+                                      <a
+                                        href={files.downloadLink}
+                                        className='text-[1rem] !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'
+                                      >
+                                        <i className='ri-download-line text-[.8rem] text-white'></i>
+                                      </a>
+                                    ) : (
+                                      <button
+                                        disabled
+                                        className='text-[1rem] !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-gray-300'
+                                      >
+                                        <i className='ri-download-line text-[.8rem] text-white'></i>
+                                      </button>
+                                    )}
                                   </div>
-                                  {/* <div className='font-semibold text-[0.9375rem] '>
-                                  <a
-                                    href={files.downloadLink}
-                                    type='button'
-                                    className='ti-btn ti-btn-primary-full label-ti-btn'
-                                  >
-                                    <i className='ri-download-line label-ti-btn-icon  me-2'></i>
-                                    Download
-                                  </a>
-                                </div> */}
                                 </div>
                               </li>
                             </>

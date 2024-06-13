@@ -92,7 +92,7 @@ const SiteCitySchema = Yup.string()
   .matches(/^[a-zA-Z\s\-_.]+$/, 'Please enter a valid address name.');
 
 const PincodeSchema = Yup.string()
-  .required('Please enter your  pincode')
+  .required('Please enter your zip code.')
   .min(5, 'The pincode should be at least five characters long')
   .max(6, 'The pincode should not exceed six characters')
   .matches(/^[0-9]+$/, 'The pincode should contain only numeric characters');
