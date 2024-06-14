@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { User } from '@supabase/supabase-js';
 
+import { logActivity } from '@/supabase/activity';
+
 import { supabase } from './db';
 
 // Define the interfaces for the input data and result
@@ -122,6 +124,13 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
             return { errorCode: 1, data: null };
           } else {
             if (!site_users || site_users.length === 0) {
+              await logActivity({
+                user_id: UserData.user_id,
+                org_id: UserData.org_id,
+                site_id: UserData.site_id,
+                // target_user_id: users[0].id,
+                activity_type: 'add_user',
+              });
               // Add email function here to send an invitation to the user
               return { errorCode: 0, data: 'Invitation sent' };
             } else {
@@ -182,10 +191,11 @@ async function modifyUserOfSites(
 
 // Function to remove a user from the 'site_users' table based on user ID
 async function removeUserFromSites(
-  user_id: any,
+  target_user_id: any,
   site_id: any,
+  user_id: any,
 ): Promise<Result<string>> {
-  if (!user_id || !site_id) {
+  if (!target_user_id || !site_id) {
     return { errorCode: 1, data: null };
   }
 
@@ -193,12 +203,20 @@ async function removeUserFromSites(
     const { error } = await supabase
       .from('site_users')
       .delete()
-      .eq('user_id', user_id)
+      .eq('user_id', target_user_id)
       .eq('site_id', site_id);
 
     if (error) {
       return { errorCode: 1, data: null };
     } else {
+      // Log the activity
+      await logActivity({
+        site_id: site_id,
+        user_id: user_id, // You might want to pass the admin's user_id who is performing the removal
+        target_user_id: target_user_id,
+        activity_type: 'remove_user',
+      });
+
       return { errorCode: 0, data: 'User sites removed successfully' };
     }
   } catch (error) {

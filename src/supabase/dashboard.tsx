@@ -223,6 +223,7 @@ async function orgEntitlementList(
     const entitlementList: EntitlementList[] = [];
 
     for (const entitlement of entitlements) {
+      // Fetch the name of the entitlement
       const { data: entitlementName, error: entitlementNameError } =
         await supabase
           .from('entitlements_name')
@@ -230,26 +231,54 @@ async function orgEntitlementList(
           .eq('id', entitlement.entitlement_name_id)
           .single();
 
+      // Fetch the value of the entitlement (select all potential value types)
       const { data: entitlementValue, error: entitlementValueError } =
         await supabase
           .from('entitlements_values')
-          .select('value_number')
+          .select('*')
           .eq('id', entitlement.entitlement_value_id)
           .single();
 
+      // Handle errors for fetching entitlement details
       if (entitlementNameError || entitlementValueError) {
         continue;
       }
 
+      // Determine which value is present
+      let entitlementValueResolved: any;
+      if (
+        entitlementValue.value_text !== null &&
+        entitlementValue.value_text !== undefined
+      ) {
+        entitlementValueResolved = entitlementValue.value_text;
+
+        entitlementValueResolved =
+          entitlementValueResolved.charAt(0).toUpperCase() +
+          entitlementValueResolved.slice(1);
+      } else if (
+        entitlementValue.value_number !== null &&
+        entitlementValue.value_number !== undefined
+      ) {
+        entitlementValueResolved = entitlementValue.value_number;
+      } else if (
+        entitlementValue.value_bool !== null &&
+        entitlementValue.value_bool !== undefined
+      ) {
+        entitlementValueResolved = entitlementValue.value_bool;
+      } else {
+        // If no value is present, continue to the next entitlement
+        continue;
+      }
+
+      // Create detailed entitlement object
       const detailedEntitlement = {
         ...entitlement,
         entitlementName: entitlementName.name,
-        entitlementValue: entitlementValue.value_number,
+        entitlementValue: entitlementValueResolved,
       };
 
       entitlementList.push(detailedEntitlement);
     }
-
     return {
       errorCode: 0,
       data: {

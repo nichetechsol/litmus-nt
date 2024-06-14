@@ -213,7 +213,7 @@ async function listSolutions() {
             if (dataName !== '.emptyFolderPlaceholder') {
               // Check if the dataName is not ".emptyFolderPlaceholder" before pushing to results
               results.push({
-                folder: `${item.name}/${subFolder.name}`,
+                folder: `${subFolder.name}`,
                 errorCode: 0,
                 message: 'Success',
                 data: {
