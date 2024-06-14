@@ -15,7 +15,6 @@ import store from '@/shared/redux/store';
 import { getUserRole } from '@/supabase/org_details';
 import { getOrgUserRole } from '@/supabase/org_user';
 import { getSiteUserRole } from '@/supabase/site_users';
-import Loader from '@/utils/Loader/Loader';
 
 import { ThemeChanger } from '../../redux/action';
 const Header = ({ local_varaiable, ThemeChanger }: any) => {
@@ -447,141 +446,139 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
       setRoleToDisplay(userrole3);
     }
   }, [userRoleName, org_id, userrole2, site_id, userrole3, pathname]);
-  const [loading, setLoading] = useState<boolean>(false);
+
   return (
-    <>
-      {loading && <Loader />}
-      <Fragment>
-        <div className='app-header'>
-          <nav className='main-header !h-[3.75rem]' aria-label='Global'>
-            <div className='main-header-container ps-[0.725rem] pe-[1rem] '>
-              <div className='header-content-left'>
-                <div className='header-element'>
-                  <div className='horizontal-logo'>
-                    <Link href='/organization' className='header-logo'>
-                      <Image
-                        src={`${
-                          process.env.NODE_ENV === 'production' ? '' : ''
-                        }/assets/images/brand-logos/desktop-logo.png`}
-                        alt='logo'
-                        className='desktop-logo'
-                        width={100}
-                        height={100}
-                      />
-                      <Image
-                        src={`${
-                          process.env.NODE_ENV === 'production' ? '' : ''
-                        }/assets/images/brand-logos/toggle-logo.png`}
-                        alt='logo'
-                        className='toggle-logo'
-                        width={100}
-                        height={100}
-                      />
-                      <Image
-                        src={`${
-                          process.env.NODE_ENV === 'production' ? '' : ''
-                        }/assets/images/brand-logos/desktop-dark.png`}
-                        alt='logo'
-                        className='desktop-dark'
-                        width={100}
-                        height={100}
-                      />
-                      <Image
-                        src={`${
-                          process.env.NODE_ENV === 'production' ? '' : ''
-                        }/assets/images/brand-logos/toggle-dark.png`}
-                        alt='logo'
-                        className='toggle-dark'
-                        width={100}
-                        height={100}
-                      />
-                      <Image
-                        src={`${
-                          process.env.NODE_ENV === 'production' ? '' : ''
-                        }/assets/images/brand-logos/desktop-white.png`}
-                        alt='logo'
-                        className='desktop-white'
-                        width={100}
-                        height={100}
-                      />
-                      <Image
-                        src={`${
-                          process.env.NODE_ENV === 'production' ? '' : ''
-                        }/assets/images/brand-logos/toggle-white.png`}
-                        alt='logo'
-                        className='toggle-white'
-                        width={100}
-                        height={100}
-                      />
-                    </Link>
-                  </div>
-                </div>
-                <div
-                  className='header-element md:px-[0.325rem] !items-center'
-                  onClick={() => toggleSidebar()}
-                >
-                  <Link
-                    aria-label='Hide Sidebar'
-                    className='sidemenu-toggle animated-arrow  hor-toggle horizontal-navtoggle inline-flex items-center'
-                    href=''
-                  >
-                    <span></span>
+    <Fragment>
+      <div className='app-header'>
+        <nav className='main-header !h-[3.75rem]' aria-label='Global'>
+          <div className='main-header-container ps-[0.725rem] pe-[1rem] '>
+            <div className='header-content-left'>
+              <div className='header-element'>
+                <div className='horizontal-logo'>
+                  <Link href='/organization' className='header-logo'>
+                    <Image
+                      src={`${
+                        process.env.NODE_ENV === 'production' ? '' : ''
+                      }/assets/images/brand-logos/desktop-logo.png`}
+                      alt='logo'
+                      className='desktop-logo'
+                      width={100}
+                      height={100}
+                    />
+                    <Image
+                      src={`${
+                        process.env.NODE_ENV === 'production' ? '' : ''
+                      }/assets/images/brand-logos/toggle-logo.png`}
+                      alt='logo'
+                      className='toggle-logo'
+                      width={100}
+                      height={100}
+                    />
+                    <Image
+                      src={`${
+                        process.env.NODE_ENV === 'production' ? '' : ''
+                      }/assets/images/brand-logos/desktop-dark.png`}
+                      alt='logo'
+                      className='desktop-dark'
+                      width={100}
+                      height={100}
+                    />
+                    <Image
+                      src={`${
+                        process.env.NODE_ENV === 'production' ? '' : ''
+                      }/assets/images/brand-logos/toggle-dark.png`}
+                      alt='logo'
+                      className='toggle-dark'
+                      width={100}
+                      height={100}
+                    />
+                    <Image
+                      src={`${
+                        process.env.NODE_ENV === 'production' ? '' : ''
+                      }/assets/images/brand-logos/desktop-white.png`}
+                      alt='logo'
+                      className='desktop-white'
+                      width={100}
+                      height={100}
+                    />
+                    <Image
+                      src={`${
+                        process.env.NODE_ENV === 'production' ? '' : ''
+                      }/assets/images/brand-logos/toggle-white.png`}
+                      alt='logo'
+                      className='toggle-white'
+                      width={100}
+                      height={100}
+                    />
                   </Link>
                 </div>
               </div>
-              <div className='header-content-right'>
-                <div className='header-element md:!px-[0.65rem] px-2 hs-dropdown !items-center ti-dropdown [--placement:bottom-left]'>
-                  <button
-                    id='dropdown-profile'
-                    type='button'
-                    className='hs-dropdown-toggle ti-dropdown-toggle !gap-2 !p-0 flex-shrink-0 sm:me-2 me-0 !rounded-full !shadow-none text-xs align-middle !border-0 !shadow-transparent '
-                  >
-                    <div className='avatar avatar-xl avatar-rounded '>
-                      {' '}
-                      <span
-                        style={{ cursor: 'pointer' }}
-                        className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'
-                      >
-                        {/* {SingleSite?.site?SingleSite?.site?.name[0].toUpperCase(): ""} */}
-                        {user_fname ? (
-                          <InitialsComponent name={user_fname} />
-                        ) : (
-                          ''
-                        )}
+              <div
+                className='header-element md:px-[0.325rem] !items-center'
+                onClick={() => toggleSidebar()}
+              >
+                <Link
+                  aria-label='Hide Sidebar'
+                  className='sidemenu-toggle animated-arrow  hor-toggle horizontal-navtoggle inline-flex items-center'
+                  href=''
+                >
+                  <span></span>
+                </Link>
+              </div>
+            </div>
+            <div className='header-content-right'>
+              <div className='header-element md:!px-[0.65rem] px-2 hs-dropdown !items-center ti-dropdown [--placement:bottom-left]'>
+                <button
+                  id='dropdown-profile'
+                  type='button'
+                  className='hs-dropdown-toggle ti-dropdown-toggle !gap-2 !p-0 flex-shrink-0 sm:me-2 me-0 !rounded-full !shadow-none text-xs align-middle !border-0 !shadow-transparent '
+                >
+                  <div className='avatar avatar-xl avatar-rounded '>
+                    {' '}
+                    <span
+                      style={{ cursor: 'pointer' }}
+                      className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'
+                    >
+                      {/* {SingleSite?.site?SingleSite?.site?.name[0].toUpperCase(): ""} */}
+                      {user_fname ? (
+                        <InitialsComponent name={user_fname} />
+                      ) : (
+                        ''
+                      )}
 
-                        {user_lname ? (
-                          <InitialsComponent name={user_lname} />
-                        ) : (
-                          ''
-                        )}
-                      </span>
-                    </div>
-                    {/* <Image
+                      {user_lname ? (
+                        <InitialsComponent name={user_lname} />
+                      ) : (
+                        ''
+                      )}
+                    </span>
+                  </div>
+                  {/* <Image
                     className='inline-block rounded-full '
                     src='/assets/images/user.jpg'
                     width='32'
                     height='32'
                     alt='Image Description'
                   /> */}
-                  </button>
-                  <div
-                    className='md:block hidden dropdown-profile'
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <p className='font-semibold mb-0 leading-none text-[#536485] text-[0.813rem] '>
-                      {user_fname} {user_lname}
-                    </p>
-                    <span className='opacity-[0.7] font-normal text-[#536485] block text-[0.6875rem] '>
-                      {/* {userRoleName} */}
-                      {roleToDisplay ? roleToDisplay : ''}
-                    </span>
-                  </div>
-                  <div
-                    className='hs-dropdown-menu ti-dropdown-menu !-mt-3 border-0 w-[11rem] !p-0 border-defaultborder hidden main-header-dropdown  pt-0 overflow-hidden header-profile-dropdown dropdown-menu-end'
-                    aria-labelledby='dropdown-profile'
-                  >
-                    <ul className='text-defaulttextcolor font-medium dark:text-[#8c9097] dark:text-white/50'>
-                      {/* <li>
+                </button>
+                <div
+                  className='md:block hidden dropdown-profile'
+                  style={{ cursor: 'pointer' }}
+                >
+                  <p className='font-semibold mb-0 leading-none text-[#536485] text-[0.813rem] '>
+                    {user_fname} {user_lname}
+                  </p>
+                  <span className='opacity-[0.7] font-normal text-[#536485] block text-[0.6875rem] '>
+                    {/* {userRoleName} */}
+                    {roleToDisplay ? roleToDisplay : ''}
+                  </span>
+                </div>
+                <div
+                  className='hs-dropdown-menu ti-dropdown-menu !-mt-3 border-0 w-[11rem] !p-0 border-defaultborder hidden main-header-dropdown  pt-0 overflow-hidden header-profile-dropdown dropdown-menu-end'
+                  aria-labelledby='dropdown-profile'
+                >
+                  <ul className='text-defaulttextcolor font-medium dark:text-[#8c9097] dark:text-white/50'>
+                    {/* <li>
                       <Link className="w-full ti-dropdown-item !text-[0.8125rem] !gap-x-0  !p-[0.65rem] !inline-flex" href="/components/pages/profile/">
                         <i className="ti ti-user-circle text-[1.125rem] me-2 opacity-[0.7]"></i>Profile
                       </Link>
@@ -601,67 +598,64 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                     <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" href="/components/pages/chat/"><i
                       className="ti ti-headset text-[1.125rem] me-2 opacity-[0.7]"></i>Support</Link></li> */}
 
-                      <li
-                        onClick={() => {
-                          swal({
-                            title: 'Are you sure?',
-                            text: 'Do you really want to logout?',
-                            icon: 'warning',
-                            buttons: {
-                              cancel: {
-                                text: 'Cancel',
-                                value: null,
-                                visible: true,
-                                className: '',
-                                closeModal: true,
-                              },
-                              confirm: {
-                                text: 'Yes, logout!',
-                                value: true,
-                                visible: true,
-                                className: '',
-                                closeModal: true,
-                              },
+                    <li
+                      onClick={() => {
+                        swal({
+                          title: 'Are you sure?',
+                          text: 'Do you really want to logout?',
+                          icon: 'warning',
+                          buttons: {
+                            cancel: {
+                              text: 'Cancel',
+                              value: null,
+                              visible: true,
+                              className: '',
+                              closeModal: true,
                             },
-                          }).then((willLogout: any) => {
-                            if (willLogout) {
-                              setLoading(true);
-                              localStorage.removeItem(
-                                'sb-emsjiuztcinhapaurcrl-auth-token',
-                              );
-                              localStorage.removeItem('org_id');
-                              localStorage.removeItem('org_name');
-                              localStorage.removeItem('site_id');
-                              localStorage.removeItem('site_name');
-                              history.push('/');
-                              setLoading(false);
-                            }
-                          });
-                        }}
-                      >
-                        <button className='w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex'>
-                          {/* <Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" href="/components/authentication/sign-in/signin-cover/"> */}
-                          <i className='ti ti-logout text-[1.125rem] me-2 opacity-[0.7]'></i>
-                          Log Out
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
+                            confirm: {
+                              text: 'Yes, logout!',
+                              value: true,
+                              visible: true,
+                              className: '',
+                              closeModal: true,
+                            },
+                          },
+                        }).then((willLogout: any) => {
+                          if (willLogout) {
+                            localStorage.removeItem(
+                              'sb-emsjiuztcinhapaurcrl-auth-token',
+                            );
+                            localStorage.removeItem('org_id');
+                            localStorage.removeItem('org_name');
+                            localStorage.removeItem('site_id');
+                            localStorage.removeItem('site_name');
+                            history.push('/');
+                          }
+                        });
+                      }}
+                    >
+                      <button className='w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex'>
+                        {/* <Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" href="/components/authentication/sign-in/signin-cover/"> */}
+                        <i className='ti ti-logout text-[1.125rem] me-2 opacity-[0.7]'></i>
+                        Log Out
+                      </button>
+                    </li>
+                  </ul>
                 </div>
-                {/* <div className="header-element md:px-[0.48rem]">
+              </div>
+              {/* <div className="header-element md:px-[0.48rem]">
               <button aria-label="button" type="button"
                 className="hs-dropdown-toggle switcher-icon inline-flex flex-shrink-0 justify-center items-center gap-2  rounded-full font-medium  align-middle transition-all text-xs dark:text-[#8c9097] dark:text-white/50 dark:hover:text-white dark:focus:ring-white/10 dark:focus:ring-offset-white/10"
                 data-hs-overlay="#hs-overlay-switcher">
                 <i className="bx bx-cog header-link-icon animate-spin-slow"></i>
               </button>
             </div> */}
-              </div>
             </div>
-          </nav>
-        </div>
-        {/* <Modalsearch /> */}
-      </Fragment>
-    </>
+          </div>
+        </nav>
+      </div>
+      {/* <Modalsearch /> */}
+    </Fragment>
   );
 };
 

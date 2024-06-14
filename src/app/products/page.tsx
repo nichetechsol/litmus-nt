@@ -4,7 +4,6 @@
 
 import { redirect } from 'next/navigation';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import swal from 'sweetalert';
 
 import { decryptData } from '@/helper/Encryption_Decryption';
 import { allCurrentfiles } from '@/supabase/products';
@@ -51,10 +50,6 @@ const Page = () => {
     if (decrytedOrgTypeId) {
       setOrg_type_id(decrytedOrgTypeId);
     }
-    if (!decryptedSiteId) {
-      swal('Please select a Site or Organization', { icon: 'error' });
-      redirect('/organization');
-    }
   }, []);
 
   // const [currentfiles, setCurrentfiles] = useState<any>('');
@@ -62,11 +57,10 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await refreshToken();
         setLoading(true);
         if (site_id && org_id && org_type_id) {
           const data: any = await allCurrentfiles(site_id, org_id, org_type_id);
-
+          await refreshToken();
           if (data.data.length >= 0) {
             setFolder(data.data);
           }
@@ -75,9 +69,6 @@ const Page = () => {
           // }
           setLoading(false);
         }
-        // else{
-        //   setLoading(false)
-        // }
       } catch (error: any) {
         setLoading(false);
       }
@@ -119,43 +110,36 @@ const Page = () => {
                   </div>
                   <div className='box-body !p-0'>
                     <ul className='list-group nft-list'>
-                      {folder && folder.length > 0 ? (
-                        folder.map((folder: any) => (
-                          <>
-                            <li
-                              style={{ cursor: 'pointer' }}
-                              key={folder.folder}
-                              className={`list-group-item ${
-                                selectedFolder === folder
-                                  ? 'checkforactive'
-                                  : ''
-                              }`}
-                              onClick={() => handlefolderclick(folder)}
-                            >
-                              <div className='flex items-center gap-2'>
-                                <div>
-                                  <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
-                                    <i className='ri-folder-line text-[1rem]  text-white'></i>
-                                  </span>
-                                  {/* <span className='avatar avatar-rounded avatar-sm bg-light p-1'>
+                      {folder && folder.length > 0
+                        ? folder.map((folder: any) => (
+                            <>
+                              <li
+                                style={{ cursor: 'pointer' }}
+                                key={folder.folder}
+                                className={`list-group-item ${
+                                  selectedFolder === folder
+                                    ? 'checkforactive'
+                                    : ''
+                                }`}
+                                onClick={() => handlefolderclick(folder)}
+                              >
+                                <div className='flex items-center gap-2'>
+                                  <div>
+                                    <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
+                                      <i className='ri-folder-line text-[1rem]  text-white'></i>
+                                    </span>
+                                    {/* <span className='avatar avatar-rounded avatar-sm bg-light p-1'>
                                  
                                 </span> */}
+                                  </div>
+                                  <div className='text-[.875rem] font-semibold my-auto '>
+                                    {folder?.folder}
+                                  </div>
                                 </div>
-                                <div className='text-[.875rem] font-semibold my-auto '>
-                                  {folder?.folder}
-                                </div>
-                              </div>
-                            </li>
-                          </>
-                        ))
-                      ) : (
-                        <>
-                          <div className='col-md-12 w-100 mt-4'>
-                            <p className='text-center'>No Products Found</p>{' '}
-                          </div>
-                          <></>
-                        </>
-                      )}
+                              </li>
+                            </>
+                          ))
+                        : null}
                     </ul>
                   </div>
                 </div>
@@ -197,60 +181,47 @@ const Page = () => {
                   </div>
                   <div className='box-body'>
                     <ul className='list-none crm-top-deals mb-0'>
-                      {filteredFiles && filteredFiles.length > 0 ? (
-                        filteredFiles?.map((files: any) => (
-                          <>
-                            <li className='mb-[0.9rem] p-4 hover:bg-light border dark:border-defaultborder/10 rounded-md relative"'>
-                              <div className='flex items-center flex-wrap'>
-                                <div className='me-2'>
-                                  <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
-                                    <i className='ri-file-line text-[1rem]  text-white'></i>
-                                  </span>
-                                </div>
-                                <div className='flex-grow'>
-                                  <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                    {files.FileName}
-                                  </p>
-                                  {/* <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
+                      {filteredFiles && filteredFiles.length > 0
+                        ? filteredFiles?.map((files: any) => (
+                            <>
+                              <li className='mb-[0.9rem] p-4 hover:bg-light border dark:border-defaultborder/10 rounded-md relative"'>
+                                <div className='flex items-center flex-wrap'>
+                                  <div className='me-2'>
+                                    <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
+                                      <i className='ri-file-line text-[1rem]  text-white'></i>
+                                    </span>
+                                  </div>
+                                  <div className='flex-grow'>
+                                    <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                      {files.FileName}
+                                    </p>
+                                    {/* <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
                                     Size 16MB
                                   </p> */}
-                                </div>
-                                <div className='font-semibold text-[0.9375rem] '>
-                                  {/* <a
+                                  </div>
+                                  <div className='font-semibold text-[0.9375rem] '>
+                                    <a
                                       href={files.downloadLink}
                                       className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
                                     >
                                       <i className='ri-download-line  text-[.8rem]  text-white'></i>
                                     </a>
-                                  </div>                                   */}
-                                  {files.disabled === 'Y' ? (
-                                    <a
-                                      href={files.downloadLink}
-                                      className='text-[1rem] !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'
-                                    >
-                                      <i className='ri-download-line text-[.8rem] text-white'></i>
-                                    </a>
-                                  ) : (
-                                    <button
-                                      disabled
-                                      className='text-[1rem] !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-gray-300'
-                                    >
-                                      <i className='ri-download-line text-[.8rem] text-white'></i>
-                                    </button>
-                                  )}
+                                  </div>
+                                  {/* <div className='font-semibold text-[0.9375rem] '>
+                                  <a
+                                    href={files.downloadLink}
+                                    type='button'
+                                    className='ti-btn ti-btn-primary-full label-ti-btn'
+                                  >
+                                    <i className='ri-download-line label-ti-btn-icon  me-2'></i>
+                                    Download
+                                  </a>
+                                </div> */}
                                 </div>
-                              </div>
-                            </li>
-                          </>
-                        ))
-                      ) : (
-                        <>
-                          <div className='col-md-12 w-100 mt-4'>
-                            <p className='text-center'>No Products Found</p>{' '}
-                          </div>
-                          <></>
-                        </>
-                      )}
+                              </li>
+                            </>
+                          ))
+                        : null}
                     </ul>
                   </div>
                 </div>

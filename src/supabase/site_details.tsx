@@ -52,93 +52,69 @@ async function fetchSiteDetails(
       throw error;
     }
 
-    const siteIds = siteDetails.map((site) => site.id);
-    const countryIds = siteDetails.map((site) => site.country_id);
-    const stateIds = siteDetails.map((site) => site.state_id);
-    const typeIds = siteDetails.map((site) => site.type_id);
+    const siteDetailsWithUsers: SiteDetailsWithUsers[] = [];
 
-    // Fetch all related data in bulk
-    const [
-      { data: usersData, error: usersError },
-      { data: countriesData, error: countriesError },
-      { data: statesData, error: statesError },
-      { data: typesData, error: typesError },
-      { data: ownersData, error: ownersError },
-    ] = await Promise.all([
-      supabase
-        .from('site_users')
-        .select('*', { count: 'exact' })
-        .in('site_id', siteIds),
-      supabase.from('country').select('id, name').in('id', countryIds),
-      supabase.from('state').select('id, name').in('id', stateIds),
-      supabase.from('site_types').select('id, name').in('id', typeIds),
-      supabase
-        .from('site_users')
-        .select('site_id, user_id')
-        .in('site_id', siteIds)
-        .eq('role_id', 1),
-    ]);
+    // Fetch user details for each site
+    for (const site of siteDetails as SiteDetails[]) {
+      const [users, country, state, type, owners] = await Promise.all([
+        supabase
+          .from('site_users')
+          .select('*', { count: 'exact' })
+          .eq('site_id', site.id),
+        supabase.from('country').select('name').eq('id', site.country_id),
+        supabase.from('state').select('name').eq('id', site.state_id),
+        supabase.from('site_types').select('name').eq('id', site.type_id),
+        supabase
+          .from('site_users')
+          .select('user_id')
+          .eq('site_id', site.id)
+          .eq('role_id', 1),
+      ]);
 
-    if (
-      usersError ||
-      countriesError ||
-      statesError ||
-      typesError ||
-      ownersError
-    ) {
-      throw new Error(
-        [usersError, countriesError, statesError, typesError, ownersError]
-          .filter(Boolean)
-          .map((err) => err?.message ?? 'Unknown error')
-          .join(', '),
-      );
-    }
-
-    // Fetch owner details if ownersData is not null
-    let ownerDetails: { id: string; firstname: string }[] = [];
-    if (ownersData) {
-      const ownerUserIds = ownersData.map((owner) => owner.user_id);
-      const { data: fetchedOwnerDetails, error: ownerDetailsError } =
-        await supabase
-          .from('users')
-          .select('id, firstname')
-          .in('id', ownerUserIds);
-
-      if (ownerDetailsError) {
-        throw ownerDetailsError;
+      if (users.error) {
+        throw users.error;
+      }
+      if (country.error) {
+        throw country.error;
+      }
+      if (state.error) {
+        throw state.error;
+      }
+      if (type.error) {
+        throw type.error;
+      }
+      if (owners.error) {
+        throw owners.error;
       }
 
-      ownerDetails = fetchedOwnerDetails ?? [];
-    }
+      let ownerNames: string[] = [];
+      if (owners.data.length > 0) {
+        const ownerUserIds = owners.data.map((owner) => owner.user_id);
 
-    const siteDetailsWithUsers: any = siteDetails.map((site) => {
-      const siteUsers =
-        usersData?.filter((user) => user.site_id === site.id) || [];
-      const siteOwners =
-        ownersData?.filter((owner) => owner.site_id === site.id) || [];
-      const ownerNames = siteOwners
-        .map(
-          (owner) =>
-            ownerDetails.find((user) => user.id === owner.user_id)?.firstname,
-        )
-        .filter(Boolean);
-      const country =
-        countriesData?.find((country) => country.id === site.country_id)
-          ?.name || null;
-      const state =
-        statesData?.find((state) => state.id === site.state_id)?.name || null;
-      const type_name =
-        typesData?.find((type) => type.id === site.type_id)?.name || null;
+        // Fetch owners' names from users table
+        const { data: ownerDetails, error: ownerDetailsError } = await supabase
+          .from('users')
+          .select('firstname')
+          .in('id', ownerUserIds);
 
-      return {
+        if (ownerDetailsError) {
+          throw ownerDetailsError;
+        }
+
+        if (ownerDetails && ownerDetails.length > 0) {
+          ownerNames = ownerDetails.map((owner) => owner.firstname);
+        }
+      }
+
+      siteDetailsWithUsers.push({
         site,
-        users: siteUsers,
+        users: users.data,
         ownerNames,
-        country,
-        state,
-        type_name,
-      };
-    });
+        country: country.data.length > 0 ? country.data[0].name : null,
+        state: state.data.length > 0 ? state.data[0].name : null,
+        type_name: type.data.length > 0 ? type.data[0].name : null,
+      });
+    }
 
     return {
       errorCode: 0,

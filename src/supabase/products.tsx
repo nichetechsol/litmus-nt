@@ -131,6 +131,9 @@ async function listLitmusProducts(site_id: any) {
 }
 
 async function allCurrentfiles(site_id: any, org_id: any, org_type_id: any) {
+  let fileTypes = []; // Declare fileTypes variable
+
+  // Fetch entitlements package based on site_id
   if (!site_id || !org_id || !org_type_id) {
     return {
       errorCode: 1,
@@ -138,12 +141,12 @@ async function allCurrentfiles(site_id: any, org_id: any, org_type_id: any) {
       data: null,
     };
   }
-
   const { data: entitlements_package, error: errorEntitlement } = await supabase
     .from('entitlements_package')
     .select('*')
     .eq('site_id', site_id);
 
+  // Check if there was an error in fetching entitlements package
   if (errorEntitlement) {
     return {
       errorCode: 2,
@@ -152,6 +155,7 @@ async function allCurrentfiles(site_id: any, org_id: any, org_type_id: any) {
     };
   }
 
+  // Determine the relevant entitlements
   const entitlement14 = entitlements_package.some(
     (entitlement) => entitlement.entitlement_name_id === 14,
   );
@@ -159,63 +163,64 @@ async function allCurrentfiles(site_id: any, org_id: any, org_type_id: any) {
     (entitlement) => entitlement.entitlement_name_id === 15,
   );
 
+  // If org_type_id is 1 and entitlement_name_id is not 14, return an error
   if (org_type_id === 1 && !entitlement14) {
     return {
       errorCode: 3,
       message: 'Entitlement 14 is required for org_type_id 1',
       data: null,
     };
+  } else {
+    // Find the entitlement with entitlement_name_id === 14
+    const entitlementValue = entitlements_package.find(
+      (entitlement) => entitlement.entitlement_name_id === 14,
+    );
+
+    // Get the entitlement_value_id if it exists, otherwise set to null
+    const entitlement_value_id_14 = entitlementValue
+      ? entitlementValue.entitlement_value_id
+      : null;
+
+    // Fetch the entitlements values from the Supabase table based on the entitlement_value_id_14
+    const { data: entitlements_values, error } = await supabase
+      .from('entitlements_values')
+      .select('*')
+      .eq('id', entitlement_value_id_14);
+
+    // If there is an error in fetching, log it or handle it accordingly
+    if (error) {
+      // Handle the error as needed, possibly return or throw
+    }
+
+    // Extract the value_text from the fetched data, ensure entitlements_values is not null
+    const values = entitlements_values
+      ? entitlements_values[0]?.value_text
+      : null;
+
+    const {
+      data: filedownload_permissions,
+      error: filedownload_permissions_error,
+    } = await supabase
+      .from('filedownload_permissions')
+      .select('*')
+      .eq('org_type_id', org_type_id)
+      .eq('entitlement_value', values);
+    if (filedownload_permissions_error) {
+      // Handle error
+    } else {
+      // Extracting file_type from each object in filedownload_permissions
+      fileTypes = filedownload_permissions.map(
+        (permission) => permission.file_type,
+      );
+
+      // Now you have an array of file types in fileTypes
+    }
   }
+  // Fetch the list of Litmus Products from storage
+  const { data, error } = await supabase.storage.from('Litmus_Products').list();
 
-  const entitlementValue = entitlements_package.find(
-    (entitlement) => entitlement.entitlement_name_id === 14,
-  );
-  const entitlement_value_id_14 = entitlementValue
-    ? entitlementValue.entitlement_value_id
-    : null;
-
-  const { data: entitlements_values, error: errorValues } = await supabase
-    .from('entitlements_values')
-    .select('*')
-    .eq('id', entitlement_value_id_14);
-
-  if (errorValues) {
-    return {
-      errorCode: 4,
-      message: 'Error fetching entitlements values',
-      data: null,
-    };
-  }
-
-  const values = entitlements_values
-    ? entitlements_values[0]?.value_text
-    : null;
-
-  const {
-    data: filedownload_permissions,
-    error: filedownload_permissions_error,
-  } = await supabase
-    .from('filedownload_permissions')
-    .select('*')
-    .eq('org_type_id', org_type_id)
-    .eq('entitlement_value', values);
-
-  if (filedownload_permissions_error) {
-    return {
-      errorCode: 5,
-      message: 'Error fetching file download permissions',
-      data: null,
-    };
-  }
-
-  const fileTypes = filedownload_permissions.map(
-    (permission) => permission.file_type,
-  );
-
-  const { data: litmusProducts, error: litmusProductsError } =
-    await supabase.storage.from('Litmus_Products').list();
-
-  if (litmusProductsError) {
+  // Handle errors from fetching Litmus Products
+  if (error) {
     return {
       errorCode: 1,
       message: 'Error fetching Litmus Products',
@@ -223,7 +228,7 @@ async function allCurrentfiles(site_id: any, org_id: any, org_type_id: any) {
     };
   }
 
-  if (!litmusProducts || litmusProducts.length === 0) {
+  if (!data || data.length === 0) {
     return {
       errorCode: 1,
       message: 'No Data Available for this product',
@@ -231,7 +236,8 @@ async function allCurrentfiles(site_id: any, org_id: any, org_type_id: any) {
     };
   }
 
-  const filteredFolders = litmusProducts.filter((item) => {
+  // Filter folders based on entitlements
+  const filteredFolders = data.filter((item) => {
     if (
       entitlement14 &&
       (item.name === 'Litmus_Edge' || item.name === 'Litmus_Edge_Manager')
@@ -244,76 +250,67 @@ async function allCurrentfiles(site_id: any, org_id: any, org_type_id: any) {
     return false;
   });
 
-  const results = await Promise.all(
-    filteredFolders.map(async (item) => {
-      const { data: folderData, error: folderError } = await supabase.storage
-        .from('Litmus_Products')
-        .list(item.name);
+  const results = [];
+  for (const item of filteredFolders) {
+    const { data: folderData, error: folderError } = await supabase.storage
+      .from('Litmus_Products')
+      .list(item.name);
 
-      if (folderError) {
-        return {
-          folder: item.name,
-          errorCode: 1,
-          message: 'Error retrieving folder contents',
-          data: null,
-        };
-      }
+    if (folderError) {
+      results.push({
+        folder: item.name,
+        errorCode: 1,
+        message: 'Error retrieving folder contents',
+        data: null,
+      });
+    } else {
+      // Store all files and their download links
+      const filesWithLinks = [];
 
-      const filesWithLinks = await Promise.all(
-        folderData.map(async (subItem) => {
-          const allFiles = {
-            name: subItem.name,
-            status: subItem.name.includes('_Current') ? 'current' : 'archive',
-          };
+      const allFiles = folderData.map((subItem) => ({
+        name: subItem.name,
+        status: subItem.name.includes('_Current') ? 'current' : 'archive',
+      }));
 
-          const { data: fileData, error: fileDataError } =
-            await supabase.storage
+      for (const file of allFiles) {
+        const { data: fileData, error: signedURLError } = await supabase.storage
+          .from('Litmus_Products')
+          .list(`${item.name}/${file.name}`);
+
+        if (fileData) {
+          for (const fileEntry of fileData) {
+            const dataName = fileEntry.name;
+            const fileExtension = dataName.split('.').pop(); // Get the file extension
+
+            // Check if the file extension is included in the fileTypes array
+            const extensionIncluded = fileTypes.includes(fileExtension)
+              ? 'Y'
+              : 'N';
+
+            const { data: download, error } = await supabase.storage
               .from('Litmus_Products')
-              .list(`${item.name}/${allFiles.name}`);
+              .createSignedUrl(`${item.name}/${file.name}/${dataName}`, 60);
 
-          if (fileDataError) {
-            return null;
-          }
-
-          return await Promise.all(
-            fileData.map(async (fileEntry) => {
-              const dataName = fileEntry.name;
-              const fileExtension = dataName.split('.').pop();
-              const extensionIncluded = fileTypes.includes(fileExtension)
-                ? 'Y'
-                : 'N';
-
-              const { data: download, error: downloadError } =
-                await supabase.storage
-                  .from('Litmus_Products')
-                  .createSignedUrl(
-                    `${item.name}/${allFiles.name}/${dataName}`,
-                    60,
-                  );
-
-              if (downloadError) {
-                return null;
-              }
-
-              return {
+            if (!error) {
+              filesWithLinks.push({
                 FileName: dataName,
                 downloadLink: download.signedUrl,
-                status: allFiles.status,
-                disabled: extensionIncluded,
-              };
-            }),
-          );
-        }),
-      );
+                status: file.status,
+                disabled: extensionIncluded, // Add extensionIncluded to the result
+              });
+            }
+          }
+        }
+      }
 
-      return {
+      results.push({
         folder: item.name,
         errorCode: 0,
         message: 'Success',
-        data: filesWithLinks.flat(),
-      };
-    }),
-  );
+        data: filesWithLinks,
+      });
+    }
+  }
 
   return {
     errorCode: 0,
