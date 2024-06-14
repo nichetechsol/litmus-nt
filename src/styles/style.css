@@ -4506,7 +4506,7 @@ label {
   @apply m-0 py-[0rem] px-3;
 }
 .app-sidebar .side-menu__item {
-  @apply p-3 relative flex items-center no-underline text-[0.78rem] text-[#a3aed1] dark:text-[#8f9bb3] font-medium rounded-md;
+  @apply p-3 relative flex items-center no-underline text-[1.28rem] text-[#a3aed1] dark:text-[#8f9bb3] font-medium rounded-md;
 }
 .app-sidebar .side-menu__item.active,
 .app-sidebar .side-menu__item:hover {
@@ -14917,7 +14917,7 @@ input.gridjs-input {
 }
 
 :is(.dark [type='radio']):checked {
-  @apply bg-primary;
+  @apply bg-success;
 }
 
 @media (max-width: 575.98px) {
@@ -15499,7 +15499,7 @@ input.gridjs-input {
   @apply border border-defaultborder outline-none;
 }
 .form-check-input:checked {
-  @apply bg-primary border-primary;
+  @apply bg-success border-success;
 }
 .form-check-input.form-checked-outline:checked {
   @apply bg-transparent border-primary;
@@ -20025,7 +20025,7 @@ h6 {
   @apply bg-primary;
 }
 .pagination {
-  @apply flex;
+  @apply flex justify-end;
 }
 .pagination .page-link {
   @apply w-[1.8rem] h-[1.8rem] bg-white border-b-defaultborder block leading-[1.8rem] text-center;
@@ -20069,4 +20069,21 @@ h6 {
 
 .box-title {
   word-break: break-all;
+}
+.pricing-li {
+  @apply hover:text-white hover:bg-success  hover:border-primary;
+}
+[data-vertical-style='overlay'][data-toggled='icon-overlay-close']:not(
+    [icon-overlay='open']
+  )
+  .app-sidebar
+  .side-menu__item
+  i {
+  margin: 0 !important;
+}
+[data-vertical-style='overlay'][data-toggled='icon-overlay-close']
+  a.sidemenu-toggle
+  span {
+  background: transparent;
+  background-image: none;
 }

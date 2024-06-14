@@ -1,4 +1,8 @@
+/* eslint-disable unused-imports/no-unused-vars */
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { logActivity } from '@/supabase/activity';
+
 import { supabase } from './db';
 
 // Define interfaces for the site data and result structure
@@ -14,6 +18,8 @@ interface SiteData {
   status: string;
   country_id: any;
   state_id: any;
+  user_id: any;
+  description: any;
 }
 
 interface UpdateSiteData {
@@ -36,18 +42,81 @@ interface Result<T> {
 }
 
 // Function to add a site
+// async function addSites(data: SiteData): Promise<Result<any>> {
+//   try {
+//     // Check for duplicate site names in the organization
+//     const { data: existingSite, error: duplicateCheckError } = await supabase
+//       .from('sites_detail')
+//       .select('id')
+//       .eq('org_id', data.org_id)
+//       .eq('name', data.name)
+//       .single(); // Assuming a single record is expected
+
+//     // If a duplicate is found, return an error
+//     if (existingSite) {
+//       return {
+//         errorCode: 1,
+//         message: 'Duplicate site name',
+//         data: null,
+//       };
+//     }
+
+//     // Check for errors during the duplicate check
+//     if (duplicateCheckError && duplicateCheckError.code !== 'PGRST116') {
+//       // PGRST116: No rows found
+//       return {
+//         errorCode: 1,
+//         message: 'Error checking for duplicate site name',
+//         data: null,
+//       };
+//     }
+
+//     // Insert new site details if no duplicate is found
+//     const { data: siteDetails, error: insertError } = await supabase
+//       .from('sites_detail')
+//       .insert([data])
+//       .select();
+
+//     // Check for errors during the insert operation
+//     if (insertError) {
+//       return {
+//         errorCode: 1,
+//         message: 'Error inserting site details',
+//         data: null,
+//       };
+//     } else {
+//       await logActivity({
+//         org_id: data.org_id,
+//         site_id: siteDetails[0].id,
+//         user_id: data.user_id,
+//         activity_type: 'create_site',
+//       });
+
+//       return {
+//         errorCode: 0,
+//         message: 'Site details inserted successfully',
+//         data: siteDetails,
+//       };
+//     }
+//   } catch (error) {
+//     return {
+//       errorCode: 1,
+//       message: 'Unexpected error',
+//       data: null,
+//     };
+//   }
+// }
 async function addSites(data: SiteData): Promise<Result<any>> {
   try {
     // Check for duplicate site names in the organization
-    const { data: existingSite, error: duplicateCheckError } = await supabase
+    const { data: existingSite, error } = await supabase
       .from('sites_detail')
-      .select('id')
+      .select('*')
       .eq('org_id', data.org_id)
-      .eq('name', data.name)
-      .single(); // Assuming a single record is expected
+      .eq('name', data.name); // Assuming a single record is expected or handle appropriately
 
-    // If a duplicate is found, return an error
-    if (existingSite) {
+    // Handle the case where no duplicate is found
+    if (existingSite && existingSite.length > 0) {
       return {
         errorCode: 1,
         message: 'Duplicate site name',
@@ -55,9 +124,9 @@ async function addSites(data: SiteData): Promise<Result<any>> {
       };
     }
 
-    // Check for errors during the duplicate check
-    if (duplicateCheckError && duplicateCheckError.code !== 'PGRST116') {
-      // PGRST116: No rows found
+    // Handle the case where no rows are found (PGRST116 error)
+    if (error) {
+      // Handle other errors during duplicate check
       return {
         errorCode: 1,
         message: 'Error checking for duplicate site name',
@@ -68,7 +137,21 @@ async function addSites(data: SiteData): Promise<Result<any>> {
     // Insert new site details if no duplicate is found
     const { data: siteDetails, error: insertError } = await supabase
       .from('sites_detail')
-      .insert([data])
+      .insert([
+        {
+          org_id: data.org_id,
+          name: data.name,
+          type_id: data.type_id,
+          address1: data.address1,
+          address2: data.address2,
+          city: data.city,
+          pin_code: data.pin_code,
+          about_site: data.about_site,
+          status: data.status,
+          country_id: data.country_id,
+          state_id: data.state_id,
+        },
+      ])
       .select();
 
     // Check for errors during the insert operation
@@ -79,6 +162,31 @@ async function addSites(data: SiteData): Promise<Result<any>> {
         data: null,
       };
     } else {
+      const { data: userInsertData, error: userInsertError } = await supabase
+        .from('site_users')
+        .insert([
+          {
+            user_id: data.user_id,
+            role_id: 1,
+            site_id: siteDetails[0].id,
+          },
+        ])
+        .select();
+
+      if (userInsertError) {
+        return {
+          errorCode: 1,
+          message: 'User not added successfully',
+          data: null,
+        };
+      }
+      await logActivity({
+        org_id: data.org_id,
+        site_id: siteDetails[0].id,
+        user_id: data.user_id,
+        activity_type: 'create_site',
+      });
+
       return {
         errorCode: 0,
         message: 'Site details inserted successfully',
@@ -86,6 +194,7 @@ async function addSites(data: SiteData): Promise<Result<any>> {
       };
     }
   } catch (error) {
+    console.error('Error adding site:', error);
     return {
       errorCode: 1,
       message: 'Unexpected error',
@@ -93,6 +202,124 @@ async function addSites(data: SiteData): Promise<Result<any>> {
     };
   }
 }
+
+// async function addSites(data: SiteData): Promise<Result<any>> {
+//   try {
+//     // Check for duplicate site name
+//     const { data: existingSite, error: duplicateCheckError } = await supabase
+//       .from('sites_detail')
+//       .select('id')
+//       .eq('org_id', data.org_id)
+//       .eq('name', data.name)
+//       .single();
+
+//     if (duplicateCheckError && duplicateCheckError.code !== 'PGRST116') {
+//       return {
+//         errorCode: 1,
+//         message: 'Error checking for duplicate site name',
+//         data: null,
+//       };
+//     }
+//     if (existingSite) {
+//       return {
+//         errorCode: 1,
+//         message: 'Duplicate site name',
+//         data: null,
+//       };
+//     }
+
+//     // Check current site count for the organization
+//     const { data: currentSites, error: countError } = await supabase
+//       .from('sites_detail')
+//       .select('id')
+//       .eq('org_id', data.org_id);
+
+//     if (countError) {
+//       return {
+//         errorCode: 1,
+//         message: 'Error retrieving current site count',
+//         data: null,
+//       };
+//     }
+
+//     // Get entitlement limit for the organization
+//     const { data: entitlement, error: entitlementError } = await supabase
+//       .from('entitlements_package')
+//       .select('entitlement_value_id')
+//       .eq('org_id', data.org_id)
+//       .eq('entitlement_name_id', 14);
+
+//     if (entitlementError) {
+//       return {
+//         errorCode: 1,
+//         message: 'Error retrieving entitlement limit',
+//         data: null,
+//       };
+//     }
+
+//     if (!entitlement || entitlement.length === 0) {
+//       return {
+//         errorCode: 1,
+//         message: 'No entitlement found for the organization',
+//         data: null,
+//       };
+//     }
+
+//     // Check entitlement value
+//     const { data: entitlementValue, error: valueError } = await supabase
+//       .from('entitlements_values')
+//       .select('value_number')
+//       .eq('id', entitlement[0].entitlement_value_id)
+//       .single();
+
+//     if (valueError) {
+//       return {
+//         errorCode: 1,
+//         message: 'Error retrieving entitlement value',
+//         data: null,
+//       };
+//     }
+
+//     // Check if current number of sites exceeds entitlement limit
+//     if (currentSites.length >= (entitlementValue.value_number ?? 0)) {
+//       return {
+//         errorCode: 1,
+//         message: 'Entitlement limit exceeded',
+//         data: null,
+//       };
+//     }
+
+//     // Insert new site details
+//     const { data: insertedSite, error: insertError } = await supabase
+//       .from('sites_detail')
+//       .insert([data])
+//       .single();
+
+//     if (insertError) {
+//       return {
+//         errorCode: 1,
+//         message: 'Error inserting site details',
+//         data: null,
+//       };
+//     }
+
+//     return {
+//       errorCode: 0,
+//       message: 'Site details inserted successfully',
+//       data: insertedSite,
+//     };
+//   } catch (error) {
+//     let errorMessage = 'Unexpected error';
+//     if (error instanceof Error) {
+//       errorMessage = error.message;
+//     }
+//     return {
+//       errorCode: 1,
+//       message: errorMessage,
+//       data: null,
+//     };
+//   }
+// }
 
 // Function to update a site
 async function updateSite(

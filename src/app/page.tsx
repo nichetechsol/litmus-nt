@@ -401,7 +401,7 @@ const LoginForm = () => {
                                   className='form-check-label text-[#8c9097] dark:text-white/50 font-normal'
                                   htmlFor='defaultCheck1'
                                 >
-                                  Remember password ?
+                                  Remember Password?
                                 </label>
                               </div>
                             </div>

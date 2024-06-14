@@ -377,7 +377,7 @@ const LoginForm = () => {
         } else {
           setLoading(false);
           if (result.errorCode === 1) {
-            swal('It exists in Organization!', { icon: 'error' });
+            swal('The organization name already exists.', { icon: 'error' });
           }
         }
         if (closeModalButtonRef.current) {
@@ -564,7 +564,7 @@ const LoginForm = () => {
                                       onChange={handleorganizationNameChange}
                                       onKeyDown={handleKeyPress}
                                       value={organizationName}
-                                      maxLength={100}
+                                      maxLength={256}
                                     />
                                     {organizationNameError && (
                                       <div className='text-danger'>
@@ -666,7 +666,9 @@ const LoginForm = () => {
                                       value={selectedType}
                                       onChange={handleTypeDropdownChange}
                                     >
-                                      <option value=''>Select Type</option>
+                                      <option value='' hidden>
+                                        Select Type
+                                      </option>
                                       {typeDropdown &&
                                         typeDropdown.map((type) => (
                                           <option
@@ -690,12 +692,12 @@ const LoginForm = () => {
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      Message
+                                      Description
                                     </label>
                                     <textarea
                                       className='form-control w-full'
                                       id='task-name'
-                                      placeholder='Enter Message'
+                                      placeholder='Enter Description'
                                       onChange={handleMessageChange}
                                       onKeyDown={handleKeyPress}
                                       value={message}
