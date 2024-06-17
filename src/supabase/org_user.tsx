@@ -1,6 +1,7 @@
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { logActivity } from '@/supabase/activity';
+import { sendEmailFunction } from '@/supabase/email';
 
 import { supabase } from './db';
 
@@ -13,6 +14,7 @@ interface UserData {
   user_id?: any;
   role_id?: any;
   org_id?: any;
+  token?: any;
 }
 
 interface User {
@@ -90,6 +92,19 @@ async function addUserToOrganization(
       } else {
         // If user is not in the organization, send an invitation
         if (!org_users || org_users.length === 0) {
+          const emaildata: any = {
+            org_id: UserData.org_id,
+            user_id: UserData.user_id,
+            target_user_id: users[0].id,
+          };
+          // Send the invitation email
+          await sendEmailFunction(
+            'shruti@nichetech.in', // To
+            'Add User To Organization', // Subject
+            'add_orgUser', // Type
+            UserData.token, // Token (Generate or provide the actual token)
+            emaildata, // Data
+          );
           // Log the activity before sending the invitation
           const logResult = await logActivity({
             org_id: UserData.org_id,

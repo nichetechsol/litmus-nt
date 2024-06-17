@@ -449,6 +449,7 @@ const OrgDashboard = () => {
             lastname: lastName,
             role_id: role,
             org_id: org_id,
+            user_id: user_id,
           };
           result = await addUserToOrganization(userData);
           if (result.errorCode == 0) {

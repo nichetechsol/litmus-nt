@@ -2,6 +2,7 @@
 import { User } from '@supabase/supabase-js';
 
 import { logActivity } from '@/supabase/activity';
+import { sendEmailFunction } from '@/supabase/email';
 
 import { supabase } from './db';
 
@@ -14,6 +15,7 @@ interface UserData {
   lastname?: string;
   user_id?: any;
   role_id?: any;
+  token: any;
 }
 interface SiteUser {
   user_id: any;
@@ -124,6 +126,21 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
             return { errorCode: 1, data: null };
           } else {
             if (!site_users || site_users.length === 0) {
+              // Prepare email data
+              const emaildata: any = {
+                org_id: UserData.org_id,
+                user_id: UserData.user_id,
+                target_user_id: users[0].id,
+                site_id: UserData.site_id,
+              };
+              // Send the invitation email
+              await sendEmailFunction(
+                'shruti@nichetech.in', // To
+                'Add User To Site', // Subject
+                'add_siteUser', // Type
+                UserData.token, // Token (Generate or provide the actual token)
+                emaildata, // Data
+              );
               await logActivity({
                 user_id: UserData.user_id,
                 org_id: UserData.org_id,

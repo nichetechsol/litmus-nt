@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { logActivity } from '@/supabase/activity';
+import { sendEmailFunction } from '@/supabase/email';
 
 import { supabase } from './db';
 
@@ -20,6 +21,7 @@ interface SiteData {
   state_id: any;
   user_id: any;
   description: any;
+  token: any;
 }
 
 interface UpdateSiteData {
@@ -180,6 +182,20 @@ async function addSites(data: SiteData): Promise<Result<any>> {
           data: null,
         };
       }
+
+      const emaildata: any = {
+        org_id: data.org_id,
+        user_id: data.user_id,
+        site_id: siteDetails[0].id,
+      };
+      // Send the invitation email
+      await sendEmailFunction(
+        'shruti@nichetech.in', // To
+        'Add Site', // Subject
+        'add_site', // Type
+        data.token, // Token (Generate or provide the actual token)
+        emaildata, // Data
+      );
       await logActivity({
         org_id: data.org_id,
         site_id: siteDetails[0].id,
