@@ -1059,189 +1059,200 @@ const OrgDashboard = () => {
                     </div>
                   </div>
                 </div>
-
-                <div className='xxl:col-span-12 xl:col-span-12 col-span-12'>
-                  <div className='box overflow-hidden'>
-                    <div className='box-header justify-between'>
-                      <div className='box-title'>Activity Logs</div>
-                      {/* <div className="hs-dropdown ti-dropdown">
-                                <Link href="#!" className="text-[0.75rem] px-2 font-normal text-[#8c9097] dark:text-white/50"
-                                    aria-expanded="false">
-                                    View All<i className="ri-arrow-down-s-line align-middle ms-1 inline-block"></i>
-                                </Link>
-                                <ul className="hs-dropdown-menu ti-dropdown-menu hidden" role="menu">
-                                    <li><Link className="ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block"
-                                        href="#!">Today</Link></li>
-                                    <li><Link className="ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block"
-                                        href="#!">This Week</Link></li>
-                                    <li><Link className="ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block"
-                                        href="#!">Last Week</Link></li>
-                                </ul>
-                            </div> */}
-                    </div>
-                    <div className='box-body !p-0'>
-                      <div className='table-responsive'>
-                        <table className='table table-hover whitespace-nowrap min-w-full'>
-                          <tbody>
-                            {activity_log && activity_log.length > 0
-                              ? activity_log.map(
-                                  (activity, index) =>
-                                    (activity?.activity_type === 'create_org' ||
-                                      activity?.activity_type === 'add_user' ||
-                                      activity?.activity_type ===
-                                        'remove_user' ||
-                                      activity?.activity_type ===
-                                        'create_site') && (
-                                      <tr
-                                        className='border hover:bg-gray-100 dark:hover:bg-light dark:border-defaultborder/10 border-defaultborder !border-x-0'
-                                        key={index}
-                                      >
-                                        <th scope='col'>
-                                          <div className='flex items-center'>
-                                            {/* <img src={idx.src} alt="" className="avatar avatar-md p-1 bg-light avatar-rounded me-2 !mb-0" /> */}
-                                            <div>
-                                              <p className='font-semibold mb-0'>
-                                                {activity?.activity_type ===
-                                                'create_org'
-                                                  ? `${
-                                                      activity.user_id
-                                                        .firstname &&
-                                                      activity.user_id.lastname
-                                                        ? activity.user_id
-                                                            .firstname +
-                                                          ' ' +
-                                                          activity.user_id
-                                                            .lastname
-                                                        : activity.user_id.email
-                                                    } created a new org. named '${
-                                                      activity.org_id.name
-                                                    }'`
-                                                  : activity?.activity_type ===
-                                                    'add_user'
-                                                  ? `${
-                                                      activity.user_id
-                                                        .firstname &&
-                                                      activity.user_id.lastname
-                                                        ? activity.user_id
-                                                            .firstname +
-                                                          ' ' +
-                                                          activity.user_id
-                                                            .lastname
-                                                        : activity.user_id.email
-                                                    } added a new user named '${
-                                                      activity.target_user_id
-                                                        .firstname &&
-                                                      activity.target_user_id
-                                                        .lastname
-                                                        ? activity
-                                                            .target_user_id
-                                                            .firstname +
-                                                          ' ' +
-                                                          activity
-                                                            .target_user_id
-                                                            .lastname
-                                                        : activity
-                                                            .target_user_id
-                                                            .email
-                                                    }' within the organization ${
-                                                      activity.org_id.name
-                                                    }`
-                                                  : activity?.activity_type ===
-                                                    'remove_user'
-                                                  ? `${
-                                                      activity.user_id
-                                                        .firstname &&
-                                                      activity.user_id.lastname
-                                                        ? activity.user_id
-                                                            .firstname +
-                                                          ' ' +
-                                                          activity.user_id
-                                                            .lastname
-                                                        : activity.user_id.email
-                                                    } removed a user named '${
-                                                      activity.target_user_id
-                                                        .firstname &&
-                                                      activity.target_user_id
-                                                        .lastname
-                                                        ? activity
-                                                            .target_user_id
-                                                            .firstname +
-                                                          ' ' +
-                                                          activity
-                                                            .target_user_id
-                                                            .lastname
-                                                        : activity
-                                                            .target_user_id
-                                                            .email
-                                                    }' within the organization ${
-                                                      activity.org_id.name
-                                                    }`
-                                                  : activity?.activity_type ===
-                                                    'create_site'
-                                                  ? `${
-                                                      activity.user_id
-                                                        .firstname &&
-                                                      activity.user_id.lastname
-                                                        ? activity.user_id
-                                                            .firstname +
-                                                          ' ' +
-                                                          activity.user_id
-                                                            .lastname
-                                                        : activity.user_id.email
-                                                    } created a new site named ${
-                                                      activity.site_id.name
-                                                    } within the organization '${
-                                                      activity.org_id.name
-                                                    }'`
-                                                  : //   : activity?.activity_type ===
-                                                    //   'download_file'
-                                                    // ? `${
-                                                    //     activity.user_id.firstname &&
-                                                    //     activity.user_id.lastname
-                                                    //       ? activity.user_id.firstname +
-                                                    //         ' ' +
-                                                    //         activity.user_id.lastname
-                                                    //       : activity.user_id.email
-                                                    //   }  downloaded a file named '${
-                                                    //     activity.details.filename
-                                                    //   }' within the site ${
-                                                    //     activity.org_id.name
-                                                    //   }`
-                                                    ''}
-                                              </p>
+                {activity_log && activity_log.length > 0 && (
+                  <div className='xxl:col-span-12 xl:col-span-12 col-span-12'>
+                    <div className='box overflow-hidden'>
+                      <div className='box-header justify-between'>
+                        <div className='box-title'>Activity Logs</div>
+                        {/* <div className="hs-dropdown ti-dropdown">
+                              <Link href="#!" className="text-[0.75rem] px-2 font-normal text-[#8c9097] dark:text-white/50"
+                                  aria-expanded="false">
+                                  View All<i className="ri-arrow-down-s-line align-middle ms-1 inline-block"></i>
+                              </Link>
+                              <ul className="hs-dropdown-menu ti-dropdown-menu hidden" role="menu">
+                                  <li><Link className="ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block"
+                                      href="#!">Today</Link></li>
+                                  <li><Link className="ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block"
+                                      href="#!">This Week</Link></li>
+                                  <li><Link className="ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block"
+                                      href="#!">Last Week</Link></li>
+                              </ul>
+                          </div> */}
+                      </div>
+                      <div className='box-body !p-0'>
+                        <div className='table-responsive'>
+                          <table className='table table-hover whitespace-nowrap min-w-full'>
+                            <tbody>
+                              {activity_log && activity_log.length > 0
+                                ? activity_log.map(
+                                    (activity, index) =>
+                                      (activity?.activity_type ===
+                                        'create_org' ||
+                                        activity?.activity_type ===
+                                          'add_user' ||
+                                        activity?.activity_type ===
+                                          'remove_user' ||
+                                        activity?.activity_type ===
+                                          'create_site') && (
+                                        <tr
+                                          className='border hover:bg-gray-100 dark:hover:bg-light dark:border-defaultborder/10 border-defaultborder !border-x-0'
+                                          key={index}
+                                        >
+                                          <th scope='col'>
+                                            <div className='flex items-center'>
+                                              {/* <img src={idx.src} alt="" className="avatar avatar-md p-1 bg-light avatar-rounded me-2 !mb-0" /> */}
+                                              <div>
+                                                <p className='font-semibold mb-0'>
+                                                  {activity?.activity_type ===
+                                                  'create_org'
+                                                    ? `${
+                                                        activity.user_id
+                                                          .firstname &&
+                                                        activity.user_id
+                                                          .lastname
+                                                          ? activity.user_id
+                                                              .firstname +
+                                                            ' ' +
+                                                            activity.user_id
+                                                              .lastname
+                                                          : activity.user_id
+                                                              .email
+                                                      } created a new org. named '${
+                                                        activity.org_id.name
+                                                      }'`
+                                                    : activity?.activity_type ===
+                                                      'add_user'
+                                                    ? `${
+                                                        activity.user_id
+                                                          .firstname &&
+                                                        activity.user_id
+                                                          .lastname
+                                                          ? activity.user_id
+                                                              .firstname +
+                                                            ' ' +
+                                                            activity.user_id
+                                                              .lastname
+                                                          : activity.user_id
+                                                              .email
+                                                      } added a new user named '${
+                                                        activity.target_user_id
+                                                          .firstname &&
+                                                        activity.target_user_id
+                                                          .lastname
+                                                          ? activity
+                                                              .target_user_id
+                                                              .firstname +
+                                                            ' ' +
+                                                            activity
+                                                              .target_user_id
+                                                              .lastname
+                                                          : activity
+                                                              .target_user_id
+                                                              .email
+                                                      }' within the organization ${
+                                                        activity.org_id.name
+                                                      }`
+                                                    : activity?.activity_type ===
+                                                      'remove_user'
+                                                    ? `${
+                                                        activity.user_id
+                                                          .firstname &&
+                                                        activity.user_id
+                                                          .lastname
+                                                          ? activity.user_id
+                                                              .firstname +
+                                                            ' ' +
+                                                            activity.user_id
+                                                              .lastname
+                                                          : activity.user_id
+                                                              .email
+                                                      } removed a user named '${
+                                                        activity.target_user_id
+                                                          .firstname &&
+                                                        activity.target_user_id
+                                                          .lastname
+                                                          ? activity
+                                                              .target_user_id
+                                                              .firstname +
+                                                            ' ' +
+                                                            activity
+                                                              .target_user_id
+                                                              .lastname
+                                                          : activity
+                                                              .target_user_id
+                                                              .email
+                                                      }' within the organization ${
+                                                        activity.org_id.name
+                                                      }`
+                                                    : activity?.activity_type ===
+                                                      'create_site'
+                                                    ? `${
+                                                        activity.user_id
+                                                          .firstname &&
+                                                        activity.user_id
+                                                          .lastname
+                                                          ? activity.user_id
+                                                              .firstname +
+                                                            ' ' +
+                                                            activity.user_id
+                                                              .lastname
+                                                          : activity.user_id
+                                                              .email
+                                                      } created a new site named ${
+                                                        activity.site_id.name
+                                                      } within the organization '${
+                                                        activity.org_id.name
+                                                      }'`
+                                                    : //   : activity?.activity_type ===
+                                                      //   'download_file'
+                                                      // ? `${
+                                                      //     activity.user_id.firstname &&
+                                                      //     activity.user_id.lastname
+                                                      //       ? activity.user_id.firstname +
+                                                      //         ' ' +
+                                                      //         activity.user_id.lastname
+                                                      //       : activity.user_id.email
+                                                      //   }  downloaded a file named '${
+                                                      //     activity.details.filename
+                                                      //   }' within the site ${
+                                                      //     activity.org_id.name
+                                                      //   }`
+                                                      ''}
+                                                </p>
+                                              </div>
                                             </div>
-                                          </div>
-                                        </th>
+                                          </th>
 
-                                        <td className='f-end'>
-                                          {/* {activity.activity_date.split('T')[0]} */}
-                                          {activity
-                                            ? moment(
-                                                activity.activity_date.split(
-                                                  'T',
-                                                )[0],
-                                              ).format('MM/DD/YY')
-                                            : ''}
-                                        </td>
-                                      </tr>
-                                    ),
-                                )
-                              : null}
-                            {activity_log && activity_log.length == 0 && (
-                              <>
-                                <tr>
-                                  <div className='col-md-12 w-100 mt-4'>
-                                    <p className='text-center'>No Log Found</p>{' '}
-                                  </div>
-                                </tr>
-                              </>
-                            )}
-                          </tbody>
-                        </table>
+                                          <td className='f-end'>
+                                            {/* {activity.activity_date.split('T')[0]} */}
+                                            {activity
+                                              ? moment(
+                                                  activity.activity_date.split(
+                                                    'T',
+                                                  )[0],
+                                                ).format('MM/DD/YY')
+                                              : ''}
+                                          </td>
+                                        </tr>
+                                      ),
+                                  )
+                                : null}
+                              {/* {activity_log && activity_log.length == 0 && (
+                            <>
+                              <tr>
+                                <div className='col-md-12 w-100 mt-4'>
+                                  <p className='text-center'>No Log Found</p>{' '}
+                                </div>
+                              </tr>
+                            </>
+                          )} */}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>

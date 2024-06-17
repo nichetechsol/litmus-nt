@@ -679,7 +679,11 @@ const Page = () => {
                         <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
                           {siteCountData
                             ? siteCountData.data.sites_details[0].about_site
-                            : 'No Description'}
+                            : null}
+                          {siteCountData &&
+                            siteCountData.data.sites_details[0].about_site ===
+                              '' &&
+                            'No Description'}
                         </p>
                       </div>
                       <div className='xl:col-span-12 col-span-12  mt-5 container !mx-auto !justify-center !items-center '>
@@ -724,7 +728,7 @@ const Page = () => {
                                       ? moment(
                                           siteCountData.data.sites_details[0]
                                             .created_at,
-                                        ).format('MM/DD/YY HH:mm:ss')
+                                        ).format('MM/DD/YYYY HH:mm')
                                       : //  siteCountData.data.sites_details[0].created_at.split(
                                         //     'T',
                                         //   )[0]
@@ -745,16 +749,17 @@ const Page = () => {
                   <div className='box'>
                     <div className='box-header flex justify-between'>
                       <div className='box-title'>License</div>
-                      {/* <div className='hs-dropdown ti-dropdown'>
-                        <Link
-                          href=''
+                      <div className='grid border-b border-dashed'>
+                        <button
+                          onClick={() => {
+                            navigate.push('/licence');
+                          }}
                           className='hs-dropdown-toggle py-2  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
-                          data-hs-overlay='#todo-compose'
                         >
                           <i className='ri-add-circle-line !text-[1rem]'></i>Add
                           License
-                        </Link>
-                        <div
+                        </button>
+                        {/*   <div
                           id='todo-compose'
                           className='hs-overlay hidden ti-modal'
                         >
@@ -852,35 +857,35 @@ const Page = () => {
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </div> */}
+                        </div>*/}
+                      </div>
                     </div>
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>
-                        {licence && licence.length > 0 ? (
-                          licence.map((user, index) => (
-                            <li className='mb-[0.9rem]' key={index}>
-                              <div className='flex items-start flex-wrap'>
-                                <div className='me-2'>
-                                  {/* <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
+                        {licence && licence.length > 0
+                          ? licence.map((user, index) => (
+                              <li className='mb-[0.9rem]' key={index}>
+                                <div className='flex items-start flex-wrap'>
+                                  <div className='me-2'>
+                                    {/* <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
                                     <i className='ri-profile-line text-[1rem] text-white'></i>
                                   </span> */}
-                                  <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
-                                    <i className='ri-profile-line text-[1rem]  text-white'></i>
-                                  </span>
-                                </div>
-                                <div className='flex-grow'>
-                                  <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                    {user.licence_number}
-                                  </p>
-                                  <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                    {user.expiry.split('T')[0]}
-                                  </p>
-                                </div>
-                                <div className='font-semibold text-[0.9375rem] '>
-                                  <h1>
-                                    {' '}
-                                    {/* {moment().isAfter(user.expiry) ? (
+                                    <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
+                                      <i className='ri-profile-line text-[1rem]  text-white'></i>
+                                    </span>
+                                  </div>
+                                  <div className='flex-grow'>
+                                    <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                      {user.licence_number}
+                                    </p>
+                                    <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
+                                      {user.expiry.split('T')[0]}
+                                    </p>
+                                  </div>
+                                  <div className='font-semibold text-[0.9375rem] '>
+                                    <h1>
+                                      {' '}
+                                      {/* {moment().isAfter(user.expiry) ? (
                                         <span className='badge bg-danger text-white'>
                                           Expired
                                         </span>
@@ -895,32 +900,32 @@ const Page = () => {
                                           Active
                                         </span>
                                       )} */}
-                                    {moment().isAfter(user.expiry) ? (
-                                      <span className='badge bg-danger text-white'>
-                                        Expired
-                                      </span>
-                                    ) : moment(user.expiry).isBefore(
-                                        moment().add(1, 'month'),
-                                      ) ? (
-                                      <span className='badge bg-warning text-white'>
-                                        Soon to Expire
-                                      </span>
-                                    ) : (
-                                      <span className='badge bg-primary text-white'>
-                                        Active
-                                      </span>
-                                    )}
-                                  </h1>
+                                      {moment().isAfter(user.expiry) ? (
+                                        <span className='badge bg-danger text-white'>
+                                          Expired
+                                        </span>
+                                      ) : moment(user.expiry).isBefore(
+                                          moment().add(1, 'month'),
+                                        ) ? (
+                                        <span className='badge bg-warning text-white'>
+                                          Soon to Expire
+                                        </span>
+                                      ) : (
+                                        <span className='badge bg-primary text-white'>
+                                          Active
+                                        </span>
+                                      )}
+                                    </h1>
+                                  </div>
                                 </div>
-                              </div>
-                            </li>
-                          ))
-                        ) : (
+                              </li>
+                            ))
+                          : null}
+                        {licence && licence.length === 0 && (
                           <div className='col-md-12 w-100 mt-4'>
                             <p className='text-center'>No License Found</p>{' '}
                           </div>
                         )}
-
                         {/* <li className="mb-[0.9rem]">
                           <div className="flex items-start flex-wrap">
                             <div className="me-2">
@@ -1112,36 +1117,37 @@ const Page = () => {
                     </div>
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>
-                        {products && products.length > 0 ? (
-                          products.map((product, index) => (
-                            <li className='mb-[0.9rem]' key={index}>
-                              <h5 className='box-title'>{product.folder}</h5>
-                              <div className='flex items-center flex-wrap'>
-                                <div className='me-2 ic-product'>
-                                  <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
-                                    <i className='ri-folder-line text-[1rem]  text-white'></i>
-                                  </span>
-                                  {/* <span className='text-[1rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
+                        {products && products.length > 0
+                          ? products.map((product, index) => (
+                              <li className='mb-[0.9rem]' key={index}>
+                                <h5 className='box-title'>{product.folder}</h5>
+                                <div className='flex items-center flex-wrap'>
+                                  <div className='me-2 ic-product'>
+                                    <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
+                                      <i className='ri-folder-line text-[1rem]  text-white'></i>
+                                    </span>
+                                    {/* <span className='text-[1rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
                                     <i className='ri-folder-line text-[1rem]  text-white'></i>
                                   </span> */}
+                                  </div>
+                                  <div className='flex-grow ic-product-p'>
+                                    <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                      {product.data.FileName}
+                                    </p>
+                                  </div>
+                                  <div className='font-semibold text-[0.9375rem] '>
+                                    <a
+                                      href={product.data.downloadLink}
+                                      className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
+                                    >
+                                      <i className='ri-download-line  text-[.8rem]  text-white'></i>
+                                    </a>
+                                  </div>
                                 </div>
-                                <div className='flex-grow ic-product-p'>
-                                  <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                    {product.data.FileName}
-                                  </p>
-                                </div>
-                                <div className='font-semibold text-[0.9375rem] '>
-                                  <a
-                                    href={product.data.downloadLink}
-                                    className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
-                                  >
-                                    <i className='ri-download-line  text-[.8rem]  text-white'></i>
-                                  </a>
-                                </div>
-                              </div>
-                            </li>
-                          ))
-                        ) : (
+                              </li>
+                            ))
+                          : null}
+                        {products && products.length === 0 && (
                           <div className='col-md-12 w-100 mt-4'>
                             <p className='text-center'>No Product Found</p>{' '}
                           </div>
@@ -1194,27 +1200,22 @@ const Page = () => {
                     </div>
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>
-                        {entitlementListData &&
-                        entitlementListData.length > 0 ? (
-                          entitlementListData.map((entitlement: any) => (
-                            <li className='mb-[0.9rem]' key={entitlement.id}>
-                              <div className='flex items-start flex-wrap'>
-                                <div className='flex-grow'>
-                                  <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                    {entitlement.entitlementName}
-                                  </p>
+                        {entitlementListData && entitlementListData.length > 0
+                          ? entitlementListData.map((entitlement: any) => (
+                              <li className='mb-[0.9rem]' key={entitlement.id}>
+                                <div className='flex items-start flex-wrap'>
+                                  <div className='flex-grow'>
+                                    <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                      {entitlement.entitlementName}
+                                    </p>
+                                  </div>
+                                  <div className='font-semibold text-[0.9375rem] '>
+                                    {entitlement.entitlementValue}
+                                  </div>
                                 </div>
-                                <div className='font-semibold text-[0.9375rem] '>
-                                  {entitlement.entitlementValue}
-                                </div>
-                              </div>
-                            </li>
-                          ))
-                        ) : (
-                          <div className='col-md-12 w-100 mt-4'>
-                            <p className='text-center'>No Entitlements Found</p>{' '}
-                          </div>
-                        )}
+                              </li>
+                            ))
+                          : null}
                         {entitlementListData &&
                           entitlementListData.length > 0 && (
                             <Pagination
@@ -1228,6 +1229,14 @@ const Page = () => {
                               itemClass='page-item pagination-custom'
                               linkClass='page-link'
                             />
+                          )}
+                        {entitlementListData &&
+                          entitlementListData.length === 0 && (
+                            <div className='col-md-12 w-100 mt-4'>
+                              <p className='text-center'>
+                                No Entitlements Found
+                              </p>{' '}
+                            </div>
                           )}
                       </ul>
                     </div>
@@ -1277,39 +1286,40 @@ const Page = () => {
                               </li>
                             ))
                           : null} */}
-                        {solutions && solutions.length > 0 ? (
-                          solutions.map((solution, index) => (
-                            <li className='mb-[0.9rem]' key={index}>
-                              <h5 className='box-title items-start'>
-                                {solution.folder}
-                              </h5>
-                              <div className='flex items-center flex-wrap'>
-                                <div className='me-2 ic-product'>
-                                  <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
-                                    <i className='ri-folder-line text-[1rem]  text-white'></i>
-                                  </span>
-                                  {/* <span className='text-[1rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
+                        {solutions && solutions.length > 0
+                          ? solutions.map((solution, index) => (
+                              <li className='mb-[0.9rem]' key={index}>
+                                <h5 className='box-title items-start'>
+                                  {solution.folder}
+                                </h5>
+                                <div className='flex items-center flex-wrap'>
+                                  <div className='me-2 ic-product'>
+                                    <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
+                                      <i className='ri-folder-line text-[1rem]  text-white'></i>
+                                    </span>
+                                    {/* <span className='text-[1rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
                                     <i className='ri-folder-line text-[1rem]  text-white'></i>
                                   </span> */}
-                                </div>
+                                  </div>
 
-                                <div className='flex-grow ic-product-p'>
-                                  <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                    {solution.data.FileName}
-                                  </p>
+                                  <div className='flex-grow ic-product-p'>
+                                    <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                      {solution.data.FileName}
+                                    </p>
+                                  </div>
+                                  <div className='font-semibold text-[0.9375rem] '>
+                                    <a
+                                      href={solution.data.downloadLink}
+                                      className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
+                                    >
+                                      <i className='ri-download-line  text-[.8rem]  text-white'></i>
+                                    </a>
+                                  </div>
                                 </div>
-                                <div className='font-semibold text-[0.9375rem] '>
-                                  <a
-                                    href={solution.data.downloadLink}
-                                    className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
-                                  >
-                                    <i className='ri-download-line  text-[.8rem]  text-white'></i>
-                                  </a>
-                                </div>
-                              </div>
-                            </li>
-                          ))
-                        ) : (
+                              </li>
+                            ))
+                          : null}
+                        {solutions && solutions.length === 0 && (
                           <div className='col-md-12 w-100 mt-4'>
                             <p className='text-center'>No Solution Found</p>{' '}
                           </div>
@@ -1547,55 +1557,47 @@ const Page = () => {
                             </tr>
                           </thead>
                           <tbody>
-                            {/* {Dealsstatistics.map((idx) => ( */}
-                            {orgUserData && orgUserData.length > 0 ? (
-                              orgUserData.map((user, index) => (
-                                <tr
-                                  className='border border-inherit border-solid hover:bg-gray-100 dark:border-defaultborder/10 dark:hover:bg-light'
-                                  key={index}
-                                >
-                                  <td>
-                                    <div className='flex items-center font-semibold'>
-                                      {/* <span className='!me-2 inline-flex justify-center items-center'>
-                                        <img
-                                          src={user.src}
-                                          alt='img'
-                                          className='w-[1.75rem] h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full'
-                                        />
-                                      </span> */}
-                                      {`${
-                                        user.firstname ? user.firstname : ''
-                                      } ${
-                                        user.lastname ? user.lastname : ''
-                                      }`}{' '}
-                                    </div>
-                                  </td>
+                            {orgUserData && orgUserData.length > 0
+                              ? orgUserData.map((user, index) => (
+                                  <tr
+                                    className='border border-inherit border-solid hover:bg-gray-100 dark:border-defaultborder/10 dark:hover:bg-light'
+                                    key={index}
+                                  >
+                                    <td>
+                                      <div className='flex items-center font-semibold'>
+                                        {`${
+                                          user.firstname ? user.firstname : ''
+                                        } ${
+                                          user.lastname ? user.lastname : ''
+                                        }`}{' '}
+                                      </div>
+                                    </td>
 
-                                  <td>{user.email}</td>
-                                  <td>
-                                    <span
-                                    // className={`inline-flex text-${user.color} !py-[0.15rem] !px-[0.45rem] rounded-sm !font-semibold !text-[0.75em] bg-${user.color}/10`}
-                                    >
-                                      {user.role_name}
-                                    </span>
-                                  </td>
-                                  {/* {userrole3 == '1' ||
-                                    (userrole3 == '2' && ( */}
-                                  <td>
-                                    <div className='flex flex-row items-center !gap-2 text-[0.9375rem]'>
-                                      <Link
-                                        aria-label='anchor'
-                                        href=''
-                                        style={{ cursor: 'pointer' }}
-                                        data-hs-overlay='#todo-compose-user'
-                                        onClick={() => {
-                                          handleEdit(user);
-                                        }}
-                                        className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
+                                    <td>{user.email}</td>
+                                    <td>
+                                      <span
+                                      // className={`inline-flex text-${user.color} !py-[0.15rem] !px-[0.45rem] rounded-sm !font-semibold !text-[0.75em] bg-${user.color}/10`}
                                       >
-                                        <i className='ri-edit-line'></i>
-                                      </Link>
-                                      {/* <Link
+                                        {user.role_name}
+                                      </span>
+                                    </td>
+                                    {/* {userrole3 == '1' ||
+                                    (userrole3 == '2' && ( */}
+                                    <td>
+                                      <div className='flex flex-row items-center !gap-2 text-[0.9375rem]'>
+                                        <Link
+                                          aria-label='anchor'
+                                          href=''
+                                          style={{ cursor: 'pointer' }}
+                                          data-hs-overlay='#todo-compose-user'
+                                          onClick={() => {
+                                            handleEdit(user);
+                                          }}
+                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
+                                        >
+                                          <i className='ri-edit-line'></i>
+                                        </Link>
+                                        {/* <Link
                                         aria-label='anchor'
                                         href=''
                                         
@@ -1603,30 +1605,22 @@ const Page = () => {
                                       >
                                         <i className='ri-user-unfollow-line'></i>
                                       </Link> */}
-                                      <div
-                                        style={{ cursor: 'pointer' }}
-                                        aria-label='anchor'
-                                        onClick={() => {
-                                          handleDelete(user.user_id);
-                                        }}
-                                        className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
-                                      >
-                                        <i className='ri-delete-bin-line'></i>
+                                        <div
+                                          style={{ cursor: 'pointer' }}
+                                          aria-label='anchor'
+                                          onClick={() => {
+                                            handleDelete(user.user_id);
+                                          }}
+                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
+                                        >
+                                          <i className='ri-delete-bin-line'></i>
+                                        </div>
                                       </div>
-                                    </div>
-                                  </td>
-                                  {/* ))} */}
-                                </tr>
-                              ))
-                            ) : (
-                              <tr>
-                                <td colSpan={4}>
-                                  <div className='col-md-12 w-100 mt-4'>
-                                    <p className='text-center'>No User Found</p>{' '}
-                                  </div>
-                                </td>
-                              </tr>
-                            )}
+                                    </td>
+                                    {/* ))} */}
+                                  </tr>
+                                ))
+                              : null}
                             {orgUserData && orgUserData.length > 0 && (
                               <tr>
                                 <td colSpan={5}>
@@ -1641,6 +1635,15 @@ const Page = () => {
                                     itemClass='page-item'
                                     linkClass='page-link'
                                   />
+                                </td>
+                              </tr>
+                            )}
+                            {orgUserData && orgUserData.length === 0 && (
+                              <tr>
+                                <td colSpan={4}>
+                                  <div className='col-md-12 w-100 mt-4'>
+                                    <p className='text-center'>No User Found</p>{' '}
+                                  </div>
                                 </td>
                               </tr>
                             )}
@@ -1690,12 +1693,12 @@ const Page = () => {
                     </div> */}
                   </div>
                 </div>
-
-                <div className='xxl:col-span-12 xl:col-span-12 col-span-12'>
-                  <div className='box overflow-hidden'>
-                    <div className='box-header justify-between'>
-                      <div className='box-title'>Activity Logs</div>
-                      {/* <div className='hs-dropdown ti-dropdown'>
+                {activity_log && activity_log.length > 0 && (
+                  <div className='xxl:col-span-12 xl:col-span-12 col-span-12'>
+                    <div className='box overflow-hidden'>
+                      <div className='box-header justify-between'>
+                        <div className='box-title'>Activity Logs</div>
+                        {/* <div className='hs-dropdown ti-dropdown'>
                         <Link
                           href=''
                           className='text-[0.75rem] px-2 font-normal text-[#8c9097] dark:text-white/50'
@@ -1734,157 +1737,167 @@ const Page = () => {
                           </li>
                         </ul>
                       </div> */}
-                    </div>
-                    <div className='box-body !p-0'>
-                      <div className='table-responsive'>
-                        <table className='table table-hover whitespace-nowrap min-w-full'>
-                          <tbody>
-                            {activity_log && activity_log.length > 0 ? (
-                              activity_log.map(
-                                (activity, index) =>
-                                  (activity?.activity_type === 'create_site' ||
-                                    activity?.activity_type === 'add_user' ||
-                                    activity?.activity_type === 'remove_user' ||
-                                    activity?.activity_type === 'add_licence' ||
-                                    activity?.activity_type ===
-                                      'download_file') && (
-                                    <tr
-                                      className='border hover:bg-gray-100 dark:hover:bg-light dark:border-defaultborder/10 border-defaultborder !border-x-0'
-                                      key={index}
-                                    >
-                                      <th scope='col'>
-                                        <div className='flex items-center'>
-                                          <div>
-                                            <p className='font-semibold mb-0'>
-                                              {activity?.activity_type ===
-                                              'create_site'
-                                                ? `${
-                                                    activity.user_id
-                                                      .firstname &&
-                                                    activity.user_id.lastname
-                                                      ? activity.user_id
-                                                          .firstname +
-                                                        ' ' +
-                                                        activity.user_id
-                                                          .lastname
-                                                      : activity.user_id.email
-                                                  } created a new site named ${
-                                                    activity.site_id.name
-                                                  } within the organization '${
-                                                    activity.org_id.name
-                                                  }'`
-                                                : activity?.activity_type ===
-                                                  'add_user'
-                                                ? `${
-                                                    activity.user_id
-                                                      .firstname &&
-                                                    activity.user_id.lastname
-                                                      ? activity.user_id
-                                                          .firstname +
-                                                        ' ' +
-                                                        activity.user_id
-                                                          .lastname
-                                                      : activity.user_id.email
-                                                  } added a new user named '${
-                                                    activity.target_user_id
-                                                      .firstname &&
-                                                    activity.target_user_id
-                                                      .lastname
-                                                      ? activity.target_user_id
-                                                          .firstname +
-                                                        ' ' +
-                                                        activity.target_user_id
-                                                          .lastname
-                                                      : activity.target_user_id
-                                                          .email
-                                                  }' within the site '${
-                                                    activity.site_id.name
-                                                  }'`
-                                                : activity?.activity_type ===
-                                                  'remove_user'
-                                                ? `${
-                                                    activity.user_id
-                                                      .firstname &&
-                                                    activity.user_id.lastname
-                                                      ? activity.user_id
-                                                          .firstname +
-                                                        ' ' +
-                                                        activity.user_id
-                                                          .lastname
-                                                      : activity.user_id.email
-                                                  } removed a user named '${
-                                                    activity.target_user_id
-                                                      .firstname &&
-                                                    activity.target_user_id
-                                                      .lastname
-                                                      ? activity.target_user_id
-                                                          .firstname +
-                                                        ' ' +
-                                                        activity.target_user_id
-                                                          .lastname
-                                                      : activity.target_user_id
-                                                          .email
-                                                  }' within the site '${
-                                                    activity.site_id.name
-                                                  }'`
-                                                : activity?.activity_type ===
-                                                  'add_licence'
-                                                ? `${
-                                                    activity.user_id
-                                                      .firstname &&
-                                                    activity.user_id.lastname
-                                                      ? activity.user_id
-                                                          .firstname +
-                                                        ' ' +
-                                                        activity.user_id
-                                                          .lastname
-                                                      : activity.user_id.email
-                                                  } added a new license within the organization ${
-                                                    activity.org_id.name
-                                                  }`
-                                                : activity?.activity_type ===
-                                                  'download_file'
-                                                ? `${
-                                                    activity.user_id
-                                                      .firstname &&
-                                                    activity.user_id.lastname
-                                                      ? activity.user_id
-                                                          .firstname +
-                                                        ' ' +
-                                                        activity.user_id
-                                                          .lastname
-                                                      : activity.user_id.email
-                                                  }  downloaded a file named '${
-                                                    activity.details.filename
-                                                  }' within the site ${
-                                                    activity.org_id.name
-                                                  }`
-                                                : ''}
-                                            </p>
+                      </div>
+                      <div className='box-body !p-0'>
+                        <div className='table-responsive'>
+                          <table className='table table-hover whitespace-nowrap min-w-full'>
+                            <tbody>
+                              {activity_log && activity_log.length > 0 ? (
+                                activity_log.map(
+                                  (activity, index) =>
+                                    (activity?.activity_type ===
+                                      'create_site' ||
+                                      activity?.activity_type === 'add_user' ||
+                                      activity?.activity_type ===
+                                        'remove_user' ||
+                                      activity?.activity_type ===
+                                        'add_licence' ||
+                                      activity?.activity_type ===
+                                        'download_file') && (
+                                      <tr
+                                        className='border hover:bg-gray-100 dark:hover:bg-light dark:border-defaultborder/10 border-defaultborder !border-x-0'
+                                        key={index}
+                                      >
+                                        <th scope='col'>
+                                          <div className='flex items-center'>
+                                            <div>
+                                              <p className='font-semibold mb-0'>
+                                                {activity?.activity_type ===
+                                                'create_site'
+                                                  ? `${
+                                                      activity.user_id
+                                                        .firstname &&
+                                                      activity.user_id.lastname
+                                                        ? activity.user_id
+                                                            .firstname +
+                                                          ' ' +
+                                                          activity.user_id
+                                                            .lastname
+                                                        : activity.user_id.email
+                                                    } created a new site named ${
+                                                      activity.site_id.name
+                                                    } within the organization '${
+                                                      activity.org_id.name
+                                                    }'`
+                                                  : activity?.activity_type ===
+                                                    'add_user'
+                                                  ? `${
+                                                      activity.user_id
+                                                        .firstname &&
+                                                      activity.user_id.lastname
+                                                        ? activity.user_id
+                                                            .firstname +
+                                                          ' ' +
+                                                          activity.user_id
+                                                            .lastname
+                                                        : activity.user_id.email
+                                                    } added a new user named '${
+                                                      activity.target_user_id
+                                                        .firstname &&
+                                                      activity.target_user_id
+                                                        .lastname
+                                                        ? activity
+                                                            .target_user_id
+                                                            .firstname +
+                                                          ' ' +
+                                                          activity
+                                                            .target_user_id
+                                                            .lastname
+                                                        : activity
+                                                            .target_user_id
+                                                            .email
+                                                    }' within the site '${
+                                                      activity.site_id.name
+                                                    }'`
+                                                  : activity?.activity_type ===
+                                                    'remove_user'
+                                                  ? `${
+                                                      activity.user_id
+                                                        .firstname &&
+                                                      activity.user_id.lastname
+                                                        ? activity.user_id
+                                                            .firstname +
+                                                          ' ' +
+                                                          activity.user_id
+                                                            .lastname
+                                                        : activity.user_id.email
+                                                    } removed a user named '${
+                                                      activity.target_user_id
+                                                        .firstname &&
+                                                      activity.target_user_id
+                                                        .lastname
+                                                        ? activity
+                                                            .target_user_id
+                                                            .firstname +
+                                                          ' ' +
+                                                          activity
+                                                            .target_user_id
+                                                            .lastname
+                                                        : activity
+                                                            .target_user_id
+                                                            .email
+                                                    }' within the site '${
+                                                      activity.site_id.name
+                                                    }'`
+                                                  : activity?.activity_type ===
+                                                    'add_licence'
+                                                  ? `${
+                                                      activity.user_id
+                                                        .firstname &&
+                                                      activity.user_id.lastname
+                                                        ? activity.user_id
+                                                            .firstname +
+                                                          ' ' +
+                                                          activity.user_id
+                                                            .lastname
+                                                        : activity.user_id.email
+                                                    } added a new license within the organization ${
+                                                      activity.org_id.name
+                                                    }`
+                                                  : activity?.activity_type ===
+                                                    'download_file'
+                                                  ? `${
+                                                      activity.user_id
+                                                        .firstname &&
+                                                      activity.user_id.lastname
+                                                        ? activity.user_id
+                                                            .firstname +
+                                                          ' ' +
+                                                          activity.user_id
+                                                            .lastname
+                                                        : activity.user_id.email
+                                                    }  downloaded a file named '${
+                                                      activity.details.filename
+                                                    }' within the site ${
+                                                      activity.org_id.name
+                                                    }`
+                                                  : ''}
+                                              </p>
+                                            </div>
                                           </div>
-                                        </div>
-                                      </th>
+                                        </th>
 
-                                      <td className='f-end'>
-                                        {activity.activity_date.split('T')[0]}
-                                      </td>
-                                    </tr>
-                                  ),
-                              )
-                            ) : (
-                              <>
-                                <div className='col-md-12 w-100 mt-4'>
-                                  <p className='text-center'>No Log Found</p>{' '}
-                                </div>
-                                <></>
-                              </>
-                            )}
-                          </tbody>
-                        </table>
+                                        <td className='f-end'>
+                                          {activity.activity_date.split('T')[0]}
+                                        </td>
+                                      </tr>
+                                    ),
+                                )
+                              ) : (
+                                <>
+                                  <div className='col-md-12 w-100 mt-4'>
+                                    <p className='text-center'>No Log Found</p>{' '}
+                                  </div>
+                                  <></>
+                                </>
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>

@@ -194,7 +194,7 @@ async function addSites(data: SiteData): Promise<Result<any>> {
       };
     }
   } catch (error) {
-    console.error('Error adding site:', error);
+    // console.error('Error adding site:', error);
     return {
       errorCode: 1,
       message: 'Unexpected error',
