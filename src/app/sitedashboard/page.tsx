@@ -879,7 +879,12 @@ const Page = () => {
                                       {user.licence_number}
                                     </p>
                                     <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                      {user.expiry.split('T')[0]}
+                                      {/* {user.expiry.split('T')[0]} */}
+                                      {user
+                                        ? moment(user.expiry).format(
+                                            'MM/DD/YYYY HH:mm',
+                                          )
+                                        : ''}
                                     </p>
                                   </div>
                                   <div className='font-semibold text-[0.9375rem] '>
@@ -1878,7 +1883,12 @@ const Page = () => {
                                         </th>
 
                                         <td className='f-end'>
-                                          {activity.activity_date.split('T')[0]}
+                                          {activity
+                                            ? moment(
+                                                activity.activity_date,
+                                              ).format('MM/DD/YYYY HH:mm')
+                                            : ''}
+                                          {/* {activity.activity_date.split('T')[0]} */}
                                         </td>
                                       </tr>
                                     ),

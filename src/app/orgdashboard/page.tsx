@@ -1228,10 +1228,8 @@ const OrgDashboard = () => {
                                             {/* {activity.activity_date.split('T')[0]} */}
                                             {activity
                                               ? moment(
-                                                  activity.activity_date.split(
-                                                    'T',
-                                                  )[0],
-                                                ).format('MM/DD/YY')
+                                                  activity.activity_date,
+                                                ).format('MM/DD/YYYY HH:mm')
                                               : ''}
                                           </td>
                                         </tr>

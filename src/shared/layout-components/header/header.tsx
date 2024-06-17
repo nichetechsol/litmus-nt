@@ -443,7 +443,12 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
       setRoleToDisplay('');
     } else if (pathname === '/orgdashboard' || pathname === '/sites') {
       setRoleToDisplay(userrole2);
-    } else if (pathname === '/sitedashboard') {
+    } else if (
+      pathname === '/sitedashboard' ||
+      pathname === '/licence' ||
+      pathname === '/products' ||
+      pathname === '/solution'
+    ) {
       setRoleToDisplay(userrole3);
     }
   }, [userRoleName, org_id, userrole2, site_id, userrole3, pathname]);
@@ -633,6 +638,12 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                               localStorage.removeItem('org_name');
                               localStorage.removeItem('site_id');
                               localStorage.removeItem('site_name');
+                              localStorage.removeItem('user_role');
+                              localStorage.removeItem('user_id');
+                              localStorage.removeItem('site_owner_name');
+                              localStorage.removeItem('user_fname');
+                              localStorage.removeItem('user_lname');
+                              localStorage.removeItem('org_type_id');
                               history.push('/');
                               setLoading(false);
                             }
