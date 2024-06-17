@@ -47,6 +47,22 @@ const Sidebar = ({ local_varaiable, ThemeChanger }: any) => {
       title: 'Sites',
       ico: 'ri-map-pin-line',
     },
+    {
+      path: '/products',
+      type: 'link',
+      active: p === '/products' ? true : false,
+      selected: p === '/products' ? true : false,
+      title: 'Products',
+      ico: 'ri-product-hunt-line',
+    },
+    {
+      path: '/solution',
+      type: 'link',
+      active: p === '/solution' ? true : false,
+      selected: p === '/solution' ? true : false,
+      title: 'Solution',
+      ico: 'ri-lightbulb-line',
+    },
   ];
   useEffect(() => {
     if (p) {

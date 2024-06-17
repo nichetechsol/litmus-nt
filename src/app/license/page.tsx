@@ -88,7 +88,7 @@ const Page = () => {
   };
   const handleAddLicense = async () => {
     if (!selectedSku) {
-      toast.error('Please select a Licence Sku', { autoClose: 3000 });
+      toast.error('Please select a License Sku', { autoClose: 3000 });
       return;
     }
     const API_KEY =

@@ -445,7 +445,7 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
       setRoleToDisplay(userrole2);
     } else if (
       pathname === '/sitedashboard' ||
-      pathname === '/licence' ||
+      pathname === '/license' ||
       pathname === '/products' ||
       pathname === '/solution'
     ) {

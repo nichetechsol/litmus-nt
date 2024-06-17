@@ -7,6 +7,7 @@ import React, { useEffect, useLayoutEffect, useState } from 'react';
 import swal from 'sweetalert';
 
 import { decryptData } from '@/helper/Encryption_Decryption';
+import { logActivity } from '@/supabase/activity';
 import { allCurrentfiles } from '@/supabase/products';
 import { refreshToken } from '@/supabase/session';
 import Loader from '@/utils/Loader/Loader';
@@ -14,6 +15,7 @@ import Loader from '@/utils/Loader/Loader';
 const Page = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [tokenVerify, setTokenVerify] = useState(false);
+  const [user_id, setuser_id] = useState<any>('');
   const [org_id, setorg_id] = useState<any>('');
   const [site_id, setsite_id] = useState<any>('');
   const [org_type_id, setOrg_type_id] = useState<any>('');
@@ -34,10 +36,12 @@ const Page = () => {
   }, []);
 
   useEffect(() => {
+    const encryptedUserId = localStorage.getItem('user_id');
     const encryptedOrgId = localStorage.getItem('org_id');
     const encryptedSiteId = localStorage.getItem('site_id');
     const encrytedOrgTypeId = localStorage.getItem('org_type_id');
 
+    const decryptedUserId = decryptData(encryptedUserId);
     const decryptedOrgId = decryptData(encryptedOrgId);
     const decryptedSiteId = decryptData(encryptedSiteId);
     const decrytedOrgTypeId = decryptData(encrytedOrgTypeId);
@@ -50,6 +54,9 @@ const Page = () => {
     }
     if (decrytedOrgTypeId) {
       setOrg_type_id(decrytedOrgTypeId);
+    }
+    if (decryptedUserId) {
+      setuser_id(decryptedUserId);
     }
     if (!decryptedSiteId) {
       swal('Please select a Site or Organization', { icon: 'error' });
@@ -105,6 +112,20 @@ const Page = () => {
       );
     }
   }, [currentTrue, innerFolder]);
+  const handleDownload = async (fileName: string) => {
+    //
+    const data = {
+      org_id: org_id,
+      site_id: site_id,
+      user_id: user_id,
+      activity_type: 'download_file',
+      details: { filename: fileName },
+    };
+    const response = await logActivity(data);
+    if (response) {
+      // fetchData8()
+    }
+  };
   return (
     <>
       {loading && <Loader />}
@@ -225,6 +246,9 @@ const Page = () => {
                                   </div>                                   */}
                                   {files.disabled === 'Y' ? (
                                     <a
+                                      onClick={() =>
+                                        handleDownload(files.FileName)
+                                      }
                                       href={files.downloadLink}
                                       className='text-[1rem] !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'
                                     >

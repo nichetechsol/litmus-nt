@@ -20,7 +20,7 @@ import {
   nameSchema2,
   roleSchema,
 } from '@/helper/ValidationHelper';
-import { getActivitiesBySiteID } from '@/supabase/activity';
+import { getActivitiesBySiteID, logActivity } from '@/supabase/activity';
 import { getUserRole } from '@/supabase/org_details';
 import { listLitmusProducts } from '@/supabase/products';
 import { refreshToken } from '@/supabase/session';
@@ -531,6 +531,20 @@ const Page = () => {
       }
     });
   };
+  const handleDownload = async (fileName: string) => {
+    //
+    const data = {
+      org_id: org_id,
+      site_id: site_id,
+      user_id: user_id,
+      activity_type: 'download_file',
+      details: { filename: fileName },
+    };
+    const response = await logActivity(data);
+    if (response) {
+      fetchData8();
+    }
+  };
   return (
     <>
       {loading && <Loader />}
@@ -752,7 +766,7 @@ const Page = () => {
                       <div className='grid border-b border-dashed'>
                         <button
                           onClick={() => {
-                            navigate.push('/licence');
+                            navigate.push('/license');
                           }}
                           className='hs-dropdown-toggle py-2  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
                         >
@@ -1142,6 +1156,9 @@ const Page = () => {
                                   </div>
                                   <div className='font-semibold text-[0.9375rem] '>
                                     <a
+                                      onClick={() => {
+                                        handleDownload(product.data.FileName);
+                                      }}
                                       href={product.data.downloadLink}
                                       className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
                                     >
@@ -1314,6 +1331,9 @@ const Page = () => {
                                   </div>
                                   <div className='font-semibold text-[0.9375rem] '>
                                     <a
+                                      onClick={() => {
+                                        handleDownload(solution.data.FileName);
+                                      }}
                                       href={solution.data.downloadLink}
                                       className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
                                     >
@@ -1866,16 +1886,16 @@ const Page = () => {
                                                         .firstname &&
                                                       activity.user_id.lastname
                                                         ? activity.user_id
-                                                            .firstname +
+                                                            ?.firstname +
                                                           ' ' +
                                                           activity.user_id
-                                                            .lastname
+                                                            ?.lastname
                                                         : activity.user_id.email
-                                                    }  downloaded a file named '${
-                                                      activity.details.filename
-                                                    }' within the site ${
-                                                      activity.org_id.name
-                                                    }`
+                                                    }  downloaded a file named '${activity
+                                                      .details
+                                                      ?.filename}' within the site '${
+                                                      activity.site_id.name
+                                                    }'`
                                                   : ''}
                                               </p>
                                             </div>

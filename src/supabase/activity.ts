@@ -9,6 +9,7 @@ interface LogActivityParams {
   target_user_id?: number;
   target_user_role?: number;
   activity_type?: string;
+  details?: { filename: string };
 }
 
 const valid_activity_types: string[] = [
@@ -20,6 +21,54 @@ const valid_activity_types: string[] = [
   'download_file',
 ];
 
+// const logActivity = async ({
+//   org_id,
+//   site_id,
+//   user_id,
+//   target_user_id,
+//   target_user_role,
+//   activity_type,
+// }: LogActivityParams): Promise<any> => {
+//   if (
+//     org_id === undefined &&
+//     site_id === undefined &&
+//     user_id === undefined &&
+//     target_user_id === undefined &&
+//     target_user_role === undefined &&
+//     activity_type === undefined
+//   ) {
+//     return 'Invalid parameters';
+//   }
+
+//   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+//   if (!valid_activity_types.includes(activity_type!)) {
+//     return 'invalid activity_type';
+//   }
+
+//   try {
+//     const { data, error } = await supabase
+//       .from('activities')
+//       .insert([
+//         {
+//           org_id,
+//           site_id,
+//           user_id,
+//           target_user_id,
+//           target_user_role,
+//           activity_type,
+//         },
+//       ])
+//       .select();
+
+//     if (error) {
+//       throw error;
+//     }
+
+//     return data;
+//   } catch (error: any) {
+//     return null;
+//   }
+// };
 const logActivity = async ({
   org_id,
   site_id,
@@ -27,6 +76,7 @@ const logActivity = async ({
   target_user_id,
   target_user_role,
   activity_type,
+  details,
 }: LogActivityParams): Promise<any> => {
   if (
     org_id === undefined &&
@@ -34,7 +84,8 @@ const logActivity = async ({
     user_id === undefined &&
     target_user_id === undefined &&
     target_user_role === undefined &&
-    activity_type === undefined
+    activity_type === undefined &&
+    details === undefined
   ) {
     return 'Invalid parameters';
   }
@@ -55,6 +106,7 @@ const logActivity = async ({
           target_user_id,
           target_user_role,
           activity_type,
+          details,
         },
       ])
       .select();
@@ -68,7 +120,6 @@ const logActivity = async ({
     return null;
   }
 };
-
 const getActivitiesByOrgId = async (orgId: number): Promise<any> => {
   try {
     const { data: activities, error } = await supabase
