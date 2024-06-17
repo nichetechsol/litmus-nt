@@ -40,8 +40,19 @@ const MessageSchema = Yup.string()
   // .required('It field is required.')
   // .min(1, 'It must be at least 1 character long.')
   .max(1000, 'It must be at most 1000 characters long.');
-const emailSchema = Yup.string()
+
+const emailSchemaSign = Yup.string()
   .required('Email address is required. Please enter your email address.')
+  .min(5, 'Email address must be at least 5 characters long.')
+  .max(320, 'It must be at most 320 characters long.')
+  .email('Invalid email address format. Please enter a valid email address.')
+  .matches(
+    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|co.in|in)$/,
+    // /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+    'Invalid email address format. Please enter a valid email address.',
+  );
+const emailSchema = Yup.string()
+  .required('Email address is required. Please enter a email address.')
   .min(5, 'Email address must be at least 5 characters long.')
   .max(320, 'It must be at most 320 characters long.')
   .email('Invalid email address format. Please enter a valid email address.')
@@ -52,13 +63,13 @@ const emailSchema = Yup.string()
   );
 
 const nameSchema = Yup.string()
-  .required('Please enter your First name.')
+  .required('Please enter First name.')
   .min(2, 'Name must be at least two characters long.')
   .max(255, 'Name must be at most 255 characters long.')
   .matches(/^[a-zA-Z]+$/, 'Please enter a valid First name.');
 
 const nameSchema2 = Yup.string()
-  .required('Please enter your Last Name.')
+  .required('Please enter Last Name.')
   .min(2, 'Name must be at least two characters long.')
   .max(255, 'Name must be at most 255 characters long.')
   .matches(/^[a-zA-Z]+$/, 'Please enter a valid Last name.');
@@ -149,6 +160,7 @@ const SiteStateDropdownSchema = Yup.string()
 export {
   DomainSchema,
   emailSchema,
+  emailSchemaSign,
   MessageSchema,
   nameSchema,
   nameSchema2,

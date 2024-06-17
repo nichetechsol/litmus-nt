@@ -16,7 +16,7 @@ import React, {
 import swal from 'sweetalert';
 import * as Yup from 'yup';
 
-import { emailSchema, passwordSchema } from '@/helper/ValidationHelper';
+import { emailSchemaSign, passwordSchema } from '@/helper/ValidationHelper';
 import Footer from '@/shared/layout-components/footer/footer';
 import { Login } from '@/supabase/auth';
 import Loader from '@/utils/Loader/Loader';
@@ -24,7 +24,7 @@ import Loader from '@/utils/Loader/Loader';
 import { basePath } from '../../next.config';
 
 const validationSchema = Yup.object().shape({
-  email: emailSchema,
+  email: emailSchemaSign,
   password: passwordSchema,
 });
 
@@ -63,7 +63,7 @@ const LoginForm = () => {
     const newEmail = e.target.value.trim().replace(/\s+/g, '');
     setEmail(newEmail);
 
-    emailSchema
+    emailSchemaSign
       .validate(newEmail)
       .then(() => {
         setEmailError('');
