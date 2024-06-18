@@ -1,4 +1,5 @@
 @charset "UTF-8";
+@tailwind utilities;
 /*------------------------------------------------------------------
 [Master Stylesheet]
 Project                        :    Ynex - NextJs Tailwind CSS & Admin Dashboard Template 
@@ -20086,4 +20087,11 @@ h6 {
   span {
   background: transparent;
   background-image: none;
+}
+.swal-button--confirm {
+  @apply bg-primary text-white;
+}
+
+.swal-button--confirm:hover {
+  @apply bg-primary-important text-white-important;
 }

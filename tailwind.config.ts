@@ -1,3 +1,5 @@
+/* eslint-disable unused-imports/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Config } from 'tailwindcss';
 import defaultTheme from 'tailwindcss/defaultTheme';
 
@@ -254,19 +256,17 @@ const config: Config = {
     require('@tailwindcss/forms'),
     require('tailwind-clip-path'),
     require('preline/plugin'),
-    // plugin(function ({ addComponents }: any) {
-    //   addComponents({
-    //     ".dirrtl": {
-    //       direction: "ltr",
-    //     },
-    //     ".dir-rtl": {
-    //       direction: "rtl",
-    //     },
-    //     ".dir-ltr": {
-    //       direction: "ltr",
-    //     },
-    //   });
-    // }),
+    function ({ addUtilities }: { addUtilities: any }) {
+      const newUtilities = {
+        '.bg-primary-important': {
+          backgroundColor: '#3490dc !important',
+        },
+        '.text-white-important': {
+          color: '#ffffff !important',
+        },
+      };
+      addUtilities(newUtilities, ['responsive', 'hover']);
+    },
   ],
 };
 

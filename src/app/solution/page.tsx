@@ -14,8 +14,8 @@ const Page = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [tokenVerify, setTokenVerify] = useState(false);
   const [folder, setFolder] = useState<any>('');
-  const [setInnerFolder] = useState<any>('');
-  const [selectedFolder, setSelectedFolder] = useState(null);
+  // const [setInnerFolder] = useState<any>('');
+  const [selectedFolder] = useState(null);
   const [filteredFiles] = useState<any>('');
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
@@ -53,16 +53,16 @@ const Page = () => {
     fetchData();
   }, []);
 
-  function handlefolderclick(folder: any) {
-    setInnerFolder(folder.data);
-    setSelectedFolder(folder);
-  }
-  useEffect(() => {
-    if (folder) {
-      handlefolderclick(folder[0]);
-      setCurrentTrue(true);
-    }
-  }, [folder]);
+  // function handlefolderclick(folder: any) {
+  //   setInnerFolder(folder.data);
+  //   setSelectedFolder(folder);
+  // }
+  // useEffect(() => {
+  //   if (folder) {
+  //     handlefolderclick(folder[0]);
+  //     setCurrentTrue(true);
+  //   }
+  // }, [folder]);
 
   // useEffect(() => {
   //   if (innerFolder) {
@@ -99,7 +99,6 @@ const Page = () => {
                                   ? 'checkforactive'
                                   : ''
                               }`}
-                              onClick={() => handlefolderclick(folder)}
                             >
                               <div className='flex items-center gap-2'>
                                 <div>
@@ -131,35 +130,54 @@ const Page = () => {
               </div>
               <div className='xl:col-span-9 col-span-12'>
                 <div className='box custom-box'>
-                  <div className='box-header justify-between'>
-                    <div className='box-title'>
-                      {currentTrue ? 'Current' : 'Archive'}
-                    </div>
-                    <div>
+                  <div className='box-header'>
+                    <div className='flex justify-between w-full'>
                       <button
                         type='button'
                         className={
                           currentTrue
-                            ? 'ti-btn ti-btn-primary-full btn-wave !me-3'
-                            : 'ti-btn ti-btn-secondary-full btn-wave !me-3'
+                            ? 'ti-btn ti-btn-primary-full btn-wave !me-3 w-full'
+                            : 'ti-btn ti-btn-outline-primary btn-wave !me-3 w-full'
                         }
                         onClick={() => {
                           setCurrentTrue(true);
                         }}
                       >
+                        {/* <span className='p-0 m-0 w-auto'>
+                                    <i className='ri-folder-line text-[1rem]  text-white'></i>
+                                  </span> */}
                         Current{' '}
                       </button>
                       <button
                         type='button'
                         className={
                           currentTrue
-                            ? 'ti-btn ti-btn-secondary-full btn-wave'
-                            : 'ti-btn ti-btn-primary-full btn-wave'
+                            ? 'ti-btn ti-btn-outline-primary btn-wave !me-3 w-full'
+                            : 'ti-btn ti-btn-primary-full btn-wave !me-3 w-full'
                         }
                         onClick={() => {
                           setCurrentTrue(false);
                         }}
                       >
+                        {/* <span className='p-0 m-0 w-auto'>
+                                    <i className='ri-folder-line text-[1rem]  text-primary'></i>
+                                  </span> */}
+                        Archive
+                      </button>
+                      <button
+                        type='button'
+                        className={
+                          currentTrue
+                            ? 'ti-btn ti-btn-outline-primary  btn-wave w-full'
+                            : 'ti-btn ti-btn-primary-full btn-wave w-full'
+                        }
+                        onClick={() => {
+                          setCurrentTrue(false);
+                        }}
+                      >
+                        {/* <span className='p-0 m-0 w-auto'>
+                                    <i className='ri-folder-line text-[1rem]  text-primary'></i>
+                                  </span> */}
                         Archive
                       </button>
                     </div>

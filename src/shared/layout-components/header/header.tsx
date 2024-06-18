@@ -624,7 +624,8 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                                 text: 'Yes, logout!',
                                 value: true,
                                 visible: true,
-                                className: '',
+                                className:
+                                  'swal-button--confirm hover:!bg-primary hover:!text-white',
                                 closeModal: true,
                               },
                             },
@@ -652,7 +653,7 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                       >
                         <button className='w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex'>
                           {/* <Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" href="/components/authentication/sign-in/signin-cover/"> */}
-                          <i className='ti ti-logout text-[1.125rem] me-2 opacity-[0.7]'></i>
+                          <i className='ri-logout-circle-line text .cs-[1.125rem] me-2 opacity-[1]'></i>
                           Log Out
                         </button>
                       </li>

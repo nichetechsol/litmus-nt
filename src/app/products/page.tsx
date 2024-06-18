@@ -194,7 +194,7 @@ const Page = () => {
                         className={
                           currentTrue
                             ? 'ti-btn ti-btn-primary-full btn-wave !me-3'
-                            : 'ti-btn btn-wave !me-3 bg-gray-500 text-white'
+                            : 'ti-btn btn-wave !me-3 ti-btn-outline-primary'
                         }
                         onClick={() => {
                           setCurrentTrue(true);
@@ -207,7 +207,7 @@ const Page = () => {
                         type='button'
                         className={
                           currentTrue
-                            ? 'ti-btn btn-wave bg-gray-500 text-white'
+                            ? 'ti-btn btn-wave ti-btn-outline-primary'
                             : 'ti-btn ti-btn-primary-full btn-wave'
                         }
                         onClick={() => {
