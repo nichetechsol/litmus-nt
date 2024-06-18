@@ -166,7 +166,7 @@ const Page = () => {
                                  
                                 </span> */}
                                   </div>
-                                  <div className='text-[.875rem] font-semibold my-auto '>
+                                  <div className='text-[.875rem] font-semibold my-auto break-all'>
                                     {folder?.folder}
                                   </div>
                                 </div>
@@ -203,8 +203,8 @@ const Page = () => {
                             type='button'
                             className={
                               currentTrue === subFolder.subFolder
-                                ? 'ti-btn ti-btn-primary-full btn-wave !me-3 w-full'
-                                : 'ti-btn ti-btn-outline-primary btn-wave !me-3 w-full'
+                                ? 'ti-btn ti-btn-primary-full break-all btn-wave !me-3 w-full'
+                                : 'ti-btn ti-btn-outline-primary break-all btn-wave !me-3 w-full'
                             }
                             style={{ cursor: 'pointer' }}
                             onClick={() => {
