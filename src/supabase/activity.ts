@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 import supabase from '@/supabase/db';
+// import { number } from 'zod';
 
 interface LogActivityParams {
   org_id?: number;
@@ -12,6 +12,19 @@ interface LogActivityParams {
   details?: { filename: string };
 }
 
+interface GetOrgActivitiesParams {
+  orgId: number;
+  start: number;
+  end: number;
+  limit: number;
+}
+interface GetSiteActivitiesParams {
+  siteID: number;
+  start?: number;
+  end?: number;
+  limit?: number;
+}
+
 const valid_activity_types: string[] = [
   'create_org',
   'create_site',
@@ -21,54 +34,6 @@ const valid_activity_types: string[] = [
   'download_file',
 ];
 
-// const logActivity = async ({
-//   org_id,
-//   site_id,
-//   user_id,
-//   target_user_id,
-//   target_user_role,
-//   activity_type,
-// }: LogActivityParams): Promise<any> => {
-//   if (
-//     org_id === undefined &&
-//     site_id === undefined &&
-//     user_id === undefined &&
-//     target_user_id === undefined &&
-//     target_user_role === undefined &&
-//     activity_type === undefined
-//   ) {
-//     return 'Invalid parameters';
-//   }
-
-//   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-//   if (!valid_activity_types.includes(activity_type!)) {
-//     return 'invalid activity_type';
-//   }
-
-//   try {
-//     const { data, error } = await supabase
-//       .from('activities')
-//       .insert([
-//         {
-//           org_id,
-//           site_id,
-//           user_id,
-//           target_user_id,
-//           target_user_role,
-//           activity_type,
-//         },
-//       ])
-//       .select();
-
-//     if (error) {
-//       throw error;
-//     }
-
-//     return data;
-//   } catch (error: any) {
-//     return null;
-//   }
-// };
 const logActivity = async ({
   org_id,
   site_id,
@@ -120,9 +85,19 @@ const logActivity = async ({
     return null;
   }
 };
-const getActivitiesByOrgId = async (orgId: number): Promise<any> => {
+
+const getActivitiesByOrgId = async ({
+  orgId,
+  start,
+  end,
+  limit,
+}: GetOrgActivitiesParams): Promise<any> => {
   try {
-    const { data: activities, error } = await supabase
+    const {
+      data: activities,
+      count,
+      error,
+    } = await supabase
       .from('activities')
       .select(
         `
@@ -149,23 +124,33 @@ const getActivitiesByOrgId = async (orgId: number): Promise<any> => {
           lastname
         )
       `,
+        { count: 'exact' },
       )
       .eq('org_id', orgId)
-      .range(0, 9);
+      .range(start, end)
+      .limit(limit);
 
     if (error) {
       throw error;
     }
 
-    return activities;
+    return { activities, total_count: count };
   } catch (error: any) {
     return null;
   }
 };
-
-const getActivitiesBySiteID = async (siteID: number): Promise<any> => {
+const getActivitiesBySiteID = async ({
+  siteID,
+  start = 0,
+  end = 2,
+  limit = 3,
+}: GetSiteActivitiesParams): Promise<any> => {
   try {
-    const { data: activities, error } = await supabase
+    const {
+      data: activities,
+      count,
+      error,
+    } = await supabase
       .from('activities')
       .select(
         `
@@ -192,17 +177,105 @@ const getActivitiesBySiteID = async (siteID: number): Promise<any> => {
           lastname
         )
       `,
+        { count: 'exact' },
       )
-      .eq('site_id', siteID);
+      .eq('site_id', siteID)
+      .range(start, end)
+      .limit(limit);
 
     if (error) {
       throw error;
     }
 
-    return activities;
+    return { activities, total_count: count };
   } catch (error: any) {
     return null;
   }
 };
+
+// const getActivitiesByOrgId = async (orgId: number): Promise<any> => {
+//   try {
+//     const { data: activities, error } = await supabase
+//       .from('activities')
+//       .select(
+//         `
+//         activity_type,
+//         activity_date,
+//         details,
+//         org_id (
+//           name
+//         ),
+//         site_id (
+//           name
+//         ),
+//         target_user_role (
+//           name
+//         ),
+//         user_id (
+//           email,
+//           firstname,
+//           lastname
+//         ),
+//         target_user_id (
+//           email,
+//           firstname,
+//           lastname
+//         )
+//       `,
+//       )
+//       .eq('org_id', orgId)
+//       .range(0, 9);
+
+//     if (error) {
+//       throw error;
+//     }
+
+//     return activities;
+//   } catch (error: any) {
+//     return null;
+//   }
+// };
+
+// const getActivitiesBySiteID = async (siteID: number): Promise<any> => {
+//   try {
+//     const { data: activities, error } = await supabase
+//       .from('activities')
+//       .select(
+//         `
+//         activity_type,
+//         activity_date,
+//         details,
+//         org_id (
+//           name
+//         ),
+//         site_id (
+//           name
+//         ),
+//         target_user_role (
+//           name
+//         ),
+//         user_id (
+//           email,
+//           firstname,
+//           lastname
+//         ),
+//         target_user_id (
+//           email,
+//           firstname,
+//           lastname
+//         )
+//       `,
+//       )
+//       .eq('site_id', siteID);
+
+//     if (error) {
+//       throw error;
+//     }
+
+//     return activities;
+//   } catch (error: any) {
+//     return null;
+//   }
+// };
 
 export { getActivitiesByOrgId, getActivitiesBySiteID, logActivity };

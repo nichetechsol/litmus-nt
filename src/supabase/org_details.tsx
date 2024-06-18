@@ -232,13 +232,23 @@ async function addOrganization(data: {
         org_id: orgId,
         user_id: data.user_id,
       };
-      await sendEmailFunction(
-        'srishti@nichetech.in',
-        'Add Organization',
-        'add_org',
-        data.token,
-        emaildata,
-      );
+      if (data.type_id === 1) {
+        await sendEmailFunction(
+          'srishti@nichetech.in',
+          'Add Organization',
+          'add_org',
+          data.token,
+          emaildata,
+        );
+      } else {
+        await sendEmailFunction(
+          'srishti@nichetech.in',
+          'Add Organization',
+          'add_org',
+          data.token,
+          emaildata,
+        );
+      }
       // Clear input fields after successful email send
     } catch (error) {
       // Handle error here
