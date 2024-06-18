@@ -967,7 +967,7 @@ const Page: React.FC = () => {
                                 }}
                               >
                                 <div className='flex items-center'>
-                                  <span className='flex-grow whitespace-nowrap'>
+                                  <span className='flex-grow'>
                                     {site?.name ? site.name : 'No Site found'}
                                   </span>
                                 </div>

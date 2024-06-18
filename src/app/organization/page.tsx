@@ -819,9 +819,7 @@ const Page = () => {
                                 {/* <span className="me-2 leading-none">
                                             <i className="ri-task-line align-middle text-[.875rem]"></i>
                                         </span> */}
-                                <span className='flex-grow whitespace-nowrap'>
-                                  {org?.name}
-                                </span>
+                                <span className='flex-grow'>{org?.name}</span>
                                 {/* <span className="badge bg-success/10 text-success rounded-full">167</span> */}
                               </div>
                             </li>

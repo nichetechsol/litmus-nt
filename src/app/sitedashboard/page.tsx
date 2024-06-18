@@ -769,7 +769,7 @@ const Page = () => {
                           onClick={() => {
                             navigate.push('/license');
                           }}
-                          className='hs-dropdown-toggle py-2  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
+                          className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
                         >
                           <i className='ri-add-circle-line !text-[1rem]'></i>Add
                           License
