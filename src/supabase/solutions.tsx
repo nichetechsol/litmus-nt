@@ -233,12 +233,12 @@ async function listSolutions() {
 
 async function listOfAllSolutions() {
   // Fetch the list of Litmus Products from storage
-  const { data, error } = await supabase.storage
+  const { data: folders, error: folderError } = await supabase.storage
     .from('Litmus_Solutions')
     .list();
 
   // Handle errors from fetching Litmus Products
-  if (error) {
+  if (folderError) {
     return {
       errorCode: 1,
       message: 'Error fetching Litmus Products',
@@ -246,7 +246,7 @@ async function listOfAllSolutions() {
     };
   }
 
-  if (!data || data.length === 0) {
+  if (!folders || folders.length === 0) {
     return {
       errorCode: 1,
       message: 'No Data Available for this product',
@@ -254,39 +254,39 @@ async function listOfAllSolutions() {
     };
   }
 
-  const results = [];
+  const results = await Promise.all(
+    folders.map(async (item) => {
+      const mainFolder: any = {
+        folder: item.name,
+        errorCode: 0,
+        message: 'Success',
+        data: [],
+      };
 
-  const generateSignedUrl = async (path: any) => {
-    const { data: signedUrlData, error: signedUrlError } =
-      await supabase.storage.from('Litmus_Solutions').createSignedUrl(path, 60); // Adjust the expiration time as needed
-    return signedUrlError ? null : signedUrlData.signedUrl;
-  };
+      const { data: folderData, error: folderError } = await supabase.storage
+        .from('Litmus_Solutions')
+        .list(item.name);
 
-  for (const item of data) {
-    const mainFolder: any = {
-      folder: item.name,
-      errorCode: 0,
-      message: 'Success',
-      data: [],
-    };
+      if (folderError) {
+        return {
+          ...mainFolder,
+          errorCode: 1,
+          message: 'Error retrieving folder contents',
+        };
+      }
 
-    const { data: folderData, error: folderError } = await supabase.storage
-      .from('Litmus_Solutions')
-      .list(item.name);
-
-    if (folderError) {
-      mainFolder.errorCode = 1;
-      mainFolder.message = 'Error retrieving folder contents';
-      results.push(mainFolder);
-      continue;
-    }
-
-    if (folderData && folderData.length > 0) {
-      const processFiles = async (folderPath: any, files: any) => {
+      const processFiles = async (
+        folderPath: string,
+        files: any[],
+        includeSubFolder: boolean,
+      ) => {
         const subFolderData: any = {
-          subFolder: folderPath,
           files: [],
         };
+
+        if (includeSubFolder) {
+          subFolderData.subFolder = folderPath;
+        }
 
         for (const file of files) {
           if (file.name !== '.emptyFolderPlaceholder') {
@@ -299,36 +299,40 @@ async function listOfAllSolutions() {
             });
           }
         }
-        mainFolder.data.push(subFolderData);
+
+        if (subFolderData.files.length > 0) {
+          mainFolder.data.push(subFolderData);
+        }
       };
 
       if (item.name === 'LE_Production_Record_DB') {
         // Fetch sub-folders within LE_Production_Record_DB
-        for (const subFolder of folderData) {
-          const { data: subFolderFiles, error: subFolderError } =
-            await supabase.storage
-              .from('Litmus_Solutions')
-              .list(`${item.name}/${subFolder.name}`);
+        await Promise.all(
+          folderData.map(async (subFolder) => {
+            const { data: subFolderFiles, error: subFolderError } =
+              await supabase.storage
+                .from('Litmus_Solutions')
+                .list(`${item.name}/${subFolder.name}`);
 
-          if (subFolderError) {
-            mainFolder.data.push({
-              subFolder: subFolder.name,
-              errorCode: 1,
-              message: 'Error retrieving sub-folder contents',
-              files: [],
-            });
-            continue;
-          }
-
-          await processFiles(`${subFolder.name}`, subFolderFiles);
-        }
+            if (subFolderError) {
+              mainFolder.data.push({
+                subFolder: subFolder.name,
+                errorCode: 1,
+                message: 'Error retrieving sub-folder contents',
+                files: [],
+              });
+            } else if (subFolderFiles && subFolderFiles.length > 0) {
+              await processFiles(`${subFolder.name}`, subFolderFiles, true);
+            }
+          }),
+        );
       } else {
-        await processFiles('', folderData);
+        await processFiles(item.name, folderData, false);
       }
-    }
 
-    results.push(mainFolder);
-  }
+      return mainFolder;
+    }),
+  );
 
   return {
     errorCode: 0,
@@ -336,5 +340,15 @@ async function listOfAllSolutions() {
     data: results,
   };
 }
+
+const generateSignedUrl = async (path: string) => {
+  const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+    .from('Litmus_Solutions')
+    .createSignedUrl(path, 60); // Adjust the expiration time as needed
+  if (signedUrlError) {
+    return null;
+  }
+  return signedUrlData.signedUrl;
+};
 
 export { listOfAllSolutions, listSolutions };
