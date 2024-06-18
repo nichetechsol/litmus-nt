@@ -494,7 +494,7 @@ const Page = () => {
             <div className='xl:col-span-3 col-span-12'>
               <div className='box'>
                 <div className='box-body !p-0'>
-                  {orgsWithSites && orgsWithSites.length == 0 && (
+                  {user_role === 1 && (
                     <div className='p-4 grid border-b border-dashed dark:border-defaultborder/10'>
                       <Link
                         href=''
