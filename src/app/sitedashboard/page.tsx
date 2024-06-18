@@ -26,6 +26,7 @@ import { listLitmusProducts } from '@/supabase/products';
 import { refreshToken } from '@/supabase/session';
 import {
   addUserToSites,
+  getSiteUserRole,
   modifyUserOfSites,
   removeUserFromSites,
 } from '@/supabase/site_users';
@@ -277,24 +278,24 @@ const Page = () => {
       // console.error("Error fetching organization details:", error.message);
     }
   };
-  // const [userrole3, setuserrole3] = useState('');
-  // useEffect(() => {
-  //   const fetchData2 = async () => {
-  //     try {
-  //       const data: any = await getSiteUserRole(user_id, site_id);
+  const [userrole3, setuserrole3] = useState<any>('');
+  useEffect(() => {
+    const fetchData2 = async () => {
+      try {
+        const data: any = await getSiteUserRole(user_id, site_id);
 
-  //       if (data) {
-  //         setuserrole3(data.data.name);
-  //       } else {
-  //         // console.log("No Role Found.");
-  //       }
-  //     } catch (error: any) {
-  //       // console.error("Error fetching organization details:", error.message);
-  //     }
-  //   };
+        if (data) {
+          setuserrole3(data.data.name);
+        } else {
+          // console.log("No Role Found.");
+        }
+      } catch (error: any) {
+        // console.error("Error fetching organization details:", error.message);
+      }
+    };
 
-  //   fetchData2();
-  // }, [site_id, user_id]);
+    fetchData2();
+  }, [site_id, user_id]);
   useEffect(() => {
     fetchUserData();
   }, [site_id, activePage, search]);
@@ -1373,16 +1374,21 @@ const Page = () => {
                         {/* <div className='hs-dropdown ti-dropdown'> */}
 
                         <div className='grid border-b border-dashed dark:border-defaultborder/10'>
-                          <Link
-                            style={{ cursor: 'pointer' }}
-                            href=''
-                            className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
-                            data-hs-overlay='#todo-compose-user'
-                            onClick={() => handleAddUser()}
-                          >
-                            <i className='ri-add-circle-line !text-[1rem]'></i>
-                            Add User
-                          </Link>
+                          {' '}
+                          {userrole3 === 1 || userrole3 === 2 ? (
+                            <Link
+                              style={{ cursor: 'pointer' }}
+                              href=''
+                              className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
+                              data-hs-overlay='#todo-compose-user'
+                              onClick={() => handleAddUser()}
+                            >
+                              <i className='ri-add-circle-line !text-[1rem]'></i>
+                              Add User
+                            </Link>
+                          ) : (
+                            <div> </div>
+                          )}
                           <div
                             id='todo-compose-user'
                             // className='hs-overlay hidden ti-modal'
@@ -1570,15 +1576,15 @@ const Page = () => {
                                 {' '}
                                 Role
                               </th>
-                              {/* {userrole3 == '1' ||
-                                (userrole3 == '2' && ( */}
-                              <th
-                                scope='col'
-                                className='!text-start !text-[0.85rem]'
-                              >
-                                Action
-                              </th>
-                              {/* // ))} */}
+                              {userrole3 == '1' ||
+                                (userrole3 == '2' && (
+                                  <th
+                                    scope='col'
+                                    className='!text-start !text-[0.85rem]'
+                                  >
+                                    Action
+                                  </th>
+                                ))}
                             </tr>
                           </thead>
                           <tbody>
@@ -1606,23 +1612,23 @@ const Page = () => {
                                         {user.role_name}
                                       </span>
                                     </td>
-                                    {/* {userrole3 == '1' ||
-                                    (userrole3 == '2' && ( */}
-                                    <td>
-                                      <div className='flex flex-row items-center !gap-2 text-[0.9375rem]'>
-                                        <Link
-                                          aria-label='anchor'
-                                          href=''
-                                          style={{ cursor: 'pointer' }}
-                                          data-hs-overlay='#todo-compose-user'
-                                          onClick={() => {
-                                            handleEdit(user);
-                                          }}
-                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
-                                        >
-                                          <i className='ri-edit-line'></i>
-                                        </Link>
-                                        {/* <Link
+                                    {userrole3 == '1' ||
+                                      (userrole3 == '2' && (
+                                        <td>
+                                          <div className='flex flex-row items-center !gap-2 text-[0.9375rem]'>
+                                            <Link
+                                              aria-label='anchor'
+                                              href=''
+                                              style={{ cursor: 'pointer' }}
+                                              data-hs-overlay='#todo-compose-user'
+                                              onClick={() => {
+                                                handleEdit(user);
+                                              }}
+                                              className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
+                                            >
+                                              <i className='ri-edit-line'></i>
+                                            </Link>
+                                            {/* <Link
                                         aria-label='anchor'
                                         href=''
                                         
@@ -1630,19 +1636,19 @@ const Page = () => {
                                       >
                                         <i className='ri-user-unfollow-line'></i>
                                       </Link> */}
-                                        <div
-                                          style={{ cursor: 'pointer' }}
-                                          aria-label='anchor'
-                                          onClick={() => {
-                                            handleDelete(user.user_id);
-                                          }}
-                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
-                                        >
-                                          <i className='ri-delete-bin-line'></i>
-                                        </div>
-                                      </div>
-                                    </td>
-                                    {/* ))} */}
+                                            <div
+                                              style={{ cursor: 'pointer' }}
+                                              aria-label='anchor'
+                                              onClick={() => {
+                                                handleDelete(user.user_id);
+                                              }}
+                                              className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
+                                            >
+                                              <i className='ri-delete-bin-line'></i>
+                                            </div>
+                                          </div>
+                                        </td>
+                                      ))}
                                   </tr>
                                 ))
                               : null}
