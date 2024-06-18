@@ -171,13 +171,10 @@ const OrgDashboard = () => {
           // setLoading(false);
           if (data) {
             setOrgData(data.data);
-          } else {
-            // setLoading(false);
-            // console.log("No organization details found.");
           }
         }
       } catch (error: any) {
-        // console.error("Error fetching organization details:", error.message);
+        toast.error(error.message, { autoClose: 3000 });
       }
     };
 
@@ -562,7 +559,7 @@ const OrgDashboard = () => {
                                     Number of Sites
                                   </p>
                                   <h4 className='font-semibold  text-[1.5rem] !mb-2 '>
-                                    {orgData ? orgData.sitesDetailCount : 0}
+                                    {orgData ? orgData?.sitesDetailCount : 0}
                                   </h4>
                                 </div>
                               </div>
@@ -604,7 +601,8 @@ const OrgDashboard = () => {
                             <div>
                               <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-success'>
                                 {/* <i className='ti ti-wave-square text-[1rem] text-white'></i> */}
-                                <i className='ri-pulse-line text-white'></i>
+                                {/* <i className='ri-pulse-line text-white'></i> */}
+                                <i className='ri-file-line text-white'></i>
                               </span>
                             </div>
                             <div className='flex-grow ms-4'>

@@ -67,7 +67,7 @@ interface Typeor {
   created_at: string;
 }
 
-const LoginForm = () => {
+const Page = () => {
   const [tokenVerify, setTokenVerify] = useState(false);
   const [onlyToken, setOnlyToken] = useState('');
   const navigate = useRouter();
@@ -176,11 +176,11 @@ const LoginForm = () => {
       const data: any = await fetchOrganizationAndSiteDetails(user_id);
 
       if (data) {
-        setLoading(false);
         setOrgsWithSites(data);
       }
-    } catch (error: unknown) {
-      /* empty */
+      setLoading(false);
+    } catch (error: any) {
+      toast.error('Error Fetching Data!!', { autoClose: 3000 });
     }
   };
 
@@ -220,8 +220,8 @@ const LoginForm = () => {
           setSidebarOrgs({ data: [] });
         }
       }
-    } catch (error: unknown) {
-      /* empty */
+    } catch (error: any) {
+      toast.error(error, { autoClose: 3000 });
     }
   };
   useEffect(() => {
@@ -310,8 +310,8 @@ const LoginForm = () => {
         if (data && data.data) {
           setTypeDropdown(data.data);
         }
-      } catch (error: unknown) {
-        /* empty */
+      } catch (error: any) {
+        toast.error('Error Fetching Type..', { autoClose: 3000 });
       }
     };
 
@@ -400,6 +400,7 @@ const LoginForm = () => {
         fetchData1();
       } catch (error) {
         setLoading(false);
+        toast.error('Error Adding Organization', { autoClose: 3000 });
       }
     }
   };
@@ -819,7 +820,7 @@ const LoginForm = () => {
                                             <i className="ri-task-line align-middle text-[.875rem]"></i>
                                         </span> */}
                                 <span className='flex-grow whitespace-nowrap'>
-                                  {org.name}
+                                  {org?.name}
                                 </span>
                                 {/* <span className="badge bg-success/10 text-success rounded-full">167</span> */}
                               </div>
@@ -898,10 +899,10 @@ const LoginForm = () => {
                                   <div>
                                     <h6 className=' mb-1 font-semibold text-[1rem] text-site-name'>
                                       {' '}
-                                      {org.org_name}{' '}
+                                      {org?.org_name}{' '}
                                     </h6>
                                     <p className='mb-1 text-[#8c9097] dark:text-white/50 contact-mail text-truncate'>
-                                      {org.sites_count} sites
+                                      {org?.sites_count} sites
                                     </p>
                                   </div>
                                 </div>
@@ -960,4 +961,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default Page;
