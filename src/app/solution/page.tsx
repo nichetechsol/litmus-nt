@@ -6,17 +6,26 @@
 import { redirect } from 'next/navigation';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 
+import { decryptData } from '@/helper/Encryption_Decryption';
+import { logActivity } from '@/supabase/activity';
 import { refreshToken } from '@/supabase/session';
 import { listOfAllSolutions } from '@/supabase/solutions';
 import Loader from '@/utils/Loader/Loader';
 
+interface subFolder {
+  files: [];
+  subFolder: string;
+}
 const Page = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [tokenVerify, setTokenVerify] = useState(false);
-  const [folder, setFolder] = useState<any>('');
-  // const [setInnerFolder] = useState<any>('');
-  const [selectedFolder] = useState(null);
-  const [filteredFiles] = useState<any>('');
+  const [folder, setFolder] = useState<any>([]);
+  const [subFolders, setSubFolders] = useState<subFolder[] | null>(null);
+  const [selectedFolder, setSelectedFolder] = useState<any>(null);
+  // const [selectedSubFolder, setSelectedSubFolder] = useState<any>(null);
+  // const [setFiles] = useState<any>([]);
+  const [file3, setfile3] = useState<any>([]);
+  const [currentTrue, setCurrentTrue] = useState('');
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
       const tokens = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
@@ -29,23 +38,18 @@ const Page = () => {
     }
   }, []);
 
-  // const [currentfiles, setCurrentfiles] = useState<any>('');
-  const [currentTrue, setCurrentTrue] = useState(true);
   useEffect(() => {
     const fetchData = async () => {
       try {
         await refreshToken();
         setLoading(true);
         const data: any = await listOfAllSolutions();
-
         if (data.data.length >= 0) {
           setFolder(data.data);
+          setSelectedFolder(data.data[0]);
+          setSubFolders(data.data[0].data);
         }
         setLoading(false);
-        // }
-        // else{
-        //   setLoading(false)
-        // }
       } catch (error: any) {
         setLoading(false);
       }
@@ -53,27 +57,79 @@ const Page = () => {
     fetchData();
   }, []);
 
-  // function handlefolderclick(folder: any) {
-  //   setInnerFolder(folder.data);
-  //   setSelectedFolder(folder);
-  // }
-  // useEffect(() => {
-  //   if (folder) {
-  //     handlefolderclick(folder[0]);
-  //     setCurrentTrue(true);
-  //   }
-  // }, [folder]);
+  const [user_id, setuser_id] = useState<any>('');
+  const [org_id, setorg_id] = useState<any>('');
+  const [site_id, setsite_id] = useState<any>('');
+  useEffect(() => {
+    const encryptedUserId = localStorage.getItem('user_id');
+    const encryptedOrgId = localStorage.getItem('org_id');
+    const encryptedSiteId = localStorage.getItem('site_id');
 
-  // useEffect(() => {
-  //   if (innerFolder) {
-  //     setFilteredFiles(
-  //       innerFolder?.filter((file: any) =>
-  //         currentTrue ? file.status === 'current' : file.status === 'archive',
-  //       ),
-  //     );
-  //   }
-  // }, [currentTrue, innerFolder]);
+    const decryptedUserId = decryptData(encryptedUserId);
+    const decryptedOrgId = decryptData(encryptedOrgId);
+    const decryptedSiteId = decryptData(encryptedSiteId);
+    if (decryptedOrgId) {
+      setorg_id(decryptedOrgId);
+    }
 
+    if (decryptedSiteId) {
+      setsite_id(decryptedSiteId);
+    }
+
+    if (decryptedUserId) {
+      setuser_id(decryptedUserId);
+    }
+  }, []);
+
+  function handleFolderClick(folder: any) {
+    setSelectedFolder(folder);
+    setSubFolders(folder.data);
+    if (folder.data[0].subFolder != '') {
+      setCurrentTrue(folder.data[0].subFolder);
+      // setSelectedSubFolder(folder.data[0].subFolder);
+      setfile3(folder.data[0].files);
+    }
+    // setFiles([]);
+  }
+
+  function handleSubFolderClick(subFolder: any) {
+    setCurrentTrue(subFolder.subFolder);
+    // setSelectedSubFolder(subFolder);
+    // setFiles(subFolder.files);
+    setfile3(subFolder.files);
+  }
+
+  useEffect(() => {
+    // if (subFolders.length < 1 && subFolders.length > 0) {
+    //   setSelectedSubFolder(subFolders[0]);
+    //   setFiles(subFolders[0].files);
+    // }
+    if (subFolders && subFolders[0]?.subFolder == '') {
+      setfile3(subFolders[0]?.files);
+    }
+    // if(folder.length>0)
+    //   {
+    //     if(folder[0].data[0].subFolder=="")
+    //       {
+    //         setfile3()
+    //       }
+    //   }
+  }, [subFolders, file3, folder]);
+
+  const handleDownload = async (fileName: string) => {
+    //
+    const data = {
+      org_id: org_id,
+      site_id: site_id,
+      user_id: user_id,
+      activity_type: 'download_file',
+      details: { filename: fileName },
+    };
+    const response = await logActivity(data);
+    if (response) {
+      // fetchData8()
+    }
+  };
   return (
     <>
       {loading && <Loader />}
@@ -88,41 +144,40 @@ const Page = () => {
                   </div>
                   <div className='box-body !p-0'>
                     <ul className='list-group nft-list'>
-                      {folder && folder.length > 0 ? (
-                        folder.map((folder: any) => (
-                          <>
-                            <li
-                              style={{ cursor: 'pointer' }}
-                              key={folder.folder}
-                              className={`list-group-item ${
-                                selectedFolder === folder
-                                  ? 'checkforactive'
-                                  : ''
-                              }`}
-                            >
-                              <div className='flex items-center gap-2'>
-                                <div>
-                                  <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
-                                    <i className='ri-folder-line text-[1rem]  text-white'></i>
-                                  </span>
-                                  {/* <span className='avatar avatar-rounded avatar-sm bg-light p-1'>
+                      {folder && folder.length > 0
+                        ? folder.map((folder: any) => (
+                            <>
+                              <li
+                                style={{ cursor: 'pointer' }}
+                                key={folder.folder}
+                                className={`list-group-item ${
+                                  selectedFolder === folder
+                                    ? 'checkforactive'
+                                    : ''
+                                }`}
+                                onClick={() => handleFolderClick(folder)}
+                              >
+                                <div className='flex items-center gap-2'>
+                                  <div>
+                                    <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
+                                      <i className='ri-folder-line text-[1rem]  text-white'></i>
+                                    </span>
+                                    {/* <span className='avatar avatar-rounded avatar-sm bg-light p-1'>
                                  
                                 </span> */}
+                                  </div>
+                                  <div className='text-[.875rem] font-semibold my-auto '>
+                                    {folder?.folder}
+                                  </div>
                                 </div>
-                                <div className='text-[.875rem] font-semibold my-auto '>
-                                  {folder?.folder}
-                                </div>
-                              </div>
-                            </li>
-                          </>
-                        ))
-                      ) : (
-                        <>
-                          <div className='col-md-12 w-100 mt-4'>
-                            <p className='text-center'>No Products Found</p>{' '}
-                          </div>
-                          <></>
-                        </>
+                              </li>
+                            </>
+                          ))
+                        : null}
+                      {folder && folder.length === 0 && (
+                        <div className='col-md-12 w-100 mt-4'>
+                          <p className='text-center'>No Solutions Found</p>
+                        </div>
                       )}
                     </ul>
                   </div>
@@ -131,112 +186,75 @@ const Page = () => {
               <div className='xl:col-span-9 col-span-12'>
                 <div className='box custom-box'>
                   <div className='box-header'>
-                    <div className='flex justify-between w-full'>
-                      <button
-                        type='button'
-                        className={
-                          currentTrue
-                            ? 'ti-btn ti-btn-primary-full btn-wave !me-3 w-full'
-                            : 'ti-btn ti-btn-outline-primary btn-wave !me-3 w-full'
-                        }
-                        onClick={() => {
-                          setCurrentTrue(true);
-                        }}
-                      >
-                        {/* <span className='p-0 m-0 w-auto'>
-                                    <i className='ri-folder-line text-[1rem]  text-white'></i>
-                                  </span> */}
-                        Current{' '}
-                      </button>
-                      <button
-                        type='button'
-                        className={
-                          currentTrue
-                            ? 'ti-btn ti-btn-outline-primary btn-wave !me-3 w-full'
-                            : 'ti-btn ti-btn-primary-full btn-wave !me-3 w-full'
-                        }
-                        onClick={() => {
-                          setCurrentTrue(false);
-                        }}
-                      >
-                        {/* <span className='p-0 m-0 w-auto'>
-                                    <i className='ri-folder-line text-[1rem]  text-primary'></i>
-                                  </span> */}
-                        Archive
-                      </button>
-                      <button
-                        type='button'
-                        className={
-                          currentTrue
-                            ? 'ti-btn ti-btn-outline-primary  btn-wave w-full'
-                            : 'ti-btn ti-btn-primary-full btn-wave w-full'
-                        }
-                        onClick={() => {
-                          setCurrentTrue(false);
-                        }}
-                      >
-                        {/* <span className='p-0 m-0 w-auto'>
-                                    <i className='ri-folder-line text-[1rem]  text-primary'></i>
-                                  </span> */}
-                        Archive
-                      </button>
-                    </div>
+                    {subFolders && subFolders[0]?.subFolder != '' ? (
+                      <div className='box-header justify-between'>
+                        <div className='box-title'>Subfolders</div>
+                      </div>
+                    ) : (
+                      <div className='box-header justify-between'>
+                        <div className='box-title'>Files</div>
+                      </div>
+                    )}
+                    {subFolders && subFolders[0]?.subFolder != '' ? (
+                      <div className='flex justify-between w-full'>
+                        {subFolders.map((subFolder: any) => (
+                          <button
+                            key={subFolder.subFolder}
+                            type='button'
+                            className={
+                              currentTrue === subFolder.subFolder
+                                ? 'ti-btn ti-btn-primary-full btn-wave !me-3 w-full'
+                                : 'ti-btn ti-btn-outline-primary btn-wave !me-3 w-full'
+                            }
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => {
+                              handleSubFolderClick(subFolder);
+                            }}
+                          >
+                            {subFolder.subFolder}{' '}
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
                   <div className='box-body'>
                     <ul className='list-none crm-top-deals mb-0'>
-                      {filteredFiles.files && filteredFiles.files.length > 0 ? (
-                        filteredFiles.files?.map((files: any) => (
-                          <>
-                            <li className='mb-[0.9rem] p-4 hover:bg-light border dark:border-defaultborder/10 rounded-md relative"'>
+                      {file3?.length > 0
+                        ? file3?.map((file: any, index: number) => (
+                            <li
+                              key={index}
+                              className='mb-[0.9rem] p-4 hover:bg-light border dark:border-defaultborder/10 rounded-md relative'
+                            >
                               <div className='flex items-center flex-wrap'>
                                 <div className='me-2'>
                                   <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
-                                    <i className='ri-file-line text-[1rem]  text-white'></i>
+                                    <i className='ri-file-line text-[1rem] text-white'></i>
                                   </span>
                                 </div>
                                 <div className='flex-grow'>
-                                  <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                    {files.files.FileName}
+                                  <p className='font-semibold mb-[1.4px]  text-[0.813rem] text-gray-500'>
+                                    {file.FileName}
                                   </p>
-                                  {/* <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                    Size 16MB
-                                  </p> */}
                                 </div>
-                                <div className='font-semibold text-[0.9375rem] '>
-                                  {/* <a
-                                      href={files.downloadLink}
-                                      className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
-                                    >
-                                      <i className='ri-download-line  text-[.8rem]  text-white'></i>
-                                    </a>
-                                  </div>                                   */}
-                                  {files.disabled === 'Y' ? (
-                                    <a
-                                      href={files.downloadLink}
-                                      className='text-[1rem] !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'
-                                    >
-                                      <i className='ri-download-line text-[.8rem] text-white'></i>
-                                    </a>
-                                  ) : (
-                                    <button
-                                      disabled
-                                      className='text-[1rem] !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-gray-300'
-                                    >
-                                      <i className='ri-download-line text-[.8rem] text-white'></i>
-                                    </button>
-                                  )}
+                                <div className='font-semibold text-[0.9375rem]'>
+                                  <a
+                                    onClick={() => {
+                                      handleDownload(file.FileName);
+                                    }}
+                                    href={file.downloadLink}
+                                    className='text-[1rem] !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'
+                                  >
+                                    <i className='ri-download-line text-[.8rem] text-white'></i>
+                                  </a>
                                 </div>
                               </div>
                             </li>
-                          </>
-                        ))
-                      ) : (
-                        <>
-                          <div className='col-md-12 w-100 mt-4'>
-                            <p className='text-center'>No Products Found</p>{' '}
-                          </div>
-                          <></>
-                        </>
+                          ))
+                        : null}
+                      {file3?.length === 0 && (
+                        <div className='col-md-12 w-100 mt-4'>
+                          <p className='text-center'>No Files Found</p>
+                        </div>
                       )}
                     </ul>
                   </div>

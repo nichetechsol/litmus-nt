@@ -276,7 +276,7 @@ async function listOfAllSolutions() {
       }
 
       const processFiles = async (
-        folderPath: string,
+        folderPath: any,
         files: any[],
         includeSubFolder: boolean,
       ) => {
@@ -327,7 +327,7 @@ async function listOfAllSolutions() {
           }),
         );
       } else {
-        await processFiles(item.name, folderData, false);
+        await processFiles('', folderData, true);
       }
 
       return mainFolder;
