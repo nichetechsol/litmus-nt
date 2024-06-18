@@ -13,7 +13,7 @@ import * as Yup from 'yup';
 
 import 'react-toastify/dist/ReactToastify.css';
 
-import { decryptData } from '@/helper/Encryption_Decryption';
+import { decryptData, encryptData } from '@/helper/Encryption_Decryption';
 import {
   emailSchema,
   nameSchema,
@@ -234,9 +234,13 @@ const Page = () => {
     try {
       // setLoading(true);
       if (site_id) {
-        const data: any = await getActivitiesBySiteID(site_id);
-
-        setActivity_log(data);
+        const data: any = await getActivitiesBySiteID({
+          siteID: site_id,
+          start: 0,
+          end: 10,
+          limit: 10,
+        });
+        setActivity_log(data.activities);
       }
     } catch (error: any) {
       // console.error("Error fetching organization details:", error.message);
@@ -1768,6 +1772,23 @@ const Page = () => {
                           </li>
                         </ul>
                       </div> */}
+                        <div>
+                          <button
+                            onClick={() => {
+                              const encryptedActvitylog =
+                                encryptData('/sitedashboard');
+                              localStorage.setItem(
+                                'ActivityLogs',
+                                encryptedActvitylog,
+                              );
+                              navigate.push('/activitylogs');
+                            }}
+                            className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
+                          >
+                            {/* <i className='ri-add-circle-line !text-[1rem]'></i> */}
+                            View All
+                          </button>
+                        </div>
                       </div>
                       <div className='box-body !p-0'>
                         <div className='table-responsive'>

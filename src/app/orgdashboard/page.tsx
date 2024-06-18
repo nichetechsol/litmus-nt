@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import moment from 'moment';
-import { redirect } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Pagination from 'react-js-pagination';
 import { toast, ToastContainer } from 'react-toastify';
@@ -13,7 +13,7 @@ import * as Yup from 'yup';
 
 import 'react-toastify/dist/ReactToastify.css';
 
-import { decryptData } from '@/helper/Encryption_Decryption';
+import { decryptData, encryptData } from '@/helper/Encryption_Decryption';
 import {
   emailSchema,
   nameSchema,
@@ -184,10 +184,15 @@ const OrgDashboard = () => {
     try {
       // setLoading(true);
       if (org_id) {
-        const data: any = await getActivitiesByOrgId(org_id);
+        const data: any = await getActivitiesByOrgId({
+          orgId: org_id,
+          start: 0,
+          end: 10,
+          limit: 10,
+        });
         // setLoading(false);
         if (data) {
-          setActivity_log(data);
+          setActivity_log(data.activities);
         } else {
           // setLoading(false);
           // console.log("No organization details found.");
@@ -278,6 +283,8 @@ const OrgDashboard = () => {
 
     fetchData();
   }, [org_id]);
+  const navigate = useRouter();
+
   const [changeFlage, setChangeFlage] = useState<boolean>(false);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -1077,6 +1084,23 @@ const OrgDashboard = () => {
                                       href="#!">Last Week</Link></li>
                               </ul>
                           </div> */}
+                        <div>
+                          <button
+                            onClick={() => {
+                              const encryptedActvitylog =
+                                encryptData('/orgdashboard');
+                              localStorage.setItem(
+                                'ActivityLogs',
+                                encryptedActvitylog,
+                              );
+                              navigate.push('/activitylogs');
+                            }}
+                            className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
+                          >
+                            {/* <i className='ri-add-circle-line !text-[1rem]'></i> */}
+                            View All
+                          </button>
+                        </div>
                       </div>
                       <div className='box-body !p-0'>
                         <div className='table-responsive'>

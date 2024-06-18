@@ -68,6 +68,7 @@ const layouts: { [route: string]: LayoutComponent } = {
   '/organization': ContentLayout,
   '/orgdashboard': ContentLayout,
   '/sites': ContentLayout,
+  '/activitylogs': ContentLayout,
   '/products': ContentLayout,
   '/solution': ContentLayout,
   '/license': ContentLayout,
