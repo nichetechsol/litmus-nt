@@ -20,9 +20,9 @@ interface GetOrgActivitiesParams {
 }
 interface GetSiteActivitiesParams {
   siteID: number;
-  start?: number;
-  end?: number;
-  limit?: number;
+  start: number;
+  end: number;
+  limit: number;
 }
 
 const valid_activity_types: string[] = [
@@ -141,9 +141,9 @@ const getActivitiesByOrgId = async ({
 };
 const getActivitiesBySiteID = async ({
   siteID,
-  start = 0,
-  end = 2,
-  limit = 3,
+  start,
+  end,
+  limit,
 }: GetSiteActivitiesParams): Promise<any> => {
   try {
     const {
