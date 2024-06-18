@@ -285,7 +285,7 @@ const Page = () => {
         const data: any = await getSiteUserRole(user_id, site_id);
 
         if (data) {
-          setuserrole3(data.data.name);
+          setuserrole3(data.data.id);
         } else {
           // console.log("No Role Found.");
         }
