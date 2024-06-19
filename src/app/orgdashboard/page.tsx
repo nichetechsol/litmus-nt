@@ -132,8 +132,12 @@ const OrgDashboard = () => {
     setorgName(decryptedOrgName);
 
     if (!decryptedOrgId) {
-      swal('Please select organization', { icon: 'error' });
-      redirect('/organization');
+      // swal('Please select organization', { icon: 'error' });
+      // redirect('/organization');
+      swal('Please select organization', { icon: 'error' }).then(() => {
+        navigate.push('/organization');
+        // redirect('/organization');
+      });
     }
   }, []);
 

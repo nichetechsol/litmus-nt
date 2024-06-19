@@ -20095,3 +20095,6 @@ h6 {
 .swal-button--confirm:hover {
   @apply bg-primary-important text-white-important;
 }
+.swal-overlay--show-modal {
+  pointer-events: none !important;
+}

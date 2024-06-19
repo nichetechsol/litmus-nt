@@ -120,8 +120,12 @@ const Page: React.FC = () => {
     Setorg_id(decryptedOrgId);
     setorgName(decryptedOrgName);
     if (!decryptedOrgId) {
-      swal('Please select organization', { icon: 'error' });
-      redirect('/organization');
+      // swal('Please select organization', { icon: 'error' });
+      // redirect('/organization');
+      swal('Please select organization', { icon: 'error' }).then(() => {
+        navigate.push('/organization');
+        // redirect('/organization');
+      });
     }
   }, []);
   const [userrole2, setuserrole2] = useState('');

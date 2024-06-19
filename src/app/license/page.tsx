@@ -91,10 +91,11 @@ const Page = () => {
       toast.error('Please select a License Sku', { autoClose: 3000 });
       return;
     }
+    toast.warning('Coming Soon..', { autoClose: 3000 });
     const API_KEY =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtc2ppdXp0Y2luaGFwYXVyY3JsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTQ0ODc1MTUsImV4cCI6MjAzMDA2MzUxNX0.79_004dmDW8KA-wXxBD2EP3iwNUu_FhCvumdN4jiCWk';
     try {
-      setLoading(true);
+      // setLoading(true);
       const headers = {
         Authorization: API_KEY,
         'Content-Type': 'application/json',
