@@ -1796,7 +1796,7 @@ const Page = () => {
                               View All
                             </button>
                           ) : (
-                            <>''</>
+                            <></>
                           )}
                         </div>
                       </div>

@@ -8,7 +8,6 @@ import React, {
   Suspense,
   useEffect,
   useLayoutEffect,
-  useRef,
   useState,
 } from 'react';
 
@@ -48,6 +47,9 @@ export default function Activitylogs() {
   const [site_name, setSite_name] = useState<any>('');
   const [name, setName] = useState<string>('');
   const [orgName, setorgName] = useState<any>('');
+  const [limit, setLimit] = useState(20); // Initial limit
+  const [totalCount, setTotalCount] = useState(0); // Total count of activities
+
   useEffect(() => {
     const decryptedOrgId = decryptData(localStorage.getItem('org_id'));
     const decryptedSiteId = decryptData(localStorage.getItem('site_id'));
@@ -71,43 +73,45 @@ export default function Activitylogs() {
           const data: any = await getActivitiesByOrgId({
             orgId: org_id,
             start: 0,
-            end: 20,
-            limit: 50,
+            end: limit, // Initial end limit
+            limit: limit,
           });
 
           setLoading(false);
           if (data) {
             setActivity_log(data.activities);
+            setTotalCount(data.total_count); // Update total count from API response
           } else {
             setLoading(false);
           }
         }
       } catch (error: any) {
-        // console.error('Error fetching organization details:', error.message);
+        // Handle error
       }
     }
-    if (CamePage === '/sitedashboard') {
-      // alert('hiii');
 
+    if (CamePage === '/sitedashboard') {
       try {
         setName(site_name);
         if (Site_id) {
+          setLoading(true);
           const data: any = await getActivitiesBySiteID({
             siteID: Site_id,
             start: 0,
-            end: 20,
-            limit: 10,
+            end: limit, // Initial end limit
+            limit: limit,
           });
 
           setLoading(false);
           if (data) {
             setActivity_log(data.activities);
+            setTotalCount(data.total_count); // Update total count from API response
           } else {
             setLoading(false);
           }
         }
       } catch (error: any) {
-        // console.error('Error fetching organization details:', error.message);
+        // Handle error
       }
     }
   };
@@ -127,7 +131,6 @@ export default function Activitylogs() {
       }
     }
   }, []);
-  const bottomReachedRef = useRef(false);
 
   // lazy loading
   useEffect(() => {
@@ -137,21 +140,20 @@ export default function Activitylogs() {
 
       // Check if the user has reached the absolute bottom of the page
       if (scrollTop + clientHeight >= scrollHeight) {
-        // Reset the flag so that the alert can show again on next scroll to bottom
-        bottomReachedRef.current = false;
-
-        // Show the alert
-        activitylogs();
-        // alert('You have reached the bottom of the page!');
+        if (activity_log && activity_log.length < totalCount) {
+          // Increase limit by 20 until totalCount is reached
+          setLimit((prevLimit) => prevLimit + 20);
+          // Call activitylogs again with updated limit
+          activitylogs();
+        }
       }
     };
-
-    // Add scroll event listener
     window.addEventListener('scroll', handleScroll);
 
     // Cleanup: remove scroll event listener
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [CamePage]);
+  }, [activity_log, totalCount, CamePage]); // Include activity_log and totalCount in dependencies
+
   const orgActivitylog = () => {
     return (
       <div className='box-body !p-0'>
@@ -164,7 +166,8 @@ export default function Activitylogs() {
                       (activity?.activity_type === 'create_org' ||
                         activity?.activity_type === 'add_user' ||
                         activity?.activity_type === 'remove_user' ||
-                        activity?.activity_type === 'create_site') && (
+                        activity?.activity_type === 'create_site' ||
+                        activity?.activity_type === 'download_file') && (
                         <tr
                           className='border hover:bg-gray-100 dark:hover:bg-light dark:border-defaultborder/10 border-defaultborder !border-x-0'
                           key={index}
@@ -195,10 +198,10 @@ export default function Activitylogs() {
                                           : activity.user_id.email
                                       } added a new user named '${
                                         activity?.target_user_id?.firstname &&
-                                        activity.target_user_id.lastname
+                                        activity?.target_user_id.lastname
                                           ? activity.target_user_id.firstname +
                                             ' ' +
-                                            activity?.target_user_id?.lastname
+                                            activity.target_user_id.lastname
                                           : activity?.target_user_id?.email
                                       }' within the organization ${
                                         activity.org_id.name
@@ -213,10 +216,10 @@ export default function Activitylogs() {
                                           : activity.user_id.email
                                       } removed a user named '${
                                         activity?.target_user_id?.firstname &&
-                                        activity.target_user_id.lastname
-                                          ? activity.target_user_id.firstname +
+                                        activity?.target_user_id.lastname
+                                          ? activity?.target_user_id.firstname +
                                             ' ' +
-                                            activity?.target_user_id.lastname
+                                            activity.target_user_id.lastname
                                           : activity?.target_user_id?.email
                                       }' within the organization ${
                                         activity.org_id.name
@@ -234,21 +237,37 @@ export default function Activitylogs() {
                                       } within the organization '${
                                         activity.org_id.name
                                       }'`
-                                    : //   : activity?.activity_type ===
-                                      //   'download_file'
-                                      // ? `${
-                                      //     activity.user_id.firstname &&
-                                      //     activity.user_id.lastname
-                                      //       ? activity.user_id.firstname +
-                                      //         ' ' +
-                                      //         activity.user_id.lastname
-                                      //       : activity.user_id.email
-                                      //   }  downloaded a file named '${
-                                      //     activity.details.filename
-                                      //   }' within the site ${
-                                      //     activity.org_id.name
-                                      //   }`
-                                      ''}
+                                    : // : activity?.activity_type ===
+                                    //   'add_licence'
+                                    // ? `${
+                                    //     activity.user_id
+                                    //       .firstname &&
+                                    //     activity.user_id
+                                    //       .lastname
+                                    //       ? activity.user_id
+                                    //           .firstname +
+                                    //         ' ' +
+                                    //         activity.user_id
+                                    //           .lastname
+                                    //       : activity.user_id
+                                    //           .email
+                                    //   } added a new license within the organization ${
+                                    //     activity.org_id.name
+                                    //   }`
+                                    activity?.activity_type === 'download_file'
+                                    ? `${
+                                        activity.user_id.firstname &&
+                                        activity.user_id.lastname
+                                          ? activity.user_id.firstname +
+                                            ' ' +
+                                            activity.user_id.lastname
+                                          : activity.user_id.email
+                                      }  downloaded a file named '${
+                                        activity.details.filename
+                                      }' within the site '${
+                                        activity.org_id.name
+                                      }'`
+                                    : ''}
                                 </p>
                               </div>
                             </div>
