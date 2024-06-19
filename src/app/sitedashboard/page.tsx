@@ -238,7 +238,7 @@ const Page = () => {
           siteID: site_id,
           start: 0,
           end: 10,
-          limit: 10,
+          limit: 11,
         });
         setActivity_log(data.activities);
       }
@@ -1779,21 +1779,25 @@ const Page = () => {
                         </ul>
                       </div> */}
                         <div>
-                          <button
-                            onClick={() => {
-                              const encryptedActvitylog =
-                                encryptData('/sitedashboard');
-                              localStorage.setItem(
-                                'ActivityLogs',
-                                encryptedActvitylog,
-                              );
-                              navigate.push('/activitylogs');
-                            }}
-                            className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
-                          >
-                            {/* <i className='ri-add-circle-line !text-[1rem]'></i> */}
-                            View All
-                          </button>
+                          {activity_log.length >= 10 ? (
+                            <button
+                              onClick={() => {
+                                const encryptedActvitylog =
+                                  encryptData('/sitedashboard');
+                                localStorage.setItem(
+                                  'ActivityLogs',
+                                  encryptedActvitylog,
+                                );
+                                navigate.push('/activitylogs');
+                              }}
+                              className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
+                            >
+                              {/* <i className='ri-add-circle-line !text-[1rem]'></i> */}
+                              View All
+                            </button>
+                          ) : (
+                            <>''</>
+                          )}
                         </div>
                       </div>
                       <div className='box-body !p-0'>
