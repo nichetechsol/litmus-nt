@@ -107,7 +107,7 @@ const Page = () => {
   const [tokenVerify, setTokenVerify] = useState(false);
   const navigate = useRouter();
   const [licence, setLicence] = useState<licenseData[] | null>(null);
-  const [orgUserData, setOrgUserData] = useState<OrgUser[]>([]);
+  const [orgUserData, setOrgUserData] = useState<OrgUser[] | null>(null);
   const [changeFlage, setChangeFlage] = useState<boolean>(false);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');

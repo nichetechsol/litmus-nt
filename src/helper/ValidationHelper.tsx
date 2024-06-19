@@ -52,14 +52,14 @@ const emailSchemaSign = Yup.string()
     'Invalid email address format. Please enter a valid email address.',
   );
 const emailSchema = Yup.string()
-  .required('Email address is required. Please enter a email address.')
+  .required('Please enter email address.')
   .min(5, 'Email address must be at least 5 characters long.')
   .max(320, 'It must be at most 320 characters long.')
-  .email('Invalid email address format. Please enter a valid email address.')
+  .email('Please enter a valid email address.')
   .matches(
     /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|co.in|in)$/,
     // /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-    'Invalid email address format. Please enter a valid email address.',
+    'Please enter a valid email address.',
   );
 
 const nameSchema = Yup.string()
@@ -82,6 +82,7 @@ const passwordSchema = Yup.string().required(
   'Password is required. Please enter your password.',
 );
 // .min(8, "Password must be at least 8 characters long.")
+// .max(16, 'Password must be less than 18 characters long.')
 // .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).+$/,
 //   "Invalid password format. Please use at least one uppercase letter, one lowercase letter, one digit, and one special character.")
 
@@ -90,13 +91,15 @@ const SiteNameSchema = Yup.string()
   .required('Site name is required. Please enter a site name.')
   .min(3, 'The Site name should be at least three characters long.')
   .max(256, 'The Site name should not exceed 256 characters.')
-  .matches(/^[a-zA-Z0-9\s\-_.]+$/, 'Please enter a valid site name.');
+  .matches(/^[a-zA-Z0-9\s.,-_&@]+$/, 'Please enter a valid site name.');
+// .matches(/^[a-zA-Z0-9\s\-_.]+$/, 'Please enter a valid site name.');
 
 const SiteAddressSchema = Yup.string()
   .required('Please enter your address.')
   .min(1, 'The Site address should be atleast one characters long.')
   .max(255, 'The Site address should not exceed 255 characters.')
-  .matches(/^[A-Za-z0-9'\.\-\s\,/]+$/, 'Please enter a valid address.');
+  .matches(/^[A-Za-z0-9'.,\-\/\s#&]+$/, 'Please enter a valid address.');
+// .matches(/^[A-Za-z0-9'\.\-\s\,/]+$/, 'Please enter a valid address.');
 
 const SiteAddress2Schema = Yup.string().max(
   255,
@@ -112,7 +115,7 @@ const SiteCitySchema = Yup.string()
 
 const PincodeSchema = Yup.string()
   .required('Please enter your zip code.')
-  .min(5, 'The zipcode should be at least five characters long')
+  .min(4, 'The zipcode should be at least four characters long')
   .max(10, 'The zipcode should not exceed ten characters')
   .matches(/^[0-9]+$/, 'Please enter a valid zip code.');
 
