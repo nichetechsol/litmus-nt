@@ -135,6 +135,7 @@ const Page = () => {
   const [solutions, setSolution] = useState<Products[] | null>(null);
 
   const [activity_log, setActivity_log] = useState<activitylogs[] | null>(null);
+  const [onlyToken, setOnlyToken] = useState('');
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
@@ -143,6 +144,8 @@ const Page = () => {
         redirect('/');
       } else {
         setTokenVerify(true);
+        const tokens = JSON.parse(token);
+        setOnlyToken(tokens.access_token);
       }
     }
   }, []);
@@ -152,6 +155,7 @@ const Page = () => {
   const [site_name, setSite_name] = useState<any>('');
   const [site_owner_name, SetSite_owner_name] = useState<any>('');
   const [orgName, setorgName] = useState<any>('');
+  const [userEmail, setUseremail] = useState<any>('');
   useEffect(() => {
     const userid = decryptData(localStorage.getItem('user_id'));
     const orgid = decryptData(localStorage.getItem('org_id'));
@@ -159,12 +163,14 @@ const Page = () => {
     const sitename = decryptData(localStorage.getItem('site_name'));
     const decryptedOrgName = decryptData(localStorage.getItem('org_name'));
     const siteownername = decryptData(localStorage.getItem('site_owner_name'));
+    const decrypteduserEmail = decryptData(localStorage.getItem('email'));
     setuser_id(userid);
     setorg_id(orgid);
     setsite_id(siteid);
     setSite_name(sitename);
     setorgName(decryptedOrgName);
     SetSite_owner_name(siteownername);
+    setUseremail(decrypteduserEmail);
   }, []);
   const [siteCountData, setSiteCountData] = useState<{
     data: {
@@ -431,13 +437,13 @@ const Page = () => {
             role_id: role,
             org_id: org_id,
             user_id: user_id,
-            token:
-              'eyJhbGciOiJIUzI1NiIsImtpZCI6ImpmZVZXUEovY3RVdElDRTYiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzE4Nzg2ODYzLCJpYXQiOjE3MTg3ODMyNjMsImlzcyI6Imh0dHBzOi8vZW1zaml1enRjaW5oYXBhdXJjcmwuc3VwYWJhc2UuY28vYXV0aC92MSIsInN1YiI6ImQ2MTA4ODVmLWU2Y2YtNDdmZi04ODBhLTkxN2YzN2Q2Y2EzOSIsImVtYWlsIjoicGFydGhyQG5pY2hldGVjaC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7fSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTcxODc4MzE4N31dLCJzZXNzaW9uX2lkIjoiOGY0NGY4MzctOTQyZS00ZDE4LThhZTYtZWIzNWU2NTFhZDA2IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.ahvdG7wJzhQs84tnX7S9XIw6dvIRSb0WUFHDAoGqj5Q',
-            userName: 'soumiya@nichetech.in',
-            siteName: 'amazon.in',
-            orgName: 'amazon',
-            site_id: 58,
+            token: onlyToken,
+            userName: userEmail,
+            siteName: site_name,
+            orgName: orgName,
+            site_id: site_id,
           };
+          await refreshToken();
           result = await addUserToSites(userData);
           if (result.errorCode == 0) {
             toast.success(result.data, { autoClose: 3000 });
@@ -446,7 +452,7 @@ const Page = () => {
               button.click();
             }
           } else {
-            toast.error('User was not in Central V2', { autoClose: 3000 });
+            toast.error(result.data, { autoClose: 3000 });
             const button = document.getElementById('close-modal-btn');
             if (button) {
               button.click();
@@ -674,7 +680,7 @@ const Page = () => {
                                   <h4 className='font-semibold text-[1.5rem] !mb-2 '>
                                     {siteCountData
                                       ? siteCountData.data.sandboxesCount
-                                      : 12}
+                                      : 0}
                                   </h4>
                                 </div>
                               </div>
@@ -1586,15 +1592,14 @@ const Page = () => {
                                 {' '}
                                 Role
                               </th>
-                              {userrole3 == '1' ||
-                                (userrole3 == '2' && (
-                                  <th
-                                    scope='col'
-                                    className='!text-start !text-[0.85rem]'
-                                  >
-                                    Action
-                                  </th>
-                                ))}
+                              {userrole3 == '1' || userrole3 == '2' ? (
+                                <th
+                                  scope='col'
+                                  className='!text-start !text-[0.85rem]'
+                                >
+                                  Action
+                                </th>
+                              ) : null}
                             </tr>
                           </thead>
                           <tbody>
@@ -1622,23 +1627,22 @@ const Page = () => {
                                         {user.role_name}
                                       </span>
                                     </td>
-                                    {userrole3 == '1' ||
-                                      (userrole3 == '2' && (
-                                        <td>
-                                          <div className='flex flex-row items-center !gap-2 text-[0.9375rem]'>
-                                            <Link
-                                              aria-label='anchor'
-                                              href=''
-                                              style={{ cursor: 'pointer' }}
-                                              data-hs-overlay='#todo-compose-user'
-                                              onClick={() => {
-                                                handleEdit(user);
-                                              }}
-                                              className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
-                                            >
-                                              <i className='ri-edit-line'></i>
-                                            </Link>
-                                            {/* <Link
+                                    {userrole3 == '1' || userrole3 == '2' ? (
+                                      <td>
+                                        <div className='flex flex-row items-center !gap-2 text-[0.9375rem]'>
+                                          <Link
+                                            aria-label='anchor'
+                                            href=''
+                                            style={{ cursor: 'pointer' }}
+                                            data-hs-overlay='#todo-compose-user'
+                                            onClick={() => {
+                                              handleEdit(user);
+                                            }}
+                                            className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
+                                          >
+                                            <i className='ri-edit-line'></i>
+                                          </Link>
+                                          {/* <Link
                                         aria-label='anchor'
                                         href=''
                                         
@@ -1646,19 +1650,19 @@ const Page = () => {
                                       >
                                         <i className='ri-user-unfollow-line'></i>
                                       </Link> */}
-                                            <div
-                                              style={{ cursor: 'pointer' }}
-                                              aria-label='anchor'
-                                              onClick={() => {
-                                                handleDelete(user.user_id);
-                                              }}
-                                              className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
-                                            >
-                                              <i className='ri-delete-bin-line'></i>
-                                            </div>
+                                          <div
+                                            style={{ cursor: 'pointer' }}
+                                            aria-label='anchor'
+                                            onClick={() => {
+                                              handleDelete(user.user_id);
+                                            }}
+                                            className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
+                                          >
+                                            <i className='ri-delete-bin-line'></i>
                                           </div>
-                                        </td>
-                                      ))}
+                                        </div>
+                                      </td>
+                                    ) : null}
                                   </tr>
                                 ))
                               : null}

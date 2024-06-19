@@ -34,6 +34,7 @@ import {
   modifyUserOfOrganization,
   removeUserFromOrganization,
 } from '@/supabase/org_user';
+import { refreshToken } from '@/supabase/session';
 import Loader from '@/utils/Loader/Loader';
 
 interface OrgUser {
@@ -83,7 +84,7 @@ const validationSchema = Yup.object().shape({
 const OrgDashboard = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [tokenVerify, setTokenVerify] = useState(false);
-
+  const [onlyToken, setOnlyToken] = useState('');
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
@@ -92,6 +93,8 @@ const OrgDashboard = () => {
         redirect('/');
       } else {
         setTokenVerify(true);
+        const tokens = JSON.parse(token);
+        setOnlyToken(tokens.access_token);
       }
     }
   }, []);
@@ -101,36 +104,18 @@ const OrgDashboard = () => {
   // const [user_role, setUserrole] = useState('');
   const [org_id, setorg_id] = useState<any>('');
   const [orgName, setorgName] = useState<any>('');
-  // useEffect(() => {
-  //   const userid: any = localStorage.getItem('user_id');
-  //   // const userfname: any = localStorage.getItem("user_fname");
-  //   // const userlname: any = localStorage.getItem("user_lname");
-  //   // const userrole: any = localStorage.getItem('user_role');
-  //   const org_id: any = localStorage.getItem('org_id');
-  //   const orgName: any = localStorage.getItem('org_name');
-  //   setuser_id(userid);
-  //   // setUser_fname(userfname);
-  //   // setUserlname(userlname);
-  //   // setUserrole(userrole);
-  //   setorg_id(org_id);
-  //   if (!org_id) {
-  //     swal('Please select organization', { icon: 'error' });
-  //     redirect('/organization');
-  //   }
-  //   setorgName(orgName);
-  // }, []);
-
-  // const user_id = localStorage.getItem('user_id');
+  const [userEmail, setUseremail] = useState<any>('');
 
   useEffect(() => {
     const decryptedUserId = decryptData(localStorage.getItem('user_id'));
     const decryptedOrgId = decryptData(localStorage.getItem('org_id'));
     const decryptedOrgName = decryptData(localStorage.getItem('org_name'));
+    const decrypteduserEmail = decryptData(localStorage.getItem('email'));
 
     setuser_id(decryptedUserId);
     setorg_id(decryptedOrgId);
     setorgName(decryptedOrgName);
-
+    setUseremail(decrypteduserEmail);
     if (!decryptedOrgId) {
       // swal('Please select organization', { icon: 'error' });
       // redirect('/organization');
@@ -458,11 +443,11 @@ const OrgDashboard = () => {
             role_id: role,
             org_id: org_id,
             user_id: user_id,
-            token:
-              'eyJhbGciOiJIUzI1NiIsImtpZCI6ImpmZVZXUEovY3RVdElDRTYiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzE4Nzg2ODYzLCJpYXQiOjE3MTg3ODMyNjMsImlzcyI6Imh0dHBzOi8vZW1zaml1enRjaW5oYXBhdXJjcmwuc3VwYWJhc2UuY28vYXV0aC92MSIsInN1YiI6ImQ2MTA4ODVmLWU2Y2YtNDdmZi04ODBhLTkxN2YzN2Q2Y2EzOSIsImVtYWlsIjoicGFydGhyQG5pY2hldGVjaC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7fSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTcxODc4MzE4N31dLCJzZXNzaW9uX2lkIjoiOGY0NGY4MzctOTQyZS00ZDE4LThhZTYtZWIzNWU2NTFhZDA2IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.ahvdG7wJzhQs84tnX7S9XIw6dvIRSb0WUFHDAoGqj5Q',
-            userName: 'soumiya@nichetech.in',
-            orgName: 'amazon',
+            token: onlyToken,
+            userName: userEmail,
+            orgName: orgName,
           };
+          await refreshToken();
           result = await addUserToOrganization(userData);
           if (result.errorCode == 0) {
             toast.success(result.data, { autoClose: 3000 });

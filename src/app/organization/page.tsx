@@ -32,6 +32,7 @@ import {
   getUserRole,
   organizationSidebarList,
 } from '@/supabase/org_details';
+import { refreshToken } from '@/supabase/session';
 import Loader from '@/utils/Loader/Loader';
 const validationSchema = Yup.object().shape({
   organizationName: OrganizationNameSchema,
@@ -86,7 +87,7 @@ const Page = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [user_id, setuser_id] = useState<any>('');
   const [user_role, setUserrole] = useState<any>('');
-
+  const [email, setEmail] = useState<any>('');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [searchTerm, setSearchTerm] = useState<any>('');
   const [orgsWithSites, setOrgsWithSites] = useState<
@@ -107,10 +108,28 @@ const Page = () => {
       }
     }
   }, []);
+  useEffect(() => {
+    const encryptedUserId = localStorage.getItem('user_id');
+    const encryptedUserRole = localStorage.getItem('user_role');
+    const encryptedemail = localStorage.getItem('user_email');
 
+    const decryptedUserId = decryptData(encryptedUserId);
+    const decryptedUserRole = decryptData(encryptedUserRole);
+    const decryptemail = decryptData(encryptedemail);
+    if (decryptedUserId) {
+      setuser_id(decryptedUserId);
+    }
+    if (decryptemail) {
+      setEmail(decryptemail);
+    }
+    if (decryptedUserRole) {
+      setUserrole(decryptedUserRole);
+    }
+  }, []);
   const getDefaultDomainFromEmail = () => {
-    const email = localStorage.getItem('user_email');
-    const decryptemail = decryptData(email);
+    const email1 = localStorage.getItem('user_email');
+    const decryptemail = decryptData(email1);
+
     if (decryptemail) {
       const domain = decryptemail.split('@')[1];
       return domain || '';
@@ -124,30 +143,7 @@ const Page = () => {
       setDomains([defaultDomain]);
     }
   }, []);
-  // useEffect(() => {
-  //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //   const userid: any = localStorage.getItem('user_id');
-  //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //   const userrole: any = localStorage.getItem('user_role');
-  //   setuser_id(userid);
 
-  //   setUserrole(userrole);
-  // }, []);
-  useEffect(() => {
-    const encryptedUserId = localStorage.getItem('user_id');
-    const encryptedUserRole = localStorage.getItem('user_role');
-
-    const decryptedUserId = decryptData(encryptedUserId);
-    const decryptedUserRole = decryptData(encryptedUserRole);
-
-    if (decryptedUserId) {
-      setuser_id(decryptedUserId);
-    }
-
-    if (decryptedUserRole) {
-      setUserrole(decryptedUserRole);
-    }
-  }, []);
   useEffect(() => {
     const fetchData2 = async () => {
       try {
@@ -366,11 +362,12 @@ const Page = () => {
         status: 'Y',
         domain: domains,
         token: onlyToken,
-        userName: 'soumiya@nichetech.in',
-        type_name: 'OEM',
+        userName: email,
+        type_name: selectedType,
       };
       try {
         setLoading(true);
+        await refreshToken();
         const result = await addOrganization(data);
 
         if (result.data != null && result.errorCode == 0) {

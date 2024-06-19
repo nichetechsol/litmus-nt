@@ -45,6 +45,7 @@ import { stateList } from '@/supabase/state';
 import Loader from '@/utils/Loader/Loader';
 import { getOrgUserRole } from '@/supabase/org_user';
 import { decryptData, encryptData } from '@/helper/Encryption_Decryption';
+import { refreshToken } from '@/supabase/session';
 interface Country {
   id: number;
   name: string;
@@ -99,32 +100,22 @@ const Page: React.FC = () => {
   const [org_id, Setorg_id] = useState<any>('');
   const [user_id, setuser_id] = useState<any>('');
   const [orgName, setorgName] = useState<any>('');
-  // const [user_role, setUserrole] = useState('');
-  // useEffect(() => {
-  //   const userid: any = localStorage.getItem('user_id');
-  //   // const userrole: any = localStorage.getItem('user_role');
-  //   const orgid: any = localStorage.getItem('org_id');
-  //   setuser_id(userid);
-  //   // setUserrole(userrole);
-  //   Setorg_id(orgid);
-  //   if (!orgid) {
-  //     swal('Please select organization', { icon: 'error' });
-  //     redirect('/organization');
-  //   }
-  // }, []);
+  const [onlyToken, setOnlyToken] = useState('');
+  const [userEmail, setUseremail] = useState<any>('');
   useEffect(() => {
     const decryptedUserid = decryptData(localStorage.getItem('user_id'));
     const decryptedOrgId = decryptData(localStorage.getItem('org_id'));
     const decryptedOrgName = decryptData(localStorage.getItem('org_name'));
+    const decrypteduserEmail = decryptData(localStorage.getItem('email'));
     setuser_id(decryptedUserid);
     Setorg_id(decryptedOrgId);
     setorgName(decryptedOrgName);
+    setUseremail(decrypteduserEmail);
     if (!decryptedOrgId) {
       // swal('Please select organization', { icon: 'error' });
       // redirect('/organization');
       swal('Please select organization', { icon: 'error' }).then(() => {
         navigate.push('/organization');
-        // redirect('/organization');
       });
     }
   }, []);
@@ -533,13 +524,13 @@ const Page: React.FC = () => {
         country_id: SelectedValueCounrty,
         state_id: SelectedValueState,
         user_id: user_id,
-        token:
-          'eyJhbGciOiJIUzI1NiIsImtpZCI6ImpmZVZXUEovY3RVdElDRTYiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzE4NzgzNzExLCJpYXQiOjE3MTg3ODAxMTEsImlzcyI6Imh0dHBzOi8vZW1zaml1enRjaW5oYXBhdXJjcmwuc3VwYWJhc2UuY28vYXV0aC92MSIsInN1YiI6ImQ2MTA4ODVmLWU2Y2YtNDdmZi04ODBhLTkxN2YzN2Q2Y2EzOSIsImVtYWlsIjoicGFydGhyQG5pY2hldGVjaC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7fSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTcxODc3ODAzM31dLCJzZXNzaW9uX2lkIjoiOGVjYzU5ZDItYzk1MC00MWZjLTg0YmEtNjVkMzM4Mzk4Mjg0IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.dsioIYCQk9gxPMwmU2FBsxB8xY9yzg_DD6Lvj5SKrC4',
-        userName: 'soumiya@nichetech.in',
-        org_name: 'Nichetech Inc',
+        token: onlyToken,
+        userName: userEmail,
+        org_name: orgName,
       };
       try {
         setLoading(true);
+        await refreshToken();
         const result = await addSites(data);
 
         if (result.errorCode == 0) {
@@ -613,6 +604,8 @@ const Page: React.FC = () => {
         redirect('/');
       } else {
         setTokenVerify(true);
+        const tokens = JSON.parse(token);
+        setOnlyToken(tokens.access_token);
       }
     }
   }, []);
