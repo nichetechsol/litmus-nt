@@ -131,7 +131,7 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
           if (siteSelectError) {
             return { errorCode: 1, data: null };
           } else {
-            if (site_users.length !== 0) {
+            if (site_users.length === 0) {
               const { data: insertedSiteUsers, error: siteInsertError } =
                 await supabase
                   .from('site_users')
