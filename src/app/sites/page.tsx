@@ -106,7 +106,7 @@ const Page: React.FC = () => {
     const decryptedUserid = decryptData(localStorage.getItem('user_id'));
     const decryptedOrgId = decryptData(localStorage.getItem('org_id'));
     const decryptedOrgName = decryptData(localStorage.getItem('org_name'));
-    const decrypteduserEmail = decryptData(localStorage.getItem('email'));
+    const decrypteduserEmail = decryptData(localStorage.getItem('user_email'));
     setuser_id(decryptedUserid);
     Setorg_id(decryptedOrgId);
     setorgName(decryptedOrgName);
@@ -538,17 +538,6 @@ const Page: React.FC = () => {
           if (closeModalButtonRef.current) {
             closeModalButtonRef.current.click();
           }
-
-          // setAddSiteName('');
-          // setSelectedValueDropdown(undefined);
-          // setAddress1('');
-          // setAddress2('');
-          // setMessage('');
-          // setFetchdropDCounrty(null);
-          // setSelectedValueState(undefined);
-          // setCity('');
-          // setMessageError('');
-          // setPincodeError('');
           handelclosemodel();
           FetchSiteDetails();
           fetchData1();

@@ -163,7 +163,7 @@ const Page = () => {
     const sitename = decryptData(localStorage.getItem('site_name'));
     const decryptedOrgName = decryptData(localStorage.getItem('org_name'));
     const siteownername = decryptData(localStorage.getItem('site_owner_name'));
-    const decrypteduserEmail = decryptData(localStorage.getItem('email'));
+    const decrypteduserEmail = decryptData(localStorage.getItem('user_email'));
     setuser_id(userid);
     setorg_id(orgid);
     setsite_id(siteid);
