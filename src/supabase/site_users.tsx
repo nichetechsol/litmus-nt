@@ -106,11 +106,11 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
         return { errorCode: 1, data: 'Error fetching User' };
       }
     } else {
-      return { errorCode: 1, data: 'No valid email or name provided' };
+      return { errorCode: -1, data: 'No valid email or name provided' };
     }
 
     if (!users || users.length === 0) {
-      return { errorCode: 1, data: 'User Not found in central v2' };
+      return { errorCode: -1, data: 'User Not found in central v2' };
     } else {
       const { data: org_users, error: orgSelectError } = await supabase
         .from('org_users')
@@ -121,7 +121,7 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
       if (orgSelectError) {
         return { errorCode: 1, data: 'Error fetching Organization' };
       } else {
-        if (org_users.length === 0) {
+        if (org_users.length !== 0) {
           const { data: site_users, error: siteSelectError } = await supabase
             .from('site_users')
             .select('*')
@@ -131,7 +131,7 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
           if (siteSelectError) {
             return { errorCode: 1, data: null };
           } else {
-            if (site_users.length === 0) {
+            if (site_users.length !== 0) {
               const { data: insertedSiteUsers, error: siteInsertError } =
                 await supabase
                   .from('site_users')
@@ -170,7 +170,7 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
                   .replace('{{Site Name}}', siteName);
                 const contentData = content
                   .replace('{{Site Name}}', siteName)
-                  .replace('{{User Name}}', userName)
+                  .replace('{{User Name}}', UserData.email)
                   .replace('{{Org Name}}', orgName);
                 await sendEmailFunction(
                   toData,
@@ -179,6 +179,41 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
                   contentData,
                   UserData.token,
                 );
+
+                if (UserData.role_id == '1' || UserData.role_id == '2') {
+                  let role_name: any;
+                  if (UserData.role_id == 1) {
+                    role_name = 'Owner';
+                  } else {
+                    role_name = 'Admin';
+                  }
+                  const target_user = UserData.email;
+                  const email_data: any = await fetchEmailData(
+                    'Add_User_to_Site_inform_Litmus',
+                  );
+                  const to = email_data.data.To;
+                  const subject = email_data.data.email_subject;
+                  const heading = email_data.data.email_heading;
+                  const content = email_data.data.email_content;
+                  const headingData = heading
+                    .replace('{{Targer User Name}}', target_user)
+                    .replace('{{Site Name}}', siteName)
+                    .replace(' {{Org name}}', orgName)
+                    .replace('{{Role Name}}', role_name);
+                  const contentData = content
+                    .replace('{{Targer User Name}}', target_user)
+                    .replace('{{Site Name}}', siteName)
+                    .replace(' {{Org name}}', orgName)
+                    .replace('{{User Name}}', userName)
+                    .replace('{{Role Name}}', role_name);
+                  await sendEmailFunction(
+                    to,
+                    subject,
+                    headingData,
+                    contentData,
+                    UserData.token,
+                  );
+                }
                 // Send the invitation email
                 // await sendEmailFunction(
                 //   'shruti@nichetech.in', // To
@@ -199,11 +234,11 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
                 return { errorCode: 0, data: 'User added successfully' };
               }
             } else {
-              return { errorCode: 0, data: 'User already in sites' };
+              return { errorCode: -1, data: 'User already in sites' };
             }
           }
         } else {
-          return { errorCode: 1, data: null };
+          return { errorCode: -1, data: 'User is not added in organization.' };
         }
       }
     }

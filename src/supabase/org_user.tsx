@@ -167,7 +167,10 @@ async function addUserToOrganization(
 
             // Add email function here to send an invitation to the user
             // email logic goes here
-            return { errorCode: 0, data: 'Invitation sent' };
+            return {
+              errorCode: 0,
+              data: 'User added successfully to the organization',
+            };
           }
         } else {
           // If user is already in the organization
