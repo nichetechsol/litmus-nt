@@ -198,12 +198,12 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
                   const headingData = heading
                     .replace('{{Target User Name}}', target_user)
                     .replace('{{Site Name}}', siteName)
-                    .replace(' {{Org name}}', orgName)
+                    .replace('{{Org name}}', orgName)
                     .replace('{{Role Name}}', role_name);
                   const contentData = content
                     .replace('{{Target User Name}}', target_user)
                     .replace('{{Site Name}}', siteName)
-                    .replace(' {{Org name}}', orgName)
+                    .replace('{{Org name}}', orgName)
                     .replace('{{User Name}}', userName)
                     .replace('{{Role Name}}', role_name);
                   await sendEmailFunction(
