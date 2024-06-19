@@ -40,13 +40,27 @@ interface SiteDetailsWithUsers {
 
 async function fetchSiteDetails(
   org_id: any,
+  user_id: any,
 ): Promise<Result<SiteDetailsWithUsers[]>> {
   try {
+    // Fetch site_id associated with the user
+    const { data: userOrgs, error: userOrgError } = await supabase
+      .from('site_users')
+      .select('site_id')
+      .eq('user_id', user_id);
+
+    if (userOrgError) {
+      throw userOrgError;
+    }
+
+    // Extract the site_ids from userOrgs
+    const siteId: any = userOrgs.map((site) => site.site_id);
     // Fetch organization details
     const { data: siteDetails, error } = await supabase
       .from('sites_detail')
       .select('*')
-      .eq('org_id', org_id);
+      .in('id', siteId)
+      .order('created_at', { ascending: false });
 
     if (error) {
       throw error;

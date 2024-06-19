@@ -182,7 +182,7 @@ const Page: React.FC = () => {
   const FetchSiteDetails = async () => {
     try {
       setLoading(true);
-      const data1 = await fetchSiteDetails(org_id);
+      const data1 = await fetchSiteDetails(org_id, user_id);
       if (org_id) {
         if (data1) {
           setOSitesList(data1.data ? data1.data : []);
