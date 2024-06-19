@@ -2,17 +2,18 @@
 async function sendEmailFunction(
   to: string,
   subject: string,
-  type: string,
-  token: string,
-  data: any,
+  heading: any,
+  content: any,
+  token: any,
 ) {
-  const url = 'https://emsjiuztcinhapaurcrl.supabase.co/functions/v1/email';
+  const url =
+    'https://emsjiuztcinhapaurcrl.supabase.co/functions/v1/send-email';
 
   const body = {
     to: to,
     subject: subject,
-    type: type,
-    data: data,
+    heading: heading,
+    content: content,
   };
 
   try {

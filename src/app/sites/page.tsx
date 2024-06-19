@@ -529,6 +529,10 @@ const Page: React.FC = () => {
         country_id: SelectedValueCounrty,
         state_id: SelectedValueState,
         user_id: user_id,
+        token:
+          'eyJhbGciOiJIUzI1NiIsImtpZCI6ImpmZVZXUEovY3RVdElDRTYiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzE4NzgzNzExLCJpYXQiOjE3MTg3ODAxMTEsImlzcyI6Imh0dHBzOi8vZW1zaml1enRjaW5oYXBhdXJjcmwuc3VwYWJhc2UuY28vYXV0aC92MSIsInN1YiI6ImQ2MTA4ODVmLWU2Y2YtNDdmZi04ODBhLTkxN2YzN2Q2Y2EzOSIsImVtYWlsIjoicGFydGhyQG5pY2hldGVjaC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7fSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTcxODc3ODAzM31dLCJzZXNzaW9uX2lkIjoiOGVjYzU5ZDItYzk1MC00MWZjLTg0YmEtNjVkMzM4Mzk4Mjg0IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.dsioIYCQk9gxPMwmU2FBsxB8xY9yzg_DD6Lvj5SKrC4',
+        userName: 'soumiya@nichetech.in',
+        org_name: 'Nichetech Inc',
       };
       try {
         setLoading(true);

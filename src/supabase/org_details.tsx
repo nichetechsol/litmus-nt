@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { logActivity } from '@/supabase/activity';
+import fetchEmailData from '@/supabase/email_configuration';
 
 import { supabase } from './db';
 import { sendEmailFunction } from './email';
@@ -176,6 +177,8 @@ async function addOrganization(data: {
   status: string;
   domain: string[];
   token: any;
+  userName: any;
+  type_name: any;
 }): Promise<Result<any>> {
   try {
     // Insert organization details
@@ -233,20 +236,39 @@ async function addOrganization(data: {
         user_id: data.user_id,
       };
       if (data.type_id === 1) {
-        await sendEmailFunction(
-          'srishti@nichetech.in',
-          'Add Organization',
-          'add_org',
-          data.token,
-          emaildata,
-        );
+        const userName: any = data.userName;
+        const orgName: any = data.name;
+        const email_data: any = await fetchEmailData('Add_Org_EndUser');
+        const to = email_data.data.To;
+        const subject = email_data.data.email_subject;
+        const heading = email_data.data.email_heading;
+        const content = email_data.data.email_content;
+
+        const contentData = content
+          .replace('{{User Name}}', userName)
+          .replace('{{Org Name}}', orgName);
+        await sendEmailFunction(to, subject, heading, contentData, data.token);
       } else {
+        const userName: any = data.userName;
+        const orgName: any = data.name;
+        const orgTypes: any = data.type_name;
+        const email_data: any = await fetchEmailData('Add_Org_OEM_Partner');
+        const to = email_data.data.To;
+        const subject = email_data.data.email_subject;
+        const heading = email_data.data.email_heading;
+        const content = email_data.data.email_content;
+        const subjectData = subject.replace('{{Org Name}}', orgName);
+        const headingData = heading.replace('{{Org Name}}', orgName);
+        const contentData = content
+          .replace('{{User Name}}', userName)
+          .replace(/{{Org Type}}/g, orgTypes)
+          .replace('{{Org Name}}', orgName);
         await sendEmailFunction(
-          'srishti@nichetech.in',
-          'Add Organization',
-          'add_org',
+          to,
+          subjectData,
+          headingData,
+          contentData,
           data.token,
-          emaildata,
         );
       }
       // Clear input fields after successful email send

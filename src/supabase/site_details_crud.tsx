@@ -1,8 +1,10 @@
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { logActivity } from '@/supabase/activity';
 import { sendEmailFunction } from '@/supabase/email';
+import fetchEmailData from '@/supabase/email_configuration';
 
 import { supabase } from './db';
 
@@ -22,6 +24,8 @@ interface SiteData {
   user_id: any;
   description: any;
   token: any;
+  userName: any;
+  org_name: any;
 }
 
 interface UpdateSiteData {
@@ -136,6 +140,150 @@ async function addSites(data: SiteData): Promise<Result<any>> {
       };
     }
 
+    const { data: currentSites, error: countError } = await supabase
+      .from('sites_detail')
+      .select('id')
+      .eq('org_id', data.org_id);
+
+    if (countError) {
+      return {
+        errorCode: 1,
+        message: 'Error retrieving current site count',
+        data: null,
+      };
+    }
+    // Get entitlement limit for the organization
+    const { data: entitlement, error: entitlementError } = await supabase
+      .from('entitlements_package')
+      .select('entitlement_value_id')
+      .eq('org_id', data.org_id)
+      .eq('entitlement_name_id', 16); // Assuming 'max_sites_prod' has id 14
+
+    if (entitlementError) {
+      return {
+        errorCode: 1,
+        message: 'Error retrieving entitlement limit',
+        data: null,
+      };
+    }
+
+    if (!entitlement || entitlement.length === 0) {
+      return {
+        errorCode: 1,
+        message: 'No entitlement found for the organization',
+        data: null,
+      };
+    }
+
+    // Check entitlement value
+    const { data: entitlementValue, error: valueError } = await supabase
+      .from('entitlements_values')
+      .select('value_number')
+      .eq('id', entitlement[0].entitlement_value_id)
+      .single();
+
+    if (valueError) {
+      return {
+        errorCode: 1,
+        message: 'Error retrieving entitlement value',
+        data: null,
+      };
+    }
+
+    // Check if current number of sites exceeds entitlement limit
+    if (currentSites.length >= (entitlementValue.value_number ?? 0)) {
+      return {
+        errorCode: 2,
+        message: 'Entitlement limit exceeded',
+        data: null,
+      };
+    } else {
+      // Insert new site details if no duplicate is found
+      const { data: siteDetails, error: insertError } = await supabase
+        .from('sites_detail')
+        .insert([
+          {
+            org_id: data.org_id,
+            name: data.name,
+            type_id: data.type_id,
+            address1: data.address1,
+            address2: data.address2,
+            city: data.city,
+            pin_code: data.pin_code,
+            about_site: data.about_site,
+            status: data.status,
+            country_id: data.country_id,
+            state_id: data.state_id,
+          },
+        ])
+        .select();
+
+      // Check for errors during the insert operation
+      if (insertError) {
+        return {
+          errorCode: 1,
+          message: 'Error inserting site details',
+          data: null,
+        };
+      } else {
+        const { data: userInsertData, error: userInsertError } = await supabase
+          .from('site_users')
+          .insert([
+            {
+              user_id: data.user_id,
+              role_id: 1,
+              site_id: siteDetails[0].id,
+            },
+          ])
+          .select();
+
+        if (userInsertError) {
+          return {
+            errorCode: 1,
+            message: 'User not added successfully',
+            data: null,
+          };
+        }
+
+        // Check current site count for the organization
+      }
+      await logActivity({
+        org_id: data.org_id,
+        site_id: siteDetails[0].id,
+        user_id: data.user_id,
+        activity_type: 'create_site',
+      });
+      const userName: any = data.userName;
+      const siteName: any = data.name;
+      const orgName: any = data.org_name;
+      const email_data: any = await fetchEmailData('Add_Site_Limit_Not_Exceed');
+      const to = email_data.data.To;
+      const subject = email_data.data.email_subject;
+      const heading = email_data.data.email_heading;
+      const content = email_data.data.email_content;
+
+      const contentData = content
+        .replace('{{User Name}}', userName)
+        .replace('{{Site Name}}', siteName)
+        .replace('{{Org name}}', orgName);
+      await sendEmailFunction(to, subject, heading, contentData, data.token);
+      return {
+        errorCode: 0,
+        message: 'Site details inserted successfully',
+        data: siteDetails,
+      };
+    }
+  } catch (error) {
+    // console.error('Error adding site:', error);
+    return {
+      errorCode: 1,
+      message: 'Unexpected error',
+      data: null,
+    };
+  }
+}
+async function addSitesConfirm(data: any) {
+  try {
     // Insert new site details if no duplicate is found
     const { data: siteDetails, error: insertError } = await supabase
       .from('sites_detail')
@@ -160,7 +308,7 @@ async function addSites(data: SiteData): Promise<Result<any>> {
     if (insertError) {
       return {
         errorCode: 1,
-        message: 'Error inserting site details',
+        message: 'Site is not updated successfully',
         data: null,
       };
     } else {
@@ -183,32 +331,33 @@ async function addSites(data: SiteData): Promise<Result<any>> {
         };
       }
 
-      const emaildata: any = {
-        org_id: data.org_id,
-        user_id: data.user_id,
-        site_id: siteDetails[0].id,
-      };
-      // Send the invitation email
-      await sendEmailFunction(
-        'shruti@nichetech.in', // To
-        'Add Site', // Subject
-        'add_site', // Type
-        data.token, // Token (Generate or provide the actual token)
-        emaildata, // Data
-      );
-      await logActivity({
-        org_id: data.org_id,
-        site_id: siteDetails[0].id,
-        user_id: data.user_id,
-        activity_type: 'create_site',
-      });
-
-      return {
-        errorCode: 0,
-        message: 'Site details inserted successfully',
-        data: siteDetails,
-      };
+      // Check current site count for the organization
     }
+    await logActivity({
+      org_id: data.org_id,
+      site_id: siteDetails[0].id,
+      user_id: data.user_id,
+      activity_type: 'create_site',
+    });
+    const userName: any = data.userName;
+    const siteName: any = data.name;
+    const orgName: any = data.org_name;
+    const email_data: any = await fetchEmailData('Add_Site_Limit_Exceed');
+    const to = email_data.data.To;
+    const subject = email_data.data.email_subject;
+    const heading = email_data.data.email_heading;
+    const content = email_data.data.email_content;
+
+    const contentData = content
+      .replace('{{User Name}}', userName)
+      .replace('{{Site Name}}', siteName)
+      .replace('{{Org name}}', orgName);
+    await sendEmailFunction(to, subject, heading, contentData, data.token);
+    return {
+      errorCode: 0,
+      message: 'Site details inserted successfully',
+      data: siteDetails,
+    };
   } catch (error) {
     // console.error('Error adding site:', error);
     return {
@@ -432,4 +581,4 @@ async function deleteSite(siteId: any): Promise<Result<any>> {
   }
 }
 
-export { addSites, deleteSite, updateSite };
+export { addSites, addSitesConfirm, deleteSite, updateSite };

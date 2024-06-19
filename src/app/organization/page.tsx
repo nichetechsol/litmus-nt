@@ -366,6 +366,8 @@ const Page = () => {
         status: 'Y',
         domain: domains,
         token: onlyToken,
+        userName: 'soumiya@nichetech.in',
+        type_name: 'OEM',
       };
       try {
         setLoading(true);
