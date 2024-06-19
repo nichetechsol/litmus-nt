@@ -3,8 +3,9 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-import { redirect } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
+import swal from 'sweetalert';
 
 import { decryptData } from '@/helper/Encryption_Decryption';
 import { logActivity } from '@/supabase/activity';
@@ -17,6 +18,7 @@ interface subFolder {
   subFolder: string;
 }
 const Page = () => {
+  const navigate = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [tokenVerify, setTokenVerify] = useState(false);
   const [folder, setFolder] = useState<any>([]);
@@ -70,6 +72,18 @@ const Page = () => {
     const decryptedSiteId = decryptData(encryptedSiteId);
     if (decryptedOrgId) {
       setorg_id(decryptedOrgId);
+      if (!decryptedSiteId) {
+        swal('Please select a Site', { icon: 'error' }).then(() => {
+          navigate.push('/sites');
+          // redirect('/organization');
+        });
+      }
+    } else {
+      swal('Please select a  Organization', { icon: 'error' }).then(() => {
+        navigate.push('/organization');
+        return;
+        // redirect('/organization');
+      });
     }
 
     if (decryptedSiteId) {
@@ -137,6 +151,17 @@ const Page = () => {
         <>
           <div className='my-5'>
             <div className='grid grid-cols-12 gap-6'>
+              <div className='xl:col-span-12 col-span-12'>
+                <div className='box'>
+                  <div className='md:flex px-4 py-6 items-center justify-between'>
+                    <div>
+                      <h6 className='font-semibold mb-0 text-[1rem]'>
+                        Solution
+                      </h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div className='xl:col-span-3 col-span-12'>
                 <div className='box custom-box overflow-hidden'>
                   <div className='box-header !border-b-0'>
@@ -232,7 +257,7 @@ const Page = () => {
                                   </span>
                                 </div>
                                 <div className='flex-grow'>
-                                  <p className='font-semibold mb-[1.4px]  text-[0.813rem] text-gray-500'>
+                                  <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
                                     {file.FileName}
                                   </p>
                                 </div>

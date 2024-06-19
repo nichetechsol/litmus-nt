@@ -1,8 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-import { redirect } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import swal from 'sweetalert';
 
@@ -13,6 +14,7 @@ import { refreshToken } from '@/supabase/session';
 import Loader from '@/utils/Loader/Loader';
 
 const Page = () => {
+  const navigate = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [tokenVerify, setTokenVerify] = useState(false);
   const [user_id, setuser_id] = useState<any>('');
@@ -47,6 +49,18 @@ const Page = () => {
     const decrytedOrgTypeId = decryptData(encrytedOrgTypeId);
     if (decryptedOrgId) {
       setorg_id(decryptedOrgId);
+      if (!decryptedSiteId) {
+        swal('Please select a Site', { icon: 'error' }).then(() => {
+          navigate.push('/sites');
+          // redirect('/organization');
+        });
+      }
+    } else {
+      swal('Please select a  Organization', { icon: 'error' }).then(() => {
+        navigate.push('/organization');
+        return;
+        // redirect('/organization');
+      });
     }
 
     if (decryptedSiteId) {
@@ -58,10 +72,11 @@ const Page = () => {
     if (decryptedUserId) {
       setuser_id(decryptedUserId);
     }
-    if (!decryptedSiteId) {
-      swal('Please select a Site or Organization', { icon: 'error' });
-      redirect('/organization');
-    }
+
+    // if (!decryptedSiteId) {
+    //   swal('Please select a Site or Organization', { icon: 'error' });
+    //   redirect('/organization');
+    // }
   }, []);
 
   // const [currentfiles, setCurrentfiles] = useState<any>('');
@@ -133,6 +148,17 @@ const Page = () => {
         <>
           <div className='my-5'>
             <div className='grid grid-cols-12 gap-6'>
+              <div className='xl:col-span-12 col-span-12'>
+                <div className='box'>
+                  <div className='md:flex px-4 py-6 items-center justify-between'>
+                    <div>
+                      <h6 className='font-semibold mb-0 text-[1rem]'>
+                        Product
+                      </h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div className='xl:col-span-3 col-span-12'>
                 <div className='box custom-box overflow-hidden'>
                   <div className='box-header !border-b-0'>
