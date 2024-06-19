@@ -431,6 +431,12 @@ const Page = () => {
             role_id: role,
             org_id: org_id,
             user_id: user_id,
+            token:
+              'eyJhbGciOiJIUzI1NiIsImtpZCI6ImpmZVZXUEovY3RVdElDRTYiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzE4Nzg2ODYzLCJpYXQiOjE3MTg3ODMyNjMsImlzcyI6Imh0dHBzOi8vZW1zaml1enRjaW5oYXBhdXJjcmwuc3VwYWJhc2UuY28vYXV0aC92MSIsInN1YiI6ImQ2MTA4ODVmLWU2Y2YtNDdmZi04ODBhLTkxN2YzN2Q2Y2EzOSIsImVtYWlsIjoicGFydGhyQG5pY2hldGVjaC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7fSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTcxODc4MzE4N31dLCJzZXNzaW9uX2lkIjoiOGY0NGY4MzctOTQyZS00ZDE4LThhZTYtZWIzNWU2NTFhZDA2IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.ahvdG7wJzhQs84tnX7S9XIw6dvIRSb0WUFHDAoGqj5Q',
+            userName: 'soumiya@nichetech.in',
+            siteName: 'amazon.in',
+            orgName: 'amazon',
+            site_id: 58,
           };
           result = await addUserToSites(userData);
           if (result.errorCode == 0) {

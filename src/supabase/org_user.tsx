@@ -1,13 +1,26 @@
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { logActivity } from '@/supabase/activity';
 import { sendEmailFunction } from '@/supabase/email';
+import fetchEmailData from '@/supabase/email_configuration';
 
 import { supabase } from './db';
 
 // Define interfaces for the data structures used
 
 interface UserData {
+  email: string;
+  firstname?: string;
+  lastname?: string;
+  user_id?: any;
+  role_id?: any;
+  org_id: any;
+  token?: any;
+  userName: any;
+  orgName: any;
+}
+interface modifyUserData {
   email?: string;
   firstname?: string;
   lastname?: string;
@@ -85,37 +98,77 @@ async function addUserToOrganization(
       const { data: org_users, error } = await supabase
         .from('org_users')
         .select('*')
-        .eq('user_id', users[0].id);
+        .eq('user_id', users[0].id)
+        .eq('org_id', UserData.org_id);
 
       if (error) {
         return { errorCode: 1, data: null };
       } else {
         // If user is not in the organization, send an invitation
-        if (!org_users || org_users.length === 0) {
-          const emaildata: any = {
-            org_id: UserData.org_id,
-            user_id: UserData.user_id,
-            target_user_id: users[0].id,
-          };
-          // Send the invitation email
-          await sendEmailFunction(
-            'shruti@nichetech.in', // To
-            'Add User To Organization', // Subject
-            'add_orgUser', // Type
-            UserData.token, // Token (Generate or provide the actual token)
-            emaildata, // Data
-          );
-          // Log the activity before sending the invitation
-          const logResult = await logActivity({
-            org_id: UserData.org_id,
-            user_id: UserData.user_id,
-            target_user_id: users[0].id,
-            activity_type: 'add_user',
-          });
+        if (org_users.length === 0) {
+          const { data: insertedOrgUsers, error: orgInsertError } =
+            await supabase
+              .from('org_users')
+              .insert([
+                {
+                  user_id: users[0].id,
+                  org_id: UserData.org_id,
+                  role_id: UserData.role_id,
+                },
+              ])
+              .select();
 
-          // Add email function here to send an invitation to the user
-          // email logic goes here
-          return { errorCode: 0, data: 'Invitation sent' };
+          if (orgInsertError) {
+            return { errorCode: 1, data: null };
+          } else {
+            const emaildata: any = {
+              org_id: UserData.org_id,
+              user_id: UserData.user_id,
+              target_user_id: users[0].id,
+            };
+
+            const userName: any = UserData.userName;
+            const orgName: any = UserData.orgName;
+            const email_data: any = await fetchEmailData('Add_User_To_Org');
+            const to = UserData.email;
+            const subject = email_data.data.email_subject;
+            const heading = email_data.data.email_heading;
+            const content = email_data.data.email_content;
+            const toData = to.replace('{{Target User EMail}}', to);
+            const headingData = heading.replace('{{Org Name}}', orgName);
+            const contentData = content
+              .replace('{{User Name}}', userName)
+              .replace('{{Org Name}}', orgName);
+            await sendEmailFunction(
+              toData,
+              subject,
+              headingData,
+              contentData,
+              UserData.token,
+            );
+            // await fetchEmailData('Add_User_To_Org');
+
+            // Send the invitation email
+            // await sendEmailFunction(
+            //   'shruti@nichetech.in', // To
+            //   'Add User To Organization', // Subject
+            //   'add_orgUser', // Type
+            //   UserData.token, // Token (Generate or provide the actual token)
+            //   emaildata, // Data
+            // );
+            // Log the activity before sending the invitation
+            const logResult = await logActivity({
+              org_id: UserData.org_id,
+              user_id: UserData.user_id,
+              target_user_id: users[0].id,
+              target_user_role: UserData.role_id,
+              activity_type: 'add_user',
+            });
+
+            // Add email function here to send an invitation to the user
+            // email logic goes here
+            return { errorCode: 0, data: 'Invitation sent' };
+          }
         } else {
           // If user is already in the organization
           return { errorCode: 0, data: 'User already in organization' };
@@ -130,7 +183,7 @@ async function addUserToOrganization(
 
 // Function to change the role of a user in an organization
 async function modifyUserOfOrganization(
-  UserData: UserData,
+  UserData: modifyUserData,
 ): Promise<Result<OrgUser[]>> {
   // Validate inputs
   if (!UserData.user_id || !UserData.role_id || !UserData.org_id) {

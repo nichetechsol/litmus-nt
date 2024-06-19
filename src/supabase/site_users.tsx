@@ -1,8 +1,10 @@
+/* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { User } from '@supabase/supabase-js';
 
 import { logActivity } from '@/supabase/activity';
 import { sendEmailFunction } from '@/supabase/email';
+import fetchEmailData from '@/supabase/email_configuration';
 
 import { supabase } from './db';
 
@@ -10,12 +12,15 @@ import { supabase } from './db';
 interface UserData {
   site_id: any;
   org_id?: any;
-  email?: string;
+  email: string;
   firstname?: string;
   lastname?: string;
   user_id?: any;
   role_id?: any;
   token: any;
+  userName: any;
+  siteName: any;
+  orgName: any;
 }
 interface SiteUser {
   user_id: any;
@@ -74,7 +79,7 @@ async function getSiteUserRole(
 // Function to add a user to sites based on email or name
 async function addUserToSites(UserData: UserData): Promise<Result<string>> {
   if (!UserData.org_id) {
-    return { errorCode: 1, data: null };
+    return { errorCode: 1, data: 'User Not added successfully' };
   }
 
   try {
@@ -88,7 +93,7 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
         .eq('email', UserData.email));
 
       if (selectError) {
-        return { errorCode: 1, data: null };
+        return { errorCode: 1, data: 'Error fetching User' };
       }
     } else if (UserData.firstname && UserData.lastname) {
       ({ data: users, error: selectError } = await supabase
@@ -98,14 +103,14 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
         .eq('lastname', UserData.lastname));
 
       if (selectError) {
-        return { errorCode: 1, data: null };
+        return { errorCode: 1, data: 'Error fetching User' };
       }
     } else {
-      return { errorCode: 1, data: null };
+      return { errorCode: 1, data: 'No valid email or name provided' };
     }
 
     if (!users || users.length === 0) {
-      return { errorCode: 1, data: null };
+      return { errorCode: 1, data: 'User Not found in central v2' };
     } else {
       const { data: org_users, error: orgSelectError } = await supabase
         .from('org_users')
@@ -114,42 +119,85 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
         .eq('org_id', UserData.org_id);
 
       if (orgSelectError) {
-        return { errorCode: 1, data: null };
+        return { errorCode: 1, data: 'Error fetching Organization' };
       } else {
-        if (org_users && org_users.length > 0) {
+        if (org_users.length === 0) {
           const { data: site_users, error: siteSelectError } = await supabase
             .from('site_users')
             .select('*')
-            .eq('user_id', users[0].id);
+            .eq('user_id', users[0].id)
+            .eq('site_id', UserData.site_id);
 
           if (siteSelectError) {
             return { errorCode: 1, data: null };
           } else {
-            if (!site_users || site_users.length === 0) {
-              // Prepare email data
-              const emaildata: any = {
-                org_id: UserData.org_id,
-                user_id: UserData.user_id,
-                target_user_id: users[0].id,
-                site_id: UserData.site_id,
-              };
-              // Send the invitation email
-              await sendEmailFunction(
-                'shruti@nichetech.in', // To
-                'Add User To Site', // Subject
-                'add_siteUser', // Type
-                UserData.token, // Token (Generate or provide the actual token)
-                emaildata, // Data
-              );
-              await logActivity({
-                user_id: UserData.user_id,
-                org_id: UserData.org_id,
-                site_id: UserData.site_id,
-                // target_user_id: users[0].id,
-                activity_type: 'add_user',
-              });
-              // Add email function here to send an invitation to the user
-              return { errorCode: 0, data: 'Invitation sent' };
+            if (site_users.length === 0) {
+              const { data: insertedSiteUsers, error: siteInsertError } =
+                await supabase
+                  .from('site_users')
+                  .insert([
+                    {
+                      user_id: users[0].id,
+                      site_id: UserData.site_id,
+                      role_id: UserData.role_id,
+                    },
+                  ])
+                  .select();
+
+              if (siteInsertError) {
+                return { errorCode: 1, data: null };
+              } else {
+                // Prepare email data
+                const emaildata: any = {
+                  org_id: UserData.org_id,
+                  user_id: UserData.user_id,
+                  target_user_id: users[0].id,
+                  site_id: UserData.site_id,
+                };
+                const userName: any = UserData.userName;
+                const orgName: any = UserData.orgName;
+                const siteName: any = UserData.siteName;
+                const email_data: any =
+                  await fetchEmailData('Add_User_to_Site');
+                const to = UserData.email;
+                const subject = email_data.data.email_subject;
+                const heading = email_data.data.email_heading;
+                const content = email_data.data.email_content;
+                const toData = to.replace('{{Target User EMail}}', to);
+                // const siteData = siteName.replace('{{Site Name}}', siteName);
+                const headingData = heading
+                  .replace('{{Org Name}}', orgName)
+                  .replace('{{Site Name}}', siteName);
+                const contentData = content
+                  .replace('{{Site Name}}', siteName)
+                  .replace('{{User Name}}', userName)
+                  .replace('{{Org Name}}', orgName);
+                await sendEmailFunction(
+                  toData,
+                  subject,
+                  headingData,
+                  contentData,
+                  UserData.token,
+                );
+                // Send the invitation email
+                // await sendEmailFunction(
+                //   'shruti@nichetech.in', // To
+                //   'Add User To Site', // Subject
+                //   'add_siteUser', // Type
+                //   UserData.token, // Token (Generate or provide the actual token)
+                //   emaildata, // Data
+                // );
+                await logActivity({
+                  user_id: UserData.user_id,
+                  org_id: UserData.org_id,
+                  site_id: UserData.site_id,
+                  target_user_id: users[0].id,
+                  target_user_role: UserData.role_id,
+                  activity_type: 'add_user',
+                });
+                // Add email function here to send an invitation to the user
+                return { errorCode: 0, data: 'User added successfully' };
+              }
             } else {
               return { errorCode: 0, data: 'User already in sites' };
             }

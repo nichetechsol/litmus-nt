@@ -6,8 +6,8 @@ interface LogActivityParams {
   org_id?: number;
   site_id?: number;
   user_id?: number;
-  target_user_id?: number;
-  target_user_role?: number;
+  target_user_id?: any;
+  target_user_role?: any;
   activity_type?: string;
   details?: { filename: string };
 }
