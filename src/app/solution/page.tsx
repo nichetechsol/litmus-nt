@@ -240,7 +240,7 @@ const Page = () => {
                               handleSubFolderClick(subFolder);
                             }}
                           >
-                            {subFolder.subFolder}{' '}
+                            {subFolder.subFolder.split('/').slice(-1)}{' '}
                           </button>
                         ))}
                       </div>

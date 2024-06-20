@@ -157,29 +157,6 @@ async function listSolutions() {
 
   const results = [];
 
-  const processFiles = async (folderPath: any, files: any) => {
-    for (const file of files) {
-      if (file.name !== '.emptyFolderPlaceholder') {
-        const { data: signedUrlData, error: signedUrlError } =
-          await supabase.storage
-            .from('Litmus_Solutions')
-            .createSignedUrl(`${folderPath}/${file.name}`, 60); // Adjust the expiration time as needed
-
-        const downloadLink = signedUrlError ? null : signedUrlData.signedUrl;
-
-        results.push({
-          folder: folderPath,
-          errorCode: 0,
-          message: 'Success',
-          data: {
-            FileName: file.name,
-            downloadLink: downloadLink,
-          },
-        });
-      }
-    }
-  };
-
   for (const item of data) {
     const { data: folderData, error: folderError } = await supabase.storage
       .from('Litmus_Solutions')
@@ -195,11 +172,14 @@ async function listSolutions() {
       continue;
     }
 
+    let downloadLink = null;
+    let dataName = null;
+
     if (folderData && folderData.length > 0) {
       if (item.name === 'LE_Production_Record_DB') {
         // Fetch sub-folders within LE_Production_Record_DB
         for (const subFolder of folderData) {
-          const { data: subFolderFiles, error: subFolderError } =
+          const { data: subFolderData, error: subFolderError } =
             await supabase.storage
               .from('Litmus_Solutions')
               .list(`${item.name}/${subFolder.name}`);
@@ -214,12 +194,55 @@ async function listSolutions() {
             continue;
           }
 
-          if (subFolderFiles && subFolderFiles.length > 0) {
-            await processFiles(`${subFolder.name}`, subFolderFiles);
+          if (subFolderData && subFolderData.length > 0) {
+            dataName = subFolderData[0].name;
+            const { data: signedUrlData, error: signedUrlError } =
+              await supabase.storage
+                .from('Litmus_Solutions')
+                .createSignedUrl(
+                  `${item.name}/${subFolder.name}/${dataName}`,
+                  60,
+                ); // Adjust the expiration time as needed
+
+            if (signedUrlError) {
+              downloadLink = null;
+            } else {
+              downloadLink = signedUrlData.signedUrl;
+            }
+
+            results.push({
+              folder: `${item.name}/${subFolder.name}`,
+              errorCode: 0,
+              message: 'Success',
+              data: {
+                FileName: dataName,
+                downloadLink: downloadLink,
+              },
+            });
           }
         }
       } else {
-        await processFiles(item.name, folderData);
+        dataName = folderData[0].name;
+        const { data: signedUrlData, error: signedUrlError } =
+          await supabase.storage
+            .from('Litmus_Solutions')
+            .createSignedUrl(`${item.name}/${dataName}`, 60); // Adjust the expiration time as needed
+
+        if (signedUrlError) {
+          downloadLink = null;
+        } else {
+          downloadLink = signedUrlData.signedUrl;
+        }
+
+        results.push({
+          folder: item.name,
+          errorCode: 0,
+          message: 'Success',
+          data: {
+            FileName: dataName,
+            downloadLink: downloadLink,
+          },
+        });
       }
     }
   }
@@ -286,6 +309,8 @@ async function listOfAllSolutions() {
 
         if (includeSubFolder) {
           subFolderData.subFolder = folderPath;
+        } else {
+          subFolderData.subFolder = '';
         }
 
         for (const file of files) {
@@ -322,12 +347,16 @@ async function listOfAllSolutions() {
                 files: [],
               });
             } else if (subFolderFiles && subFolderFiles.length > 0) {
-              await processFiles(`${subFolder.name}`, subFolderFiles, true);
+              await processFiles(
+                `${item.name}/${subFolder.name}`,
+                subFolderFiles,
+                true,
+              );
             }
           }),
         );
       } else {
-        await processFiles('', folderData, true);
+        await processFiles(item.name, folderData, false);
       }
 
       return mainFolder;
