@@ -1810,7 +1810,8 @@ const Page = () => {
                                   'ActivityLogs',
                                   encryptedActvitylog,
                                 );
-                                navigate.push('/activitylogs');
+                                window.location.href = '/activitylogs';
+                                // navigate.push('/activitylogs');
                               }}
                               className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
                             >
@@ -1845,116 +1846,117 @@ const Page = () => {
                                         <th scope='col'>
                                           <div className='flex items-center'>
                                             <div>
-                                              <p className='font-semibold mb-0'>
+                                              <p className='font-semibold mb-0 text-wrap'>
                                                 {activity?.activity_type ===
                                                 'create_site'
                                                   ? `${
-                                                      activity.user_id
-                                                        .firstname &&
-                                                      activity.user_id.lastname
-                                                        ? activity.user_id
-                                                            .firstname +
+                                                      activity?.user_id
+                                                        ?.firstname &&
+                                                      activity?.user_id.lastname
+                                                        ? activity?.user_id
+                                                            ?.firstname +
                                                           ' ' +
-                                                          activity.user_id
-                                                            .lastname
-                                                        : activity.user_id.email
-                                                    } created a new site named ${
-                                                      activity.site_id.name
-                                                    } within the organization '${
-                                                      activity.org_id.name
-                                                    }'`
+                                                          activity?.user_id
+                                                            ?.lastname
+                                                        : activity?.user_id
+                                                            .email
+                                                    } created a new site named ${activity
+                                                      ?.site_id
+                                                      .name} within the organization '${activity
+                                                      ?.org_id.name}'`
                                                   : activity?.activity_type ===
                                                     'add_user'
                                                   ? `${
-                                                      activity.user_id
-                                                        .firstname &&
-                                                      activity.user_id.lastname
-                                                        ? activity.user_id
-                                                            .firstname +
+                                                      activity?.user_id
+                                                        ?.firstname &&
+                                                      activity?.user_id.lastname
+                                                        ? activity?.user_id
+                                                            ?.firstname +
                                                           ' ' +
-                                                          activity.user_id
-                                                            .lastname
-                                                        : activity.user_id.email
+                                                          activity?.user_id
+                                                            ?.lastname
+                                                        : activity?.user_id
+                                                            ?.email
                                                     } added a new user named '${
-                                                      activity.target_user_id
-                                                        .firstname &&
-                                                      activity.target_user_id
-                                                        .lastname
+                                                      activity?.target_user_id
+                                                        ?.firstname &&
+                                                      activity?.target_user_id
+                                                        ?.lastname
                                                         ? activity
-                                                            .target_user_id
-                                                            .firstname +
+                                                            ?.target_user_id
+                                                            ?.firstname +
                                                           ' ' +
                                                           activity
-                                                            .target_user_id
-                                                            .lastname
+                                                            ?.target_user_id
+                                                            ?.lastname
                                                         : activity
-                                                            .target_user_id
-                                                            .email
-                                                    }' within the site '${
-                                                      activity.site_id.name
-                                                    }'`
+                                                            ?.target_user_id
+                                                            ?.email
+                                                    }' within the site '${activity
+                                                      ?.site_id.name}'`
                                                   : activity?.activity_type ===
                                                     'remove_user'
                                                   ? `${
-                                                      activity.user_id
-                                                        .firstname &&
-                                                      activity.user_id.lastname
-                                                        ? activity.user_id
-                                                            .firstname +
+                                                      activity?.user_id
+                                                        ?.firstname &&
+                                                      activity?.user_id.lastname
+                                                        ? activity?.user_id
+                                                            ?.firstname +
                                                           ' ' +
-                                                          activity.user_id
-                                                            .lastname
-                                                        : activity.user_id.email
+                                                          activity?.user_id
+                                                            ?.lastname
+                                                        : activity?.user_id
+                                                            ?.email
                                                     } removed a user named '${
-                                                      activity.target_user_id
-                                                        .firstname &&
-                                                      activity.target_user_id
-                                                        .lastname
+                                                      activity?.target_user_id
+                                                        ?.firstname &&
+                                                      activity?.target_user_id
+                                                        ?.lastname
                                                         ? activity
-                                                            .target_user_id
-                                                            .firstname +
+                                                            ?.target_user_id
+                                                            ?.firstname +
                                                           ' ' +
                                                           activity
-                                                            .target_user_id
-                                                            .lastname
+                                                            ?.target_user_id
+                                                            ?.lastname
                                                         : activity
-                                                            .target_user_id
-                                                            .email
-                                                    }' within the site '${
-                                                      activity.site_id.name
-                                                    }'`
+                                                            ?.target_user_id
+                                                            ?.email
+                                                    }' within the site '${activity
+                                                      ?.site_id.name}'`
                                                   : activity?.activity_type ===
                                                     'add_licence'
                                                   ? `${
-                                                      activity.user_id
-                                                        .firstname &&
-                                                      activity.user_id.lastname
-                                                        ? activity.user_id
-                                                            .firstname +
+                                                      activity?.user_id
+                                                        ?.firstname &&
+                                                      activity?.user_id.lastname
+                                                        ? activity?.user_id
+                                                            ?.firstname +
                                                           ' ' +
-                                                          activity.user_id
-                                                            .lastname
-                                                        : activity.user_id.email
-                                                    } added a new license within the organization ${
-                                                      activity.org_id.name
-                                                    }`
+                                                          activity?.user_id
+                                                            ?.lastname
+                                                        : activity?.user_id
+                                                            .email
+                                                    } added a new license within the organization ${activity
+                                                      ?.org_id.name}`
                                                   : activity?.activity_type ===
                                                     'download_file'
                                                   ? `${
-                                                      activity.user_id
-                                                        .firstname &&
-                                                      activity.user_id.lastname
+                                                      activity?.user_id
+                                                        ?.firstname &&
+                                                      activity?.user_id
+                                                        ?.lastname
                                                         ? activity.user_id
                                                             ?.firstname +
                                                           ' ' +
-                                                          activity.user_id
+                                                          activity?.user_id
                                                             ?.lastname
-                                                        : activity.user_id.email
+                                                        : activity?.user_id
+                                                            ?.email
                                                     }  downloaded a file named '${activity
                                                       .details
-                                                      ?.filename}' within the site '${
-                                                      activity.site_id.name
-                                                    }'`
+                                                      ?.filename}' within the site '${activity
+                                                      ?.site_id.name}'`
                                                   : ''}
                                               </p>
                                             </div>
