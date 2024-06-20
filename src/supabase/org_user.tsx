@@ -68,7 +68,7 @@ async function addUserToOrganization(
 
       // Check for errors during the select operation
       if (selectError) {
-        return { errorCode: 1, data: null };
+        return { errorCode: 1, data: 'User is not in Central V2' };
       }
     }
     // If email is not provided, check if both firstname and lastname are provided
@@ -82,17 +82,17 @@ async function addUserToOrganization(
 
       // Check for errors during the select operation
       if (selectError) {
-        return { errorCode: 1, data: null };
+        return { errorCode: 1, data: 'User is not in Central V2' };
       }
     }
     // If neither email nor both firstname and lastname are provided
     else {
-      return { errorCode: 1, data: null };
+      return { errorCode: 1, data: 'User is not in Central V2' };
     }
 
     // Check if no users were found
     if (!users || users.length === 0) {
-      return { errorCode: 1, data: null };
+      return { errorCode: 1, data: 'User is not in Central V2' };
     } else {
       // Check if the user is already part of the organization
       const { data: org_users, error } = await supabase
@@ -102,7 +102,7 @@ async function addUserToOrganization(
         .eq('org_id', UserData.org_id);
 
       if (error) {
-        return { errorCode: 1, data: null };
+        return { errorCode: 1, data: 'User is not in Central V2' };
       } else {
         // If user is not in the organization, send an invitation
         if (org_users.length === 0) {
@@ -119,7 +119,7 @@ async function addUserToOrganization(
               .select();
 
           if (orgInsertError) {
-            return { errorCode: 1, data: null };
+            return { errorCode: 1, data: 'User is not in Central V2' };
           } else {
             const emaildata: any = {
               org_id: UserData.org_id,
@@ -174,13 +174,13 @@ async function addUserToOrganization(
           }
         } else {
           // If user is already in the organization
-          return { errorCode: 0, data: 'User already in organization' };
+          return { errorCode: 1, data: 'User already in organization' };
         }
       }
     }
   } catch (error) {
     // Log any unexpected errors
-    return { errorCode: -1, data: null };
+    return { errorCode: 1, data: 'User not added ' };
   }
 }
 

@@ -195,7 +195,7 @@ async function addSites(data: SiteData): Promise<Result<any>> {
       return {
         errorCode: 2,
         message: 'Entitlement limit exceeded',
-        data: null,
+        data: data,
       };
     } else {
       // Insert new site details if no duplicate is found

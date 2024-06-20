@@ -93,7 +93,7 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
         .eq('email', UserData.email));
 
       if (selectError) {
-        return { errorCode: 1, data: 'Error fetching User' };
+        return { errorCode: 1, data: 'User is not in Central V2' };
       }
     } else if (UserData.firstname && UserData.lastname) {
       ({ data: users, error: selectError } = await supabase
@@ -103,14 +103,14 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
         .eq('lastname', UserData.lastname));
 
       if (selectError) {
-        return { errorCode: 1, data: 'Error fetching User' };
+        return { errorCode: 1, data: 'User is not in Central V2' };
       }
     } else {
-      return { errorCode: -1, data: 'No valid email or name provided' };
+      return { errorCode: 1, data: 'User is not in Central V2' };
     }
 
     if (!users || users.length === 0) {
-      return { errorCode: -1, data: 'User Not found in central v2' };
+      return { errorCode: 1, data: 'User Not found in central v2' };
     } else {
       const { data: org_users, error: orgSelectError } = await supabase
         .from('org_users')
@@ -119,7 +119,7 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
         .eq('org_id', UserData.org_id);
 
       if (orgSelectError) {
-        return { errorCode: 1, data: 'Error fetching Organization' };
+        return { errorCode: 1, data: 'User is not in organization' };
       } else {
         if (org_users.length !== 0) {
           const { data: site_users, error: siteSelectError } = await supabase
@@ -129,7 +129,7 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
             .eq('site_id', UserData.site_id);
 
           if (siteSelectError) {
-            return { errorCode: 1, data: null };
+            return { errorCode: 1, data: 'User not added ' };
           } else {
             if (site_users.length === 0) {
               const { data: insertedSiteUsers, error: siteInsertError } =
@@ -145,7 +145,7 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
                   .select();
 
               if (siteInsertError) {
-                return { errorCode: 1, data: null };
+                return { errorCode: 1, data: 'User not added' };
               } else {
                 // Prepare email data
                 const emaildata: any = {
@@ -234,16 +234,16 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
                 return { errorCode: 0, data: 'User added successfully' };
               }
             } else {
-              return { errorCode: -1, data: 'User already in sites' };
+              return { errorCode: 1, data: 'User already in sites' };
             }
           }
         } else {
-          return { errorCode: -1, data: 'User is not added in organization.' };
+          return { errorCode: 1, data: 'User is not added in organization.' };
         }
       }
     }
   } catch (error) {
-    return { errorCode: -1, data: null };
+    return { errorCode: 1, data: 'User not added' };
   }
 }
 
