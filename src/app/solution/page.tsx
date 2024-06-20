@@ -17,16 +17,23 @@ interface subFolder {
   files: [];
   subFolder: string;
 }
+interface folder {
+  folder: string;
+}
+interface file {
+  FileName: string;
+  downloadLink: string;
+}
 const Page = () => {
   const navigate = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [tokenVerify, setTokenVerify] = useState(false);
-  const [folder, setFolder] = useState<any>([]);
+  const [folder, setFolder] = useState<folder[] | null>(null);
   const [subFolders, setSubFolders] = useState<subFolder[] | null>(null);
   const [selectedFolder, setSelectedFolder] = useState<any>(null);
   // const [selectedSubFolder, setSelectedSubFolder] = useState<any>(null);
   // const [setFiles] = useState<any>([]);
-  const [file3, setfile3] = useState<any>([]);
+  const [file3, setfile3] = useState<file[] | null>(null);
   const [currentTrue, setCurrentTrue] = useState('');
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
@@ -187,9 +194,6 @@ const Page = () => {
                                     <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
                                       <i className='ri-folder-line text-[1rem]  text-white'></i>
                                     </span>
-                                    {/* <span className='avatar avatar-rounded avatar-sm bg-light p-1'>
-                                 
-                                </span> */}
                                   </div>
                                   <div className='text-[.875rem] font-semibold my-auto break-all'>
                                     {folder?.folder}
@@ -244,7 +248,7 @@ const Page = () => {
                   </div>
                   <div className='box-body'>
                     <ul className='list-none crm-top-deals mb-0'>
-                      {file3?.length > 0
+                      {file3 && file3?.length > 0
                         ? file3?.map((file: any, index: number) => (
                             <li
                               key={index}
