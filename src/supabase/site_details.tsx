@@ -60,6 +60,7 @@ async function fetchSiteDetails(
       .from('sites_detail')
       .select('*')
       .in('id', siteId)
+      .eq('org_id', org_id)
       .order('created_at', { ascending: false });
 
     if (error) {

@@ -11,7 +11,7 @@ interface FolderResult {
   } | null;
 }
 
-async function listLitmusProducts(site_id: any) {
+async function listLitmusProducts(site_id: any, org_id: any, org_type_id: any) {
   // Fetch entitlements package based on site_id
   const { data: entitlements_package, error: errorEntitlement } = await supabase
     .from('entitlements_package')
@@ -34,7 +34,58 @@ async function listLitmusProducts(site_id: any) {
   const entitlement15 = entitlements_package.some(
     (entitlement) => entitlement.entitlement_name_id === 15,
   );
+  if (org_type_id === 1 && !entitlement14) {
+    return {
+      errorCode: 1,
+      message: 'Entitlement 14 is required for org_type_id 1',
+      data: null,
+    };
+  }
 
+  const entitlementValue = entitlements_package.find(
+    (entitlement) => entitlement.entitlement_name_id === 14,
+  );
+  const entitlement_value_id_14 = entitlementValue
+    ? entitlementValue.entitlement_value_id
+    : null;
+
+  const { data: entitlements_values, error: errorValues } = await supabase
+    .from('entitlements_values')
+    .select('*')
+    .eq('id', entitlement_value_id_14);
+
+  if (errorValues) {
+    return {
+      errorCode: 1,
+      message: 'Error fetching entitlements values',
+      data: null,
+    };
+  }
+
+  const values = entitlements_values
+    ? entitlements_values[0]?.value_text
+    : null;
+
+  const {
+    data: filedownload_permissions,
+    error: filedownload_permissions_error,
+  } = await supabase
+    .from('filedownload_permissions')
+    .select('*')
+    .eq('org_type_id', org_type_id)
+    .eq('entitlement_value', values);
+
+  if (filedownload_permissions_error) {
+    return {
+      errorCode: 5,
+      message: 'Error fetching file download permissions',
+      data: null,
+    };
+  }
+
+  const fileTypes = filedownload_permissions.map(
+    (permission) => permission.file_type,
+  );
   // Fetch the list of Litmus Products from storage
   const { data, error } = await supabase.storage.from('Litmus_Products').list();
 
@@ -93,6 +144,8 @@ async function listLitmusProducts(site_id: any) {
       // Generate a signed URL for the top file
       let downloadLink = null;
       let dataName = null;
+      let extensionIncluded = null;
+
       if (topFile) {
         const { data: fileData, error: signedURLError } = await supabase.storage
           .from('Litmus_Products')
@@ -107,6 +160,12 @@ async function listLitmusProducts(site_id: any) {
             downloadLink = null;
           } else {
             downloadLink = download.signedUrl;
+            const fileExtension = dataName.split('.').pop();
+            if (org_type_id === 1) {
+              extensionIncluded = fileTypes.includes(fileExtension) ? 'Y' : 'N';
+            } else if (org_type_id === 2 || org_type_id === 3) {
+              extensionIncluded = 'Y';
+            }
           }
         }
       }
@@ -118,6 +177,7 @@ async function listLitmusProducts(site_id: any) {
         data: {
           FileName: dataName,
           downloadLink: downloadLink,
+          extensionIncluded: extensionIncluded,
         },
       });
     }
@@ -146,7 +206,7 @@ async function allCurrentfiles(site_id: any, org_id: any, org_type_id: any) {
 
   if (errorEntitlement) {
     return {
-      errorCode: 2,
+      errorCode: 1,
       message: 'Error fetching entitlements package',
       data: null,
     };
@@ -161,7 +221,7 @@ async function allCurrentfiles(site_id: any, org_id: any, org_type_id: any) {
 
   if (org_type_id === 1 && !entitlement14) {
     return {
-      errorCode: 3,
+      errorCode: 1,
       message: 'Entitlement 14 is required for org_type_id 1',
       data: null,
     };
@@ -181,7 +241,7 @@ async function allCurrentfiles(site_id: any, org_id: any, org_type_id: any) {
 
   if (errorValues) {
     return {
-      errorCode: 4,
+      errorCode: 1,
       message: 'Error fetching entitlements values',
       data: null,
     };
@@ -279,9 +339,15 @@ async function allCurrentfiles(site_id: any, org_id: any, org_type_id: any) {
             fileData.map(async (fileEntry) => {
               const dataName = fileEntry.name;
               const fileExtension = dataName.split('.').pop();
-              const extensionIncluded = fileTypes.includes(fileExtension)
-                ? 'Y'
-                : 'N';
+              let extensionIncluded;
+
+              if (org_type_id === 1) {
+                extensionIncluded = fileTypes.includes(fileExtension)
+                  ? 'Y'
+                  : 'N';
+              } else if (org_type_id === 2 || org_type_id === 3) {
+                extensionIncluded = 'Y';
+              }
 
               const { data: download, error: downloadError } =
                 await supabase.storage

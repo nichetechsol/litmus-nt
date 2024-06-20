@@ -151,6 +151,7 @@ const Page = () => {
   }, []);
   const [user_id, setuser_id] = useState<any>('');
   const [org_id, setorg_id] = useState<any>('');
+  const [org_type_id, setOrg_type_id] = useState<any>('');
   const [site_id, setsite_id] = useState<any>('');
   const [site_name, setSite_name] = useState<any>('');
   const [site_owner_name, SetSite_owner_name] = useState<any>('');
@@ -161,9 +162,11 @@ const Page = () => {
     const orgid = decryptData(localStorage.getItem('org_id'));
     const siteid = decryptData(localStorage.getItem('site_id'));
     const sitename = decryptData(localStorage.getItem('site_name'));
+    const decrytedOrgTypeId = decryptData(localStorage.getItem('org_type_id'));
     const decryptedOrgName = decryptData(localStorage.getItem('org_name'));
     const siteownername = decryptData(localStorage.getItem('site_owner_name'));
     const decrypteduserEmail = decryptData(localStorage.getItem('user_email'));
+    setOrg_type_id(decrytedOrgTypeId);
     setuser_id(userid);
     setorg_id(orgid);
     setsite_id(siteid);
@@ -315,7 +318,11 @@ const Page = () => {
         await refreshToken();
         setLoading(true);
         if (site_id) {
-          const result1: any = await listLitmusProducts(site_id); // Replace with your actual API call
+          const result1: any = await listLitmusProducts(
+            site_id,
+            org_id,
+            org_type_id,
+          ); // Replace with your actual API call
 
           if (result1) {
             setProducts(result1.data);
