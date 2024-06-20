@@ -376,7 +376,7 @@ const Page = () => {
         } else {
           setLoading(false);
           if (result.errorCode === 1) {
-            swal('The organization name already exists.', { icon: 'error' });
+            swal(result.data, { icon: 'error' });
           }
         }
         if (closeModalButtonRef.current) {

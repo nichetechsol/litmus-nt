@@ -1099,8 +1099,8 @@ const OrgDashboard = () => {
                                   'ActivityLogs',
                                   encryptedActvitylog,
                                 );
-                                window.location.href = '/activitylogs';
-                                // navigate.push('/activitylogs');
+                                // window.location.href = '/activitylogs';
+                                navigate.push('/activitylogs');
                               }}
                               className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
                             >
