@@ -384,8 +384,12 @@ const OrgDashboard = () => {
           );
 
           if (response.errorCode === 0) {
-            swal('Record deleted!', { icon: 'success' });
-            fetchData2();
+            if (id === user_id) {
+              navigate.push('/organization');
+            } else {
+              swal('Record deleted!', { icon: 'success' });
+              fetchData2();
+            }
             setLoading(false);
             // Optionally, update your state or refetch data here
           } else {

@@ -541,8 +541,12 @@ const Page = () => {
           setLoading(true);
           const response = await removeUserFromSites(id, site_id, user_id);
           if (response.errorCode === 0 && response.data) {
-            swal(response.data, { icon: 'success' });
-            fetchUserData();
+            if (id === user_id) {
+              navigate.push('/sites');
+            } else {
+              swal(response.data, { icon: 'success' });
+              fetchUserData();
+            }
             setLoading(false);
             // Optionally, update your state or refetch data here
           } else {
