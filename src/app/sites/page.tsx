@@ -39,7 +39,7 @@ import {
   fetchSiteDetails,
   fetchSiteSidebarList,
 } from '@/supabase/site_details';
-import { addSites } from '@/supabase/site_details_crud';
+import { addSites, addSitesConfirm } from '@/supabase/site_details_crud';
 import { fetchSiteType } from '@/supabase/site_type';
 import { stateList } from '@/supabase/state';
 import Loader from '@/utils/Loader/Loader';
@@ -436,6 +436,30 @@ const Page: React.FC = () => {
   };
 
   /// for submit
+  const handelclosemodel = () => {
+    setAddSiteNameError('');
+    settypeDropdown(null);
+    setTypeDropdownError('');
+    setAddress2Error('');
+    setAddress1Error('');
+    setCountryListError('');
+    setstateListError('');
+    setCityError('');
+    setMessageError('');
+    setAddSiteName('');
+    setSelectedValueDropdown(undefined);
+    setAddress1('');
+    setPincode('');
+    setAddress2('');
+    setMessage('');
+    setFetchdropDCounrty(null);
+    setSelectedValueState(undefined);
+    setCity('');
+    setPincodeError('');
+    setMessageError('');
+    // FetchSiteDetails();
+    // fetchData1();
+  };
   const validateForm = async () => {
     try {
       await validationSchema.validate(
@@ -507,10 +531,6 @@ const Page: React.FC = () => {
     const isValid = await validateForm();
 
     if (isValid) {
-      //  const selectedTypeId =
-      //    typeDropdown?.find((type) => type.name === SelectedValueDropdown)
-      //      ?.id ?? null;
-
       const data: any = {
         org_id: org_id,
         name: AddSiteName,
@@ -542,14 +562,58 @@ const Page: React.FC = () => {
           FetchSiteDetails();
           fetchData1();
           toast.success(result.message, { autoClose: 3000 });
-        } else {
+        } else if (result.errorCode == 2) {
           setLoading(false);
-
-          toast.error(result.message, { autoClose: 3000 });
           if (closeModalButtonRef.current) {
             closeModalButtonRef.current.click();
           }
           handelclosemodel();
+          swal({
+            title: result.message,
+            text: 'You have exceeded the Entitlement limit. Do you want to proceed?',
+            icon: 'warning',
+            buttons: {
+              cancel: {
+                text: 'No, cancel',
+                value: false,
+                visible: true,
+                className: '',
+                closeModal: true,
+              },
+              confirm: {
+                text: 'Yes, proceed!',
+                value: true,
+                visible: true,
+                className: '',
+                closeModal: true,
+              },
+            },
+          }).then(async (willProceed) => {
+            if (willProceed) {
+              await refreshToken();
+              setLoading(true);
+              const result1 = await addSitesConfirm(result.data);
+              if (result1.errorCode === 0) {
+                setLoading(false);
+                FetchSiteDetails();
+                fetchData1();
+                toast.success(result1.message, { autoClose: 3000 });
+              } else {
+                setLoading(false);
+                toast.error(result1.message, { autoClose: 3000 });
+              }
+            } else {
+              setLoading(false);
+              toast.error(result.message, { autoClose: 3000 });
+            }
+          });
+        } else {
+          setLoading(false);
+          if (closeModalButtonRef.current) {
+            closeModalButtonRef.current.click();
+          }
+          handelclosemodel();
+          toast.error(result.message, { autoClose: 3000 });
         }
       } catch (error) {
         setLoading(false);
@@ -559,30 +623,6 @@ const Page: React.FC = () => {
   };
 
   // for close model add and clear all values
-  const handelclosemodel = () => {
-    setAddSiteNameError('');
-    settypeDropdown(null);
-    setTypeDropdownError('');
-    setAddress2Error('');
-    setAddress1Error('');
-    setCountryListError('');
-    setstateListError('');
-    setCityError('');
-    setMessageError('');
-    setAddSiteName('');
-    setSelectedValueDropdown(undefined);
-    setAddress1('');
-    setPincode('');
-    setAddress2('');
-    setMessage('');
-    setFetchdropDCounrty(null);
-    setSelectedValueState(undefined);
-    setCity('');
-    setPincodeError('');
-    setMessageError('');
-    // FetchSiteDetails();
-    // fetchData1();
-  };
 
   const [tokenVerify, setTokenVerify] = useState(false);
   useLayoutEffect(() => {

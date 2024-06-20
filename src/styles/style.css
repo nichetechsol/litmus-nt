@@ -20098,3 +20098,7 @@ h6 {
 .swal-overlay--show-modal {
   pointer-events: none !important;
 }
+.swal-button:hover {
+  background-color: #032125 !important;
+  color: #fff !important;
+}

@@ -456,7 +456,7 @@ const OrgDashboard = () => {
               button.click(); // Directly trigger click event on button
             }
           } else {
-            toast.error('User was not in Central V2', { autoClose: 3000 });
+            toast.error(result.data, { autoClose: 3000 });
             const button = document.getElementById('close-modal-btn');
             if (button) {
               button.click(); // Directly trigger click event on button
@@ -558,7 +558,14 @@ const OrgDashboard = () => {
                                   <p className='text-[#8c9097] dark:text-white/50 text-[0.813rem] mb-0'>
                                     Number of Sites
                                   </p>
-                                  <h4 className='font-semibold  text-[1.5rem] !mb-2 '>
+                                  <h4
+                                    className={`font-semibold text-[1.5rem] !mb-2 ${
+                                      orgData?.sitesDetailCount &&
+                                      orgData.sitesDetailCount > 10
+                                        ? 'text-danger'
+                                        : ''
+                                    }`}
+                                  >
                                     {orgData ? orgData?.sitesDetailCount : 0}
                                   </h4>
                                 </div>

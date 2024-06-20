@@ -53,6 +53,7 @@ interface Products {
   data: {
     FileName: string;
     downloadLink: string;
+    extensionIncluded: string;
   };
   errorCode: number;
   folder: string;
@@ -322,7 +323,7 @@ const Page = () => {
             site_id,
             org_id,
             org_type_id,
-          ); // Replace with your actual API call
+          );
 
           if (result1) {
             setProducts(result1.data);
@@ -1169,26 +1170,32 @@ const Page = () => {
                                     <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
                                       <i className='ri-folder-line text-[1rem]  text-white'></i>
                                     </span>
-                                    {/* <span className='text-[1rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
-                                    <i className='ri-folder-line text-[1rem]  text-white'></i>
-                                  </span> */}
                                   </div>
                                   <div className='flex-grow ic-product-p'>
-                                    <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                    <p
+                                      className={`font-semibold mb-[1.4px]  text-[0.813rem] ${
+                                        product.data.extensionIncluded === 'Y'
+                                          ? ''
+                                          : 'text-gray-500'
+                                      }`}
+                                    >
                                       {product.data.FileName}
                                     </p>
                                   </div>
-                                  <div className='font-semibold text-[0.9375rem] '>
-                                    <a
-                                      onClick={() => {
-                                        handleDownload(product.data.FileName);
-                                      }}
-                                      href={product.data.downloadLink}
-                                      className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
-                                    >
-                                      <i className='ri-download-line  text-[.8rem]  text-white'></i>
-                                    </a>
-                                  </div>
+                                  {product.data.extensionIncluded === 'Y' && (
+                                    <div className='font-semibold text-[0.9375rem] '>
+                                      <a
+                                        onClick={() => {
+                                          handleDownload(product.data.FileName);
+                                        }}
+                                        style={{ cursor: 'pointer' }}
+                                        href={product.data.downloadLink}
+                                        className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
+                                      >
+                                        <i className='ri-download-line  text-[.8rem]  text-white'></i>
+                                      </a>
+                                    </div>
+                                  )}
                                 </div>
                               </li>
                             ))
