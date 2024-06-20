@@ -13,6 +13,7 @@ interface DashboardCounts {
   userCount: any | null;
   entitlementCount: any | null;
   sitesDetailCount: any | null;
+  entitlementExceed: any | null;
 }
 
 interface UserList {
@@ -53,7 +54,62 @@ async function orgDashboardCounts(
       .from('sites_detail')
       .select('*', { count: 'exact' })
       .eq('org_id', org_id);
+    const { data: currentSites, error: countError } = await supabase
+      .from('sites_detail')
+      .select('id')
+      .eq('org_id', org_id);
 
+    if (countError) {
+      return {
+        errorCode: 1,
+        message: 'Error retrieving current site count',
+        data: null,
+      };
+    }
+    // Get entitlement limit for the organization
+    const { data: entitlement, error: entitlementError1 } = await supabase
+      .from('entitlements_package')
+      .select('entitlement_value_id')
+      .eq('org_id', org_id)
+      .eq('entitlement_name_id', 16); // Assuming 'max_sites_prod' has id 14
+
+    if (entitlementError1) {
+      return {
+        errorCode: 1,
+        message: 'Error retrieving entitlement limit',
+        data: null,
+      };
+    }
+
+    if (!entitlement || entitlement.length === 0) {
+      return {
+        errorCode: 1,
+        message: 'No entitlement found for the organization',
+        data: null,
+      };
+    }
+
+    // Check entitlement value
+    const { data: entitlementValue, error: valueError } = await supabase
+      .from('entitlements_values')
+      .select('value_number')
+      .eq('id', entitlement[0].entitlement_value_id)
+      .single();
+
+    if (valueError) {
+      return {
+        errorCode: 1,
+        message: 'Error retrieving entitlement value',
+        data: null,
+      };
+    }
+    let entitlementExceed = null;
+    // Check if current number of sites exceeds entitlement limit
+    if (currentSites.length >= (entitlementValue.value_number ?? 0)) {
+      entitlementExceed = 'Y';
+    } else {
+      entitlementExceed = 'N';
+    }
     if (userError || entitlementError || siteError) {
       return {
         errorCode: 1,
@@ -61,6 +117,7 @@ async function orgDashboardCounts(
           userCount: null,
           entitlementCount: null,
           sitesDetailCount: null,
+          entitlementExceed: null,
         },
       };
     }
@@ -71,6 +128,7 @@ async function orgDashboardCounts(
         userCount,
         entitlementCount,
         sitesDetailCount,
+        entitlementExceed,
       },
     };
   } catch (error) {
@@ -80,6 +138,7 @@ async function orgDashboardCounts(
         userCount: null,
         entitlementCount: null,
         sitesDetailCount: null,
+        entitlementExceed: null,
       },
     };
   }

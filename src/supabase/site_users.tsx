@@ -170,7 +170,7 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
                   .replace('{{Site Name}}', siteName);
                 const contentData = content
                   .replace('{{Site Name}}', siteName)
-                  .replace('{{User Name}}', UserData.email)
+                  .replace('{{User Name}}', userName)
                   .replace('{{Org Name}}', orgName);
                 await sendEmailFunction(
                   toData,
@@ -181,6 +181,9 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
                 );
 
                 if (UserData.role_id == '1' || UserData.role_id == '2') {
+                  const userName: any = UserData.userName;
+                  const orgName: any = UserData.orgName;
+                  const siteName: any = UserData.siteName;
                   let role_name: any;
                   if (UserData.role_id == 1) {
                     role_name = 'Owner';
@@ -203,7 +206,7 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
                   const contentData = content
                     .replace('{{Target User Name}}', target_user)
                     .replace('{{Site Name}}', siteName)
-                    .replace('{{Org name}}', orgName)
+                    .replace('{{Org Name}}', orgName)
                     .replace('{{User Name}}', userName)
                     .replace('{{Role Name}}', role_name);
                   await sendEmailFunction(

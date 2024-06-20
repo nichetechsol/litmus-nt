@@ -181,7 +181,25 @@ async function addOrganization(data: {
   type_name: any;
 }): Promise<Result<any>> {
   try {
-    // Insert organization details
+    // Check if the domains already exist
+    const { data: existingDomains, error: domainCheckError } = await supabase
+      .from('domains')
+      .select('name')
+      .in('name', data.domain);
+
+    if (domainCheckError) {
+      return { errorCode: 1, data: 'Error checking domains' };
+    }
+
+    if (existingDomains && existingDomains.length > 0) {
+      const existingDomainNames = existingDomains.map(
+        (domain: { name: string }) => domain.name,
+      );
+      return {
+        errorCode: 1,
+        data: `Domains already exist: ${existingDomainNames.join(', ')}`,
+      };
+    }
     const { data: insertData, error: insertError } = await supabase
       .from('org_details')
       .insert([
