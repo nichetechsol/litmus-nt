@@ -188,7 +188,7 @@ async function addOrganization(data: {
       .in('name', data.domain);
 
     if (domainCheckError) {
-      return { errorCode: 1, data: 'Error checking domains' };
+      return { errorCode: 1, data: 'Organization is not added' };
     }
 
     if (existingDomains && existingDomains.length > 0) {
@@ -213,7 +213,7 @@ async function addOrganization(data: {
       .select();
 
     if (insertError) {
-      return { errorCode: 1, data: null };
+      return { errorCode: 1, data: 'Organization is not added' };
     }
 
     // Insert organization user
@@ -229,7 +229,7 @@ async function addOrganization(data: {
       .select();
 
     if (userInsertError) {
-      return { errorCode: 1, data: null };
+      return { errorCode: 1, data: 'Organization is not added' };
     }
 
     // Insert domains
@@ -305,7 +305,7 @@ async function addOrganization(data: {
       data: { insertData, userInsertData, domainInsertResults },
     };
   } catch (error) {
-    return { errorCode: 1, data: null };
+    return { errorCode: 1, data: 'Organization is not added' };
   }
 }
 

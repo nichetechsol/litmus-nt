@@ -19,6 +19,7 @@ interface LoginResult {
   message?: string;
   auth?: AuthData;
   user?: UserData[];
+  add_orgUser?: any;
 }
 
 // // Function for logging in
@@ -89,8 +90,35 @@ async function Login(email: string, password: string): Promise<LoginResult> {
     if (userError) {
       return { errorCode: 1, message: 'Invalid data' };
     }
+    const userId = userData[0].id;
+
+    // Check the number of organizations where the user has role_id = 1
+    const { data: orgUsersData, error: orgUsersError } = await supabase
+      .from('org_users')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (orgUsersError) {
+      return { errorCode: 1, message: 'Error fetching organization user data' };
+    }
+
+    let add_orgUser = false;
+    if (orgUsersData.length > 0) {
+      for (const orgUser of orgUsersData) {
+        if (orgUser.role_id === 1) {
+          add_orgUser = true;
+        }
+      }
+    } else {
+      add_orgUser = false;
+    }
     if (userData.length > 0) {
-      return { errorCode: 0, auth: authData, user: userData };
+      return {
+        errorCode: 0,
+        auth: authData,
+        user: userData,
+        add_orgUser: add_orgUser,
+      };
     } else {
       return { errorCode: 1, message: 'User data is not found' };
     }

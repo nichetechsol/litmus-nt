@@ -2,7 +2,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 
-import { listOfAllSolutions } from '@/supabase/solutions';
+import { Login } from '@/supabase/auth';
 
 const OrgDashboard = () => {
   const [result, setResult] = useState(null);
@@ -20,7 +20,7 @@ const OrgDashboard = () => {
         //   firstname: 'Parth',
         //   lastname: 'Roka',
         // };
-        const data: any = await listOfAllSolutions();
+        const data: any = await Login('parthr@nichetech.com', '111111');
 
         // const { data, error } = await supabase
         //   .from('site_users')
