@@ -138,6 +138,7 @@ const OrgDashboard = () => {
     errorCode: number;
     sitesDetailCount: number;
     userCount: number;
+    entitlementExceed: string;
   } | null>(null);
   const [orgUserData, setOrgUserData] = useState<OrgUser[] | null>(null);
   const [entitlementListData, setEntitlementListData] = useState<
@@ -453,13 +454,13 @@ const OrgDashboard = () => {
             toast.success(result.data, { autoClose: 3000 });
             const button = document.getElementById('close-modal-btn');
             if (button) {
-              button.click(); // Directly trigger click event on button
+              button.click();
             }
           } else {
             toast.error(result.data, { autoClose: 3000 });
             const button = document.getElementById('close-modal-btn');
             if (button) {
-              button.click(); // Directly trigger click event on button
+              button.click();
             }
           }
         } else {
@@ -560,8 +561,8 @@ const OrgDashboard = () => {
                                   </p>
                                   <h4
                                     className={`font-semibold text-[1.5rem] !mb-2 ${
-                                      orgData?.sitesDetailCount &&
-                                      orgData.sitesDetailCount > 10
+                                      orgData?.entitlementExceed &&
+                                      orgData.entitlementExceed === 'Y'
                                         ? 'text-danger'
                                         : ''
                                     }`}

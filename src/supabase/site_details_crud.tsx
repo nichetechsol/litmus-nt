@@ -351,7 +351,7 @@ async function addSitesConfirm(data: any) {
     const contentData = content
       .replace('{{User Name}}', userName)
       .replace('{{Site Name}}', siteName)
-      .replace('{{Org name}}', orgName);
+      .replace('{{Org Name}}', orgName);
     await sendEmailFunction(to, subject, heading, contentData, data.token);
     return {
       errorCode: 0,

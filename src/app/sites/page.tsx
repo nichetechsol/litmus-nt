@@ -437,28 +437,30 @@ const Page: React.FC = () => {
 
   /// for submit
   const handelclosemodel = () => {
-    setAddSiteNameError('');
-    settypeDropdown(null);
-    setTypeDropdownError('');
-    setAddress2Error('');
-    setAddress1Error('');
+    setAddSiteName('');
+    setSelectedValueDropdown(undefined);
+    setAddress1('');
+    setAddress2('');
+
     setCountryListError('');
     setstateListError('');
     setCityError('');
     setMessageError('');
-    setAddSiteName('');
-    setSelectedValueDropdown(undefined);
-    setAddress1('');
+
+    setAddSiteNameError('');
+    setTypeDropdownError('');
+    setAddress1Error('');
+    setAddress2Error('');
+
     setPincode('');
-    setAddress2('');
+
     setMessage('');
+    settypeDropdown(null);
     setFetchdropDCounrty(null);
     setSelectedValueState(undefined);
     setCity('');
     setPincodeError('');
     setMessageError('');
-    // FetchSiteDetails();
-    // fetchData1();
   };
   const validateForm = async () => {
     try {
@@ -749,7 +751,7 @@ const Page: React.FC = () => {
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      Addres 1*
+                                      Address 1*
                                     </label>
                                     <input
                                       type='text'
