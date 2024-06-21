@@ -31,8 +31,6 @@ const Page = () => {
   const [folder, setFolder] = useState<folder[] | null>(null);
   const [subFolders, setSubFolders] = useState<subFolder[] | null>(null);
   const [selectedFolder, setSelectedFolder] = useState<any>(null);
-  // const [selectedSubFolder, setSelectedSubFolder] = useState<any>(null);
-  // const [setFiles] = useState<any>([]);
   const [file3, setfile3] = useState<file[] | null>(null);
   const [currentTrue, setCurrentTrue] = useState('');
   useLayoutEffect(() => {
@@ -82,21 +80,17 @@ const Page = () => {
       if (!decryptedSiteId) {
         swal('Please select a Site', { icon: 'error' }).then(() => {
           navigate.push('/sites');
-          // redirect('/organization');
         });
       }
     } else {
       swal('Please select a  Organization', { icon: 'error' }).then(() => {
         navigate.push('/organization');
         return;
-        // redirect('/organization');
       });
     }
-
     if (decryptedSiteId) {
       setsite_id(decryptedSiteId);
     }
-
     if (decryptedUserId) {
       setuser_id(decryptedUserId);
     }
@@ -107,38 +101,21 @@ const Page = () => {
     setSubFolders(folder.data);
     if (folder.data[0].subFolder != '') {
       setCurrentTrue(folder.data[0].subFolder);
-      // setSelectedSubFolder(folder.data[0].subFolder);
       setfile3(folder.data[0].files);
     }
-    // setFiles([]);
   }
 
   function handleSubFolderClick(subFolder: any) {
     setCurrentTrue(subFolder.subFolder);
-    // setSelectedSubFolder(subFolder);
-    // setFiles(subFolder.files);
     setfile3(subFolder.files);
   }
-
   useEffect(() => {
-    // if (subFolders.length < 1 && subFolders.length > 0) {
-    //   setSelectedSubFolder(subFolders[0]);
-    //   setFiles(subFolders[0].files);
-    // }
     if (subFolders && subFolders[0]?.subFolder == '') {
       setfile3(subFolders[0]?.files);
     }
-    // if(folder.length>0)
-    //   {
-    //     if(folder[0].data[0].subFolder=="")
-    //       {
-    //         setfile3()
-    //       }
-    //   }
   }, [subFolders, file3, folder]);
 
   const handleDownload = async (fileName: string) => {
-    //
     const data = {
       org_id: org_id,
       site_id: site_id,
@@ -159,13 +136,7 @@ const Page = () => {
           <div className='my-5'>
             <div className='grid grid-cols-12 gap-6'>
               <div className='xl:col-span-12 col-span-12'>
-                {/* <div className='box'>
-                  <div className='md:flex px-4 py-6 items-center justify-between'>
-                    <div> */}
                 <h6 className='font-semibold mb-0 text-[1rem]'>Solution</h6>
-                {/* </div>
-                  </div>
-                </div> */}
               </div>
               <div className='xl:col-span-3 col-span-12'>
                 <div className='box custom-box overflow-hidden'>

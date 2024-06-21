@@ -72,7 +72,6 @@ const Page = () => {
         }
       } catch (error: any) {
         setLoading(false);
-        // console.error("Error fetching organization details:", error.message);
       }
     };
     fetchData();

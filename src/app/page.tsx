@@ -54,7 +54,6 @@ const LoginForm = () => {
       const bytes = CryptoJS.AES.decrypt(encryptedData, ENCRYPTION_KEY);
       return bytes.toString(CryptoJS.enc.Utf8);
     } catch (error) {
-      // console.error('Decryption error:', error);
       return null;
     }
   };

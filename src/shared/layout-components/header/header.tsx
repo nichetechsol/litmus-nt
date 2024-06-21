@@ -335,7 +335,6 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
         ? Number(decryptedString)
         : decryptedString;
     } catch (error) {
-      // console.error('Decryption error:', error);
       return null;
     }
   };
@@ -385,11 +384,11 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
             if (data.data[i].id == user_role) {
               setUserRoleName(data.data[i].name);
             } else {
-              // console.log("Not found")
+              //
             }
           }
         } else {
-          // console.log("No organization details found.");
+          //
         }
       } catch (error: any) {
         /* empty */
@@ -408,10 +407,10 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
         if (data) {
           setuserrole2(data.data.name);
         } else {
-          // console.log("No Role Found.");
+          //
         }
       } catch (error: any) {
-        // console.error("Error fetching organization details:", error.message);
+        //
       }
     };
 
@@ -426,10 +425,10 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
         if (data) {
           setuserrole3(data.data.name);
         } else {
-          // console.log("No Role Found.");
+          //
         }
       } catch (error: any) {
-        // console.error("Error fetching organization details:", error.message);
+        //
       }
     };
 

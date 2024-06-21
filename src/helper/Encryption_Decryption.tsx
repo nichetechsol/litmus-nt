@@ -22,7 +22,6 @@ export const decryptData = (encryptedData: string | null): any => {
       ? Number(decryptedString)
       : decryptedString;
   } catch (error) {
-    // console.error('Decryption error:', error);
     return null;
   }
 };

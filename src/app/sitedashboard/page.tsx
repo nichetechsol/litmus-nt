@@ -125,7 +125,6 @@ const Page = () => {
   const [activePage, setActivePage] = useState(1);
   const [perPage] = useState(10);
   const [totalItemsCount, setTotalItemsCount] = useState(0);
-
   const [entitlementListData, setEntitlementListData] = useState<
     Entitlement[] | null
   >(null);
@@ -134,9 +133,9 @@ const Page = () => {
   const [perPage2] = useState(10);
   const [products, setProducts] = useState<Products[] | null>(null);
   const [solutions, setSolution] = useState<Products[] | null>(null);
-
   const [activity_log, setActivity_log] = useState<activitylogs[] | null>(null);
   const [onlyToken, setOnlyToken] = useState('');
+
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
@@ -191,20 +190,20 @@ const Page = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const start: any = (activePage2 - 1) * perPage2; // Calculate start index
+        const start: any = (activePage2 - 1) * perPage2;
         const end: any = start + perPage2 - 1;
         if (site_id) {
           const data: any = await entitlementSite(site_id, start, end);
 
           if (data) {
             setEntitlementListData(data?.data);
-            setTotalItemsCount2(data.totalCount); // Set total items count for pagination
+            setTotalItemsCount2(data.totalCount);
           } else {
-            // console.log("No organization details found.");
+            //
           }
         }
       } catch (error: any) {
-        // console.error("Error fetching organization details:", error.message);
+        //
       }
     };
     fetchData();
@@ -213,14 +212,12 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // setLoading(true);
         if (site_id && org_id) {
           const data: any = await sitesCounts(site_id, org_id);
           setSiteCountData(data);
-          // setLoading(false);
         }
       } catch (error: any) {
-        // console.error("Error fetching organization details:", error.message);
+        //
       }
     };
     fetchData();
@@ -228,21 +225,18 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // setLoading(true);
         if (site_id) {
           const data: any = await licenceData(site_id);
           setLicence(data.data);
-          // setLoading(false);
         }
       } catch (error: any) {
-        // console.error("Error fetching organization details:", error.message);
+        //
       }
     };
     fetchData();
   }, [site_id]);
   const fetchData8 = async () => {
     try {
-      // setLoading(true);
       if (site_id) {
         const data: any = await getActivitiesBySiteID({
           siteID: site_id,
@@ -253,7 +247,7 @@ const Page = () => {
         setActivity_log(data.activities);
       }
     } catch (error: any) {
-      // console.error("Error fetching organization details:", error.message);
+      //
     }
   };
   useEffect(() => {
@@ -271,7 +265,7 @@ const Page = () => {
         setLoading(false);
       } catch (error: any) {
         setLoading(false);
-        // console.error("Error fetching organization details:", error.message);
+        //
       }
     };
     fetchData();
@@ -279,17 +273,15 @@ const Page = () => {
 
   const fetchUserData = async () => {
     try {
-      const start: any = (activePage - 1) * perPage; // Calculate start index
+      const start: any = (activePage - 1) * perPage;
       const end: any = start + perPage - 1;
       if (site_id) {
-        // setLoading(true);
         const data: any = await allSitesOfUsers(site_id, search, start, end);
         setOrgUserData(data.data);
         setTotalItemsCount(data.totalCount);
-        // setLoading(false);
       }
     } catch (error: any) {
-      // console.error("Error fetching organization details:", error.message);
+      //
     }
   };
   const [userrole3, setuserrole3] = useState<any>('');
@@ -297,22 +289,22 @@ const Page = () => {
     const fetchData2 = async () => {
       try {
         const data: any = await getSiteUserRole(user_id, site_id);
-
         if (data) {
           setuserrole3(data.data.id);
         } else {
-          // console.log("No Role Found.");
+          //
         }
       } catch (error: any) {
-        // console.error("Error fetching organization details:", error.message);
+        //
       }
     };
-
     fetchData2();
   }, [site_id, user_id]);
+
   useEffect(() => {
     fetchUserData();
   }, [site_id, activePage, search]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -324,7 +316,6 @@ const Page = () => {
             org_id,
             org_type_id,
           );
-
           if (result1) {
             setProducts(result1.data);
             setLoading(false);
@@ -332,12 +323,12 @@ const Page = () => {
         }
       } catch (error: any) {
         setLoading(false);
-        // console.error("Error fetching roles:", error.message);
+        //
       }
     };
-
     fetchData();
   }, [site_id]);
+
   const handleFiledClear = () => {
     setEmailError('');
     setFirstNameError('');
@@ -347,26 +338,20 @@ const Page = () => {
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        // setLoading(true);
-
-        const result1: any = await getUserRole(); // Replace with your actual API call
-
+        const result1: any = await getUserRole();
         if (result1 && result1.data) {
           setRoles(result1.data);
-          // setLoading(false);
         }
       } catch (error: any) {
-        // setLoading(false);
-        // console.error("Error fetching roles:", error.message);
+        //
       }
     };
-
     fetchRoles();
   }, []);
+
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newEmail = e.target.value.trim();
     setEmail(newEmail);
-
     emailSchema
       .validate(newEmail)
       .then(() => setEmailError(''))
@@ -375,27 +360,22 @@ const Page = () => {
   const handleFirstNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newFirstName = e.target.value.trim().replace(/[^a-zA-Z]/g, '');
     setFirstName(newFirstName);
-
     nameSchema
       .validate(newFirstName)
       .then(() => setFirstNameError(''))
       .catch((err: Yup.ValidationError) => setFirstNameError(err.message));
   };
-
   const handleLastNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newLastName = e.target.value.trim().replace(/[^a-zA-Z]/g, '');
     setLastName(newLastName);
-
     nameSchema2
       .validate(newLastName)
       .then(() => setLastNameError(''))
       .catch((err: Yup.ValidationError) => setLastNameError(err.message));
   };
-
   const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newRole = e.target.value;
     setRole(newRole);
-
     roleSchema
       .validate(newRole)
       .then(() => setRoleError(''))
@@ -480,31 +460,26 @@ const Page = () => {
             toast.success('Updated Successfully', { autoClose: 3000 });
             const button = document.getElementById('close-modal-btn');
             if (button) {
-              button.click(); // Directly trigger click event on button
+              button.click();
             }
           } else {
             toast.error("Couldn't Update", { autoClose: 3000 });
             const button = document.getElementById('close-modal-btn');
             if (button) {
-              button.click(); // Directly trigger click event on button
+              button.click();
             }
           }
         }
-
         if (closeModalButtonRef.current) {
           closeModalButtonRef.current.click();
         }
         fetchUserData();
-
         setLoading(false);
       } catch (error) {
         setLoading(false);
-        // console.error("API call failed:", error);
-        // setLoading(false);
       }
     } else {
       setLoading(false);
-      // console.log('isValid', isValid);
     }
   };
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -548,7 +523,6 @@ const Page = () => {
               fetchUserData();
             }
             setLoading(false);
-            // Optionally, update your state or refetch data here
           } else {
             swal('Error deleting record!', { icon: 'error' });
             setLoading(false);
@@ -561,7 +535,6 @@ const Page = () => {
     });
   };
   const handleDownload = async (fileName: string) => {
-    //
     const data = {
       org_id: org_id,
       site_id: site_id,
@@ -585,7 +558,6 @@ const Page = () => {
               <p className='font-semibold text-[1.125rem] text-defaulttextcolor dark:text-defaulttextcolor/70 !mb-0 '>
                 Site Dashboard({site_name})
               </p>
-              {/* <p className="font-normal text-[#8c9097] dark:text-white/50 text-[0.813rem]">Track your sales activity, leads and deals here.</p> */}
             </div>
           </div>
           <div className='grid grid-cols-12 gap-x-6'>
@@ -802,105 +774,6 @@ const Page = () => {
                           <i className='ri-add-circle-line !text-[1rem]'></i>Add
                           License
                         </button>
-                        {/*   <div
-                          id='todo-compose'
-                          className='hs-overlay hidden ti-modal'
-                        >
-                          <div className='hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out'>
-                            <div className='ti-modal-content'>
-                              <div className='ti-modal-header'>
-                                <h6
-                                  className='modal-title text-[1rem] font-semibold'
-                                  id='mail-ComposeLabel'
-                                >
-                                  Add User
-                                </h6>
-                                <button
-                                  type='button'
-                                  className='hs-dropdown-toggle !text-[1rem] !font-semibold !text-defaulttextcolor'
-                                  data-hs-overlay='#todo-compose'
-                                >
-                                  <span className='sr-only'>Close</span>
-                                  <i className='ri-close-line'></i>
-                                </button>
-                              </div>
-                              <div className='ti-modal-body !overflow-visible px-4'>
-                                <div className='grid grid-cols-12 gap-2'>
-                                  <div className='xl:col-span-12 col-span-12'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      Email
-                                    </label>
-                                    <input
-                                      type='text'
-                                      className='form-control w-full'
-                                      id='task-name'
-                                      placeholder='Task Name'
-                                    />
-                                  </div>
-
-                                  <div className='xl:col-span-12 col-span-12'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      First Name
-                                    </label>
-                                    <input
-                                      type='text'
-                                      className='form-control w-full'
-                                      id='task-name'
-                                      placeholder='Task Name'
-                                    />
-                                  </div>
-                                  <div className='xl:col-span-12 col-span-12'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      Last Name
-                                    </label>
-                                    <input
-                                      type='text'
-                                      className='form-control w-full'
-                                      id='task-name'
-                                      placeholder='Task Name'
-                                    />
-                                  </div>
-
-                                  <div className='xl:col-span-12 col-span-12'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      Role
-                                    </label>
-                                    <select className='form-select'>
-                                      <option>No options</option>
-                                    </select>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className='ti-modal-footer'>
-                                <button
-                                  type='button'
-                                  className='hs-dropdown-toggle ti-btn  ti-btn-light align-middle'
-                                  data-hs-overlay='#todo-compose'
-                                >
-                                  Cancel
-                                </button>
-                                <button
-                                  type='button'
-                                  className='ti-btn bg-primary text-white !font-medium'
-                                >
-                                  Add User
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>*/}
                       </div>
                     </div>
                     <div className='box-body'>
@@ -910,9 +783,6 @@ const Page = () => {
                               <li className='mb-[0.9rem]' key={index}>
                                 <div className='flex items-start flex-wrap'>
                                   <div className='me-2'>
-                                    {/* <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
-                                    <i className='ri-profile-line text-[1rem] text-white'></i>
-                                  </span> */}
                                     <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
                                       <i className='ri-profile-line text-[1rem]  text-white'></i>
                                     </span>
@@ -933,21 +803,6 @@ const Page = () => {
                                   <div className='font-semibold text-[0.9375rem] '>
                                     <h1>
                                       {' '}
-                                      {/* {moment().isAfter(user.expiry) ? (
-                                        <span className='badge bg-danger text-white'>
-                                          Expired
-                                        </span>
-                                      ) : moment(user.expiry).isBefore(moment().add(1, 'month'))?
-                                      (
-                                        <span className='badge bg-warning text-white'>
-                                          Soon to Expire
-                                        </span>
-                                      ) 
-                                      : (
-                                        <span className='badge bg-primary text-white'>
-                                          Active
-                                        </span>
-                                      )} */}
                                       {moment().isAfter(user.expiry) ? (
                                         <span className='badge bg-danger text-white'>
                                           Expired
@@ -974,74 +829,6 @@ const Page = () => {
                             <p className='text-center'>No License Found</p>{' '}
                           </div>
                         )}
-                        {/* <li className="mb-[0.9rem]">
-                          <div className="flex items-start flex-wrap">
-                            <div className="me-2">
-                              <span
-                                className="inline-flex items-center justify-center !w-[1.75rem] !h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full text-warning  bg-warning/10 font-semibold">
-                                EK
-                              </span>
-                            </div>
-                            <div className="flex-grow">
-                              <p className="font-semibold mb-[1.4px]  text-[0.813rem]">Emigo Kiaren</p>
-                              <p className="text-[#8c9097] dark:text-white/50 text-[0.75rem]">01/01/2024</p>
-                              <p className="text-[#8c9097] dark:text-white/50 text-[0.75rem]">2hr Ago</p>
-                            </div>
-                            <div className="font-semibold text-[0.9375rem] "><h1> <span className="badge bg-danger text-white">Expired</span></h1></div>
-                          </div>
-                        </li>
-                        <li className="mb-[0.9rem]">
-                          <div className="flex items-top flex-wrap">
-                            <div className="me-2">
-                              <span className="inline-flex items-center justify-center">
-                                <img src="../../../assets/images/faces/12.jpg" alt=""
-                                  className="!w-[1.75rem] !h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full" />
-                              </span>
-                            </div>
-                            <div className="flex-grow">
-                              <p className="font-semibold mb-[1.4px]  text-[0.813rem]">Randy Origoan
-                              </p>
-                              <p className="text-[#8c9097] dark:text-white/50 text-[0.75rem]">01/01/2024</p>
-                              <p className="text-[#8c9097] dark:text-white/50 text-[0.75rem]">2hr Ago</p>
-                            </div>
-                            <div className="font-semibold text-[0.9375rem] ">
-                              <h1> <span className="badge bg-danger text-white">Expired</span></h1>
-                            </div>
-                          </div>
-                        </li>
-                        <li className="mb-[0.9rem]">
-                          <div className="flex items-top flex-wrap">
-                            <div className="me-2">
-                              <span
-                                className="inline-flex items-center justify-center !w-[1.75rem] !h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full text-success bg-success/10 font-semibold">
-                                GP
-                              </span>
-                            </div>
-                            <div className="flex-grow">
-                              <p className="font-semibold mb-[1.4px]  text-[0.813rem]">George Pieterson
-                              </p>
-                              <p className="text-[#8c9097] dark:text-white/50 text-[0.75rem]">george.pieterson@gmail.com</p>
-                              <p className="text-[#8c9097] dark:text-white/50 text-[0.75rem]">kiaraadvain214@gmail.com</p>
-                            </div>
-                            <div className="font-semibold text-[0.9375rem] "><h1> <span className="badge bg-warning text-white">Renew</span></h1></div>
-                          </div>
-                        </li>
-                        <li>
-                          <div className="flex items-top flex-wrap">
-                            <div className="me-2">
-                              <span
-                                className="inline-flex items-center justify-center !w-[1.75rem] !h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full text-primary bg-primary/10 font-semibold">
-                                KA
-                              </span>
-                            </div>
-                            <div className="flex-grow">
-                              <p className="font-semibold mb-[1.4px]  text-[0.813rem]">Kiara Advain</p>
-                              <p className="text-[#8c9097] dark:text-white/50 text-[0.75rem]">kiaraadvain214@gmail.com</p>
-                              <p className="text-[#8c9097] dark:text-white/50 text-[0.75rem]">kiaraadvain214@gmail.com</p>
-                            </div>
-                            <div className="font-semibold text-[0.9375rem] ">   <h1> <span className="badge bg-danger text-white">Expired</span></h1></div>
-                          </div>
-                        </li> */}
                       </ul>
                     </div>
                   </div>
@@ -1051,7 +838,6 @@ const Page = () => {
                   <div className='box'>
                     <div className='box-header flex justify-between'>
                       <div className='box-title'>Products</div>
-                      {/* <div className='hs-dropdown ti-dropdown'> */}
                       <div className='grid border-b border-dashed'>
                         <button
                           onClick={() => {
@@ -1062,105 +848,6 @@ const Page = () => {
                           <i className='ri-add-circle-line !text-[1rem]'></i>Add
                           Product
                         </button>
-                        {/* <div
-                          id='todo-compose'
-                          className='hs-overlay hidden ti-modal'
-                        >
-                          <div className='hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out'>
-                            <div className='ti-modal-content'>
-                              <div className='ti-modal-header'>
-                                <h6
-                                  className='modal-title text-[1rem] font-semibold'
-                                  id='mail-ComposeLabel'
-                                >
-                                  Add User
-                                </h6>
-                                <button
-                                  type='button'
-                                  className='hs-dropdown-toggle !text-[1rem] !font-semibold !text-defaulttextcolor'
-                                  data-hs-overlay='#todo-compose'
-                                >
-                                  <span className='sr-only'>Close</span>
-                                  <i className='ri-close-line'></i>
-                                </button>
-                              </div>
-                              <div className='ti-modal-body !overflow-visible px-4'>
-                                <div className='grid grid-cols-12 gap-2'>
-                                  <div className='xl:col-span-12 col-span-12'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      Email
-                                    </label>
-                                    <input
-                                      type='text'
-                                      className='form-control w-full'
-                                      id='task-name'
-                                      placeholder='Task Name'
-                                    />
-                                  </div>
-
-                                  <div className='xl:col-span-12 col-span-12'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      First Name
-                                    </label>
-                                    <input
-                                      type='text'
-                                      className='form-control w-full'
-                                      id='task-name'
-                                      placeholder='Task Name'
-                                    />
-                                  </div>
-                                  <div className='xl:col-span-12 col-span-12'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      Last Name
-                                    </label>
-                                    <input
-                                      type='text'
-                                      className='form-control w-full'
-                                      id='task-name'
-                                      placeholder='Task Name'
-                                    />
-                                  </div>
-
-                                  <div className='xl:col-span-12 col-span-12'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      Role
-                                    </label>
-                                    <select className='form-select'>
-                                      <option>No options</option>
-                                    </select>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className='ti-modal-footer'>
-                                <button
-                                  type='button'
-                                  className='hs-dropdown-toggle ti-btn  ti-btn-light align-middle'
-                                  data-hs-overlay='#todo-compose'
-                                >
-                                  Cancel
-                                </button>
-                                <button
-                                  type='button'
-                                  className='ti-btn bg-primary text-white !font-medium'
-                                >
-                                  Add User
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div> */}
                       </div>
                     </div>
                     <div className='box-body'>
@@ -1213,47 +900,10 @@ const Page = () => {
                     </div>
                   </div>
                 </div>
-
                 <div className='xxl:col-span-6 xl:col-span-6 col-span-6'>
                   <div className='box'>
                     <div className='box-header flex justify-between'>
                       <div className='box-title'>List Of Entitlement</div>
-                      {/* <div className='hs-dropdown ti-dropdown'>
-                        <Link
-                          aria-label='anchor'
-                          href=''
-                          className='flex items-center justify-center w-[1.75rem] h-[1.75rem]  !text-[0.8rem] !py-1 !px-2 rounded-sm bg-light border-light shadow-none !font-medium'
-                          aria-expanded='false'
-                        >
-                          <i className='fe fe-more-vertical text-[0.8rem]'></i>
-                        </Link>
-                        <ul className='hs-dropdown-menu ti-dropdown-menu hidden'>
-                          <li>
-                            <Link
-                              className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
-                              href=''
-                            >
-                              Week
-                            </Link>
-                          </li>
-                          <li>
-                            <Link
-                              className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
-                              href=''
-                            >
-                              Month
-                            </Link>
-                          </li>
-                          <li>
-                            <Link
-                              className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
-                              href=''
-                            >
-                              Year
-                            </Link>
-                          </li>
-                        </ul>
-                      </div> */}
                     </div>
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>
@@ -1306,43 +956,6 @@ const Page = () => {
                     </div>
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>
-                        {/* {solutions && solutions.length > 0
-                          ? solutions.map((solution, index) => (
-                              <li className='mb-[0.9rem]' key={index}>
-                                  <div className='flex items-start flex-wrap'>
-                                  <div className='me-2 ic-product'>
-                                    <span className=' inline-flex items-center justify-center'>
-                                      <i className='ri-file-text-line'></i>
-                                    </span>
-                                  </div>
-                                  <div className='flex-grow ic-product-p'>
-                                    <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                      {solution.folder}
-                                    </p>
-                                    <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                      {solution.data.FileName}
-                                    </p>
-                                  </div>
-                                  <div className='font-semibold text-[0.9375rem] '>
-                                    <button
-                                      type='button'
-                                      className='ti-btn ti-btn-primary-full label-ti-btn'
-                                      style={{ cursor: 'pointer' }}
-                                    >
-                                      <i className='ri-download-line label-ti-btn-icon  me-2'></i>
-                                      <a
-                                        href={solution.data.downloadLink}
-                                        target='_blank'
-                                        rel='noopener noreferrer'
-                                      >
-                                        Download
-                                      </a>
-                                    </button>
-                                  </div>
-                                </div>
-                              </li>
-                            ))
-                          : null} */}
                         {solutions && solutions.length > 0
                           ? solutions.map((solution, index) => (
                               <li className='mb-[0.9rem]' key={index}>
@@ -1354,11 +967,7 @@ const Page = () => {
                                     <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
                                       <i className='ri-folder-line text-[1rem]  text-white'></i>
                                     </span>
-                                    {/* <span className='text-[1rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
-                                    <i className='ri-folder-line text-[1rem]  text-white'></i>
-                                  </span> */}
                                   </div>
-
                                   <div className='flex-grow ic-product-p'>
                                     <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
                                       {solution.data.FileName}
@@ -1388,7 +997,6 @@ const Page = () => {
                     </div>
                   </div>
                 </div>
-
                 <div className='xxl:col-span-12 xl:col-span-12 col-span-12'>
                   <div className='box custom-card'>
                     <div className='box-header justify-between'>
@@ -1405,8 +1013,6 @@ const Page = () => {
                             }}
                           />
                         </div>
-                        {/* <div className='hs-dropdown ti-dropdown'> */}
-
                         <div className='grid border-b border-dashed dark:border-defaultborder/10'>
                           {' '}
                           {userrole3 === 1 || userrole3 === 2 ? (
@@ -1425,7 +1031,6 @@ const Page = () => {
                           )}
                           <div
                             id='todo-compose-user'
-                            // className='hs-overlay hidden ti-modal'
                             className='hs-overlay hidden ti-modal  [--overlay-backdrop:static]'
                           >
                             <div className='hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out'>
@@ -1525,7 +1130,6 @@ const Page = () => {
                                         </div>
                                       )}
                                     </div>
-
                                     <div className='xl:col-span-12 col-span-12'>
                                       <label
                                         htmlFor='task-name'
@@ -1596,7 +1200,6 @@ const Page = () => {
                               >
                                 Name
                               </th>
-
                               <th
                                 scope='col'
                                 className='!text-start !text-[0.85rem]'
@@ -1660,14 +1263,6 @@ const Page = () => {
                                           >
                                             <i className='ri-edit-line'></i>
                                           </Link>
-                                          {/* <Link
-                                        aria-label='anchor'
-                                        href=''
-                                        
-                                        className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-primary/10 text-primary hover:bg-primary hover:text-white hover:border-primary'
-                                      >
-                                        <i className='ri-user-unfollow-line'></i>
-                                      </Link> */}
                                           <div
                                             style={{ cursor: 'pointer' }}
                                             aria-label='anchor'
@@ -1714,46 +1309,6 @@ const Page = () => {
                         </table>
                       </div>
                     </div>
-                    {/* <div className='box-footer'>
-                      <div className='sm:flex items-center'>
-                        <div className='text-defaulttextcolor dark:text-defaulttextcolor/70'>
-                          Showing 5 Entries{' '}
-                          <i className='bi bi-arrow-right ms-2 font-semibold'></i>
-                        </div>
-                        <div className='ms-auto'>
-                          <nav
-                            aria-label='Page navigation'
-                            className='pagination-style-4'
-                          >
-                            <ul className='ti-pagination mb-0'>
-                              <li className='page-item disabled'>
-                                <Link className='page-link' href=''>
-                                  Prev
-                                </Link>
-                              </li>
-                              <li className='page-item'>
-                                <Link className='page-link active' href=''>
-                                  1
-                                </Link>
-                              </li>
-                              <li className='page-item'>
-                                <Link className='page-link' href=''>
-                                  2
-                                </Link>
-                              </li>
-                              <li className='page-item'>
-                                <Link
-                                  className='page-link !text-primary'
-                                  href=''
-                                >
-                                  next
-                                </Link>
-                              </li>
-                            </ul>
-                          </nav>
-                        </div>
-                      </div>
-                    </div> */}
                   </div>
                 </div>
                 {activity_log && activity_log.length > 0 && (
@@ -1761,45 +1316,6 @@ const Page = () => {
                     <div className='box overflow-hidden'>
                       <div className='box-header justify-between'>
                         <div className='box-title'>Activity Logs</div>
-                        {/* <div className='hs-dropdown ti-dropdown'>
-                        <Link
-                          href=''
-                          className='text-[0.75rem] px-2 font-normal text-[#8c9097] dark:text-white/50'
-                          aria-expanded='false'
-                        >
-                          View All
-                          <i className='ri-arrow-down-s-line align-middle ms-1 inline-block'></i>
-                        </Link>
-                        <ul
-                          className='hs-dropdown-menu ti-dropdown-menu hidden'
-                          role='menu'
-                        >
-                          <li>
-                            <Link
-                              className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
-                              href=''
-                            >
-                              Today
-                            </Link>
-                          </li>
-                          <li>
-                            <Link
-                              className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
-                              href=''
-                            >
-                              This Week
-                            </Link>
-                          </li>
-                          <li>
-                            <Link
-                              className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
-                              href=''
-                            >
-                              Last Week
-                            </Link>
-                          </li>
-                        </ul>
-                      </div> */}
                         <div>
                           {activity_log.length >= 10 ? (
                             <button

@@ -184,12 +184,11 @@ const OrgDashboard = () => {
         if (data) {
           setActivity_log(data.activities);
         } else {
-          // setLoading(false);
-          // console.log("No organization details found.");
+          //
         }
       }
     } catch (error: any) {
-      // console.error("Error fetching organization details:", error.message);
+      //
     }
   };
   useEffect(() => {
@@ -210,13 +209,11 @@ const OrgDashboard = () => {
           setTotalItemsCount(data.data?.totalCount); // Set total items count for pagination
           // setLoading(false);
         } else {
-          // setLoading(false);
-          // console.log("No organization details found.");
+          //
         }
       }
     } catch (error: any) {
-      // setLoading(false);
-      // console.error("Error fetching organization details:", error.message);
+      //
     }
   };
   useEffect(() => {
@@ -237,12 +234,10 @@ const OrgDashboard = () => {
             setLoading(false);
           } else {
             setLoading(false);
-            // console.log("No organization details found.");
           }
         }
       } catch (error: any) {
         setLoading(false);
-        // console.error("Error fetching organization details:", error.message);
       }
     };
 
@@ -261,13 +256,11 @@ const OrgDashboard = () => {
             setLocationOfSites(data.data);
             // setLoading(false);
           } else {
-            // setLoading(false);
-            // console.log("No organization details found.");
+            //
           }
         }
       } catch (error: any) {
-        // setLoading(false);
-        // console.error("Error fetching organization details:", error.message);
+        //
       }
     };
 
@@ -299,8 +292,7 @@ const OrgDashboard = () => {
           // setLoading(false);
         }
       } catch (error: any) {
-        // setLoading(false);
-        // console.error("Error fetching roles:", error.message);
+        //
       }
     };
 
@@ -497,12 +489,11 @@ const OrgDashboard = () => {
         setLoading(false);
       } catch (error) {
         setLoading(false);
-        // console.error("API call failed:", error);
-        // setLoading(false);
+        //
       }
     } else {
       setLoading(false);
-      // console.log('isValid', isValid);
+      //
     }
   };
 
@@ -520,10 +511,10 @@ const OrgDashboard = () => {
         if (data) {
           setuserrole2(data.data.id);
         } else {
-          // console.log("No Role Found.");
+          //
         }
       } catch (error: any) {
-        // console.error("Error fetching organization details:", error.message);
+        //
       }
     };
 

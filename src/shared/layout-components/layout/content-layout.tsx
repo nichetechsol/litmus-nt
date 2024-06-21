@@ -31,7 +31,7 @@ const ContentLayout = ({ children }: any) => {
       try {
         await refreshToken();
       } catch (error: any) {
-        // console.error("Error fetching organization details:", error.message);
+        //
       }
     };
     fetchData();
