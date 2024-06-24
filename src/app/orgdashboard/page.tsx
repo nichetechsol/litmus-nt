@@ -434,7 +434,7 @@ const OrgDashboard = () => {
         let result;
         if (changeFlage) {
           const userData = {
-            email: email,
+            email: email.toLowerCase(),
             firstname: firstName,
             lastname: lastName,
             role_id: role,

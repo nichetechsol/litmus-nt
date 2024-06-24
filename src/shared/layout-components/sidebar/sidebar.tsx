@@ -716,7 +716,11 @@ const Sidebar = ({ local_varaiable, ThemeChanger }: any) => {
         onMouseLeave={() => Outhover()}
       >
         <div className='main-sidebar-header'>
-          <Link href='/organization' className='header-logo'>
+          <Link
+            href='/organization'
+            onClick={() => window.location.reload()}
+            className='header-logo'
+          >
             <img
               src={`${
                 process.env.NODE_ENV === 'production' ? '' : ''

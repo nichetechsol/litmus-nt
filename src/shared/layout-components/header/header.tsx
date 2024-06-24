@@ -579,7 +579,6 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                       {user_fname} {user_lname}
                     </p>
                     <span className='opacity-[0.7] font-normal text-[#536485] block text-[0.6875rem] '>
-                      {/* {userRoleName} */}
                       {roleToDisplay ? roleToDisplay : ''}
                     </span>
                   </div>
