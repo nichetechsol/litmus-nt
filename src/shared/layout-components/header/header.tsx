@@ -438,8 +438,8 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
 
   useEffect(() => {
     if (pathname == '/organization') {
-      setRoleToDisplay(userRoleName);
-      // setRoleToDisplay('');
+      // setRoleToDisplay(userRoleName);
+      setRoleToDisplay('');
     } else if (pathname === '/orgdashboard' || pathname === '/sites') {
       setRoleToDisplay(userrole2);
     } else if (

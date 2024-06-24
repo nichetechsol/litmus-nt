@@ -149,13 +149,7 @@ const Page = () => {
           <div className='my-5'>
             <div className='grid grid-cols-12 gap-6'>
               <div className='xl:col-span-12 col-span-12'>
-                {/* <div className='box'> */}
-                {/* <div className='md:flex px-4 py-6 items-center justify-between'> */}
-                {/* <div> */}
                 <h6 className='font-semibold mb-0 text-[1rem]'>Products</h6>
-                {/* </div> */}
-                {/* </div> */}
-                {/* </div> */}
               </div>
               <div className='xl:col-span-3 col-span-12'>
                 <div className='box custom-box overflow-hidden'>

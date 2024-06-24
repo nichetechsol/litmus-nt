@@ -1089,7 +1089,7 @@ const Page: React.FC = () => {
                                           <i className='bx bx-briefcase align-middle me-2 text-muted'></i>
                                           <b>Owner</b>
                                           <span className='ms-1 text-muted fw-normal d-inline-block'>
-                                            {SingleSite?.ownerNames}
+                                            {SingleSite?.ownerNames?.join(', ')}
                                           </span>
                                         </li>
                                         <li className='list-group-item fw-semibold'>

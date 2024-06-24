@@ -186,6 +186,7 @@ const Page = () => {
     errorCode: number;
     message: string;
   } | null>(null);
+  const [productSiteCount, setProductSiteCount] = useState<number | null>(null);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -309,7 +310,7 @@ const Page = () => {
     const fetchData = async () => {
       try {
         await refreshToken();
-        setLoading(true);
+
         if (site_id) {
           const result1: any = await listLitmusProducts(
             site_id,
@@ -318,11 +319,12 @@ const Page = () => {
           );
           if (result1) {
             setProducts(result1.data);
-            setLoading(false);
+            setProductSiteCount(result1.data.length);
+            // setLoading(false);
           }
         }
       } catch (error: any) {
-        setLoading(false);
+        // setLoading(false);
         //
       }
     };
@@ -635,9 +637,10 @@ const Page = () => {
                                     Number of Products
                                   </p>
                                   <h4 className='font-semibold text-[1.5rem] !mb-2 '>
-                                    {siteCountData
+                                    {/* {siteCountData
                                       ? siteCountData.data.productCount
-                                      : 0}
+                                      : 0} */}
+                                    {productSiteCount ? productSiteCount : 0}
                                   </h4>
                                 </div>
                               </div>
@@ -891,11 +894,12 @@ const Page = () => {
                               </li>
                             ))
                           : null}
-                        {products && products.length === 0 && (
-                          <div className='col-md-12 w-100 mt-4'>
-                            <p className='text-center'>No Product Found</p>{' '}
-                          </div>
-                        )}
+                        {(products && products.length === 0) ||
+                          (products === null && (
+                            <div className='col-md-12 w-100 mt-4'>
+                              <p className='text-center'>No Product Found</p>{' '}
+                            </div>
+                          ))}
                       </ul>
                     </div>
                   </div>

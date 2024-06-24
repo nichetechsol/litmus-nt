@@ -191,6 +191,7 @@ const LoginForm = () => {
         const user_role: any = result.user[0]?.user_role;
         const user_firstname: any = result.user[0]?.firstname;
         const user_lastname: any = result.user[0]?.lastname;
+        const add_orgUser: any = result.add_orgUser;
 
         const encryptedUserId = encryptData(user_id);
         const encryptedUserRole = encryptData(user_role);
@@ -200,6 +201,7 @@ const LoginForm = () => {
         const encryptedUserLastName = encryptData(
           user_lastname ? user_lastname : '',
         );
+        const encryptedAddOrgUser = encryptData(add_orgUser ? add_orgUser : '');
 
         if (encryptedUserId) {
           localStorage.setItem('user_id', encryptedUserId);
@@ -213,7 +215,9 @@ const LoginForm = () => {
         if (encryptedUserLastName) {
           localStorage.setItem('user_lname', encryptedUserLastName);
         }
-
+        if (encryptedAddOrgUser) {
+          localStorage.setItem('add_orgUser', encryptedAddOrgUser);
+        }
         navigate.push('/organization');
         setLoading(false);
       } else {
@@ -274,7 +278,7 @@ const LoginForm = () => {
                   <div className='xxl:col-span-4 xl:col-span-4 lg:col-span-4 md:col-span-3 sm:col-span-2'></div>
                   <div className='xxl:col-span-4 xl:col-span-4 lg:col-span-4 md:col-span-6 sm:col-span-8 col-span-12'>
                     <div className='my-[2.5rem] flex justify-center'>
-                      <Link href='/'>
+                      <Link href='/' onClick={() => window.location.reload()}>
                         <img
                           src={`${
                             process.env.NODE_ENV === 'production'

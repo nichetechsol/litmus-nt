@@ -63,16 +63,16 @@ const emailSchema = Yup.string()
   );
 
 const nameSchema = Yup.string()
-  .required('Please enter First name.')
+  .required('Please enter first name.')
   .min(2, 'Name must be at least two characters long.')
   .max(255, 'Name must be at most 255 characters long.')
-  .matches(/^[a-zA-Z]+$/, 'Please enter a valid First name.');
+  .matches(/^[a-zA-Z]+$/, 'Please enter a valid first name.');
 
 const nameSchema2 = Yup.string()
-  .required('Please enter Last Name.')
+  .required('Please enter last name.')
   .min(2, 'Name must be at least two characters long.')
   .max(255, 'Name must be at most 255 characters long.')
-  .matches(/^[a-zA-Z]+$/, 'Please enter a valid Last name.');
+  .matches(/^[a-zA-Z]+$/, 'Please enter a valid last name.');
 
 const roleSchema = Yup.string().required(
   'Please select a role from the dropdown menu.',
