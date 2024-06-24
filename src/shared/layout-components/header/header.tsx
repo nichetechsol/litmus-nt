@@ -359,20 +359,7 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
   //   setUserrole(userrole);
   //   setOrg_id(orgid);
   // }, [pathname]);
-  useEffect(() => {
-    const decryptedUserId = decryptData(localStorage.getItem('user_id'));
-    const decryptedUserFname = decryptData(localStorage.getItem('user_fname'));
-    const decryptedUserLname = decryptData(localStorage.getItem('user_lname'));
-    const decryptedUserRole = decryptData(localStorage.getItem('user_role'));
-    const decryptedOrgId = decryptData(localStorage.getItem('org_id'));
-    const decryptedsiteId = decryptData(localStorage.getItem('site_id'));
-    setuser_id(decryptedUserId);
-    setUser_fname(decryptedUserFname);
-    setUserlname(decryptedUserLname);
-    setUserrole(decryptedUserRole);
-    setOrg_id(decryptedOrgId);
-    setSite_id(decryptedsiteId);
-  }, [pathname]);
+
   const [userRoleName, setUserRoleName] = useState('');
   useEffect(() => {
     const fetchData2 = async () => {
@@ -415,7 +402,7 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
     };
 
     fetchData2();
-  }, [user_id, org_id, pathname]);
+  }, [user_id, org_id, pathname, userrole2]);
   const [userrole3, setuserrole3] = useState('');
   useEffect(() => {
     const fetchData2 = async () => {
@@ -442,7 +429,8 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
       setRoleToDisplay('');
     } else if (pathname === '/orgdashboard' || pathname === '/sites') {
       setRoleToDisplay(userrole2);
-    } else if (
+    }
+    if (
       pathname === '/sitedashboard' ||
       pathname === '/license' ||
       pathname === '/products' ||
@@ -451,6 +439,21 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
       setRoleToDisplay(userrole3);
     }
   }, [userRoleName, org_id, userrole2, site_id, userrole3, pathname]);
+  useEffect(() => {
+    const decryptedUserId = decryptData(localStorage.getItem('user_id'));
+    const decryptedUserFname = decryptData(localStorage.getItem('user_fname'));
+    const decryptedUserLname = decryptData(localStorage.getItem('user_lname'));
+    const decryptedUserRole = decryptData(localStorage.getItem('user_role'));
+    const decryptedOrgId = decryptData(localStorage.getItem('org_id'));
+    const decryptedsiteId = decryptData(localStorage.getItem('site_id'));
+    setuser_id(decryptedUserId);
+    setUser_fname(decryptedUserFname);
+    setUserlname(decryptedUserLname);
+    setUserrole(decryptedUserRole);
+    setOrg_id(decryptedOrgId);
+    setSite_id(decryptedsiteId);
+  }, [pathname, userRoleName, userrole3, userrole2]);
+
   const [loading, setLoading] = useState<boolean>(false);
   return (
     <>

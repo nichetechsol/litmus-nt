@@ -44,7 +44,8 @@ export default function Activitylogs() {
   const [Siteactivity_log, setSiteActivity_log] = useState<
     activitylogs[] | null
   >(null);
-  // const [totalCount, setTotalCount] = useState(0);
+
+  const [totalCount, setTotalCount] = useState(0);
 
   const [org_id, setorg_id] = useState<any>('');
   const [Site_id, setSite_id] = useState<any>('');
@@ -92,15 +93,15 @@ export default function Activitylogs() {
           limit: 20,
         });
       }
-
       setLoading(false);
+
       if (sitedata) {
         setSiteActivity_log((prevLogs) => [
           ...(prevLogs || []),
           ...sitedata.activities,
         ]);
 
-        // setTotalCount(sitedata.total_count); // Update total count from API response
+        setTotalCount(sitedata.total_count); // Update total count from API response
         setStart(start + 20); // Update start offset for next batch
         if (start + 20 >= data.total_count) {
           setHasMore(false); // No more data to load
@@ -112,7 +113,7 @@ export default function Activitylogs() {
           ...(prevLogs || []),
           ...data.activities,
         ]);
-        // setTotalCount(data.total_count); // Update total count from API response
+        setTotalCount(data.total_count); // Update total count from API response
         setStart(start + 20); // Update start offset for next batch
         if (start + 20 >= data.total_count) {
           setHasMore(false); // No more data to load
@@ -148,14 +149,19 @@ export default function Activitylogs() {
         document.documentElement;
 
       if (scrollTop + clientHeight >= scrollHeight && hasMore) {
-        activitylogs();
+        if (activity_log && activity_log.length < totalCount) {
+          activitylogs();
+        }
+        if (Siteactivity_log && Siteactivity_log.length < totalCount) {
+          activitylogs();
+        }
       }
     };
 
     window.addEventListener('scroll', handleScroll);
 
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [hasMore, CamePage]); // Add `CamePage` to dependencies if needed
+  }, [Siteactivity_log, hasMore, CamePage, activity_log]); // Add `CamePage` to dependencies if needed
 
   const orgActivitylog = () => {
     return (

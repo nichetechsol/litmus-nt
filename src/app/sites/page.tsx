@@ -154,10 +154,16 @@ const Page: React.FC = () => {
     null,
   );
   const [CountryListError, setCountryListError] = useState<string>('');
-  const [SelectedValueCounrty, SetSelectedValueCounrty] = useState<number>();
+  const [SelectedValueCounrty, SetSelectedValueCounrty] = useState<
+    number | string
+  >(''); // Default to 0 or any other valid number
+
   const [FetchdropDState, setFetchdropDState] = useState<State[] | null>(null);
   const [stateListError, setstateListError] = useState<string>('');
-  const [SelectedValueState, setSelectedValueState] = useState<number>();
+  const [SelectedValueState, setSelectedValueState] = useState<number | string>(
+    '',
+  );
+
   const [City, setCity] = useState<string>('');
   const [CityError, setCityError] = useState<string>('');
   const [Pincode, setPincode] = useState<string>('');
@@ -235,6 +241,35 @@ const Page: React.FC = () => {
       }
     }
   };
+  /// for submit
+  const handelclosemodel = () => {
+    setAddSiteName('');
+    setSelectedValueDropdown(undefined);
+    setAddress1('');
+    setAddress2('');
+    SetSelectedValueCounrty('');
+
+    setCountryListError('');
+    setstateListError('');
+    setCityError('');
+    setMessageError('');
+
+    setAddSiteNameError('');
+    setTypeDropdownError('');
+    setAddress1Error('');
+    setAddress2Error('');
+
+    setPincode('');
+
+    setMessage('');
+    settypeDropdown(null);
+    setFetchdropDCounrty(null);
+    setSelectedValueState('');
+    setCity('');
+    setPincodeError('');
+    setMessageError('');
+  };
+
   ///////////////////for crud validations/////
   const validationSchema = Yup.object().shape({
     AddSiteName: SiteNameSchema,
@@ -247,6 +282,7 @@ const Page: React.FC = () => {
     Pincode: PincodeSchema,
     message: MessageSchema,
   });
+  /////
   const handelAddSiteName = (e: React.ChangeEvent<HTMLInputElement>) => {
     const NewSiteName = e.target.value.trimStart();
     setAddSiteName(NewSiteName);
@@ -286,7 +322,7 @@ const Page: React.FC = () => {
     };
 
     SiteTypesFetch();
-  }, []);
+  }, [handelclosemodel]);
   // for dropdown change
   const handelchangeTypeDropDown = (
     e: React.ChangeEvent<HTMLSelectElement>,
@@ -369,7 +405,7 @@ const Page: React.FC = () => {
       }
     };
     AddSiteCounrtyDropDown();
-  }, []);
+  }, [handelclosemodel]);
 
   const handelchangeCountry = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const Newcountryselected = parseInt(e.target.value);
@@ -408,29 +444,6 @@ const Page: React.FC = () => {
       });
   };
 
-  /// for submit
-  const handelclosemodel = () => {
-    setAddSiteName('');
-    setSelectedValueDropdown(undefined);
-    setAddress1('');
-    setAddress2('');
-    setCountryListError('');
-    setstateListError('');
-    setCityError('');
-    setMessageError('');
-    setAddSiteNameError('');
-    setTypeDropdownError('');
-    setAddress1Error('');
-    setAddress2Error('');
-    setPincode('');
-    setMessage('');
-    settypeDropdown(null);
-    setFetchdropDCounrty(null);
-    setSelectedValueState(undefined);
-    setCity('');
-    setPincodeError('');
-    setMessageError('');
-  };
   const validateForm = async () => {
     try {
       await validationSchema.validate(
