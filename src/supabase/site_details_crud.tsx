@@ -100,7 +100,7 @@ interface Result<T> {
 
 //       return {
 //         errorCode: 0,
-//         message: 'Site details inserted successfully',
+//         message: 'Site added successfully',
 //         data: siteDetails,
 //       };
 //     }
@@ -125,7 +125,7 @@ async function addSites(data: SiteData): Promise<Result<any>> {
     if (existingSite && existingSite.length > 0) {
       return {
         errorCode: 1,
-        message: 'Duplicate site name',
+        message: 'Site name already exists',
         data: null,
       };
     }
@@ -269,7 +269,7 @@ async function addSites(data: SiteData): Promise<Result<any>> {
       await sendEmailFunction(to, subject, heading, contentData, data.token);
       return {
         errorCode: 0,
-        message: 'Site details inserted successfully',
+        message: 'Site added successfully',
         data: siteDetails,
       };
     }
@@ -355,7 +355,7 @@ async function addSitesConfirm(data: any) {
     await sendEmailFunction(to, subject, heading, contentData, data.token);
     return {
       errorCode: 0,
-      message: 'Site details inserted successfully',
+      message: 'Site added successfully',
       data: siteDetails,
     };
   } catch (error) {
@@ -470,7 +470,7 @@ async function addSitesConfirm(data: any) {
 
 //     return {
 //       errorCode: 0,
-//       message: 'Site details inserted successfully',
+//       message: 'Site added successfully',
 //       data: insertedSite,
 //     };
 //   } catch (error) {

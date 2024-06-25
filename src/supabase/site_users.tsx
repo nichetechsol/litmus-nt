@@ -335,7 +335,7 @@ async function removeUserFromSites(
         activity_type: 'remove_user',
       });
 
-      return { errorCode: 0, data: 'User sites removed successfully' };
+      return { errorCode: 0, data: 'Site user deleted successfully' };
     }
   } catch (error) {
     return { errorCode: -1, data: null };
