@@ -95,6 +95,21 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
       if (selectError) {
         return { errorCode: 1, data: 'User is not in Central V2' };
       }
+      if (users?.length === 0) {
+        if (UserData.firstname && UserData.lastname) {
+          // Select the user from the 'users' table using the firstname and lastname
+          ({ data: users, error: selectError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('firstname', UserData.firstname)
+            .eq('lastname', UserData.lastname));
+
+          // Check for errors during the select operation
+          if (selectError) {
+            return { errorCode: 1, data: 'User is not in Central V2' };
+          }
+        }
+      }
     } else if (UserData.firstname && UserData.lastname) {
       ({ data: users, error: selectError } = await supabase
         .from('users')
