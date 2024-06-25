@@ -129,7 +129,7 @@ const OrgDashboard = () => {
   const [activePage, setActivePage] = useState(1);
   const [search, setsearch] = useState('');
   const [perPage] = useState(10); // Number of items per page
-  const [totalItemsCount, setTotalItemsCount] = useState(0);
+  const [totalItemsCount, setTotalItemsCount] = useState<number>(0);
 
   const closeModalButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -141,6 +141,7 @@ const OrgDashboard = () => {
     entitlementExceed: string;
   } | null>(null);
   const [orgUserData, setOrgUserData] = useState<OrgUser[] | null>(null);
+
   const [entitlementListData, setEntitlementListData] = useState<
     Entitlement[] | null
   >(null);
@@ -152,23 +153,22 @@ const OrgDashboard = () => {
     null,
   );
   const [activity_log, setActivity_log] = useState<activitylogs[] | null>(null);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // setLoading(true);
-        if (org_id) {
-          const data: any = await orgDashboardCounts(org_id);
-          // setLoading(false);
-          if (data) {
-            setOrgData(data.data);
-          }
+  const CountData = async () => {
+    try {
+      // setLoading(true);
+      if (org_id) {
+        const data: any = await orgDashboardCounts(org_id);
+        // setLoading(false);
+        if (data) {
+          setOrgData(data.data);
         }
-      } catch (error: any) {
-        toast.error(error.message, { autoClose: 3000 });
       }
-    };
-
-    fetchData();
+    } catch (error: any) {
+      toast.error(error.message, { autoClose: 3000 });
+    }
+  };
+  useEffect(() => {
+    CountData();
   }, [org_id]);
   const fetchData7 = async () => {
     try {
@@ -339,9 +339,9 @@ const OrgDashboard = () => {
   const handleEdit = (user: any) => {
     setChangeFlage(false);
     setUserNameId(user.id);
-    setEmail(user.email);
-    setFirstName(user.firstname);
-    setLastName(user.lastname);
+    setEmail(user.email ? user.email : '');
+    setFirstName(user.firstname ? user.firstname : '');
+    setLastName(user.lastname ? user.lastname : '');
     setRole(user.role_id);
   };
   const handleFiledClear = () => {
@@ -379,7 +379,7 @@ const OrgDashboard = () => {
             if (id === user_id) {
               navigate.push('/organization');
             } else {
-              swal('Record deleted!', { icon: 'success' });
+              swal('User deleted successfully!', { icon: 'success' });
               fetchData2();
             }
             setLoading(false);
@@ -448,6 +448,8 @@ const OrgDashboard = () => {
           result = await addUserToOrganization(userData);
           if (result.errorCode == 0) {
             toast.success(result.data, { autoClose: 3000 });
+            fetchData2();
+            CountData();
             const button = document.getElementById('close-modal-btn');
             if (button) {
               button.click();
@@ -468,6 +470,7 @@ const OrgDashboard = () => {
           result = await modifyUserOfOrganization(userData);
           if (result.errorCode == 0) {
             toast.success('Updated Successfully', { autoClose: 3000 });
+
             const button = document.getElementById('close-modal-btn');
             if (button) {
               button.click(); // Directly trigger click event on button
@@ -485,7 +488,7 @@ const OrgDashboard = () => {
           closeModalButtonRef.current.click();
         }
         fetchData2();
-
+        CountData();
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -661,7 +664,11 @@ const OrgDashboard = () => {
                                 setActivePage2(page)
                               }
                               itemClass='page-item pagination-custom'
-                              linkClass='page-link'
+                              linkClass={` ${
+                                totalItemsCount2 && totalItemsCount2 > 10
+                                  ? 'page-link'
+                                  : 'page-link chnage'
+                              }`}
                             />
                           )}
                         {entitlementListData &&
@@ -1028,7 +1035,11 @@ const OrgDashboard = () => {
                                       page: React.SetStateAction<number>,
                                     ) => setActivePage(page)}
                                     itemClass='page-item'
-                                    linkClass='page-link'
+                                    linkClass={` ${
+                                      totalItemsCount && totalItemsCount > 10
+                                        ? 'page-link'
+                                        : 'page-link chnage'
+                                    }`}
                                   />
                                 </td>
                               </tr>

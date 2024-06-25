@@ -13,6 +13,12 @@ import { allCurrentfiles } from '@/supabase/products';
 import { refreshToken } from '@/supabase/session';
 import Loader from '@/utils/Loader/Loader';
 
+interface folder {
+  data: object;
+  errorCode: number;
+  folder: string;
+  message: string;
+}
 const Page = () => {
   const navigate = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
@@ -21,7 +27,8 @@ const Page = () => {
   const [org_id, setorg_id] = useState<any>('');
   const [site_id, setsite_id] = useState<any>('');
   const [org_type_id, setOrg_type_id] = useState<any>('');
-  const [folder, setFolder] = useState<any>('');
+  const [folder, setFolder] = useState<folder[] | null>(null);
+  const [folderTrue, setFolderTrue] = useState(false);
   const [innerFolder, setInnerFolder] = useState<any>('');
   const [selectedFolder, setSelectedFolder] = useState(null);
   const [filteredFiles, setFilteredFiles] = useState<any>('');
@@ -78,19 +85,30 @@ const Page = () => {
     //   redirect('/organization');
     // }
   }, []);
-
+  useEffect(() => {
+    const refresh = async () => {
+      try {
+        await refreshToken();
+      } catch {
+        //
+      }
+    };
+    refresh();
+  }, []);
   // const [currentfiles, setCurrentfiles] = useState<any>('');
   const [currentTrue, setCurrentTrue] = useState(true);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await refreshToken();
         setLoading(true);
         if (site_id && org_id && org_type_id) {
           const data: any = await allCurrentfiles(site_id, org_id, org_type_id);
 
-          if (data.data.length >= 0) {
+          if (data.data) {
             setFolder(data.data);
+          } else {
+            setFolder(null);
+            setFolderTrue(true);
           }
           // if (data.data.length >= 0) {
           //   setCurrentfiles(data && data.data.filter((i: { folder: string; }) => i.folder == "Litmus_Edge"))
@@ -188,13 +206,10 @@ const Page = () => {
                             </>
                           ))
                         : null}
-                      {folder && folder.length === 0 && (
-                        <>
-                          <div className='col-md-12 w-100 mt-4'>
-                            <p className='text-center'>No Products Found</p>{' '}
-                          </div>
-                          <></>
-                        </>
+                      {folderTrue && folderTrue === true && (
+                        <div className='col-md-12 w-100 mt-4'>
+                          <p className='text-center'>No Folder Found</p>{' '}
+                        </div>
                       )}
                     </ul>
                   </div>
@@ -297,10 +312,11 @@ const Page = () => {
                             </>
                           ))
                         : null}
-                      {filteredFiles && filteredFiles.length == 0 && (
+
+                      {folderTrue && folderTrue === true && (
                         <>
                           <div className='col-md-12 w-100 mt-4'>
-                            <p className='text-center'>No Products Found</p>{' '}
+                            <p className='text-center'>No Files Found</p>{' '}
                           </div>
                           <></>
                         </>

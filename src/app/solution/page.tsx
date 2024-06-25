@@ -44,11 +44,19 @@ const Page = () => {
       }
     }
   }, []);
-
+  useEffect(() => {
+    const refresh = async () => {
+      try {
+        await refreshToken();
+      } catch {
+        //
+      }
+    };
+    refresh();
+  }, []);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await refreshToken();
         setLoading(true);
         const data: any = await listOfAllSolutions();
         if (data.data.length >= 0) {

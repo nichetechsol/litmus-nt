@@ -2821,6 +2821,9 @@ Background Image
 .page-item.active .page-link {
   @apply text-white bg-primary border-primary;
 }
+.chnage {
+  cursor: default;
+}
 
 .disabled > .page-link,
 .page-link.disabled {

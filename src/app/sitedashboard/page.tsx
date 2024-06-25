@@ -135,7 +135,16 @@ const Page = () => {
   const [solutions, setSolution] = useState<Products[] | null>(null);
   const [activity_log, setActivity_log] = useState<activitylogs[] | null>(null);
   const [onlyToken, setOnlyToken] = useState('');
-
+  useEffect(() => {
+    const refresh = async () => {
+      try {
+        await refreshToken();
+      } catch {
+        //
+      }
+    };
+    refresh();
+  }, []);
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
@@ -209,19 +218,18 @@ const Page = () => {
     };
     fetchData();
   }, [site_id, activePage2, perPage2]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (site_id && org_id) {
-          const data: any = await sitesCounts(site_id, org_id);
-          setSiteCountData(data);
-        }
-      } catch (error: any) {
-        //
+  const countData = async () => {
+    try {
+      if (site_id && org_id) {
+        const data: any = await sitesCounts(site_id, org_id);
+        setSiteCountData(data);
       }
-    };
-    fetchData();
+    } catch (error: any) {
+      //
+    }
+  };
+  useEffect(() => {
+    countData();
   }, [org_id, site_id]);
   useEffect(() => {
     const fetchData = async () => {
@@ -257,7 +265,6 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await refreshToken();
         setLoading(true);
         const data: any = await listSolutions();
         if (data) {
@@ -309,8 +316,6 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await refreshToken();
-
         if (site_id) {
           const result1: any = await listLitmusProducts(
             site_id,
@@ -421,7 +426,7 @@ const Page = () => {
         let result;
         if (changeFlage) {
           const userData: any = {
-            email: email,
+            email: email.toLowerCase(),
             firstname: firstName,
             lastname: lastName,
             role_id: role,
@@ -476,6 +481,7 @@ const Page = () => {
           closeModalButtonRef.current.click();
         }
         fetchUserData();
+        countData();
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -492,9 +498,9 @@ const Page = () => {
   const handleEdit = (user: any) => {
     setChangeFlage(false);
     setUserNameId(user.user_id);
-    setEmail(user.email);
-    setFirstName(user.firstname);
-    setLastName(user.lastname);
+    setEmail(user.email ? user.email : '');
+    setFirstName(user.firstname ? user.firstname : '');
+    setLastName(user.lastname ? user.lastname : '');
     setRole(user.role_id);
     setsite_id(user.site_id);
   };
@@ -938,7 +944,11 @@ const Page = () => {
                                 setActivePage2(page)
                               }
                               itemClass='page-item pagination-custom'
-                              linkClass='page-link'
+                              linkClass={` ${
+                                totalItemsCount2 && totalItemsCount2 > 10
+                                  ? 'page-link'
+                                  : 'page-link chnage'
+                              }`}
                             />
                           )}
                         {entitlementListData &&
@@ -1295,7 +1305,11 @@ const Page = () => {
                                       page: React.SetStateAction<number>,
                                     ) => setActivePage(page)}
                                     itemClass='page-item'
-                                    linkClass='page-link'
+                                    linkClass={` ${
+                                      totalItemsCount && totalItemsCount > 10
+                                        ? 'page-link'
+                                        : 'page-link chnage'
+                                    }`}
                                   />
                                 </td>
                               </tr>
