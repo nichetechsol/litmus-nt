@@ -76,6 +76,7 @@ const Page = () => {
   const [organizationNameError, setOrganizationNameError] = useState('');
   const [domains, setDomains] = useState<any[]>([]);
   const [domainInput, setDomainInput] = useState<string>('');
+
   const [domainError, setDomainError] = useState('');
   const [typeDropdown, setTypeDropdown] = useState<Typeor[] | null>(null);
   const [selectedType, setSelectedType] = useState<string>('');
@@ -90,11 +91,13 @@ const Page = () => {
   const [email, setEmail] = useState<any>('');
   const [add_orgUser, setadd_orgUser] = useState<any>('');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [searchTerm, setSearchTerm] = useState<any>('');
+  const [searchTerm, setSearchTerm] = useState<any>();
   const [orgsWithSites, setOrgsWithSites] = useState<
     OrganizationWithSiteCount[] | null
   >(null);
-  const [sidebarOrgs, setSidebarOrgs] = useState<SidebarOrgs>({ data: [] });
+  const [sidebarOrgs, setSidebarOrgs] = useState<SidebarOrgs | null>({
+    data: [],
+  });
 
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
@@ -196,13 +199,12 @@ const Page = () => {
 
   const fetchData1 = async () => {
     try {
-      // setLoading(true);
-
-      const result1: any = await organizationSidebarList(searchTerm, user_id);
+      const result1: any = await organizationSidebarList(
+        searchTerm ? searchTerm : null,
+        user_id,
+      );
 
       if (result1.errorCode === 0 && result1.data.length > 0) {
-        // setLoading(false);
-
         setSidebarOrgs({ data: result1.data });
       } else if (result1.errorCode === 1) {
         setSidebarOrgs({ data: [] });
@@ -226,11 +228,13 @@ const Page = () => {
         }
       }
     } catch (error: any) {
-      toast.error(error, { autoClose: 3000 });
+      //
     }
   };
   useEffect(() => {
-    fetchData1();
+    if (searchTerm || searchTerm == '') {
+      fetchData1();
+    }
   }, [searchTerm]);
 
   const handleorganizationNameChange = (
@@ -355,59 +359,66 @@ const Page = () => {
   };
 
   const handleSubmit = async () => {
-    const isValid = await validateForm();
+    if (domainInput) {
+      setDomainError('Please press Enter');
+    } else {
+      const isValid = await validateForm();
 
-    if (isValid) {
-      const selectedTypeId =
-        typeDropdown?.find((type) => type.name === selectedType)?.id ?? null;
+      if (isValid) {
+        const selectedTypeId =
+          typeDropdown?.find((type) => type.name === selectedType)?.id ?? null;
 
-      const data: any = {
-        user_id: user_id,
-        user_role: user_role,
-        name: organizationName,
-        description: message,
-        type_id: selectedTypeId,
-        status: 'Y',
-        domain: domains,
-        token: onlyToken,
-        userName: email,
-        type_name: selectedType,
-      };
-      try {
-        setLoading(true);
-        await refreshToken();
-        const result = await addOrganization(data);
+        const data: any = {
+          user_id: user_id,
+          user_role: user_role,
+          name: organizationName,
+          description: message,
+          type_id: selectedTypeId,
+          status: 'Y',
+          domain: domains,
+          token: onlyToken,
+          userName: email,
+          type_name: selectedType,
+        };
+        try {
+          setLoading(true);
+          await refreshToken();
+          const result = await addOrganization(data);
 
-        if (result.data != null && result.errorCode == 0) {
-          setLoading(false);
-          toast.success('Successfully Added organization', { autoClose: 3000 });
-        } else {
-          setLoading(false);
-          if (result.errorCode === 1) {
-            swal(result.data, { icon: 'error' });
+          if (result.data != null && result.errorCode == 0) {
+            setLoading(false);
+            toast.success('Successfully Added organization', {
+              autoClose: 3000,
+            });
+          } else {
+            setLoading(false);
+            if (result.errorCode === 1) {
+              swal(result.data, { icon: 'error' });
+            }
           }
-        }
-        if (closeModalButtonRef.current) {
-          closeModalButtonRef.current.click();
-        }
+          if (closeModalButtonRef.current) {
+            closeModalButtonRef.current.click();
+          }
 
-        setDomainInput('');
-        setOrganizationName('');
-        setSelectedType('');
-        // const defaultDomain = getDefaultDomainFromEmail();
-        // if (defaultDomain) {
-        //   setDomains([defaultDomain]);
-        // }
-        setMessage('');
-        setOrganizationNameError('');
-        setDomainError('');
-        setTypeDropdownError('');
-        setMessageError('');
-        fetchData();
-        fetchData1();
-      } catch (error) {
-        setLoading(false);
-        toast.error('Error Adding Organization', { autoClose: 3000 });
+          setDomainInput('');
+          setOrganizationName('');
+          setSelectedType('');
+          // const defaultDomain = getDefaultDomainFromEmail();
+          // if (defaultDomain) {
+          //   setDomains([defaultDomain]);
+          // }
+          setMessage('');
+          setOrganizationNameError('');
+          setDomainError('');
+          setTypeDropdownError('');
+          setMessageError('');
+          fetchData();
+          fetchData1();
+          setDomainError('');
+        } catch (error) {
+          setLoading(false);
+          toast.error('Error Adding Organization', { autoClose: 3000 });
+        }
       }
     }
   };
@@ -490,6 +501,7 @@ const Page = () => {
   useEffect(() => {
     /* */
   }, [domains]);
+
   return (
     <>
       {loading && <Loader />}
@@ -541,6 +553,7 @@ const Page = () => {
                                     // if (defaultDomain) {
                                     //   setDomains([defaultDomain]);
                                     // }
+                                    setDomains([]);
                                     setMessage('');
                                     setOrganizationNameError('');
                                     setDomainError('');
@@ -737,6 +750,7 @@ const Page = () => {
                                     // if (defaultDomain) {
                                     //   setDomains([defaultDomain]);
                                     // }
+                                    setDomains([]);
                                     setMessage('');
                                     setOrganizationNameError('');
                                     setDomainError('');
@@ -768,8 +782,8 @@ const Page = () => {
                     <div className='input-group' style={{ cursor: 'pointer' }}>
                       <input
                         type='text'
-                        value={searchTerm ?? ''}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e?.target?.value)}
                         className='form-control w-full !rounded-md !bg-light border-0 !rounded-e-none'
                         placeholder='Search Organization'
                         aria-describedby='button-addon2'
@@ -789,50 +803,54 @@ const Page = () => {
                       {/* <li className="!px-0 !pt-0">
                                         <span className="text-[.6875rem] text-[#8c9097] dark:text-white/50 opacity-[0.7] font-semibold"> Organization</span>
                                     </li> */}
+
                       {sidebarOrgs && (
                         <div>
-                          {sidebarOrgs.data.map((org) => (
-                            <li
-                              style={{ cursor: 'pointer' }}
-                              key={org.id as number}
-                              onClick={() => {
-                                if (org.id != -1) {
-                                  setLoading(true);
-                                  const encryptedOrgId = encryptData(
-                                    org.id as string,
-                                  );
-                                  const encryptedOrgName = encryptData(
-                                    org.name,
-                                  );
-                                  localStorage.setItem(
-                                    'org_id',
-                                    encryptedOrgId,
-                                  );
-                                  localStorage.setItem(
-                                    'org_name',
-                                    encryptedOrgName,
-                                  );
-                                  navigate.push('/orgdashboard');
-                                  setLoading(false);
-                                }
-                              }}
-                              // onClick={() => {
-                              //   localStorage.setItem(
-                              //     'org_id',
-                              //     org.id as string,
-                              //   );
-                              //   localStorage.setItem('org_name', org.name);
-                              // }}
-                            >
-                              <div className='flex items-center'>
-                                {/* <span className="me-2 leading-none">
+                          {sidebarOrgs &&
+                            sidebarOrgs.data.map((org) => (
+                              <li
+                                style={{
+                                  cursor: org.id == -1 ? '' : 'pointer',
+                                }}
+                                key={org.id as number}
+                                onClick={() => {
+                                  if (org.id != -1) {
+                                    setLoading(true);
+                                    const encryptedOrgId = encryptData(
+                                      org.id as string,
+                                    );
+                                    const encryptedOrgName = encryptData(
+                                      org.name,
+                                    );
+                                    localStorage.setItem(
+                                      'org_id',
+                                      encryptedOrgId,
+                                    );
+                                    localStorage.setItem(
+                                      'org_name',
+                                      encryptedOrgName,
+                                    );
+                                    navigate.push('/orgdashboard');
+                                    setLoading(false);
+                                  }
+                                }}
+                                // onClick={() => {
+                                //   localStorage.setItem(
+                                //     'org_id',
+                                //     org.id as string,
+                                //   );
+                                //   localStorage.setItem('org_name', org.name);
+                                // }}
+                              >
+                                <div className='flex items-center'>
+                                  {/* <span className="me-2 leading-none">
                                             <i className="ri-task-line align-middle text-[.875rem]"></i>
                                         </span> */}
-                                <span className='flex-grow'>{org?.name}</span>
-                                {/* <span className="badge bg-success/10 text-success rounded-full">167</span> */}
-                              </div>
-                            </li>
-                          ))}
+                                  <span className='flex-grow'>{org?.name}</span>
+                                  {/* <span className="badge bg-success/10 text-success rounded-full">167</span> */}
+                                </div>
+                              </li>
+                            ))}
                         </div>
                       )}
                     </ul>

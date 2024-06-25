@@ -400,10 +400,7 @@ const LoginForm = () => {
                                   onKeyDown={handleKeyPress}
                                   onChange={handleRememberMeChange}
                                 />
-                                <label
-                                  className='form-check-label text-[#8c9097] dark:text-white/50 font-normal'
-                                  htmlFor='defaultCheck1'
-                                >
+                                <label className='form-check-label text-[#8c9097] dark:text-white/50 font-normal'>
                                   Remember Password?
                                 </label>
                               </div>

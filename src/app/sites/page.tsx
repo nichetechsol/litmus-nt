@@ -203,6 +203,7 @@ const Page: React.FC = () => {
         searchTerm ? searchTerm : null,
         org_id,
       );
+
       if (result1.errorCode === 0 && result1.data.length > 0) {
         setsidebarSite(result1.data);
       } else if (result1.errorCode === 1) {
@@ -270,6 +271,35 @@ const Page: React.FC = () => {
     setMessageError('');
   };
 
+  function handleCall() {
+    const SiteTypesFetch = async () => {
+      try {
+        const data = await fetchSiteType();
+
+        if (data && data.data) {
+          settypeDropdown(data.data);
+        } else {
+          //
+        }
+      } catch (error: any) {
+        //
+      }
+    };
+    const AddSiteCounrtyDropDown = async () => {
+      try {
+        const data = await countryList();
+        if (data && data) {
+          setFetchdropDCounrty(data.data);
+        } else {
+          //
+        }
+      } catch (error: any) {
+        //
+      }
+    };
+    AddSiteCounrtyDropDown();
+    SiteTypesFetch();
+  }
   ///////////////////for crud validations/////
   const validationSchema = Yup.object().shape({
     AddSiteName: SiteNameSchema,
@@ -306,23 +336,7 @@ const Page: React.FC = () => {
       });
   };
   // for dropdown//
-  useEffect(() => {
-    const SiteTypesFetch = async () => {
-      try {
-        const data = await fetchSiteType();
 
-        if (data && data.data) {
-          settypeDropdown(data.data);
-        } else {
-          //
-        }
-      } catch (error: any) {
-        //
-      }
-    };
-
-    SiteTypesFetch();
-  }, [handelclosemodel]);
   // for dropdown change
   const handelchangeTypeDropDown = (
     e: React.ChangeEvent<HTMLSelectElement>,
@@ -391,21 +405,6 @@ const Page: React.FC = () => {
   };
 
   // for country dropdown
-  useEffect(() => {
-    const AddSiteCounrtyDropDown = async () => {
-      try {
-        const data = await countryList();
-        if (data && data) {
-          setFetchdropDCounrty(data.data);
-        } else {
-          //
-        }
-      } catch (error: any) {
-        //
-      }
-    };
-    AddSiteCounrtyDropDown();
-  }, [handelclosemodel]);
 
   const handelchangeCountry = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const Newcountryselected = parseInt(e.target.value);
@@ -617,6 +616,7 @@ const Page: React.FC = () => {
       }
     }
   }, []);
+
   return (
     <>
       <>
@@ -635,6 +635,7 @@ const Page: React.FC = () => {
                           href=''
                           className='hs-dropdown-toggle py-2  px-3 ti-btn bg-primary text-white !font-medium w-full !mb-0'
                           data-hs-overlay='#todo-compose'
+                          onClick={() => handleCall()}
                         >
                           <i className='ri-add-circle-line !text-[1rem]'></i>Add
                           Site
@@ -657,7 +658,6 @@ const Page: React.FC = () => {
                                   className='hs-dropdown-toggle !text-[1rem] !font-semibold !text-defaulttextcolor'
                                   data-hs-overlay='#todo-compose'
                                   ref={closeModalButtonRef}
-                                  onClick={handelclosemodel}
                                 >
                                   <span className='sr-only'>Close</span>
                                   <i className='ri-close-line'></i>
@@ -943,7 +943,10 @@ const Page: React.FC = () => {
                           <div>
                             {sidebarSite.map((site) => (
                               <li
-                                style={{ cursor: 'pointer' }}
+                                // style={{ cursor: 'pointer' }}
+                                style={{
+                                  cursor: site.id == -1 ? '' : 'pointer',
+                                }}
                                 key={site?.id}
                                 onClick={() => {
                                   if (site.id != -1) {
@@ -969,7 +972,7 @@ const Page: React.FC = () => {
                               >
                                 <div className='flex items-center'>
                                   <span className='flex-grow'>
-                                    {site?.name ? site.name : 'No Site found'}
+                                    {site?.name ? site.name : 'No site found'}
                                   </span>
                                 </div>
                               </li>
@@ -995,7 +998,7 @@ const Page: React.FC = () => {
                         </div>
                         {SitesList && SitesList.length == 0 && (
                           <div className='col-md-12 w-100 mt-4 mb-4'>
-                            <p className='text-center'>No Site Found</p>{' '}
+                            <p className='text-center'>No ite Found</p>{' '}
                           </div>
                         )}
                       </div>
@@ -1010,7 +1013,6 @@ const Page: React.FC = () => {
                         ? SitesList.map((SingleSite) => (
                             <div
                               className='xl:col-span-6 col-span-12 task-card'
-                              style={{ cursor: 'pointer' }}
                               key={SingleSite?.site?.id}
                               onClick={() => {
                                 const encryptedsiteid = encryptData(
@@ -1037,8 +1039,11 @@ const Page: React.FC = () => {
                                 navigate.push('/sitedashboard');
                               }}
                             >
-                              <div className='box task-pending-card'>
-                                <div className='box-body'>
+                              <div className='box task-pending-card '>
+                                <div
+                                  className='box-body'
+                                  style={{ cursor: 'pointer' }}
+                                >
                                   <div className='flex justify-between align-center flex-wrap gap-2'>
                                     <h1
                                       style={{
