@@ -439,7 +439,11 @@ const Page = () => {
   const handleKeyPress = async (e: any) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      if (domainError === '' && domainInput.trim() !== '') {
+
+      if (
+        (domainError === '' || domainError === 'Please press Enter') &&
+        domainInput.trim() !== ''
+      ) {
         const domainsArray = domainInput.endsWith(',')
           ? domainInput
               .split(',')
