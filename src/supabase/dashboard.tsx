@@ -40,6 +40,7 @@ async function orgDashboardCounts(
   org_id: any,
 ): Promise<Result<DashboardCounts>> {
   try {
+    let entitlementExceed = 'N';
     const { count: userCount, error: userError } = await supabase
       .from('org_users')
       .select('*', { count: 'exact' })
@@ -82,34 +83,32 @@ async function orgDashboardCounts(
     }
 
     if (!entitlement || entitlement.length === 0) {
-      return {
-        errorCode: 1,
-        message: 'No entitlement found for the organization',
-        data: null,
-      };
+      entitlementExceed = 'N';
+    } else {
+      const { data: entitlementValue, error: valueError } = await supabase
+        .from('entitlements_values')
+        .select('value_number')
+        .eq('id', entitlement[0].entitlement_value_id)
+        .single();
+
+      if (valueError) {
+        return {
+          errorCode: 1,
+          message: 'Error retrieving entitlement value',
+          data: null,
+        };
+      }
+
+      // Check if current number of sites exceeds entitlement limit
+      if (currentSites.length >= (entitlementValue.value_number ?? 0)) {
+        entitlementExceed = 'Y';
+      } else {
+        entitlementExceed = 'N';
+      }
     }
 
     // Check entitlement value
-    const { data: entitlementValue, error: valueError } = await supabase
-      .from('entitlements_values')
-      .select('value_number')
-      .eq('id', entitlement[0].entitlement_value_id)
-      .single();
 
-    if (valueError) {
-      return {
-        errorCode: 1,
-        message: 'Error retrieving entitlement value',
-        data: null,
-      };
-    }
-    let entitlementExceed = null;
-    // Check if current number of sites exceeds entitlement limit
-    if (currentSites.length >= (entitlementValue.value_number ?? 0)) {
-      entitlementExceed = 'Y';
-    } else {
-      entitlementExceed = 'N';
-    }
     if (userError || entitlementError || siteError) {
       return {
         errorCode: 1,
