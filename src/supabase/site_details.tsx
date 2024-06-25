@@ -171,12 +171,26 @@ async function fetchSiteDetails(
 async function fetchSiteSidebarList(
   searchQuery: string,
   org_id: any,
+  user_id: any,
 ): Promise<Result<SiteDetails[]>> {
   try {
     // Fetch site details with names matching the search query
+    const { data: userOrgs, error: userOrgError } = await supabase
+      .from('site_users')
+      .select('site_id')
+      .eq('user_id', user_id);
+
+    if (userOrgError) {
+      throw userOrgError;
+    }
+
+    // Extract the site_ids from userOrgs
+    const siteId: any = userOrgs.map((site) => site.site_id);
+
     const { data: siteDetails, error } = await supabase
       .from('sites_detail')
       .select('*')
+      .in('id', siteId)
       .eq('org_id', org_id)
       .ilike('name', `%${searchQuery}%`);
 

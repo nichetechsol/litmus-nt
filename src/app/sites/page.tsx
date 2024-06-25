@@ -202,6 +202,7 @@ const Page: React.FC = () => {
       const result1: any = await fetchSiteSidebarList(
         searchTerm ? searchTerm : null,
         org_id,
+        user_id,
       );
 
       if (result1.errorCode === 0 && result1.data.length > 0) {
