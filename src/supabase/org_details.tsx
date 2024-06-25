@@ -182,24 +182,7 @@ async function addOrganization(data: {
 }): Promise<Result<any>> {
   try {
     // Check if the domains already exist
-    const { data: existingDomains, error: domainCheckError } = await supabase
-      .from('domains')
-      .select('name')
-      .in('name', data.domain);
 
-    if (domainCheckError) {
-      return { errorCode: 1, data: 'Organization is not added' };
-    }
-
-    if (existingDomains && existingDomains.length > 0) {
-      const existingDomainNames = existingDomains.map(
-        (domain: { name: string }) => domain.name,
-      );
-      return {
-        errorCode: 1,
-        data: `Domains already exist: ${existingDomainNames.join(', ')}`,
-      };
-    }
     const { data: insertData, error: insertError } = await supabase
       .from('org_details')
       .insert([
@@ -233,21 +216,17 @@ async function addOrganization(data: {
     }
 
     // Insert domains
-    const domainInsertResults = [];
-    const orgId = insertData[0].id;
+    let domainInsertResults: any = [];
+    const orgId = insertData[0].id; // Replace with actual orgId
+    const domainsToInsert = data.domain; // Replace with actual domain list
 
-    for (const domain of data.domain) {
-      const { data: insertDomain, error: domainError } = await supabase
-        .from('domains')
-        .insert([{ name: domain, org_id: orgId }])
-        .select();
-
-      if (domainError) {
-        domainInsertResults.push({ success: false, error: domainError });
-      } else {
-        domainInsertResults.push({ success: true, data: insertDomain });
-      }
-    }
+    await insertDomains(orgId, domainsToInsert)
+      .then((results) => {
+        domainInsertResults = results;
+      })
+      .catch((error: any) => {
+        return { errorCode: 1, data: 'Domain is not added' };
+      });
     try {
       const emaildata: any = {
         org_id: orgId,
@@ -308,6 +287,63 @@ async function addOrganization(data: {
     return { errorCode: 1, data: 'Organization is not added' };
   }
 }
+const insertDomains = async (orgId: any, domains: any) => {
+  const domainInsertResults = [];
+
+  for (const domain of domains) {
+    try {
+      // Check if the domain already exists
+      const { data: existingDomain, error: fetchError } = await supabase
+        .from('domains')
+        .select('*')
+        .eq('name', domain);
+
+      if (fetchError) {
+        // Handle error in fetching domain
+        domainInsertResults.push({ success: false, error: fetchError });
+        continue;
+      }
+
+      let domainId;
+
+      if (existingDomain.length > 0) {
+        // Domain already exists
+        domainId = existingDomain[0].id;
+      } else {
+        // Domain does not exist, proceed to insert
+        const { data: insertDomain, error: domainError } = await supabase
+          .from('domains')
+          .insert([{ name: domain }])
+          .select();
+
+        if (domainError) {
+          domainInsertResults.push({ success: false, error: domainError });
+          continue;
+        }
+        if (insertDomain) {
+          // Retrieve the newly inserted domainId
+          domainId = insertDomain[0].id;
+        }
+      }
+
+      // Link the domain to the organization in org_domains table
+      const { data, error } = await supabase
+        .from('org_domains')
+        .insert([{ org_id: orgId, domain_id: domainId }])
+        .select();
+
+      if (error) {
+        domainInsertResults.push({ success: false, error });
+      } else {
+        domainInsertResults.push({ success: true, data });
+      }
+    } catch (error: any) {
+      domainInsertResults.push({ success: false, error: error.message });
+    }
+  }
+
+  return domainInsertResults;
+};
 
 async function updateOrganization(data: {
   name: string;
