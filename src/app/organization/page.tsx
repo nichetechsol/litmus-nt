@@ -204,7 +204,6 @@ const Page = () => {
         searchTerm ? searchTerm : null,
         user_id,
       );
-
       if (result1.errorCode === 0 && result1.data.length > 0) {
         setSidebarOrgs({ data: result1.data });
       } else if (result1.errorCode === 1) {
@@ -432,65 +431,64 @@ const Page = () => {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // const handleKeyPress = (e: any) => {
-  //   if (e.key === 'Enter') {
-  //     e.preventDefault();
+  const addDomain = async () => {
+    if (
+      (domainError === '' || domainError === 'Please press Enter') &&
+      domainInput.trim() !== ''
+    ) {
+      const domainsArray = domainInput.endsWith(',')
+        ? domainInput
+            .split(',')
+            .map((domain) => domain.trim())
+            .filter((domain) => domain !== '')
+        : domainInput.split(',').map((domain) => domain.trim());
+      const newDomains = [];
+      let errorMessage = '';
 
-  //     if (domainError === '' && domainInput.trim() !== '') {
-  //       addDomain(domainInput.trim());
-  //     } else {
-  //       handleSubmit();
-  //     }
-  //   }
-  // };
-
-  const handleKeyPress = async (e: any) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-
-      if (
-        (domainError === '' || domainError === 'Please press Enter') &&
-        domainInput.trim() !== ''
-      ) {
-        const domainsArray = domainInput.endsWith(',')
-          ? domainInput
-              .split(',')
-              .map((domain) => domain.trim())
-              .filter((domain) => domain !== '')
-          : domainInput.split(',').map((domain) => domain.trim());
-        const newDomains = [];
-        let errorMessage = '';
-
-        for (const domain of domainsArray) {
-          if (domains.includes(domain)) {
-            errorMessage += `Domain ${domain} already added. `;
-          } else {
-            try {
-              await DomainSchema.validate(domain);
-              newDomains.push(domain);
-            } catch (error) {
-              if (error instanceof Error) {
-                errorMessage += `${error.message} for domain ${domain}. `;
-              } else {
-                errorMessage += `An unknown error occurred for domain ${domain}. `;
-              }
+      for (const domain of domainsArray) {
+        if (domains.includes(domain)) {
+          errorMessage += `Domain ${domain} already added. `;
+        } else {
+          try {
+            await DomainSchema.validate(domain);
+            newDomains.push(domain);
+          } catch (error) {
+            if (error instanceof Error) {
+              errorMessage += `${error.message} for domain ${domain}. `;
+            } else {
+              errorMessage += `An unknown error occurred for domain ${domain}. `;
             }
           }
         }
-        if (errorMessage === '') {
-          setDomains([...domains, ...newDomains]);
-          setDomainInput('');
-          setDomainError('');
-        } else {
-          setDomainError(errorMessage.trim());
-        }
-      } else {
-        handleSubmit();
       }
+      if (errorMessage === '') {
+        setDomains([...domains, ...newDomains]);
+        setDomainInput('');
+        setDomainError('');
+      } else {
+        setDomainError(errorMessage.trim());
+      }
+    } else {
+      handleSubmit();
     }
   };
-
+  const handleKeyPress = async (e: any) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      await addDomain();
+    }
+  };
+  const handleDomainPlus = async () => {
+    DomainSchema.validate(domainInput)
+      .then(async () => {
+        setDomainError('');
+        await addDomain();
+      })
+      .catch((err: Yup.ValidationError) => {
+        setDomainError(err.message);
+      });
+    // handleDomainChange;
+  };
   //   const removeDomain = (domain: string) => {
   //     setDomains(domains.filter(d => d !== domain));
   //     // const updatedDomains = domains.filter(d => d !== domain);
@@ -631,6 +629,13 @@ const Page = () => {
                                       value={domainInput}
                                       maxLength={255}
                                     />
+                                    <button
+                                      type='button'
+                                      className='ti-btn bg-primary text-white ml-2'
+                                      onClick={handleDomainPlus}
+                                    >
+                                      +
+                                    </button>
                                     {domainError && (
                                       <div className='text-danger'>
                                         {domainError}

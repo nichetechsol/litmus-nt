@@ -729,7 +729,7 @@ const OrgDashboard = () => {
                           <input
                             className='ti-form-control form-control-sm'
                             type='text'
-                            placeholder='Search Here'
+                            placeholder='Search here'
                             aria-label='.form-control-sm example'
                             onChange={(e) => {
                               setsearch(e.target.value);
