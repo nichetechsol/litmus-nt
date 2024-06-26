@@ -226,7 +226,17 @@ const Page: React.FC = () => {
     }
   };
   useEffect(() => {
-    fetchData1();
+    const handler = setTimeout(() => {
+      // This code runs after the user has stopped typing for 300ms
+      if (searchTerm !== undefined) {
+        fetchData1();
+      }
+    }, 300); // 300ms delay
+
+    // Cleanup function to clear the timeout if searchTerm changes before 300ms
+    return () => {
+      clearTimeout(handler);
+    };
   }, [searchTerm]);
   // for search//
   const handleSearch = async () => {
@@ -659,6 +669,7 @@ const Page: React.FC = () => {
                                   className='hs-dropdown-toggle !text-[1rem] !font-semibold !text-defaulttextcolor'
                                   data-hs-overlay='#todo-compose'
                                   ref={closeModalButtonRef}
+                                  onClick={handelclosemodel}
                                 >
                                   <span className='sr-only'>Close</span>
                                   <i className='ri-close-line'></i>
@@ -671,11 +682,12 @@ const Page: React.FC = () => {
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      Site Name*
+                                      Site Name{' '}
+                                      <span className='text-danger'>*</span>
                                     </label>
                                     <input
                                       type='text'
-                                      className='form-control w-full'
+                                      className='form-control '
                                       id='task-name'
                                       placeholder='Enter Site Name'
                                       onChange={handelAddSiteName}
@@ -693,7 +705,8 @@ const Page: React.FC = () => {
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      Type*
+                                      Type{' '}
+                                      <span className='text-danger'>*</span>
                                     </label>
                                     <select
                                       className='form-select'
@@ -722,7 +735,8 @@ const Page: React.FC = () => {
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      Address 1*
+                                      Address 1{' '}
+                                      <span className='text-danger'>*</span>
                                     </label>
                                     <input
                                       type='text'
@@ -765,7 +779,8 @@ const Page: React.FC = () => {
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      Country*
+                                      Country{' '}
+                                      <span className='text-danger'>*</span>
                                     </label>
                                     <select
                                       className='form-select'
@@ -797,7 +812,8 @@ const Page: React.FC = () => {
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      State*
+                                      State{' '}
+                                      <span className='text-danger'>*</span>
                                     </label>
                                     <select
                                       className='form-select'
@@ -829,7 +845,8 @@ const Page: React.FC = () => {
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      City*
+                                      City{' '}
+                                      <span className='text-danger'>*</span>
                                     </label>
                                     <input
                                       type='text'
@@ -851,7 +868,8 @@ const Page: React.FC = () => {
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      Zip Code*
+                                      Zip Code{' '}
+                                      <span className='text-danger'>*</span>
                                     </label>
                                     <input
                                       type='text'
@@ -999,7 +1017,7 @@ const Page: React.FC = () => {
                         </div>
                         {SitesList && SitesList.length == 0 && (
                           <div className='col-md-12 w-100 mt-4 mb-4'>
-                            <p className='text-center'>No ite Found</p>{' '}
+                            <p className='text-center'>No site Found</p>{' '}
                           </div>
                         )}
                       </div>

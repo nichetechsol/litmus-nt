@@ -794,7 +794,8 @@ const OrgDashboard = () => {
                                         htmlFor='Email'
                                         className='ti-form-label'
                                       >
-                                        Email*
+                                        Email{' '}
+                                        <span className='text-danger'>*</span>
                                       </label>
                                       <input
                                         type='text'
@@ -819,7 +820,8 @@ const OrgDashboard = () => {
                                         htmlFor='task-name'
                                         className='ti-form-label'
                                       >
-                                        First Name*
+                                        First Name{' '}
+                                        <span className='text-danger'>*</span>
                                       </label>
                                       <input
                                         type='text'
@@ -843,7 +845,8 @@ const OrgDashboard = () => {
                                         htmlFor='Last Name'
                                         className='ti-form-label'
                                       >
-                                        Last Name*
+                                        Last Name{' '}
+                                        <span className='text-danger'>*</span>
                                       </label>
                                       <input
                                         type='text'
@@ -868,7 +871,8 @@ const OrgDashboard = () => {
                                         htmlFor='task-name'
                                         className='ti-form-label'
                                       >
-                                        Role*
+                                        Role{' '}
+                                        <span className='text-danger'>*</span>
                                       </label>
                                       <select
                                         className='form-select'

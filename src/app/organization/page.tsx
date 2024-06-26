@@ -92,6 +92,7 @@ const Page = () => {
   const [add_orgUser, setadd_orgUser] = useState<any>('');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [searchTerm, setSearchTerm] = useState<any>();
+
   const [orgsWithSites, setOrgsWithSites] = useState<
     OrganizationWithSiteCount[] | null
   >(null);
@@ -232,9 +233,17 @@ const Page = () => {
     }
   };
   useEffect(() => {
-    if (searchTerm || searchTerm == '') {
-      fetchData1();
-    }
+    const handler = setTimeout(() => {
+      // This code runs after the user has stopped typing for 300ms
+      if (searchTerm !== undefined) {
+        fetchData1();
+      }
+    }, 300); // 300ms delay
+
+    // Cleanup function to clear the timeout if searchTerm changes before 300ms
+    return () => {
+      clearTimeout(handler);
+    };
   }, [searchTerm]);
 
   const handleorganizationNameChange = (
@@ -579,7 +588,8 @@ const Page = () => {
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      Organization Name*
+                                      Organization Name{' '}
+                                      <span className='text-danger'>*</span>
                                     </label>
                                     <input
                                       type='text'
@@ -602,7 +612,8 @@ const Page = () => {
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      Domains*{' '}
+                                      Domains{' '}
+                                      <span className='text-danger'>*</span>{' '}
                                       <small className='form-text text-muted'>
                                         (Separate Domain with a comma, and press
                                         enter to add them to your list)
@@ -686,7 +697,8 @@ const Page = () => {
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      Type*
+                                      Type{' '}
+                                      <span className='text-danger'>*</span>
                                     </label>
                                     <select
                                       className='form-select'
