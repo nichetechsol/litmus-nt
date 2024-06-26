@@ -347,6 +347,7 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
   const [user_role, setUserrole] = useState<any>('');
   const [org_id, setOrg_id] = useState<any>('');
   const [site_id, setSite_id] = useState<any>('');
+  const [user_email, setUser_email] = useState<any>('');
   // useEffect(() => {
   //   const userid: any = localStorage.getItem('user_id');
   //   const userfname: any = localStorage.getItem('user_fname');
@@ -446,12 +447,14 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
     const decryptedUserRole = decryptData(localStorage.getItem('user_role'));
     const decryptedOrgId = decryptData(localStorage.getItem('org_id'));
     const decryptedsiteId = decryptData(localStorage.getItem('site_id'));
+    const decryptedUserEmail = decryptData(localStorage.getItem('user_email'));
     setuser_id(decryptedUserId);
     setUser_fname(decryptedUserFname);
     setUserlname(decryptedUserLname);
     setUserrole(decryptedUserRole);
     setOrg_id(decryptedOrgId);
     setSite_id(decryptedsiteId);
+    setUser_email(decryptedUserEmail);
   }, [pathname, userRoleName, userrole3, userrole2]);
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -550,10 +553,11 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                         className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'
                       >
                         {/* {SingleSite?.site?SingleSite?.site?.name[0].toUpperCase(): ""} */}
+
                         {user_fname ? (
                           <InitialsComponent name={user_fname} />
                         ) : (
-                          ''
+                          <InitialsComponent name={user_email} />
                         )}
 
                         {user_lname ? (
@@ -576,7 +580,9 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                     style={{ cursor: 'pointer' }}
                   >
                     <p className='font-semibold mb-0 leading-none text-[#536485] text-[0.813rem] '>
-                      {user_fname} {user_lname}
+                      {user_fname
+                        ? `${user_fname} ${user_lname}`
+                        : `${user_email}`}
                     </p>
                     <span className='opacity-[0.7] font-normal text-[#536485] block text-[0.6875rem] '>
                       {roleToDisplay ? roleToDisplay : ''}

@@ -1103,7 +1103,7 @@ const Page = () => {
                                         className='ti-form-label'
                                       >
                                         First Name{' '}
-                                        <span className='text-danger'>*</span>
+                                        {/* <span className='text-danger'>*</span> */}
                                       </label>
                                       <input
                                         type='text'
@@ -1128,7 +1128,7 @@ const Page = () => {
                                         className='ti-form-label'
                                       >
                                         Last Name{' '}
-                                        <span className='text-danger'>*</span>
+                                        {/* <span className='text-danger'>*</span> */}
                                       </label>
                                       <input
                                         type='text'
@@ -1251,9 +1251,9 @@ const Page = () => {
                                     <td>
                                       <div className='flex items-center font-semibold'>
                                         {`${
-                                          user.firstname ? user.firstname : ''
+                                          user.firstname ? user.firstname : '-'
                                         } ${
-                                          user.lastname ? user.lastname : ''
+                                          user.lastname ? user.lastname : '-'
                                         }`}{' '}
                                       </div>
                                     </td>

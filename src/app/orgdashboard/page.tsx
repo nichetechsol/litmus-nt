@@ -821,7 +821,7 @@ const OrgDashboard = () => {
                                         className='ti-form-label'
                                       >
                                         First Name{' '}
-                                        <span className='text-danger'>*</span>
+                                        {/* <span className='text-danger'>*</span> */}
                                       </label>
                                       <input
                                         type='text'
@@ -846,7 +846,7 @@ const OrgDashboard = () => {
                                         className='ti-form-label'
                                       >
                                         Last Name{' '}
-                                        <span className='text-danger'>*</span>
+                                        {/* <span className='text-danger'>*</span> */}
                                       </label>
                                       <input
                                         type='text'
@@ -978,9 +978,9 @@ const OrgDashboard = () => {
                                     className="w-[1.75rem] h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full" /> */}
                                         </span>{' '}
                                         {`${
-                                          user.firstname ? user.firstname : ''
+                                          user.firstname ? user.firstname : '-'
                                         } ${
-                                          user.lastname ? user.lastname : ''
+                                          user.lastname ? user.lastname : '-'
                                         }`}{' '}
                                       </div>
                                     </td>
