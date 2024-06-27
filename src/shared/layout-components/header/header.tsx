@@ -576,7 +576,7 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                   /> */}
                   </button>
                   <div
-                    className='md:block hidden dropdown-profile'
+                    className='md:block  dropdown-profile'
                     style={{ cursor: 'pointer' }}
                   >
                     <p className='font-semibold mb-0 leading-none text-[#536485] text-[0.813rem] '>
@@ -658,7 +658,7 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                           });
                         }}
                       >
-                        <button className='w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex'>
+                        <button className='w-full ti-dropdown-item !text-[0.8125rem] !px-[0.65rem] !px-[1.5rem]   !gap-x-0 !inline-flex justify-center'>
                           {/* <Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" href="/components/authentication/sign-in/signin-cover/"> */}
                           <i className='ri-logout-circle-line text .cs-[1.125rem] me-2 opacity-[1]'></i>
                           Log Out

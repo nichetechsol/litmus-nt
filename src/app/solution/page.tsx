@@ -202,7 +202,7 @@ const Page = () => {
                       </div>
                     )}
                     {subFolders && subFolders[0]?.subFolder != '' ? (
-                      <div className='flex justify-between w-full'>
+                      <div className='flex-lg justify-between w-full'>
                         {subFolders.map((subFolder: any) => (
                           <button
                             key={subFolder.subFolder}
@@ -231,14 +231,14 @@ const Page = () => {
                               key={index}
                               className='mb-[0.9rem] p-4 hover:bg-light border dark:border-defaultborder/10 rounded-md relative'
                             >
-                              <div className='flex items-center flex-wrap'>
+                              <div className='flex items-center '>
                                 <div className='me-2'>
                                   <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
                                     <i className='ri-file-line text-[1rem] text-white'></i>
                                   </span>
                                 </div>
                                 <div className='flex-grow'>
-                                  <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                  <p className='font-semibold mb-[1.4px]  text-[0.813rem] word-break'>
                                     {file.FileName}
                                   </p>
                                 </div>

@@ -273,9 +273,8 @@ const LoginForm = () => {
         <div className='bg-theme'>
           <div className='authentication authentication-basic signin-new'>
             <div className='container'>
-              <div className='flex justify-center  items-center h-full text-defaultsize text-defaulttextcolor'>
-                <div className='grid grid-cols-12'>
-                  <div className='xxl:col-span-4 xl:col-span-4 lg:col-span-4 md:col-span-3 sm:col-span-2'></div>
+              <div className='flex justify-center   items-center h-90 text-defaultsize text-defaulttextcolor'>
+                <div className='login-div'>
                   <div className='xxl:col-span-4 xl:col-span-4 lg:col-span-4 md:col-span-6 sm:col-span-8 col-span-12'>
                     <div className='my-[2.5rem] flex justify-center'>
                       <Link href='/' onClick={() => window.location.reload()}>

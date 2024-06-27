@@ -126,7 +126,7 @@ Background Image
   --pink: 231 145 188;
   --teal: 18 194 194;
   --purple: 137 32 173;
-  --default-text-color: 51 51 53;
+  --default-text-color: 35 35 35;
   --default-border: 243 243 243;
   --default-background: 247 248 249;
   --menu-prime-color: 83 100 133;
@@ -538,6 +538,7 @@ Background Image
 @media (max-width: 991.98px) {
   .app-header .horizontal-logo .header-logo img {
     @apply h-8 leading-8;
+    width: 100%;
   }
 }
 .main-index footer {
@@ -2392,9 +2393,16 @@ Background Image
     @apply bg-transparent before:hidden after:hidden;
   }
 }
+
 @media (max-width: 767.98px) {
   [data-nav-layout='horizontal'] .landing-body .landing-banner {
     @apply h-[34rem];
+  }
+  .ic-product-p p {
+    width: 14.5rem !important;
+  }
+  .box-header .ti-form-control {
+    width: 130px;
   }
   [data-nav-layout='horizontal']
     .landing-body
@@ -2820,9 +2828,6 @@ Background Image
 
 .page-item.active .page-link {
   @apply text-white bg-primary border-primary;
-}
-.chnage {
-  cursor: default;
 }
 
 .disabled > .page-link,
@@ -15489,7 +15494,7 @@ input.gridjs-input {
   @apply bg-white dark:bg-bodybg border border-solid border-inputborder dark:border-white/10 text-defaulttextcolor text-defaultsize rounded-md focus:border focus:border-primary;
 }
 .form-select option {
-  @apply bg-white dark:bg-bodybg py-[0.35rem] px-3 rounded-sm border border-primary/10;
+  @apply bg-white dark:bg-bodybg py-[0.55rem] px-3 rounded-sm border border-primary/10;
   text-transform: capitalize;
 }
 .form-select option:checked {
@@ -15497,7 +15502,8 @@ input.gridjs-input {
 }
 
 .form-check-input {
-  @apply h-[0.9rem] w-[0.9rem] bg-white dark:bg-bodybg dark:border-white/10 border border-solid border-inputborder rounded-sm;
+  @apply h-[0.9rem] w-[0.9rem] bg-light dark:bg-bodybg dark:border-white/10 border border-solid border-inputborder rounded-sm;
+  vertical-align: text-bottom;
 }
 .form-check-input:focus {
   @apply border border-defaultborder outline-none;
@@ -16438,7 +16444,9 @@ select {
 h5 {
   font-size: 1.25rem;
 }
-
+.h-90 {
+  height: 90vh;
+}
 .ti-img-thumbnail {
   @apply p-1 rounded-md border border-defaultborder dark:border-defaultborder/10 max-w-full h-auto dark:bg-bodybg2 mx-auto;
 }
@@ -20104,4 +20112,37 @@ h6 {
 .swal-button:hover {
   background-color: #032125 !important;
   color: #fff !important;
+}
+
+.swal-text {
+  color: #000;
+}
+.task-main-nav li {
+  padding-left: 0 !important;
+}
+.word-break {
+  word-break: break-all;
+}
+.swal-overlay--show-modal .swal-modal {
+  will-change: unset !important;
+}
+
+.login-div {
+  @apply w-[26.75rem];
+}
+.username {
+  text-transform: capitalize;
+}
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+
+.text-danger {
+  color: rgb(255 34 0);
+}
+.Toastify__toast-body > div:last-child {
+  @apply text-dark;
+}
+.Toastify__close-button {
+  @apply relative top-[12px];
 }

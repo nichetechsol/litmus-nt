@@ -715,7 +715,7 @@ const Page = () => {
                           <div className='box-body !p-0'>
                             <div className='sm:grid grid-cols-12'>
                               <div className='xl:col-span-3 xxl:col-span-3 lg:col-span-3 md:col-span-3 col-span-3 about-company-stats-border'>
-                                <div className='text-center p-6 w-full h-full flex items-center justify-center'>
+                                <div className='text-center p-6 w-full h-full flex justify-center'>
                                   <span className='font-semibold me-2'>
                                     Owner:
                                   </span>
@@ -726,7 +726,7 @@ const Page = () => {
                                 </div>
                               </div>
                               <div className='xl:col-span-3 xxl:col-span-3 lg:col-span-3 md:col-span-3 col-span-3 about-company-stats-border'>
-                                <div className='text-center p-6 w-full h-full flex items-center justify-center'>
+                                <div className='text-center p-6 w-full h-full flex justify-center'>
                                   <span className='font-semibold me-2'>
                                     Organization Name:
                                   </span>
@@ -737,7 +737,7 @@ const Page = () => {
                                 </div>
                               </div>
                               <div className='xl:col-span-3 xxl:col-span-3 lg:col-span-3 md:col-span-3 col-span-3'>
-                                <div className='text-center p-6 w-full h-full flex items-center justify-center'>
+                                <div className='text-center p-6 w-full h-full flex justify-center'>
                                   <span className='font-semibold'>
                                     {siteCountData &&
                                     siteCountData.data.sites_details[0]
@@ -910,7 +910,7 @@ const Page = () => {
                     </div>
                   </div>
                 </div>
-                <div className='xxl:col-span-6 xl:col-span-6 col-span-6'>
+                <div className='xxl:col-span-6 xl:col-span-6 col-span-12'>
                   <div className='box'>
                     <div className='box-header flex justify-between'>
                       <div className='box-title'>List Of Entitlement</div>
@@ -976,7 +976,7 @@ const Page = () => {
                                 <h5 className='box-title items-start'>
                                   {solution.folder}
                                 </h5>
-                                <div className='flex items-center flex-wrap'>
+                                <div className='flex items-center'>
                                   <div className='me-2 ic-product'>
                                     <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
                                       <i className='ri-folder-line text-[1rem]  text-white'></i>
@@ -1015,7 +1015,7 @@ const Page = () => {
                   <div className='box custom-card'>
                     <div className='box-header justify-between'>
                       <div className='box-title'>User Management</div>
-                      <div className='flex flex-wrap gap-2'>
+                      <div className='flex  gap-2'>
                         <div>
                           <input
                             className='ti-form-control form-control-sm'

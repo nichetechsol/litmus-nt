@@ -208,7 +208,7 @@ const Page = () => {
                         : null}
                       {folderTrue && folderTrue === true && (
                         <div className='col-md-12 w-100 mt-4'>
-                          <p className='text-center'>No Folder Found</p>{' '}
+                          <p className='text-center py-3'>No Folder Found</p>{' '}
                         </div>
                       )}
                     </ul>
@@ -217,7 +217,7 @@ const Page = () => {
               </div>
               <div className='xl:col-span-9 col-span-12'>
                 <div className='box custom-box'>
-                  <div className='box-header justify-between'>
+                  <div className='box-header flex justify-between'>
                     <div className='box-title'>
                       {currentTrue ? 'Current' : 'Archive'}
                     </div>
@@ -263,7 +263,7 @@ const Page = () => {
                                       <i className='ri-file-line text-[1rem]  text-white'></i>
                                     </span>
                                   </div>
-                                  <div className='flex-grow'>
+                                  <div className='flex-grow  ic-product-p'>
                                     {/* {files.disabled === 'Y' ? ( */}
                                     <p
                                       className={`font-semibold mb-[1.4px]  text-[0.813rem] ${

@@ -620,25 +620,27 @@ const Page = () => {
                                         enter to add them to your list)
                                       </small>
                                     </label>
-                                    <input
-                                      type='text'
-                                      className='form-control w-full'
-                                      id='task-name'
-                                      placeholder={`For eg: ${
-                                        email.split('@')[1]
-                                      }`}
-                                      onChange={handleDomainChange}
-                                      onKeyDown={handleKeyPress}
-                                      value={domainInput}
-                                      maxLength={255}
-                                    />
-                                    <button
-                                      type='button'
-                                      className='ti-btn bg-primary text-white ml-2'
-                                      onClick={handleDomainPlus}
-                                    >
-                                      +
-                                    </button>
+                                    <div className='flex'>
+                                      <input
+                                        type='text'
+                                        className='form-control w-full me-2'
+                                        id='task-name'
+                                        placeholder={`For eg: ${
+                                          email.split('@')[1]
+                                        }`}
+                                        onChange={handleDomainChange}
+                                        onKeyDown={handleKeyPress}
+                                        value={domainInput}
+                                        maxLength={255}
+                                      />
+                                      <button
+                                        type='button'
+                                        className='ti-btn bg-primary text-white ml-2 mb-0'
+                                        onClick={handleDomainPlus}
+                                      >
+                                        +
+                                      </button>
+                                    </div>
                                     {domainError && (
                                       <div className='text-danger'>
                                         {domainError}
@@ -925,7 +927,7 @@ const Page = () => {
                           <div style={{ cursor: 'pointer' }} className='box'>
                             <div className='box-body contact-action'>
                               <div className='flex items-start '>
-                                <div className='flex flex-grow flex-wrap gap-2'>
+                                <div className='flex flex-grow flex-wrap gap-2 items-center'>
                                   <div className='avatar avatar-xl avatar-rounded me-3'>
                                     <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
                                       {/* {SingleSite?.site?SingleSite?.site?.name[0].toUpperCase(): ""} */}

@@ -630,7 +630,7 @@ const OrgDashboard = () => {
                   </div>
                 </div>
 
-                <div className='xxl:col-span-6 xl:col-span-6 col-span-6'>
+                <div className='xxl:col-span-6 xl:col-span-6 sm:col-span-12 col-span-12'>
                   <div className='box'>
                     <div className='box-header flex justify-between'>
                       <div className='box-title'>List Of Entitlement</div>
@@ -724,7 +724,7 @@ const OrgDashboard = () => {
                   <div className='box custom-card'>
                     <div className='box-header justify-between'>
                       <div className='box-title'>User Management</div>
-                      <div className='flex flex-wrap gap-2'>
+                      <div className='flex  gap-2'>
                         <div>
                           <input
                             className='ti-form-control form-control-sm'
@@ -1079,7 +1079,7 @@ const OrgDashboard = () => {
                 {activity_log && activity_log.length > 0 && (
                   <div className='xxl:col-span-12 xl:col-span-12 col-span-12'>
                     <div className='box overflow-hidden'>
-                      <div className='box-header justify-between'>
+                      <div className='box-header flex justify-between'>
                         <div className='box-title'>Activity Logs</div>
                         {/* <div className="hs-dropdown ti-dropdown">
                               <Link href="#!" className="text-[0.75rem] px-2 font-normal text-[#8c9097] dark:text-white/50"
