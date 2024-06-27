@@ -395,7 +395,7 @@ const Page = () => {
 
           if (result.data != null && result.errorCode == 0) {
             setLoading(false);
-            toast.success('Successfully Added organization', {
+            toast.success('Organization added successfully', {
               autoClose: 3000,
             });
           } else {

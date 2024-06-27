@@ -136,6 +136,7 @@ const Page = () => {
   useEffect(() => {
     if (folder) {
       handlefolderclick(folder[0]);
+      setSelectedFolder(folder[0]);
       setCurrentTrue(true);
     }
   }, [folder]);
@@ -322,7 +323,7 @@ const Page = () => {
                                               files.subfolder,
                                             )
                                           }
-                                          href={files.downloadLink}
+                                          // href={files.downloadLink}
                                           className='text-[1rem] !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'
                                         >
                                           <i className='ri-download-line text-[.8rem] text-white'></i>

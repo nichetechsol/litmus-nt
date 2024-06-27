@@ -36,10 +36,12 @@ const TypeDropdownSchema = Yup.string().required(
   'Please select a type from the dropdown menu.',
 );
 
-const MessageSchema = Yup.string()
-  // .required('It field is required.')
-  // .min(1, 'It must be at least 1 character long.')
-  .max(1000, 'It must be no more than 1000 characters long.');
+const MessageSchema = Yup.string().max(
+  1000,
+  'It must be no more than 1000 characters long.',
+);
+// .required('It field is required.')
+// .min(1, 'It must be at least 1 character long.')
 
 const emailSchemaSign = Yup.string()
   .required('Email address is required. Please enter your email address.')

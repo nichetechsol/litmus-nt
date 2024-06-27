@@ -22,7 +22,7 @@ import {
 } from '@/helper/ValidationHelper';
 import { getActivitiesBySiteID, logActivity } from '@/supabase/activity';
 import { getUserRole } from '@/supabase/org_details';
-import { listLitmusProducts } from '@/supabase/products';
+import { downloadProduct, listLitmusProducts } from '@/supabase/products';
 import { refreshToken } from '@/supabase/session';
 import {
   addUserToSites,
@@ -36,7 +36,7 @@ import {
   licenceData,
   sitesCounts,
 } from '@/supabase/sitedashboard';
-import { listSolutions } from '@/supabase/solutions';
+import { generateSignedUrl, listSolutions } from '@/supabase/solutions';
 import Loader from '@/utils/Loader/Loader';
 
 interface licenseData {
@@ -54,6 +54,7 @@ interface Products {
     FileName: string;
     downloadLink: string;
     extensionIncluded: string;
+    subfolder: string;
   };
   errorCode: number;
   folder: string;
@@ -542,7 +543,37 @@ const Page = () => {
       }
     });
   };
-  const handleDownload = async (fileName: string) => {
+  const handleDownload = async (
+    fileName: string,
+    folder: string,
+    subfolder: string,
+    flage: string,
+  ) => {
+    setLoading(true);
+    let result: any = null;
+    if (flage === 'P') {
+      result = await downloadProduct(folder, subfolder, fileName);
+    } else if (flage === 'S') {
+      result = await generateSignedUrl(folder, subfolder, fileName);
+    }
+    if (result) {
+      // Convert the response to a blob
+      const blob = new Blob([result], { type: result.type });
+      const url = window.URL.createObjectURL(blob);
+
+      // Create a link element and simulate a click to download the file
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Revoke the object URL to free up memory
+      window.URL.revokeObjectURL(url);
+    }
+
+    setLoading(false);
     const data = {
       org_id: org_id,
       site_id: site_id,
@@ -886,10 +917,15 @@ const Page = () => {
                                     <div className='font-semibold text-[0.9375rem] '>
                                       <a
                                         onClick={() => {
-                                          handleDownload(product.data.FileName);
+                                          handleDownload(
+                                            product.data.FileName,
+                                            product.folder,
+                                            product.data.subfolder,
+                                            'P',
+                                          );
                                         }}
                                         style={{ cursor: 'pointer' }}
-                                        href={product.data.downloadLink}
+                                        // href={product.data.downloadLink}
                                         className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
                                       >
                                         <i className='ri-download-line  text-[.8rem]  text-white'></i>
@@ -990,9 +1026,16 @@ const Page = () => {
                                   <div className='font-semibold text-[0.9375rem] '>
                                     <a
                                       onClick={() => {
-                                        handleDownload(solution.data.FileName);
+                                        handleDownload(
+                                          solution.data.FileName,
+                                          solution.folder.split('/')[0],
+                                          solution.folder.includes('/')
+                                            ? solution.folder.split('/')[-1]
+                                            : '',
+                                          'S',
+                                        );
                                       }}
-                                      href={solution.data.downloadLink}
+                                      // href={solution.data.downloadLink}
                                       className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
                                     >
                                       <i className='ri-download-line  text-[.8rem]  text-white'></i>
