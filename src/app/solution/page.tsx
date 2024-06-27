@@ -10,7 +10,7 @@ import swal from 'sweetalert';
 import { decryptData } from '@/helper/Encryption_Decryption';
 import { logActivity } from '@/supabase/activity';
 import { refreshToken } from '@/supabase/session';
-import { listOfAllSolutions } from '@/supabase/solutions';
+import { generateSignedUrl, listOfAllSolutions } from '@/supabase/solutions';
 import Loader from '@/utils/Loader/Loader';
 
 interface subFolder {
@@ -22,7 +22,6 @@ interface folder {
 }
 interface file {
   FileName: string;
-  downloadLink: string;
 }
 const Page = () => {
   const navigate = useRouter();
@@ -107,8 +106,8 @@ const Page = () => {
   function handleFolderClick(folder: any) {
     setSelectedFolder(folder);
     setSubFolders(folder.data);
+    setCurrentTrue(folder.data[0].subFolder);
     if (folder.data[0].subFolder != '') {
-      setCurrentTrue(folder.data[0].subFolder);
       setfile3(folder.data[0].files);
     }
   }
@@ -124,6 +123,29 @@ const Page = () => {
   }, [subFolders, file3, folder]);
 
   const handleDownload = async (fileName: string) => {
+    setLoading(true);
+    const result = await generateSignedUrl(
+      selectedFolder.folder,
+      currentTrue ? currentTrue.split('/').slice(-1) : '',
+      fileName,
+    );
+    if (result) {
+      // Convert the response to a blob
+      const blob = new Blob([result], { type: result.type });
+      const url = window.URL.createObjectURL(blob);
+
+      // Create a link element and simulate a click to download the file
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Revoke the object URL to free up memory
+      window.URL.revokeObjectURL(url);
+    }
+    setLoading(false);
     const data = {
       org_id: org_id,
       site_id: site_id,
@@ -247,7 +269,7 @@ const Page = () => {
                                     onClick={() => {
                                       handleDownload(file.FileName);
                                     }}
-                                    href={file.downloadLink}
+                                    // href={file.downloadLink}
                                     className='text-[1rem] !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'
                                   >
                                     <i className='ri-download-line text-[.8rem] text-white'></i>

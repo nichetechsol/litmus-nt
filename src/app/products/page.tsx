@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
@@ -9,7 +10,7 @@ import swal from 'sweetalert';
 
 import { decryptData } from '@/helper/Encryption_Decryption';
 import { logActivity } from '@/supabase/activity';
-import { allCurrentfiles } from '@/supabase/products';
+import { allCurrentfiles, downloadProduct } from '@/supabase/products';
 import { refreshToken } from '@/supabase/session';
 import Loader from '@/utils/Loader/Loader';
 
@@ -19,6 +20,7 @@ interface folder {
   folder: string;
   message: string;
 }
+
 const Page = () => {
   const navigate = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
@@ -30,7 +32,10 @@ const Page = () => {
   const [folder, setFolder] = useState<folder[] | null>(null);
   const [folderTrue, setFolderTrue] = useState(false);
   const [innerFolder, setInnerFolder] = useState<any>('');
-  const [selectedFolder, setSelectedFolder] = useState(null);
+  const [selectedFolder, setSelectedFolder] = useState<any>('');
+  // const [selectedFolder, setSelectedFolder] = useState<selectedFolder | null>(
+  //   null,
+  // );
   const [filteredFiles, setFilteredFiles] = useState<any>('');
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
@@ -103,7 +108,6 @@ const Page = () => {
         setLoading(true);
         if (site_id && org_id && org_type_id) {
           const data: any = await allCurrentfiles(site_id, org_id, org_type_id);
-
           if (data.data) {
             setFolder(data.data);
           } else {
@@ -145,8 +149,30 @@ const Page = () => {
       );
     }
   }, [currentTrue, innerFolder]);
-  const handleDownload = async (fileName: string) => {
-    //
+  const handleDownload = async (fileName: string, subfolder: string) => {
+    setLoading(true);
+    const result = await downloadProduct(
+      selectedFolder?.folder ?? '',
+      subfolder,
+      fileName,
+    );
+    if (result) {
+      // Convert the response to a blob
+      const blob = new Blob([result], { type: result.type });
+      const url = window.URL.createObjectURL(blob);
+
+      // Create a link element and simulate a click to download the file
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Revoke the object URL to free up memory
+      window.URL.revokeObjectURL(url);
+    }
+    setLoading(false);
     const data = {
       org_id: org_id,
       site_id: site_id,
@@ -291,7 +317,10 @@ const Page = () => {
                                       files.disabled === 'Y' ? (
                                         <a
                                           onClick={() =>
-                                            handleDownload(files.FileName)
+                                            handleDownload(
+                                              files.FileName,
+                                              files.subfolder,
+                                            )
                                           }
                                           href={files.downloadLink}
                                           className='text-[1rem] !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'

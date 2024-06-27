@@ -321,10 +321,17 @@ async function licenceData(site_id: any): Promise<FunctionReturnLicence> {
   }
 
   try {
-    // Fetch the licenses associated with the site
+    // Fetch the licenses associated with the site and their types in one query
     const { data: licences, error: licenceError } = await supabase
       .from('licence')
-      .select('*')
+      .select(
+        `
+        *,
+        licence_type (
+          name
+        )
+      `,
+      )
       .eq('site_id', site_id);
 
     // Check for errors during the fetch operation for licenses
@@ -345,26 +352,14 @@ async function licenceData(site_id: any): Promise<FunctionReturnLicence> {
       };
     }
 
-    // Fetch all license types in parallel
-    const licenceDetails = await Promise.all(
-      licences.map(async (licence) => {
-        const { data: licenceType, error: licenceTypeError } = await supabase
-          .from('licence_type')
-          .select('name')
-          .eq('id', licence.type)
-          .single(); // Assuming licence.type refers to the license type ID
-
-        // If there's an error fetching the license type, handle it here
-        if (licenceTypeError) {
-          throw new Error('Error while fetching license type name');
-        }
-        const licenseTypeName = licenceType.name;
-        return {
-          ...licence,
-          licence_type_name: licenseTypeName,
-        };
-      }),
-    );
+    // Map the license details to include the license type name
+    const licenceDetails = licences.map((licence) => {
+      const licenseTypeName = licence.licence_type.name;
+      return {
+        ...licence,
+        licence_type_name: licenseTypeName,
+      };
+    });
 
     // Return the license details with type names
     return {
@@ -383,6 +378,121 @@ async function licenceData(site_id: any): Promise<FunctionReturnLicence> {
 }
 
 // Define the function to fetch entitlement data for a site
+// async function entitlementSite(site_id: any, start: any, end: any) {
+//   try {
+//     // Validate the input
+//     if (!site_id) {
+//       return {
+//         errorCode: 1,
+//         message: 'Invalid input: site_id cannot be null or empty',
+//         data: null,
+//       };
+//     }
+//     const { count: totalCount, error: countError } = await supabase
+//       .from('entitlements_package')
+//       .select('*', { count: 'exact', head: true })
+//       .eq('site_id', site_id);
+
+//     if (countError) {
+//       return {
+//         errorCode: 1,
+//         data: null,
+//       };
+//     }
+
+//     // Fetch the licenses associated with the site
+//     const { data: entitlements_package, error: entitlementsError } =
+//       await supabase
+//         .from('entitlements_package')
+//         .select('*')
+//         .eq('site_id', site_id)
+//         .range(start, end);
+
+//     // Check for errors during the fetch operation for licenses
+//     if (entitlementsError) {
+//       return {
+//         errorCode: 1,
+//         message: 'Error while fetching entitlement packages',
+//         data: null,
+//       };
+//     }
+
+//     const entitlementList = [];
+
+//     for (const entitlement of entitlements_package) {
+//       // Fetch the name of the entitlement
+//       const { data: entitlementName, error: entitlementNameError } =
+//         await supabase
+//           .from('entitlements_name')
+//           .select('name')
+//           .eq('id', entitlement.entitlement_name_id)
+//           .single();
+
+//       // Fetch the value of the entitlement (select all potential value types)
+//       const { data: entitlementValue, error: entitlementValueError } =
+//         await supabase
+//           .from('entitlements_values')
+//           .select('*')
+//           .eq('id', entitlement.entitlement_value_id)
+//           .single();
+
+//       // Handle errors for fetching entitlement details
+//       if (entitlementNameError || entitlementValueError) {
+//         continue;
+//       }
+
+//       // Determine which value is present
+//       let entitlementValueResolved: any;
+//       if (
+//         entitlementValue.value_text !== null &&
+//         entitlementValue.value_text !== undefined
+//       ) {
+//         entitlementValueResolved = entitlementValue.value_text;
+
+//         entitlementValueResolved =
+//           entitlementValueResolved.charAt(0).toUpperCase() +
+//           entitlementValueResolved.slice(1);
+//       } else if (
+//         entitlementValue.value_number !== null &&
+//         entitlementValue.value_number !== undefined
+//       ) {
+//         entitlementValueResolved = entitlementValue.value_number;
+//       } else if (
+//         entitlementValue.value_bool !== null &&
+//         entitlementValue.value_bool !== undefined
+//       ) {
+//         entitlementValueResolved = entitlementValue.value_bool;
+//       } else {
+//         // If no value is present, continue to the next entitlement
+//         continue;
+//       }
+
+//       // Create detailed entitlement object
+//       const detailedEntitlement = {
+//         ...entitlement,
+//         entitlementName: entitlementName.name,
+//         entitlementValue: entitlementValueResolved,
+//       };
+
+//       entitlementList.push(detailedEntitlement);
+//     }
+
+//     // Return the license details with type names
+//     return {
+//       errorCode: 0,
+//       message: 'Success',
+//       data: entitlementList,
+//       totalCount: totalCount,
+//     };
+//   } catch (error) {
+//     // Log any unexpected errors
+//     return {
+//       errorCode: -1,
+//       message: 'Unexpected error during fetching license data',
+//       data: null,
+//     };
+//   }
+// }
 async function entitlementSite(site_id: any, start: any, end: any) {
   try {
     // Validate the input
@@ -393,28 +503,32 @@ async function entitlementSite(site_id: any, start: any, end: any) {
         data: null,
       };
     }
-    const { count: totalCount, error: countError } = await supabase
+
+    // Fetch the entitlements with related name and value details in one query
+    const {
+      data: entitlements,
+      count: totalCount,
+      error,
+    } = await supabase
       .from('entitlements_package')
-      .select('*', { count: 'exact', head: true })
-      .eq('site_id', site_id);
+      .select(
+        `
+        *,
+        entitlements_name (
+          name
+        ),
+        entitlements_values (
+          value_text,
+          value_number,
+          value_bool
+        )
+      `,
+        { count: 'exact' },
+      )
+      .eq('site_id', site_id)
+      .range(start, end);
 
-    if (countError) {
-      return {
-        errorCode: 1,
-        data: null,
-      };
-    }
-
-    // Fetch the licenses associated with the site
-    const { data: entitlements_package, error: entitlementsError } =
-      await supabase
-        .from('entitlements_package')
-        .select('*')
-        .eq('site_id', site_id)
-        .range(start, end);
-
-    // Check for errors during the fetch operation for licenses
-    if (entitlementsError) {
+    if (error) {
       return {
         errorCode: 1,
         message: 'Error while fetching entitlement packages',
@@ -422,65 +536,43 @@ async function entitlementSite(site_id: any, start: any, end: any) {
       };
     }
 
-    const entitlementList = [];
+    const entitlementList = entitlements
+      .map((entitlement) => {
+        const { entitlements_name, entitlements_values } = entitlement;
 
-    for (const entitlement of entitlements_package) {
-      // Fetch the name of the entitlement
-      const { data: entitlementName, error: entitlementNameError } =
-        await supabase
-          .from('entitlements_name')
-          .select('name')
-          .eq('id', entitlement.entitlement_name_id)
-          .single();
+        // Determine which value is present
+        let entitlementValueResolved: any;
+        if (
+          entitlements_values.value_text !== null &&
+          entitlements_values.value_text !== undefined
+        ) {
+          entitlementValueResolved = entitlements_values.value_text;
+          entitlementValueResolved =
+            entitlementValueResolved.charAt(0).toUpperCase() +
+            entitlementValueResolved.slice(1);
+        } else if (
+          entitlements_values.value_number !== null &&
+          entitlements_values.value_number !== undefined
+        ) {
+          entitlementValueResolved = entitlements_values.value_number;
+        } else if (
+          entitlements_values.value_bool !== null &&
+          entitlements_values.value_bool !== undefined
+        ) {
+          entitlementValueResolved = entitlements_values.value_bool;
+        } else {
+          // If no value is present, skip this entitlement
+          return null;
+        }
 
-      // Fetch the value of the entitlement (select all potential value types)
-      const { data: entitlementValue, error: entitlementValueError } =
-        await supabase
-          .from('entitlements_values')
-          .select('*')
-          .eq('id', entitlement.entitlement_value_id)
-          .single();
-
-      // Handle errors for fetching entitlement details
-      if (entitlementNameError || entitlementValueError) {
-        continue;
-      }
-
-      // Determine which value is present
-      let entitlementValueResolved: any;
-      if (
-        entitlementValue.value_text !== null &&
-        entitlementValue.value_text !== undefined
-      ) {
-        entitlementValueResolved = entitlementValue.value_text;
-
-        entitlementValueResolved =
-          entitlementValueResolved.charAt(0).toUpperCase() +
-          entitlementValueResolved.slice(1);
-      } else if (
-        entitlementValue.value_number !== null &&
-        entitlementValue.value_number !== undefined
-      ) {
-        entitlementValueResolved = entitlementValue.value_number;
-      } else if (
-        entitlementValue.value_bool !== null &&
-        entitlementValue.value_bool !== undefined
-      ) {
-        entitlementValueResolved = entitlementValue.value_bool;
-      } else {
-        // If no value is present, continue to the next entitlement
-        continue;
-      }
-
-      // Create detailed entitlement object
-      const detailedEntitlement = {
-        ...entitlement,
-        entitlementName: entitlementName.name,
-        entitlementValue: entitlementValueResolved,
-      };
-
-      entitlementList.push(detailedEntitlement);
-    }
+        // Create detailed entitlement object
+        return {
+          ...entitlement,
+          entitlementName: entitlements_name.name,
+          entitlementValue: entitlementValueResolved,
+        };
+      })
+      .filter((entitlement) => entitlement !== null); // Filter out null values
 
     // Return the license details with type names
     return {

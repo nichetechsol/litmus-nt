@@ -144,6 +144,105 @@ async function orgDashboardCounts(
 }
 
 // Function to fetch a list of users for an organization
+// async function orgUserList(
+//   org_id: any,
+//   start: any,
+//   end: any,
+//   search: any,
+// ): Promise<Result<{ userList: UserList[]; totalCount: any }>> {
+//   try {
+//     const { data: orgUsers, error: orgUsersError } = await supabase
+//       .from('org_users')
+//       .select('*')
+//       .eq('org_id', org_id);
+
+//     if (orgUsersError) {
+//       return {
+//         errorCode: 1,
+//         data: null,
+//       };
+//     }
+
+//     const userIds = orgUsers.map((orgUser: any) => orgUser.user_id);
+//     const roleIds = orgUsers.map((orgUser: any) => orgUser.role_id);
+
+//     let userQuery = supabase
+//       .from('users')
+//       .select('*')
+//       .in('id', userIds)
+//       .range(start, end);
+
+//     if (search) {
+//       userQuery = userQuery.ilike('firstname', `%${search}%`);
+//     } else {
+//       userQuery = userQuery.or('firstname.ilike.%,firstname.is.null');
+//     }
+
+//     const { data: users, error: usersError } = await userQuery;
+
+//     if (usersError) {
+//       return {
+//         errorCode: 1,
+//         data: null,
+//       };
+//     }
+
+//     const { data: userRoles, error: userRolesError } = await supabase
+//       .from('user_role')
+//       .select('*')
+//       .in('id', roleIds);
+
+//     if (userRolesError) {
+//       return {
+//         errorCode: 1,
+//         data: null,
+//       };
+//     }
+
+//     const roleMap: Record<number, string> = {};
+//     userRoles.forEach((role) => {
+//       roleMap[role.id] = role.name;
+//     });
+
+//     const userList = users
+//       .map((user) => {
+//         const orgUser = orgUsers.find((orgUser) => orgUser.user_id === user.id);
+//         if (!orgUser) {
+//           return null; // Handle case where orgUser is not found
+//         }
+//         return {
+//           ...user,
+//           role_id: orgUser.role_id,
+//           role: roleMap[orgUser.role_id],
+//         };
+//       })
+//       .filter(Boolean) as UserList[];
+
+//     const totalCountQuery = supabase
+//       .from('users')
+//       .select('*', { count: 'exact' })
+//       .in('id', userIds);
+
+//     if (search) {
+//       totalCountQuery.ilike('firstname', `%${search}%`);
+//     } else {
+//       totalCountQuery.or('firstname.ilike.%,firstname.is.null');
+//     }
+
+//     const totalCountResult = await totalCountQuery;
+//     const totalCount = totalCountResult.count || 0;
+
+//     return {
+//       errorCode: 0,
+//       data: { userList, totalCount },
+//     };
+//   } catch (error) {
+//     return {
+//       errorCode: 1,
+//       data: null,
+//     };
+//   }
+// }
 async function orgUserList(
   org_id: any,
   start: any,
@@ -168,7 +267,14 @@ async function orgUserList(
 
     let userQuery = supabase
       .from('users')
-      .select('*')
+      .select(
+        `
+        id,
+        email,
+        firstname,
+        lastname
+      `,
+      )
       .in('id', userIds)
       .range(start, end);
 
@@ -189,7 +295,7 @@ async function orgUserList(
 
     const { data: userRoles, error: userRolesError } = await supabase
       .from('user_role')
-      .select('*')
+      .select('id, name')
       .in('id', roleIds);
 
     if (userRolesError) {
@@ -229,8 +335,7 @@ async function orgUserList(
       totalCountQuery.or('firstname.ilike.%,firstname.is.null');
     }
 
-    const totalCountResult = await totalCountQuery;
-    const totalCount = totalCountResult.count || 0;
+    const { count: totalCount } = await totalCountQuery;
 
     return {
       errorCode: 0,
@@ -245,102 +350,182 @@ async function orgUserList(
 }
 
 // Function to fetch a list of entitlements for an organization
+// async function orgEntitlementList(
+//   org_id: any,
+//   start: any,
+//   end: any,
+// ): Promise<Result<{ totalCount: number; entitlements: EntitlementList[] }>> {
+//   try {
+//     // Fetch total count of entitlements
+//     const { count: totalCount, error: countError } = await supabase
+//       .from('entitlements_package')
+//       .select('*', { count: 'exact', head: true })
+//       .eq('org_id', org_id);
+
+//     if (countError) {
+//       return {
+//         errorCode: 1,
+//         data: null,
+//       };
+//     }
+
+//     // Fetch paginated list of entitlements
+//     const { data: entitlements, error: entitlementsError } = await supabase
+//       .from('entitlements_package')
+//       .select('*')
+//       .eq('org_id', org_id)
+//       .range(start, end);
+
+//     if (entitlementsError) {
+//       return {
+//         errorCode: 1,
+//         data: null,
+//       };
+//     }
+
+//     const entitlementList: EntitlementList[] = [];
+
+//     for (const entitlement of entitlements) {
+//       // Fetch the name of the entitlement
+//       const { data: entitlementName, error: entitlementNameError } =
+//         await supabase
+//           .from('entitlements_name')
+//           .select('name')
+//           .eq('id', entitlement.entitlement_name_id)
+//           .single();
+
+//       // Fetch the value of the entitlement (select all potential value types)
+//       const { data: entitlementValue, error: entitlementValueError } =
+//         await supabase
+//           .from('entitlements_values')
+//           .select('*')
+//           .eq('id', entitlement.entitlement_value_id)
+//           .single();
+
+//       // Handle errors for fetching entitlement details
+//       if (entitlementNameError || entitlementValueError) {
+//         continue;
+//       }
+
+//       // Determine which value is present
+//       let entitlementValueResolved: any;
+//       if (
+//         entitlementValue.value_text !== null &&
+//         entitlementValue.value_text !== undefined
+//       ) {
+//         entitlementValueResolved = entitlementValue.value_text;
+
+//         entitlementValueResolved =
+//           entitlementValueResolved.charAt(0).toUpperCase() +
+//           entitlementValueResolved.slice(1);
+//       } else if (
+//         entitlementValue.value_number !== null &&
+//         entitlementValue.value_number !== undefined
+//       ) {
+//         entitlementValueResolved = entitlementValue.value_number;
+//       } else if (
+//         entitlementValue.value_bool !== null &&
+//         entitlementValue.value_bool !== undefined
+//       ) {
+//         entitlementValueResolved = entitlementValue.value_bool;
+//       } else {
+//         // If no value is present, continue to the next entitlement
+//         continue;
+//       }
+
+//       // Create detailed entitlement object
+//       const detailedEntitlement = {
+//         ...entitlement,
+//         entitlementName: entitlementName.name,
+//         entitlementValue: entitlementValueResolved,
+//       };
+
+//       entitlementList.push(detailedEntitlement);
+//     }
+//     return {
+//       errorCode: 0,
+//       data: {
+//         totalCount: totalCount || 0, // Provide a default value in case totalCount is undefined
+//         entitlements: entitlementList,
+//       },
+//     };
+//   } catch (error) {
+//     return {
+//       errorCode: 1,
+//       data: null,
+//     };
+//   }
+// }
 async function orgEntitlementList(
   org_id: any,
   start: any,
   end: any,
 ): Promise<Result<{ totalCount: number; entitlements: EntitlementList[] }>> {
   try {
-    // Fetch total count of entitlements
-    const { count: totalCount, error: countError } = await supabase
+    // Fetch entitlements with names and values using joins
+    const {
+      data: entitlements,
+      count,
+      error,
+    } = await supabase
       .from('entitlements_package')
-      .select('*', { count: 'exact', head: true })
-      .eq('org_id', org_id);
-
-    if (countError) {
-      return {
-        errorCode: 1,
-        data: null,
-      };
-    }
-
-    // Fetch paginated list of entitlements
-    const { data: entitlements, error: entitlementsError } = await supabase
-      .from('entitlements_package')
-      .select('*')
+      .select(
+        `
+        *,
+        entitlement_name:entitlements_name(name),
+        entitlement_value:entitlements_values(*)
+      `,
+        { count: 'exact' },
+      )
       .eq('org_id', org_id)
       .range(start, end);
 
-    if (entitlementsError) {
+    if (error) {
       return {
         errorCode: 1,
         data: null,
       };
     }
 
-    const entitlementList: EntitlementList[] = [];
+    const entitlementList: EntitlementList[] = entitlements
+      .map((entitlement) => {
+        // Determine which value is present
+        let entitlementValueResolved: any;
+        if (
+          entitlement.entitlement_value.value_text !== null &&
+          entitlement.entitlement_value.value_text !== undefined
+        ) {
+          entitlementValueResolved = entitlement.entitlement_value.value_text;
+          entitlementValueResolved =
+            entitlementValueResolved.charAt(0).toUpperCase() +
+            entitlementValueResolved.slice(1);
+        } else if (
+          entitlement.entitlement_value.value_number !== null &&
+          entitlement.entitlement_value.value_number !== undefined
+        ) {
+          entitlementValueResolved = entitlement.entitlement_value.value_number;
+        } else if (
+          entitlement.entitlement_value.value_bool !== null &&
+          entitlement.entitlement_value.value_bool !== undefined
+        ) {
+          entitlementValueResolved = entitlement.entitlement_value.value_bool;
+        } else {
+          // If no value is present, return null to filter out later
+          return null;
+        }
 
-    for (const entitlement of entitlements) {
-      // Fetch the name of the entitlement
-      const { data: entitlementName, error: entitlementNameError } =
-        await supabase
-          .from('entitlements_name')
-          .select('name')
-          .eq('id', entitlement.entitlement_name_id)
-          .single();
+        return {
+          ...entitlement,
+          entitlementName: entitlement.entitlement_name.name,
+          entitlementValue: entitlementValueResolved,
+        };
+      })
+      .filter(Boolean); // Filter out any null values
 
-      // Fetch the value of the entitlement (select all potential value types)
-      const { data: entitlementValue, error: entitlementValueError } =
-        await supabase
-          .from('entitlements_values')
-          .select('*')
-          .eq('id', entitlement.entitlement_value_id)
-          .single();
-
-      // Handle errors for fetching entitlement details
-      if (entitlementNameError || entitlementValueError) {
-        continue;
-      }
-
-      // Determine which value is present
-      let entitlementValueResolved: any;
-      if (
-        entitlementValue.value_text !== null &&
-        entitlementValue.value_text !== undefined
-      ) {
-        entitlementValueResolved = entitlementValue.value_text;
-
-        entitlementValueResolved =
-          entitlementValueResolved.charAt(0).toUpperCase() +
-          entitlementValueResolved.slice(1);
-      } else if (
-        entitlementValue.value_number !== null &&
-        entitlementValue.value_number !== undefined
-      ) {
-        entitlementValueResolved = entitlementValue.value_number;
-      } else if (
-        entitlementValue.value_bool !== null &&
-        entitlementValue.value_bool !== undefined
-      ) {
-        entitlementValueResolved = entitlementValue.value_bool;
-      } else {
-        // If no value is present, continue to the next entitlement
-        continue;
-      }
-
-      // Create detailed entitlement object
-      const detailedEntitlement = {
-        ...entitlement,
-        entitlementName: entitlementName.name,
-        entitlementValue: entitlementValueResolved,
-      };
-
-      entitlementList.push(detailedEntitlement);
-    }
     return {
       errorCode: 0,
       data: {
-        totalCount: totalCount || 0, // Provide a default value in case totalCount is undefined
+        totalCount: count || 0, // Provide a default value in case count is undefined
         entitlements: entitlementList,
       },
     };
