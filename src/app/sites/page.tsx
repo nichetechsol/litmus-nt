@@ -1101,27 +1101,17 @@ const Page: React.FC = () => {
                                           <i className='bx bx-map align-middle me-2 text-muted'></i>
                                           <b>Address </b>
                                           <p className='ms-1 over-text text-muted fw-normal d-inline-block'>
-                                            {SingleSite?.site
-                                              ? SingleSite.site?.address1 +
-                                                ',' +
-                                                SingleSite?.site?.address2
-                                              : ''}
-
-                                            {/* {SingleSite?.site
-                                              ? SingleSite.site?.address2 + ','
-                                              : ''} */}
-
-                                            {SingleSite?.site
-                                              ? SingleSite.site?.city + ','
-                                              : ''}
-
-                                            {SingleSite?.site
-                                              ? SingleSite.state + ','
-                                              : ''}
-
-                                            {SingleSite?.site
-                                              ? SingleSite.country
-                                              : ''}
+                                            {SingleSite?.site && (
+                                              <>
+                                                {SingleSite?.site?.address1}
+                                                {SingleSite?.site?.address2
+                                                  ? `, ${SingleSite?.site?.address2}`
+                                                  : ''}
+                                                {`, ${SingleSite?.site?.city}`}
+                                                {`, ${SingleSite?.state}`}
+                                                {`, ${SingleSite?.country}`}
+                                              </>
+                                            )}
                                           </p>
                                         </li>
                                         <li className='list-group-item fw-semibold'>
