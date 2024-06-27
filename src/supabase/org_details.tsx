@@ -34,48 +34,94 @@ interface OrganizationWithSiteCount {
   sites_count: number;
 }
 
+// async function fetchOrganizationAndSiteDetails(
+//   user_id: any | null,
+// ): Promise<OrganizationWithSiteCount[] | null> {
+//   try {
+//     // Fetch org_id associated with the user
+//     const { data: userOrgs, error: userOrgError } = await supabase
+//       .from('org_users')
+//       .select('org_id')
+//       .eq('user_id', user_id);
+
+//     if (userOrgError) {
+//       throw userOrgError;
+//     }
+
+//     // Extract the org_ids from userOrgs
+//     const orgIds = userOrgs.map((org) => org.org_id);
+
+//     // Fetch organization details based on orgIds
+//     const { data: orgDetails, error: orgError } = await supabase
+//       .from('org_details')
+//       .select('*')
+//       .in('id', orgIds)
+//       .order('created_at', { ascending: false });
+
+//     if (orgError) {
+//       throw orgError;
+//     }
+
+//     // Fetch site details
+//     const { data: siteDetails, error: siteError } = await supabase
+//       .from('sites_detail')
+//       .select('*');
+
+//     if (siteError) {
+//       throw siteError;
+//     }
+
+//     // Count sites for each organization
+//     const orgsWithSitesCount = orgDetails.map((org) => {
+//       const sitesCountForOrg = siteDetails.filter(
+//         (site) => site.org_id === org.id,
+//       ).length;
+//       return {
+//         errorCode: 0,
+//         org_id: org.id,
+//         org_name: org.name,
+//         org_type_id: org.type_id,
+//         sites_count: sitesCountForOrg,
+//       };
+//     });
+
+//     return orgsWithSitesCount;
+//   } catch (error) {
+//     return null;
+//   }
+// }
 async function fetchOrganizationAndSiteDetails(
   user_id: any | null,
 ): Promise<OrganizationWithSiteCount[] | null> {
   try {
-    // Fetch org_id associated with the user
-    const { data: userOrgs, error: userOrgError } = await supabase
+    // Fetch organization and site details in one query
+    const { data, error } = await supabase
       .from('org_users')
-      .select('org_id')
-      .eq('user_id', user_id);
-
-    if (userOrgError) {
-      throw userOrgError;
-    }
-
-    // Extract the org_ids from userOrgs
-    const orgIds = userOrgs.map((org) => org.org_id);
-
-    // Fetch organization details based on orgIds
-    const { data: orgDetails, error: orgError } = await supabase
-      .from('org_details')
-      .select('*')
-      .in('id', orgIds)
+      .select(
+        `
+        org_id,
+        org_details (
+          id,
+          name,
+          type_id,
+          sites:sites_detail (
+            id,
+            org_id
+          )
+        )
+      `,
+      )
+      .eq('user_id', user_id)
       .order('created_at', { ascending: false });
 
-    if (orgError) {
-      throw orgError;
+    if (error) {
+      throw error;
     }
 
-    // Fetch site details
-    const { data: siteDetails, error: siteError } = await supabase
-      .from('sites_detail')
-      .select('*');
-
-    if (siteError) {
-      throw siteError;
-    }
-
-    // Count sites for each organization
-    const orgsWithSitesCount = orgDetails.map((org) => {
-      const sitesCountForOrg = siteDetails.filter(
-        (site) => site.org_id === org.id,
-      ).length;
+    // Transform the data to get the required structure
+    const orgsWithSitesCount = data.map((orgUser) => {
+      const org: any = orgUser.org_details;
+      const sitesCountForOrg: any = org.sites.length;
       return {
         errorCode: 0,
         org_id: org.id,

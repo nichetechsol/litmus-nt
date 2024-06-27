@@ -38,6 +38,135 @@ interface SiteDetailsWithUsers {
   type_name: string | null;
 }
 
+// async function fetchSiteDetails(
+//   org_id: any,
+//   user_id: any,
+// ): Promise<Result<SiteDetailsWithUsers[]>> {
+//   try {
+//     // Fetch site_id associated with the user
+//     const { data: userOrgs, error: userOrgError } = await supabase
+//       .from('site_users')
+//       .select('site_id')
+//       .eq('user_id', user_id);
+
+//     if (userOrgError) {
+//       throw userOrgError;
+//     }
+
+//     // Extract the site_ids from userOrgs
+//     const siteId: any = userOrgs.map((site) => site.site_id);
+//     // Fetch organization details
+//     const { data: siteDetails, error } = await supabase
+//       .from('sites_detail')
+//       .select('*')
+//       .in('id', siteId)
+//       .eq('org_id', org_id)
+//       .order('created_at', { ascending: false });
+
+//     if (error) {
+//       throw error;
+//     }
+
+//     const siteIds = siteDetails.map((site) => site.id);
+//     const countryIds = siteDetails.map((site) => site.country_id);
+//     const stateIds = siteDetails.map((site) => site.state_id);
+//     const typeIds = siteDetails.map((site) => site.type_id);
+
+//     // Fetch all related data in bulk
+//     const [
+//       { data: usersData, error: usersError },
+//       { data: countriesData, error: countriesError },
+//       { data: statesData, error: statesError },
+//       { data: typesData, error: typesError },
+//       { data: ownersData, error: ownersError },
+//     ] = await Promise.all([
+//       supabase
+//         .from('site_users')
+//         .select('*', { count: 'exact' })
+//         .in('site_id', siteIds),
+//       supabase.from('country').select('id, name').in('id', countryIds),
+//       supabase.from('state').select('id, name').in('id', stateIds),
+//       supabase.from('site_types').select('id, name').in('id', typeIds),
+//       supabase
+//         .from('site_users')
+//         .select('site_id, user_id')
+//         .in('site_id', siteIds)
+//         .eq('role_id', 1),
+//     ]);
+
+//     if (
+//       usersError ||
+//       countriesError ||
+//       statesError ||
+//       typesError ||
+//       ownersError
+//     ) {
+//       throw new Error(
+//         [usersError, countriesError, statesError, typesError, ownersError]
+//           .filter(Boolean)
+//           .map((err) => err?.message ?? 'Unknown error')
+//           .join(', '),
+//       );
+//     }
+
+//     // Fetch owner details if ownersData is not null
+//     let ownerDetails: { id: string; firstname: string }[] = [];
+//     if (ownersData) {
+//       const ownerUserIds = ownersData.map((owner) => owner.user_id);
+//       const { data: fetchedOwnerDetails, error: ownerDetailsError } =
+//         await supabase
+//           .from('users')
+//           .select('id, firstname')
+//           .in('id', ownerUserIds);
+
+//       if (ownerDetailsError) {
+//         throw ownerDetailsError;
+//       }
+
+//       ownerDetails = fetchedOwnerDetails ?? [];
+//     }
+
+//     const siteDetailsWithUsers: any = siteDetails.map((site) => {
+//       const siteUsers =
+//         usersData?.filter((user) => user.site_id === site.id) || [];
+//       const siteOwners =
+//         ownersData?.filter((owner) => owner.site_id === site.id) || [];
+//       const ownerNames = siteOwners
+//         .map(
+//           (owner) =>
+//             ownerDetails.find((user) => user.id === owner.user_id)?.firstname,
+//         )
+//         .filter(Boolean);
+//       const country =
+//         countriesData?.find((country) => country.id === site.country_id)
+//           ?.name || null;
+//       const state =
+//         statesData?.find((state) => state.id === site.state_id)?.name || null;
+//       const type_name =
+//         typesData?.find((type) => type.id === site.type_id)?.name || null;
+
+//       return {
+//         site,
+//         users: siteUsers,
+//         ownerNames,
+//         country,
+//         state,
+//         type_name,
+//       };
+//     });
+
+//     return {
+//       errorCode: 0,
+//       data: siteDetailsWithUsers,
+//     };
+//   } catch (error) {
+//     return {
+//       errorCode: 1,
+//       message: (error as Error).message,
+//       data: null,
+//     };
+//   }
+// }
 async function fetchSiteDetails(
   org_id: any,
   user_id: any,
@@ -54,12 +183,38 @@ async function fetchSiteDetails(
     }
 
     // Extract the site_ids from userOrgs
-    const siteId: any = userOrgs.map((site) => site.site_id);
-    // Fetch organization details
+    const siteIds: any = userOrgs.map((site) => site.site_id);
+
+    // Fetch site details and related data
     const { data: siteDetails, error } = await supabase
       .from('sites_detail')
-      .select('*')
-      .in('id', siteId)
+      .select(
+        `
+        *,
+        country:country_id (name),
+        state:state_id (name),
+        type:type_id (name),
+        users:site_users (
+          user_id,
+          role_id,
+          user:users (
+            id,
+            firstname,
+            lastname,
+            email
+          )
+        ),
+        owners:site_users (
+          user_id,
+          role_id,
+          user:users (
+            id,
+            firstname
+          )
+        )
+      `,
+      )
+      .in('id', siteIds)
       .eq('org_id', org_id)
       .order('created_at', { ascending: false });
 
@@ -67,91 +222,28 @@ async function fetchSiteDetails(
       throw error;
     }
 
-    const siteIds = siteDetails.map((site) => site.id);
-    const countryIds = siteDetails.map((site) => site.country_id);
-    const stateIds = siteDetails.map((site) => site.state_id);
-    const typeIds = siteDetails.map((site) => site.type_id);
-
-    // Fetch all related data in bulk
-    const [
-      { data: usersData, error: usersError },
-      { data: countriesData, error: countriesError },
-      { data: statesData, error: statesError },
-      { data: typesData, error: typesError },
-      { data: ownersData, error: ownersError },
-    ] = await Promise.all([
-      supabase
-        .from('site_users')
-        .select('*', { count: 'exact' })
-        .in('site_id', siteIds),
-      supabase.from('country').select('id, name').in('id', countryIds),
-      supabase.from('state').select('id, name').in('id', stateIds),
-      supabase.from('site_types').select('id, name').in('id', typeIds),
-      supabase
-        .from('site_users')
-        .select('site_id, user_id')
-        .in('site_id', siteIds)
-        .eq('role_id', 1),
-    ]);
-
-    if (
-      usersError ||
-      countriesError ||
-      statesError ||
-      typesError ||
-      ownersError
-    ) {
-      throw new Error(
-        [usersError, countriesError, statesError, typesError, ownersError]
-          .filter(Boolean)
-          .map((err) => err?.message ?? 'Unknown error')
-          .join(', '),
-      );
-    }
-
-    // Fetch owner details if ownersData is not null
-    let ownerDetails: { id: string; firstname: string }[] = [];
-    if (ownersData) {
-      const ownerUserIds = ownersData.map((owner) => owner.user_id);
-      const { data: fetchedOwnerDetails, error: ownerDetailsError } =
-        await supabase
-          .from('users')
-          .select('id, firstname')
-          .in('id', ownerUserIds);
-
-      if (ownerDetailsError) {
-        throw ownerDetailsError;
-      }
-
-      ownerDetails = fetchedOwnerDetails ?? [];
-    }
-
     const siteDetailsWithUsers: any = siteDetails.map((site) => {
-      const siteUsers =
-        usersData?.filter((user) => user.site_id === site.id) || [];
+      const siteUsers = site.users || [];
       const siteOwners =
-        ownersData?.filter((owner) => owner.site_id === site.id) || [];
-      const ownerNames = siteOwners
-        .map(
-          (owner) =>
-            ownerDetails.find((user) => user.id === owner.user_id)?.firstname,
-        )
-        .filter(Boolean);
-      const country =
-        countriesData?.find((country) => country.id === site.country_id)
-          ?.name || null;
-      const state =
-        statesData?.find((state) => state.id === site.state_id)?.name || null;
-      const type_name =
-        typesData?.find((type) => type.id === site.type_id)?.name || null;
+        site.owners.filter((owner: any) => owner.role_id === 1) || [];
+      const ownerNames = siteOwners.map((owner: any) => owner.user.firstname);
 
       return {
         site,
-        users: siteUsers,
+        users: siteUsers.map((user: any) => ({
+          user_id: user.user_id,
+          role_id: user.role_id,
+          user: {
+            id: user.user.id,
+            firstname: user.user.firstname,
+            lastname: user.user.lastname,
+            email: user.user.email,
+          },
+        })),
         ownerNames,
-        country,
-        state,
-        type_name,
+        country: site.country?.name || null,
+        state: site.state?.name || null,
+        type_name: site.type?.name || null,
       };
     });
 
@@ -168,49 +260,98 @@ async function fetchSiteDetails(
   }
 }
 
+// async function fetchSiteSidebarList(
+//   searchQuery: string,
+//   org_id: any,
+//   user_id: any,
+// ): Promise<Result<SiteDetails[]>> {
+//   try {
+//     // Fetch site details with names matching the search query
+//     const { data: userOrgs, error: userOrgError } = await supabase
+//       .from('site_users')
+//       .select('site_id')
+//       .eq('user_id', user_id);
+
+//     if (userOrgError) {
+//       throw userOrgError;
+//     }
+
+//     // Extract the site_ids from userOrgs
+//     const siteId: any = userOrgs.map((site) => site.site_id);
+
+//     const { data: siteDetails, error } = await supabase
+//       .from('sites_detail')
+//       .select('*')
+//       .in('id', siteId)
+//       .eq('org_id', org_id)
+//       .ilike('name', `%${searchQuery}%`);
+
+//     if (error) {
+//       return {
+//         errorCode: 1,
+//         message: 'Error fetching site details',
+//         data: null,
+//       };
+//     } else {
+//       return {
+//         errorCode: 0,
+//         message: 'Site details fetched successfully',
+//         data: siteDetails,
+//       };
+//     }
+//   } catch (error) {
+//     return {
+//       errorCode: 1,
+//       message: (error as Error).message,
+//       data: null,
+//     };
+//   }
+// }
 async function fetchSiteSidebarList(
   searchQuery: string,
   org_id: any,
   user_id: any,
 ): Promise<Result<SiteDetails[]>> {
   try {
-    // Fetch site details with names matching the search query
+    // Fetch site_ids associated with the user
     const { data: userOrgs, error: userOrgError } = await supabase
       .from('site_users')
       .select('site_id')
       .eq('user_id', user_id);
 
     if (userOrgError) {
-      throw userOrgError;
+      return {
+        errorCode: 1,
+        message: 'No data found',
+        data: null,
+      };
     }
 
-    // Extract the site_ids from userOrgs
-    const siteId: any = userOrgs.map((site) => site.site_id);
+    // Extract the site_ids
+    const siteIds = userOrgs.map((site) => site.site_id);
 
+    // Fetch site details with names matching the search query
     const { data: siteDetails, error } = await supabase
       .from('sites_detail')
       .select('*')
-      .in('id', siteId)
+      .in('id', siteIds)
       .eq('org_id', org_id)
-      .ilike('name', `%${searchQuery}%`);
+      .ilike('name', `%${searchQuery}%`)
+      .order('created_at', { ascending: false });
 
     if (error) {
-      return {
-        errorCode: 1,
-        message: 'Error fetching site details',
-        data: null,
-      };
-    } else {
-      return {
-        errorCode: 0,
-        message: 'Site details fetched successfully',
-        data: siteDetails,
-      };
+      throw error;
     }
+
+    return {
+      errorCode: 0,
+      message: 'Site details fetched successfully',
+      data: siteDetails,
+    };
   } catch (error) {
     return {
       errorCode: 1,
-      message: (error as Error).message,
+      message: 'No data found',
       data: null,
     };
   }

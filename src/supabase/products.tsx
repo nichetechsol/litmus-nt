@@ -1,3 +1,4 @@
+/* eslint-disable simple-import-sort/exports */
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import supabase from '@/supabase/db';
@@ -142,7 +143,7 @@ async function listLitmusProducts(site_id: any, org_id: any, org_type_id: any) {
       const topFile = currentFiles.length > 0 ? currentFiles[0] : null;
 
       // Generate a signed URL for the top file
-      let downloadLink = null;
+      const downloadLink = null;
       let dataName = null;
       let extensionIncluded = null;
 
@@ -152,32 +153,42 @@ async function listLitmusProducts(site_id: any, org_id: any, org_type_id: any) {
           .list(`${item.name}/${topFile}`); // Adjust the expiration time as needed
         if (fileData && fileData.length > 0) {
           dataName = fileData[0].name;
-
-          const { data: download, error } = await supabase.storage
-            .from('Litmus_Products')
-            .createSignedUrl(`${item.name}/${topFile}/${dataName}`, 60);
-          if (error) {
-            downloadLink = null;
-          } else {
-            downloadLink = download.signedUrl;
-            const fileExtension = dataName.split('.').pop();
+          const fileExtension = dataName.split('.').pop();
+          if (fileExtension) {
             if (org_type_id === 1) {
               extensionIncluded = fileTypes.includes(fileExtension) ? 'Y' : 'N';
             } else if (org_type_id === 2 || org_type_id === 3) {
               extensionIncluded = 'Y';
             }
           }
+
+          // const { data: download, error } = await supabase.storage
+          //   .from('Litmus_Products')
+          //   .createSignedUrl(`${item.name}/${topFile}/${dataName}`, 60);
+          // if (error) {
+          //   downloadLink = null;
+          // } else {
+          //   downloadLink = download.signedUrl;
+          //   const fileExtension = dataName.split('.').pop();
+          //   if (org_type_id === 1) {
+          //     extensionIncluded = fileTypes.includes(fileExtension) ? 'Y' : 'N';
+          //   } else if (org_type_id === 2 || org_type_id === 3) {
+          //     extensionIncluded = 'Y';
+          //   }
+          // }
         }
       }
 
       results.push({
         folder: item.name,
+
         errorCode: 0,
         message: 'Success',
         data: {
           FileName: dataName,
-          downloadLink: downloadLink,
+          downloadLink: '',
           extensionIncluded: extensionIncluded,
+          subfolder: topFile,
         },
       });
     }
@@ -349,23 +360,24 @@ async function allCurrentfiles(site_id: any, org_id: any, org_type_id: any) {
                 extensionIncluded = 'Y';
               }
 
-              const { data: download, error: downloadError } =
-                await supabase.storage
-                  .from('Litmus_Products')
-                  .createSignedUrl(
-                    `${item.name}/${allFiles.name}/${dataName}`,
-                    60,
-                  );
+              // const { data: download, error: downloadError } =
+              //   await supabase.storage
+              //     .from('Litmus_Products')
+              //     .createSignedUrl(
+              //       `${item.name}/${allFiles.name}/${dataName}`,
+              //       60,
+              //     );
 
-              if (downloadError) {
-                return null;
-              }
+              // if (downloadError) {
+              //   return null;
+              // }
 
               return {
                 FileName: dataName,
-                downloadLink: download.signedUrl,
+                downloadLink: '',
                 status: allFiles.status,
                 disabled: extensionIncluded,
+                subfolder: allFiles.name,
               };
             }),
           );
@@ -453,5 +465,20 @@ async function allfiles() {
     data: currentFilesList, // Return the list of current files
   };
 }
+const downloadProduct = async (
+  folder: string,
+  subfolder: any,
+  fileName: any,
+) => {
+  const path: any = folder + '/' + subfolder + '/' + fileName;
+  const { data, error } = await supabase.storage
+    .from('Litmus_Products')
+    .download(path);
 
-export { allCurrentfiles, allfiles, listLitmusProducts };
+  // Adjust the expiration time as needed
+  if (error) {
+    return null;
+  }
+  return data;
+};
+export { allCurrentfiles, allfiles, listLitmusProducts, downloadProduct };
