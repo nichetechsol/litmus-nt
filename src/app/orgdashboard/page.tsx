@@ -197,7 +197,7 @@ const OrgDashboard = () => {
 
   const fetchData2 = async () => {
     try {
-      // setLoading(true);
+      setLoading(true);
 
       const start: any = (activePage - 1) * perPage; // Calculate start index
       const end: any = start + perPage - 1; // Calculate end index
@@ -207,13 +207,13 @@ const OrgDashboard = () => {
         if (data) {
           setOrgUserData(data.data.userList);
           setTotalItemsCount(data.data?.totalCount); // Set total items count for pagination
-          // setLoading(false);
+          setLoading(false);
         } else {
-          //
+          setLoading(false);
         }
       }
     } catch (error: any) {
-      //
+      setLoading(false);
     }
   };
   useEffect(() => {
@@ -222,7 +222,7 @@ const OrgDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
+        // setLoading(true);
         const start: any = (activePage2 - 1) * perPage2; // Calculate start index
         const end: any = start + perPage2 - 1; // Calculate end index
         if (org_id) {
@@ -231,13 +231,13 @@ const OrgDashboard = () => {
           if (data) {
             setEntitlementListData(data?.data?.entitlements);
             setTotalItemsCount2(data.data?.totalCount); // Set total items count for pagination
-            setLoading(false);
+            // setLoading(false);
           } else {
-            setLoading(false);
+            // setLoading(false);
           }
         }
       } catch (error: any) {
-        setLoading(false);
+        // setLoading(false);
       }
     };
 
