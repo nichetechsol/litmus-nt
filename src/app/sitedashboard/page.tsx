@@ -266,14 +266,14 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
+        // setLoading(true);
         const data: any = await listSolutions();
         if (data) {
           setSolution(data.data);
         }
-        setLoading(false);
+        // setLoading(false);
       } catch (error: any) {
-        setLoading(false);
+        // setLoading(false);
         //
       }
     };
@@ -318,6 +318,7 @@ const Page = () => {
     const fetchData = async () => {
       try {
         if (site_id) {
+          setLoading(true);
           const result1: any = await listLitmusProducts(
             site_id,
             org_id,
@@ -326,11 +327,11 @@ const Page = () => {
           if (result1) {
             setProducts(result1.data);
             setProductSiteCount(result1.data.length);
-            // setLoading(false);
+            setLoading(false);
           }
         }
       } catch (error: any) {
-        // setLoading(false);
+        setLoading(false);
         //
       }
     };
