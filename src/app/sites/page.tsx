@@ -1102,12 +1102,14 @@ const Page: React.FC = () => {
                                           <b>Address </b>
                                           <p className='ms-1 over-text text-muted fw-normal d-inline-block'>
                                             {SingleSite?.site
-                                              ? SingleSite.site?.address1 + ','
+                                              ? SingleSite.site?.address1 +
+                                                ',' +
+                                                SingleSite?.site?.address2
                                               : ''}
 
-                                            {SingleSite?.site
+                                            {/* {SingleSite?.site
                                               ? SingleSite.site?.address2 + ','
-                                              : ''}
+                                              : ''} */}
 
                                             {SingleSite?.site
                                               ? SingleSite.site?.city + ','

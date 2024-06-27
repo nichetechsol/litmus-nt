@@ -444,11 +444,15 @@ const Page = () => {
         : domainInput.split(',').map((domain) => domain.trim());
       const newDomains = [];
       let errorMessage = '';
+      const seenDomains = new Set();
 
       for (const domain of domainsArray) {
         if (domains.includes(domain)) {
           errorMessage += `Domain ${domain} already added. `;
+        } else if (seenDomains.has(domain)) {
+          errorMessage += `Domain ${domain} repeated. `;
         } else {
+          seenDomains.add(domain);
           try {
             await DomainSchema.validate(domain);
             newDomains.push(domain);
@@ -487,7 +491,6 @@ const Page = () => {
       .catch((err: Yup.ValidationError) => {
         setDomainError(err.message);
       });
-    // handleDomainChange;
   };
   //   const removeDomain = (domain: string) => {
   //     setDomains(domains.filter(d => d !== domain));
