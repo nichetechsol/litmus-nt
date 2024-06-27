@@ -635,7 +635,7 @@ const Page = () => {
                                       />
                                       <button
                                         type='button'
-                                        className='ti-btn bg-primary text-white ml-2 mb-0'
+                                        className='ti-btn bg-primary text-white ml-2 mb-0 plus-btn-org'
                                         onClick={handleDomainPlus}
                                       >
                                         +

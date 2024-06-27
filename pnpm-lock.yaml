@@ -83,6 +83,9 @@ importers:
       sass:
         specifier: ^1.77.4
         version: 1.77.4
+      simple-keyboard:
+        specifier: ^3.7.87
+        version: 3.7.87
       simplebar-react:
         specifier: ^3.2.5
         version: 3.2.5(react@18.3.1)
@@ -4231,6 +4234,9 @@ packages:
   signal-exit@4.1.0:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
+
+  simple-keyboard@3.7.87:
+    resolution: {integrity: sha512-NnO4miDY/aWQOriwAJs1aQoqcJ5J9D04vM+PswSbf6yC7mtyUawwRkJ8paXUIWymocvZQZX7MFOZ9/j4aCxb9A==}
 
   simplebar-core@1.2.5:
     resolution: {integrity: sha512-33AVCYXS8yavWId0GbE4TG1cYELsYybpCKWHJYuWEY/j6nccgz6zQdJ7nCqOpIGo7HgPPbkSSSIlJhi43fHP6A==}
@@ -9711,6 +9717,8 @@ snapshots:
   signal-exit@3.0.7: {}
 
   signal-exit@4.1.0: {}
+
+  simple-keyboard@3.7.87: {}
 
   simplebar-core@1.2.5:
     dependencies:

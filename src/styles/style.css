@@ -20149,3 +20149,25 @@ h6 {
 .chnage {
   cursor: default;
 }
+.swal-icon--warning {
+  border-color: rgb(251 150 61);
+  opacity: 1;
+  animation: none;
+}
+.swal-icon--warning__body,
+.swal-icon--warning__dot {
+  background-color: rgb(251 150 61);
+  opacity: 1;
+}
+.swal-title {
+  color: rgba(0, 0, 0, 1);
+  opacity: 1;
+}
+.keyboard-open {
+  padding: 0px !important;
+  margin: 0px !important;
+}
+.plus-btn-org {
+  font-size: 24px;
+  padding: 0px 10px;
+}

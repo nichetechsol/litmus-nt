@@ -43,6 +43,7 @@
     "react-toastify": "^10.0.5",
     "redux-thunk": "^3.1.0",
     "sass": "^1.77.4",
+    "simple-keyboard": "^3.7.87",
     "simplebar-react": "^3.2.5",
     "styled-components": "^6.1.11",
     "sweetalert": "^2.1.2",
