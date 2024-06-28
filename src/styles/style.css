@@ -111,8 +111,8 @@ Background Image
 @tailwind components;
 @tailwind utilities;
 /* End Tailwind Styles */
-* {
-  touch-action: none !important;
+body, html {
+  overflow: auto;
 }
 :root {
   --body-bg: 240 241 247;
@@ -20166,10 +20166,7 @@ h6 {
   color: rgba(0, 0, 0, 1);
   opacity: 1;
 }
-.keyboard-open {
-  padding: 0px !important;
-  margin: 0px !important;
-}
+
 .plus-btn-org {
   font-size: 24px;
   padding: 0px 10px;
@@ -20178,4 +20175,8 @@ h6 {
 /* input {
   font-size: 1rem;
   padding: .5rem 1rem;
+} */
+/* .keyboard-open {
+  padding: 0px !important;
+  margin: 0px !important;
 } */
