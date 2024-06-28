@@ -111,6 +111,9 @@ Background Image
 @tailwind components;
 @tailwind utilities;
 /* End Tailwind Styles */
+* {
+  touch-action: none !important;
+}
 :root {
   --body-bg: 240 241 247;
   --primary: 3 33 37;
