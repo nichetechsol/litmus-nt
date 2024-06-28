@@ -266,7 +266,7 @@ async function addSites(data: SiteData): Promise<Result<any>> {
         .replace('{{User Name}}', userName)
         .replace('{{Site Name}}', siteName)
         .replace('{{Org name}}', orgName);
-      await sendEmailFunction(to, subject, heading, contentData, data.token);
+      sendEmailFunction(to, subject, heading, contentData, data.token);
       return {
         errorCode: 0,
         message: 'Site added successfully',
@@ -352,7 +352,7 @@ async function addSitesConfirm(data: any) {
       .replace('{{User Name}}', userName)
       .replace('{{Site Name}}', siteName)
       .replace('{{Org Name}}', orgName);
-    await sendEmailFunction(to, subject, heading, contentData, data.token);
+    sendEmailFunction(to, subject, heading, contentData, data.token);
     return {
       errorCode: 0,
       message: 'Site added successfully',

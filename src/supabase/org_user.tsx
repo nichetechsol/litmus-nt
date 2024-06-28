@@ -155,7 +155,7 @@ async function addUserToOrganization(
             const contentData = content
               .replace('{{User Name}}', userName)
               .replace('{{Org Name}}', orgName);
-            await sendEmailFunction(
+            sendEmailFunction(
               toData,
               subject,
               headingData,

@@ -290,7 +290,7 @@ async function addOrganization(data: {
         const contentData = content
           .replace('{{User Name}}', userName)
           .replace('{{Org Name}}', orgName);
-        await sendEmailFunction(to, subject, heading, contentData, data.token);
+        sendEmailFunction(to, subject, heading, contentData, data.token);
       } else {
         const userName: any = data.userName;
         const orgName: any = data.name;
@@ -306,7 +306,7 @@ async function addOrganization(data: {
           .replace('{{User Name}}', userName)
           .replace(/{{Org Type}}/g, orgTypes)
           .replace('{{Org Name}}', orgName);
-        await sendEmailFunction(
+        sendEmailFunction(
           to,
           subjectData,
           headingData,

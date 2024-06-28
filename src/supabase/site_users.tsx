@@ -187,7 +187,7 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
                   .replace('{{Site Name}}', siteName)
                   .replace('{{User Name}}', userName)
                   .replace('{{Org Name}}', orgName);
-                await sendEmailFunction(
+                sendEmailFunction(
                   toData,
                   subject,
                   headingData,
