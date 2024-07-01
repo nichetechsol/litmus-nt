@@ -111,7 +111,8 @@ Background Image
 @tailwind components;
 @tailwind utilities;
 /* End Tailwind Styles */
-body, html {
+body,
+html {
   overflow: auto;
 }
 :root {

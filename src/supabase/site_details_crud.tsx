@@ -487,46 +487,160 @@ async function addSitesConfirm(data: any) {
 // }
 
 // Function to update a site
-async function updateSite(
-  siteId: any,
-  updateData: UpdateSiteData,
-): Promise<Result<any>> {
+async function updateSite(updateData: any): Promise<Result<any>> {
   try {
     // Validate the input
-    if (!siteId || !updateData) {
-      return { errorCode: 1, message: 'Invalid input', data: null };
+    if (!updateData.siteId || !updateData.name || !updateData) {
+      return {
+        errorCode: 1,
+        message: 'Invalid input. Please provide siteId and name.',
+        data: null,
+      };
+    }
+
+    // Check if the new name already exists in the database, excluding the current site ID
+    const { data: existingSites, error: fetchError } = await supabase
+      .from('sites_detail')
+      .select('id')
+      .eq('name', updateData.name)
+      .neq('id', updateData.siteId);
+
+    if (fetchError) {
+      console.error(
+        'Error checking uniqueness of site name:',
+        fetchError.message,
+      );
+      return {
+        errorCode: 1,
+        message: 'Error checking uniqueness of site name',
+        data: null,
+      };
+    }
+
+    if (existingSites && existingSites.length > 0) {
+      return {
+        errorCode: 1,
+        message: 'Site name is already taken. Please choose a different name.',
+        data: null,
+      };
     }
 
     // Update site details
-    const { data: updatedSite, error: updateError } = await supabase
+    const { data, error } = await supabase
       .from('sites_detail')
-      .update(updateData)
-      .eq('id', siteId)
+      .update({
+        name: updateData.name,
+        type_id: updateData.type_id,
+        address1: updateData.address1,
+        address2: updateData.address2,
+        city: updateData.city,
+        pin_code: updateData.pin_code,
+        about_site: updateData.about_site,
+        status: updateData.status,
+        country_id: updateData.country_id,
+        state_id: updateData.state_id,
+      })
+      .eq('id', updateData.siteId)
       .select();
 
-    // Check for errors during the update operation
-    if (updateError) {
+    // Handle update errors
+    if (error) {
       return {
         errorCode: 1,
-        message: 'Error updating site details',
+        message: 'Error updating site details. Please try again later.',
         data: null,
       };
-    } else {
+    }
+
+    if (!data) {
       return {
-        errorCode: 0,
-        message: 'Site details updated successfully',
-        data: updatedSite,
+        errorCode: 1,
+        message: 'No data returned after update. Site may not exist.',
+        data: null,
       };
     }
+    await logActivity({
+      org_id: updateData.org_id,
+      site_id: updateData.siteId,
+      user_id: updateData.user_id,
+      activity_type: 'create_site',
+    });
+    // Return success response
+    return {
+      errorCode: 0,
+      message: 'Site details updated successfully',
+      data: data,
+    };
   } catch (error) {
+    console.error('Unexpected error during site update:');
     return {
       errorCode: 1,
-      message: 'Unexpected error',
+      message: 'Unexpected error occurred. Please contact support.',
       data: null,
     };
   }
 }
+async function viewSite(site_id: any): Promise<Result<any>> {
+  try {
+    // Fetch site details along with site type name
+    const { data: siteDetails, error } = await supabase
+      .from('sites_detail')
+      .select(
+        `
+        id,
+        org_id,
+        name,
+        type_id,
+        address1,
+        address2,
+        city,
+        pin_code,
+        about_site,
+        status,
+        country_id,
+        state_id,
+        site_types (name)
+        `,
+      )
+      .eq('id', site_id)
+      .single();
 
+    if (error || !siteDetails) {
+      console.error('Error fetching site details:', error);
+      return {
+        errorCode: 1,
+        message: 'Error fetching site details',
+        data: null,
+      };
+    }
+
+    // Construct the SiteDetail object
+    const siteWithDetails: any = {
+      id: siteDetails.id,
+      org_id: siteDetails.org_id,
+      name: siteDetails.name,
+      type_id: siteDetails.type_id,
+      // type_name: siteDetails.site_types.name,
+      address1: siteDetails.address1,
+      address2: siteDetails.address2,
+      city: siteDetails.city,
+      pin_code: siteDetails.pin_code,
+      about_site: siteDetails.about_site,
+      status: siteDetails.status,
+      country_id: siteDetails.country_id,
+      state_id: siteDetails.state_id,
+    };
+
+    return {
+      errorCode: 0,
+      message: 'Site details fetched successfully',
+      data: siteWithDetails,
+    };
+  } catch (error) {
+    console.error('Error viewing site:', error);
+    return { errorCode: 1, message: 'Unexpected error', data: null };
+  }
+}
 // Function to delete a site
 async function deleteSite(siteId: any): Promise<Result<any>> {
   try {
@@ -581,4 +695,4 @@ async function deleteSite(siteId: any): Promise<Result<any>> {
   }
 }
 
-export { addSites, addSitesConfirm, deleteSite, updateSite };
+export { addSites, addSitesConfirm, deleteSite, updateSite, viewSite };

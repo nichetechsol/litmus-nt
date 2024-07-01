@@ -448,24 +448,127 @@ async function updateOrganization(data: {
   }
 }
 
-async function viewOrganization(org_id: any): Promise<Result<OrgDetail[]>> {
+async function viewOrganization(org_id: any): Promise<Result<any>> {
   try {
-    // Fetch organization details
-    const { data: orgDetails, error } = await supabase
-      .from('org_details')
-      .select('*')
-      .eq('id', org_id);
+    // Fetch organization details and type in parallel
+    const [orgDetailsResult, orgDomainIdsResult] = await Promise.all([
+      supabase
+        .from('org_details')
+        .select('id, name, description, type_id, status')
+        .eq('id', org_id)
+        .single(),
+      supabase.from('org_domains').select('domain_id').eq('org_id', org_id),
+    ]);
 
-    if (error) {
+    const { data: orgDetails, error: orgError } = orgDetailsResult;
+    const { data: orgDomainIds, error: domainIdsError } = orgDomainIdsResult;
+
+    if (orgError || !orgDetails || domainIdsError || !orgDomainIds) {
       return { errorCode: 1, data: null };
-    } else {
-      return { errorCode: 0, data: orgDetails };
     }
+
+    // Fetch organization type name and domain details in parallel
+    const [orgTypeResult, domainsResult] = await Promise.all([
+      supabase
+        .from('org_types')
+        .select('name')
+        .eq('id', orgDetails.type_id)
+        .single(),
+      supabase
+        .from('domains')
+        .select('id, name')
+        .in(
+          'id',
+          orgDomainIds.map((orgDomain) => orgDomain.domain_id),
+        ),
+    ]);
+
+    const { data: orgType, error: orgTypeError } = orgTypeResult;
+    const { data: domains, error: domainsError } = domainsResult;
+
+    if (orgTypeError || !orgType || domainsError || !domains) {
+      return { errorCode: 1, data: null };
+    }
+
+    // Construct the OrgDetail object
+    const orgWithDomains: any = {
+      id: orgDetails.id,
+      name: orgDetails.name,
+      description: orgDetails.description,
+      type_id: orgDetails.type_id,
+      status: orgDetails.status,
+      // type_name: orgType.name,
+      domains: domains.map((domain) => ({
+        id: domain.id,
+        name: domain.name,
+      })),
+    };
+
+    return { errorCode: 0, data: orgWithDomains };
   } catch (error) {
     return { errorCode: 1, data: null };
   }
 }
+async function deleteDomains(
+  org_id: any,
+  domain_id: any,
+): Promise<Result<any>> {
+  try {
+    // Validate the input
+    if (!org_id || !domain_id) {
+      return { errorCode: 1, message: 'Invalid input', data: null };
+    }
 
+    // Delete the domain from org_domains table for the specified organization
+    const { error: deleteOrgDomainError } = await supabase
+      .from('org_domains')
+      .delete()
+      .eq('org_id', org_id)
+      .eq('domain_id', domain_id);
+
+    if (deleteOrgDomainError) {
+      return {
+        errorCode: 1,
+        message: 'Error deleting domain from org_domains',
+        data: null,
+      };
+    }
+
+    // Check if the domain is associated with any other organization
+    const { data: domain, error: checkOtherOrgsError } = await supabase
+      .from('org_domains')
+      .select('*')
+      .eq('domain_id', domain_id);
+
+    // If the domain is not found in any other org_domains entries, delete it from domains table
+    if (!domain || domain.length === 0) {
+      const { error: deleteDomainError } = await supabase
+        .from('domains')
+        .delete()
+        .eq('id', domain_id);
+
+      if (deleteDomainError) {
+        return {
+          errorCode: 1,
+          message: 'Error deleting domain from domains table',
+          data: null,
+        };
+      }
+    }
+
+    return {
+      errorCode: 0,
+      message: 'Domain deleted successfully',
+      data: null,
+    };
+  } catch (error) {
+    return {
+      errorCode: 1,
+      message: 'Unexpected error',
+      data: null,
+    };
+  }
+}
 async function deleteOrganization(org_id: any): Promise<Result<null>> {
   try {
     // Delete matching domains from 'domains' table
@@ -509,6 +612,7 @@ async function getUserRole(): Promise<Result<UserRole[]>> {
 
 export {
   addOrganization,
+  deleteDomains,
   deleteOrganization,
   fetchOrganizationAndSiteDetails,
   fetchOrganizationTypes,

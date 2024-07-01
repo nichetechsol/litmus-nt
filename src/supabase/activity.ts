@@ -32,6 +32,7 @@ const valid_activity_types: string[] = [
   'remove_user',
   'add_licence',
   'download_file',
+  'update_site',
 ];
 
 const logActivity = async ({
