@@ -99,6 +99,7 @@ async function fetchOrganizationAndSiteDetails(
       .from('org_users')
       .select(
         `
+        role_id,
         org_id,
         org_details (
           id,
@@ -128,6 +129,7 @@ async function fetchOrganizationAndSiteDetails(
         org_name: org.name,
         org_type_id: org.type_id,
         sites_count: sitesCountForOrg,
+        user_role_id: orgUser.role_id,
       };
     });
 

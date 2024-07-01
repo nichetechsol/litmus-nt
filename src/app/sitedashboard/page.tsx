@@ -1441,7 +1441,7 @@ const Page = () => {
                                                           activity?.user_id
                                                             ?.lastname
                                                         : activity?.user_id
-                                                            .email
+                                                            ?.email
                                                     } created a new site named ${activity
                                                       ?.site_id
                                                       .name} within the organization '${activity
