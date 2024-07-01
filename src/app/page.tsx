@@ -331,7 +331,7 @@ const LoginForm = () => {
                               htmlFor='signin-email'
                               className='form-label text-default'
                             >
-                              Email<span className='text-danger'>*</span>
+                              Email<span className='text-danger'>&nbsp; *</span>
                             </label>
                             <input
                               type='text'
@@ -354,7 +354,8 @@ const LoginForm = () => {
                               htmlFor='signin-password'
                               className='form-label text-default block'
                             >
-                              Password<span className='text-danger'>*</span>
+                              Password
+                              <span className='text-danger'> &nbsp;*</span>
                             </label>
                             <div className='input-group'>
                               <input

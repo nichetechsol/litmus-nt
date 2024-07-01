@@ -39,7 +39,11 @@ import {
   fetchSiteDetails,
   fetchSiteSidebarList,
 } from '@/supabase/site_details';
-import { addSites, addSitesConfirm } from '@/supabase/site_details_crud';
+import {
+  addSites,
+  addSitesConfirm,
+  updateSite,
+} from '@/supabase/site_details_crud';
 import { fetchSiteType } from '@/supabase/site_type';
 import { stateList } from '@/supabase/state';
 import Loader from '@/utils/Loader/Loader';
@@ -132,6 +136,8 @@ const Page: React.FC = () => {
 
     fetchData2();
   }, [user_id, org_id]);
+  const [changeFlage, setChangeFlage] = useState<boolean>(false);
+
   const [loading, setLoading] = useState<boolean>(false);
   const [SitesList, setOSitesList] = useState<SiteDetailsWithUsers[] | null>(
     null,
@@ -519,96 +525,142 @@ const Page: React.FC = () => {
       return false;
     }
   };
+  const [editsiteid, seteditsiteid] = useState();
   const handleSubmit = async () => {
     const isValid = await validateForm();
 
     if (isValid) {
-      const data: any = {
-        org_id: org_id,
-        name: AddSiteName,
-        type_id: SelectedValueDropdown,
-        address1: Address1,
-        address2: Address2,
-        city: City,
-        pin_code: Pincode,
-        about_site: message,
-        status: 'Y',
-        country_id: SelectedValueCounrty,
-        state_id: SelectedValueState,
-        user_id: user_id,
-        token: onlyToken,
-        userName: userEmail,
-        org_name: orgName,
-      };
-      try {
-        setLoading(true);
-        await refreshToken();
-        const result = await addSites(data);
+      if (changeFlage) {
+        const data: any = {
+          org_id: org_id,
+          name: AddSiteName,
+          type_id: SelectedValueDropdown,
+          address1: Address1,
+          address2: Address2,
+          city: City,
+          pin_code: Pincode,
+          about_site: message,
+          status: 'Y',
+          country_id: SelectedValueCounrty,
+          state_id: SelectedValueState,
+          user_id: user_id,
+          token: onlyToken,
+          userName: userEmail,
+          org_name: orgName,
+        };
+        try {
+          setLoading(true);
+          await refreshToken();
+          const result = await addSites(data);
 
-        if (result.errorCode == 0) {
-          setLoading(false);
-          if (closeModalButtonRef.current) {
-            closeModalButtonRef.current.click();
-          }
-          handelclosemodel();
-          FetchSiteDetails();
-          fetchData1();
-          toast.success(result.message, { autoClose: 3000 });
-        } else if (result.errorCode == 2) {
-          setLoading(false);
-          if (closeModalButtonRef.current) {
-            closeModalButtonRef.current.click();
-          }
-          handelclosemodel();
-          swal({
-            title: result.message,
-            text: 'You have exceeded the Entitlement limit. Do you want to proceed?',
-            icon: 'warning',
-            buttons: {
-              cancel: {
-                text: 'No, cancel',
-                value: false,
-                visible: true,
-                className: '',
-                closeModal: true,
+          if (result.errorCode == 0) {
+            setLoading(false);
+            if (closeModalButtonRef.current) {
+              closeModalButtonRef.current.click();
+            }
+            handelclosemodel();
+            FetchSiteDetails();
+            fetchData1();
+            toast.success(result.message, { autoClose: 3000 });
+          } else if (result.errorCode == 2) {
+            setLoading(false);
+            if (closeModalButtonRef.current) {
+              closeModalButtonRef.current.click();
+            }
+            handelclosemodel();
+            swal({
+              title: result.message,
+              text: 'You have exceeded the Entitlement limit. Do you want to proceed?',
+              icon: 'warning',
+              buttons: {
+                cancel: {
+                  text: 'No, cancel',
+                  value: false,
+                  visible: true,
+                  className: '',
+                  closeModal: true,
+                },
+                confirm: {
+                  text: 'Yes, proceed!',
+                  value: true,
+                  visible: true,
+                  className: '',
+                  closeModal: true,
+                },
               },
-              confirm: {
-                text: 'Yes, proceed!',
-                value: true,
-                visible: true,
-                className: '',
-                closeModal: true,
-              },
-            },
-          }).then(async (willProceed) => {
-            if (willProceed) {
-              await refreshToken();
-              setLoading(true);
-              const result1 = await addSitesConfirm(result.data);
-              if (result1.errorCode === 0) {
-                setLoading(false);
-                FetchSiteDetails();
-                fetchData1();
-                toast.success(result1.message, { autoClose: 3000 });
+            }).then(async (willProceed) => {
+              if (willProceed) {
+                await refreshToken();
+                setLoading(true);
+                const result1 = await addSitesConfirm(result.data);
+                if (result1.errorCode === 0) {
+                  setLoading(false);
+                  FetchSiteDetails();
+                  fetchData1();
+                  toast.success(result1.message, { autoClose: 3000 });
+                } else {
+                  setLoading(false);
+                  toast.error(result1.message, { autoClose: 3000 });
+                }
               } else {
                 setLoading(false);
-                toast.error(result1.message, { autoClose: 3000 });
+                toast.error(result.message, { autoClose: 3000 });
               }
-            } else {
-              setLoading(false);
-              toast.error(result.message, { autoClose: 3000 });
+            });
+          } else {
+            setLoading(false);
+            if (closeModalButtonRef.current) {
+              closeModalButtonRef.current.click();
             }
-          });
-        } else {
-          setLoading(false);
-          if (closeModalButtonRef.current) {
-            closeModalButtonRef.current.click();
+            handelclosemodel();
+            toast.error(result.message, { autoClose: 3000 });
           }
-          handelclosemodel();
-          toast.error(result.message, { autoClose: 3000 });
+        } catch (error) {
+          setLoading(false);
         }
-      } catch (error) {
-        setLoading(false);
+      }
+      if (changeFlage == false) {
+        const updatedata: any = {
+          org_id: org_id,
+          name: AddSiteName,
+          type_id: SelectedValueDropdown,
+          address1: Address1,
+          address2: Address2,
+          city: City,
+          pin_code: Pincode,
+          about_site: message,
+          status: 'Y',
+          country_id: SelectedValueCounrty,
+          state_id: SelectedValueState,
+          user_id: user_id,
+          token: onlyToken,
+          siteId: editsiteid,
+        };
+        try {
+          setLoading(true);
+          await refreshToken();
+          const result = await updateSite(updatedata);
+
+          if (result.errorCode == 0) {
+            setLoading(false);
+            if (closeModalButtonRef.current) {
+              closeModalButtonRef.current.click();
+            }
+            handelclosemodel();
+            FetchSiteDetails();
+            fetchData1();
+            toast.success(result.message, { autoClose: 3000 });
+          } else {
+            setLoading(false);
+            if (closeModalButtonRef.current) {
+              closeModalButtonRef.current.click();
+            }
+            handelclosemodel();
+            toast.error(result.message, { autoClose: 3000 });
+          }
+        } catch (error) {
+          setLoading(false);
+        }
       }
     }
   };
@@ -627,7 +679,29 @@ const Page: React.FC = () => {
       }
     }
   }, []);
+  ///// for edit
+  const handeledit = (SingleSite: any) => {
+    setChangeFlage(false);
+    setAddSiteName(SingleSite.site.name);
+    setSelectedValueDropdown(SingleSite?.site.type_id);
+    setAddress1(SingleSite?.site?.address1);
+    setAddress2(SingleSite?.site?.address2);
+    SetSelectedValueCounrty(SingleSite?.site.country_id);
+    setSelectedValueState(SingleSite?.site.state_id);
+    setCity(SingleSite?.site?.city);
+    setPincode(SingleSite?.site.pin_code);
+    setMessage(SingleSite?.site.about_site);
+    seteditsiteid(SingleSite?.site.id);
+    // remaning descriptopn
 
+    handleCall();
+  };
+  const Addsite = () => {
+    handleCall();
+    handelclosemodel();
+    // remaning descriptopn
+    setChangeFlage(true);
+  };
   return (
     <>
       <>
@@ -646,7 +720,8 @@ const Page: React.FC = () => {
                           href=''
                           className='hs-dropdown-toggle py-2  px-3 ti-btn bg-primary text-white !font-medium w-full !mb-0'
                           data-hs-overlay='#todo-compose'
-                          onClick={() => handleCall()}
+                          onClick={Addsite}
+                          // onClick={() => handleCall()}
                         >
                           <i className='ri-add-circle-line !text-[1rem]'></i>Add
                           Site
@@ -662,7 +737,9 @@ const Page: React.FC = () => {
                                   className='modal-title text-[1rem] font-semibold'
                                   id='mail-ComposeLabel'
                                 >
-                                  Add Site
+                                  {changeFlage === true
+                                    ? 'Add Site'
+                                    : 'Edit Site'}
                                 </h6>
                                 <button
                                   type='button'
@@ -925,7 +1002,9 @@ const Page: React.FC = () => {
                                   className='ti-btn bg-primary text-white !font-medium'
                                   onClick={handleSubmit}
                                 >
-                                  Add Site
+                                  {changeFlage === true
+                                    ? 'Add Site'
+                                    : 'Edit Site'}
                                 </button>
                               </div>
                             </div>
@@ -1017,7 +1096,7 @@ const Page: React.FC = () => {
                         </div>
                         {SitesList && SitesList.length == 0 && (
                           <div className='col-md-12 w-100 mt-4 mb-4'>
-                            <p className='text-center'>No site Found</p>{' '}
+                            <p className='text-center'>No site found</p>{' '}
                           </div>
                         )}
                       </div>
@@ -1033,35 +1112,35 @@ const Page: React.FC = () => {
                             <div
                               className='xl:col-span-6 col-span-12 task-card'
                               key={SingleSite?.site?.id}
-                              onClick={() => {
-                                const encryptedsiteid = encryptData(
-                                  SingleSite.site.id,
-                                );
-                                const encryptedsitename = encryptData(
-                                  SingleSite.site.name,
-                                );
-                                const encryptedsiteOwnerName = encryptData(
-                                  SingleSite.ownerNames,
-                                );
-                                localStorage.setItem(
-                                  'site_id',
-                                  encryptedsiteid,
-                                );
-                                localStorage.setItem(
-                                  'site_name',
-                                  encryptedsitename,
-                                );
-                                localStorage.setItem(
-                                  'site_owner_name',
-                                  encryptedsiteOwnerName,
-                                );
-                                navigate.push('/sitedashboard');
-                              }}
                             >
                               <div className='box task-pending-card '>
                                 <div
                                   className='box-body'
                                   style={{ cursor: 'pointer' }}
+                                  onClick={() => {
+                                    const encryptedsiteid = encryptData(
+                                      SingleSite.site.id,
+                                    );
+                                    const encryptedsitename = encryptData(
+                                      SingleSite.site.name,
+                                    );
+                                    const encryptedsiteOwnerName = encryptData(
+                                      SingleSite.ownerNames,
+                                    );
+                                    localStorage.setItem(
+                                      'site_id',
+                                      encryptedsiteid,
+                                    );
+                                    localStorage.setItem(
+                                      'site_name',
+                                      encryptedsitename,
+                                    );
+                                    localStorage.setItem(
+                                      'site_owner_name',
+                                      encryptedsiteOwnerName,
+                                    );
+                                    navigate.push('/sitedashboard');
+                                  }}
                                 >
                                   <div className='flex justify-between align-center flex-wrap gap-2'>
                                     <h1
@@ -1136,6 +1215,34 @@ const Page: React.FC = () => {
                                           </span>
                                         </li>
                                       </ul>
+                                      <div>
+                                        <div
+                                          style={{ cursor: 'pointer' }}
+                                          aria-label='anchor'
+                                          data-bs-target='#formmodal'
+                                          data-bs-toggle='modal'
+                                          data-bs-whatever='@fat'
+                                          data-hs-overlay='#todo-compose'
+                                          onClick={(e) => {
+                                            e.stopPropagation(); // Prevent card click
+                                            // setModalOpen(true);
+                                            handeledit(SingleSite);
+                                          }}
+                                          className='ti-btn  ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
+                                        >
+                                          <i className='ri-edit-line'></i>
+                                        </div>
+                                        <div
+                                          style={{ cursor: 'pointer' }}
+                                          aria-label='anchor'
+                                          // onClick={() => {
+                                          //   handleDelete(user.id);
+                                          // }}
+                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
+                                        >
+                                          <i className='ri-delete-bin-line'></i>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>

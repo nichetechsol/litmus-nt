@@ -254,6 +254,7 @@ const Page = () => {
           end: 10,
           limit: 11,
         });
+
         setActivity_log(data.activities);
       }
     } catch (error: any) {

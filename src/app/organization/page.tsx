@@ -72,6 +72,8 @@ const Page = () => {
   const [tokenVerify, setTokenVerify] = useState(false);
   const [onlyToken, setOnlyToken] = useState('');
   const navigate = useRouter();
+  const [changeFlage, setChangeFlage] = useState<boolean>(false);
+
   const [organizationName, setOrganizationName] = useState('');
   const [organizationNameError, setOrganizationNameError] = useState('');
   const [domains, setDomains] = useState<any[]>([]);
@@ -367,8 +369,17 @@ const Page = () => {
   };
 
   const handleSubmit = async () => {
-    if (domainInput) {
-      setDomainError('Please press Enter');
+    if (domainInput.trim() !== '') {
+      try {
+        const v = await DomainSchema.validate(domainInput);
+        if (v) {
+          setDomainError('Please press Enter key');
+        }
+      } catch (error) {
+        if (error instanceof Yup.ValidationError) {
+          setDomainError(error.message);
+        }
+      }
     } else {
       const isValid = await validateForm();
 
@@ -433,7 +444,7 @@ const Page = () => {
 
   const addDomain = async () => {
     if (
-      (domainError === '' || domainError === 'Please press Enter') &&
+      (domainError === '' || domainError === 'Please press Enter key') &&
       domainInput.trim() !== ''
     ) {
       const domainsArray = domainInput.endsWith(',')
@@ -516,6 +527,28 @@ const Page = () => {
     /* */
   }, [domains]);
 
+  ///// for edit ///
+  const handeledit = async (org: any) => {
+    // const result = await viewOrganization(org.org_id);
+
+    setChangeFlage(false);
+
+    setOrganizationName(org.org_name);
+  };
+  const addorg = () => {
+    setDomainInput('');
+    setOrganizationName('');
+    setSelectedType('');
+    // const defaultDomain = getDefaultDomainFromEmail();
+    // if (defaultDomain) {
+    //   setDomains([defaultDomain]);
+    // }
+    setMessage('');
+    fetchData();
+    fetchData1();
+    setChangeFlage(true);
+    setModalOpen(true);
+  };
   return (
     <>
       {loading && <Loader />}
@@ -533,7 +566,8 @@ const Page = () => {
                         href=''
                         className='hs-dropdown-toggle py-2  px-3 ti-btn bg-primary text-white !font-medium w-full !mb-0'
                         data-hs-overlay='#todo-compose'
-                        onClick={() => setModalOpen(true)}
+                        // onClick={() => setModalOpen(true) }
+                        onClick={addorg}
                       >
                         <i className='ri-add-circle-line !text-[1rem]'></i>Add
                         Organization
@@ -551,7 +585,9 @@ const Page = () => {
                                   className='modal-title text-[1rem] font-semibold'
                                   id='mail-ComposeLabel'
                                 >
-                                  Add Organization
+                                  {changeFlage === true
+                                    ? 'Add Organization'
+                                    : 'Edit Organization'}
                                 </h6>
                                 <button
                                   type='button'
@@ -793,7 +829,9 @@ const Page = () => {
                                   className='ti-btn bg-primary text-white !font-medium'
                                   onClick={handleSubmit}
                                 >
-                                  Create
+                                  {changeFlage === true
+                                    ? 'Add Organization'
+                                    : 'Edit Organization'}
                                 </button>
                               </div>
                             </div>
@@ -909,22 +947,68 @@ const Page = () => {
                         <div
                           className='xl:col-span-4 col-span-12 task-card'
                           key={org.org_id}
-                          onClick={() => {
-                            const encryptedOrgId = encryptData(org.org_id);
-                            const encryptedOrgName = encryptData(org.org_name);
-                            const encryptOrgTypeId = encryptData(
-                              org.org_type_id,
-                            );
-                            localStorage.setItem('org_id', encryptedOrgId);
-                            localStorage.setItem('org_name', encryptedOrgName);
-                            localStorage.setItem(
-                              'org_type_id',
-                              encryptOrgTypeId,
-                            );
-                            navigate.push('/orgdashboard');
-                          }}
                         >
-                          <div style={{ cursor: 'pointer' }} className='box'>
+                          <div
+                            className='box'
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => {
+                              const encryptedOrgId = encryptData(org.org_id);
+                              const encryptedOrgName = encryptData(
+                                org.org_name,
+                              );
+                              const encryptOrgTypeId = encryptData(
+                                org.org_type_id,
+                              );
+                              localStorage.setItem('org_id', encryptedOrgId);
+                              localStorage.setItem(
+                                'org_name',
+                                encryptedOrgName,
+                              );
+                              localStorage.setItem(
+                                'org_type_id',
+                                encryptOrgTypeId,
+                              );
+                              navigate.push('/orgdashboard');
+                            }}
+                          >
+                            {/* <button
+                              className='hs-dropdown-toggle py-2 px-3 ti-btn bg-primary text-white !font-medium !mb-0'
+                              data-hs-overlay='#todo-compose'
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevent card click
+                                setModalOpen(true);
+                                handeledit(org);
+                              }}
+                            >
+                              <i className='ri-edit-2-line'></i>
+                            </button> */}
+                            <div
+                              style={{ cursor: 'pointer' }}
+                              aria-label='anchor'
+                              data-bs-target='#formmodal'
+                              data-bs-toggle='modal'
+                              data-bs-whatever='@fat'
+                              data-hs-overlay='#todo-compose'
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevent card click
+                                setModalOpen(true);
+                                handeledit(org);
+                              }}
+                              className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
+                            >
+                              <i className='ri-edit-line'></i>
+                            </div>
+                            <div
+                              style={{ cursor: 'pointer' }}
+                              aria-label='anchor'
+                              // onClick={() => {
+                              //   handleDelete(user.id);
+                              // }}
+                              className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
+                            >
+                              <i className='ri-delete-bin-line'></i>
+                            </div>
+
                             <div className='box-body contact-action'>
                               <div className='flex items-start '>
                                 <div className='flex flex-grow flex-wrap gap-2 items-center'>
