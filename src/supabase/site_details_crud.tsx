@@ -694,5 +694,45 @@ async function deleteSite(siteId: any): Promise<Result<any>> {
     };
   }
 }
+async function requestSiteDeletion(data: any): Promise<Result<any>> {
+  try {
+    const userName: any = data.userName;
+    const siteName: any = data.siteName;
+    const orgName: any = data.orgName;
+    const email_data: any = await fetchEmailData('Site_Delete_Request');
+    const to = email_data.data.To;
+    const subject = email_data.data.email_subject;
+    const heading = email_data.data.email_heading;
+    const content = email_data.data.email_content;
+    const headingData = heading
+      .replace('{{User Name}}', userName)
+      .replace('{{Site Name}}', siteName);
+    const contentData = content
+      .replace('{{User Name}}', userName)
+      .replace('{{Site Name}}', siteName)
+      .replace('{{Org Name}}', orgName);
 
-export { addSites, addSitesConfirm, deleteSite, updateSite, viewSite };
+    // Send email
+    await sendEmailFunction(to, subject, headingData, contentData, data.token);
+    return {
+      errorCode: 0,
+      message: 'Site deletion request sent successfully.',
+      data: null,
+    };
+  } catch (error) {
+    // Handle unexpected errors
+    return {
+      errorCode: 1,
+      message: 'Unexpected error',
+      data: null,
+    };
+  }
+}
+export {
+  addSites,
+  addSitesConfirm,
+  deleteSite,
+  requestSiteDeletion,
+  updateSite,
+  viewSite,
+};

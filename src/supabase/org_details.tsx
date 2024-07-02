@@ -511,14 +511,134 @@ async function viewOrganization(org_id: any): Promise<Result<any>> {
     return { errorCode: 1, data: null };
   }
 }
+// async function deleteDomains(
+//   org_id: any,
+//   domain_id: any,
+//   user_id: any,
+// ): Promise<Result<any>> {
+//   try {
+//     // Validate the input
+//     if (!org_id || !domain_id) {
+//       return { errorCode: 1, message: 'Invalid input', data: null };
+//     }
+
+//     // Delete the domain from org_domains table for the specified organization
+//     const { error: deleteOrgDomainError } = await supabase
+//       .from('org_domains')
+//       .delete()
+//       .eq('org_id', org_id)
+//       .eq('domain_id', domain_id);
+
+//     if (deleteOrgDomainError) {
+//       return {
+//         errorCode: 1,
+//         message: 'Error deleting domain from org_domains',
+//         data: null,
+//       };
+//     }
+
+//     // Check if the domain is associated with any other organization
+//     const { data: domain, error: checkOtherOrgsError } = await supabase
+//       .from('org_domains')
+//       .select('*')
+//       .eq('domain_id', domain_id);
+
+//     // If the domain is not found in any other org_domains entries, delete it from domains table
+//     if (!domain || domain.length === 0) {
+//       const { error: deleteDomainError } = await supabase
+//         .from('domains')
+//         .delete()
+//         .eq('id', domain_id);
+
+//       if (deleteDomainError) {
+//         return {
+//           errorCode: 1,
+//           message: 'Error deleting domain from domains table',
+//           data: null,
+//         };
+//       }
+//     }
+
+//     return {
+//       errorCode: 0,
+//       message: 'Domain deleted successfully',
+//       data: null,
+//     };
+//   } catch (error) {
+//     return {
+//       errorCode: 1,
+//       message: 'Unexpected error',
+//       data: null,
+//     };
+//   }
+// }
 async function deleteDomains(
   org_id: any,
   domain_id: any,
+  user_id: any,
 ): Promise<Result<any>> {
   try {
     // Validate the input
     if (!org_id || !domain_id) {
       return { errorCode: 1, message: 'Invalid input', data: null };
+    }
+
+    // Fetch the user's email and the domain information in parallel
+    const [
+      { data: user, error: userError },
+      { data: domainData, error: domainError },
+    ] = await Promise.all([
+      supabase.from('users').select('email').eq('id', user_id).single(),
+      supabase.from('domains').select('domain').eq('id', domain_id).single(),
+    ]);
+
+    if (userError || !user) {
+      return { errorCode: 1, message: 'Error fetching user email', data: null };
+    }
+
+    if (domainError || !domainData) {
+      return {
+        errorCode: 1,
+        message: 'Error fetching domain information',
+        data: null,
+      };
+    }
+
+    const userEmailDomain = user.email.split('@')[1];
+    const domainName = domainData.domain;
+
+    // If the user's email domain matches the domain being deleted, do not delete
+    if (userEmailDomain === domainName) {
+      return {
+        errorCode: 1,
+        message: 'Cannot delete domain associated with user email',
+        data: null,
+      };
+    }
+
+    // Check if the domain is associated with any other organization
+    const { data: domainAssociations, error: checkOtherOrgsError } =
+      await supabase
+        .from('org_domains')
+        .select('org_id')
+        .eq('domain_id', domain_id)
+        .neq('org_id', org_id);
+
+    if (checkOtherOrgsError) {
+      return {
+        errorCode: 1,
+        message: 'Error checking domain associations',
+        data: null,
+      };
+    }
+
+    // If the domain is associated with other organizations, do not delete
+    if (domainAssociations && domainAssociations.length > 0) {
+      return {
+        errorCode: 1,
+        message: 'Cannot delete domain associated with other organizations',
+        data: null,
+      };
     }
 
     // Delete the domain from org_domains table for the specified organization
@@ -536,14 +656,12 @@ async function deleteDomains(
       };
     }
 
-    // Check if the domain is associated with any other organization
-    const { data: domain, error: checkOtherOrgsError } = await supabase
-      .from('org_domains')
-      .select('*')
-      .eq('domain_id', domain_id);
+    // Check if the domain is associated with any other organization again
+    const { data: domainAfterDelete, error: checkDomainAfterDeleteError } =
+      await supabase.from('org_domains').select('*').eq('domain_id', domain_id);
 
     // If the domain is not found in any other org_domains entries, delete it from domains table
-    if (!domain || domain.length === 0) {
+    if (!domainAfterDelete || domainAfterDelete.length === 0) {
       const { error: deleteDomainError } = await supabase
         .from('domains')
         .delete()
@@ -558,19 +676,12 @@ async function deleteDomains(
       }
     }
 
-    return {
-      errorCode: 0,
-      message: 'Domain deleted successfully',
-      data: null,
-    };
+    return { errorCode: 0, message: 'Domain deleted successfully', data: null };
   } catch (error) {
-    return {
-      errorCode: 1,
-      message: 'Unexpected error',
-      data: null,
-    };
+    return { errorCode: 1, message: 'Unexpected error', data: null };
   }
 }
+
 async function deleteOrganization(org_id: any): Promise<Result<null>> {
   try {
     // Delete matching domains from 'domains' table
