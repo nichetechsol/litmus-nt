@@ -111,6 +111,9 @@ Background Image
 @tailwind components;
 @tailwind utilities;
 /* End Tailwind Styles */
+/* body{
+  touch-action: none;
+} */
 body,
 html {
   overflow: auto;
@@ -403,6 +406,9 @@ html {
 /* End::Header theme-mode icon style */
 /* Start::Header fullscreen responsive */
 @media (max-width: 767.98px) {
+  .authentication {
+    min-height: 90vh !important;
+}
   .header-element.header-fullscreen {
     @apply hidden;
   }
@@ -2405,8 +2411,9 @@ html {
   .ic-product-p p {
     width: 14.5rem !important;
   }
-  .box-header .ti-form-control {
+  .box-header .search-ti {
     width: 130px;
+    @apply h-[1.9rem]
   }
   [data-nav-layout='horizontal']
     .landing-body
@@ -15509,9 +15516,9 @@ input.gridjs-input {
   @apply h-[0.9rem] w-[0.9rem] bg-light dark:bg-bodybg dark:border-white/10 border border-solid border-inputborder rounded-sm;
   vertical-align: text-bottom;
 }
-.form-check-input:focus {
+/* .form-check-input:focus {
   @apply border border-defaultborder outline-none;
-}
+} */
 .form-check-input:checked {
   @apply bg-success border-success;
 }
@@ -15560,9 +15567,9 @@ input.gridjs-input {
   @apply brightness-[90%];
 }
 
-.form-check-input:focus {
+/* .form-check-input:focus {
   @apply border-[#86b7fe] outline-none;
-}
+} */
 
 .form-check-input:checked {
   @apply bg-primary border-primary ring-primary;
@@ -15625,7 +15632,7 @@ input.gridjs-input {
   @apply ltr:float-right rtl:float-left -me-[1.5em] ms-0;
 }
 
-[type='text']:focus,
+/* [type='text']:focus,
 input:where(:not([type])):focus,
 [type='email']:focus,
 [type='url']:focus,
@@ -15642,7 +15649,7 @@ input:where(:not([type])):focus,
 textarea:focus,
 select:focus {
   @apply border-defaultborder dark:border-defaultborder/10 ring-0;
-}
+} */
 
 [type='checkbox']:checked:hover,
 [type='checkbox']:checked:focus,
@@ -20181,3 +20188,26 @@ h6 {
   padding: 0px !important;
   margin: 0px !important;
 } */
+
+input[type="color"],
+input[type="date"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="email"],
+input[type="month"],
+input[type="number"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="text"],
+input[type="time"],
+input[type="url"],
+input[type="week"],
+select:focus,
+textarea {
+  font-size: 16px;
+}
+
+body.modal-open {
+  overflow-y: hidden;
+}

@@ -721,7 +721,7 @@ const Page: React.FC = () => {
                           className='hs-dropdown-toggle py-2  px-3 ti-btn bg-primary text-white !font-medium w-full !mb-0'
                           data-hs-overlay='#todo-compose'
                           onClick={Addsite}
-                          // onClick={() => handleCall()}
+                        // onClick={() => handleCall()}
                         >
                           <i className='ri-add-circle-line !text-[1rem]'></i>Add
                           Site
@@ -1109,146 +1109,146 @@ const Page: React.FC = () => {
                     >
                       {SitesList && SitesList.length > 0
                         ? SitesList.map((SingleSite) => (
-                            <div
-                              className='xl:col-span-6 col-span-12 task-card'
-                              key={SingleSite?.site?.id}
-                            >
-                              <div className='box task-pending-card '>
-                                <div
-                                  className='box-body'
-                                  style={{ cursor: 'pointer' }}
-                                  onClick={() => {
-                                    const encryptedsiteid = encryptData(
-                                      SingleSite.site.id,
-                                    );
-                                    const encryptedsitename = encryptData(
-                                      SingleSite.site.name,
-                                    );
-                                    const encryptedsiteOwnerName = encryptData(
-                                      SingleSite.ownerNames,
-                                    );
-                                    localStorage.setItem(
-                                      'site_id',
-                                      encryptedsiteid,
-                                    );
-                                    localStorage.setItem(
-                                      'site_name',
-                                      encryptedsitename,
-                                    );
-                                    localStorage.setItem(
-                                      'site_owner_name',
-                                      encryptedsiteOwnerName,
-                                    );
-                                    navigate.push('/sitedashboard');
-                                  }}
-                                >
-                                  <div className='flex justify-between align-center flex-wrap gap-2'>
-                                    <h1
-                                      style={{
-                                        fontSize: '1.1rem',
-                                        fontWeight: 'bold',
-                                        marginBottom: '0.5rem',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                      }}
-                                    >
-                                      <Link
-                                        aria-label='anchor'
-                                        href='#!'
-                                      ></Link>
-                                      {SingleSite?.site
-                                        ? SingleSite?.site?.name
-                                        : ''}
-                                    </h1>
-                                    <div className='avatar avatar-xl avatar-rounded '>
-                                      {' '}
-                                      <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
-                                        <InitialsComponent
-                                          name={
-                                            SingleSite?.site
-                                              ? SingleSite?.site?.name
-                                              : ''
-                                          }
-                                        />
-                                      </span>
-                                    </div>
+                          <div
+                            className='xl:col-span-6 col-span-12 task-card'
+                            key={SingleSite?.site?.id}
+                          >
+                            <div className='box task-pending-card '>
+                              <div
+                                className='box-body'
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => {
+                                  const encryptedsiteid = encryptData(
+                                    SingleSite.site.id,
+                                  );
+                                  const encryptedsitename = encryptData(
+                                    SingleSite.site.name,
+                                  );
+                                  const encryptedsiteOwnerName = encryptData(
+                                    SingleSite.ownerNames,
+                                  );
+                                  localStorage.setItem(
+                                    'site_id',
+                                    encryptedsiteid,
+                                  );
+                                  localStorage.setItem(
+                                    'site_name',
+                                    encryptedsitename,
+                                  );
+                                  localStorage.setItem(
+                                    'site_owner_name',
+                                    encryptedsiteOwnerName,
+                                  );
+                                  navigate.push('/sitedashboard');
+                                }}
+                              >
+                                <div className='flex justify-between align-center flex-wrap gap-2'>
+                                  <h1
+                                    style={{
+                                      fontSize: '1.1rem',
+                                      fontWeight: 'bold',
+                                      marginBottom: '0.5rem',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                    }}
+                                  >
+                                    <Link
+                                      aria-label='anchor'
+                                      href='#!'
+                                    ></Link>
+                                    {SingleSite?.site
+                                      ? SingleSite?.site?.name
+                                      : ''}
+                                  </h1>
+                                  <div className='avatar avatar-xl avatar-rounded '>
+                                    {' '}
+                                    <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
+                                      <InitialsComponent
+                                        name={
+                                          SingleSite?.site
+                                            ? SingleSite?.site?.name
+                                            : ''
+                                        }
+                                      />
+                                    </span>
                                   </div>
-                                  <div className=''>
-                                    <div>
-                                      <ul className='list-group list-group-flush'>
-                                        <li className='flex list-group-item fw-semibold'>
-                                          <i className='bx bx-map align-middle me-2 text-muted'></i>
-                                          <b>Address </b>
-                                          <p className='ms-1 over-text text-muted fw-normal d-inline-block'>
-                                            {SingleSite?.site && (
-                                              <>
-                                                {SingleSite?.site?.address1}
-                                                {SingleSite?.site?.address2
-                                                  ? `, ${SingleSite?.site?.address2}`
-                                                  : ''}
-                                                {`, ${SingleSite?.site?.city}`}
-                                                {`, ${SingleSite?.state}`}
-                                                {`, ${SingleSite?.country}`}
-                                              </>
-                                            )}
-                                          </p>
-                                        </li>
-                                        <li className='list-group-item fw-semibold'>
-                                          <i className='bx bx-briefcase align-middle me-2 text-muted'></i>
-                                          <b>Owner</b>
-                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
-                                            {SingleSite?.ownerNames?.join(', ')}
-                                          </span>
-                                        </li>
-                                        <li className='list-group-item fw-semibold'>
-                                          <i className='bx bx-user align-middle me-2 text-muted'></i>
-                                          <b>Number of users</b>
-                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
-                                            {SingleSite?.users?.length}
-                                          </span>
-                                        </li>
-                                        <li className='list-group-item fw-semibold'>
-                                          <i className='bx bx-user align-middle me-2 text-muted'></i>
-                                          <b>Type</b>
-                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
-                                            {SingleSite?.type_name}
-                                          </span>
-                                        </li>
-                                      </ul>
-                                      <div>
-                                        <div
-                                          style={{ cursor: 'pointer' }}
-                                          aria-label='anchor'
-                                          data-bs-target='#formmodal'
-                                          data-bs-toggle='modal'
-                                          data-bs-whatever='@fat'
-                                          data-hs-overlay='#todo-compose'
-                                          onClick={(e) => {
-                                            e.stopPropagation(); // Prevent card click
-                                            // setModalOpen(true);
-                                            handeledit(SingleSite);
-                                          }}
-                                          className='ti-btn  ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
-                                        >
-                                          <i className='ri-edit-line'></i>
-                                        </div>
-                                        <div
-                                          style={{ cursor: 'pointer' }}
-                                          aria-label='anchor'
-                                          // onClick={() => {
-                                          //   handleDelete(user.id);
-                                          // }}
-                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
-                                        >
-                                          <i className='ri-delete-bin-line'></i>
-                                        </div>
+                                </div>
+                                <div className=''>
+                                  <div>
+                                    <ul className='list-group list-group-flush'>
+                                      <li className='flex list-group-item fw-semibold'>
+                                        <i className='bx bx-map align-middle me-2 text-muted'></i>
+                                        <b>Address </b>
+                                        <p className='ms-1 over-text text-muted fw-normal d-inline-block'>
+                                          {SingleSite?.site && (
+                                            <>
+                                              {SingleSite?.site?.address1}
+                                              {SingleSite?.site?.address2
+                                                ? `, ${SingleSite?.site?.address2}`
+                                                : ''}
+                                              {`, ${SingleSite?.site?.city}`}
+                                              {`, ${SingleSite?.state}`}
+                                              {`, ${SingleSite?.country}`}
+                                            </>
+                                          )}
+                                        </p>
+                                      </li>
+                                      <li className='list-group-item fw-semibold'>
+                                        <i className='bx bx-briefcase align-middle me-2 text-muted'></i>
+                                        <b>Owner</b>
+                                        <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                          {SingleSite?.ownerNames?.join(', ')}
+                                        </span>
+                                      </li>
+                                      <li className='list-group-item fw-semibold'>
+                                        <i className='bx bx-user align-middle me-2 text-muted'></i>
+                                        <b>Number of users</b>
+                                        <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                          {SingleSite?.users?.length}
+                                        </span>
+                                      </li>
+                                      <li className='list-group-item fw-semibold'>
+                                        <i className='bx bx-user align-middle me-2 text-muted'></i>
+                                        <b>Type</b>
+                                        <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                          {SingleSite?.type_name}
+                                        </span>
+                                      </li>
+                                    </ul>
+                                    <div className='flex justify-center mt-3'>
+                                      <div
+                                        style={{ cursor: 'pointer' }}
+                                        aria-label='anchor'
+                                        data-bs-target='#formmodal'
+                                        data-bs-toggle='modal'
+                                        data-bs-whatever='@fat'
+                                        data-hs-overlay='#todo-compose'
+                                        onClick={(e) => {
+                                          e.stopPropagation(); // Prevent card click
+                                          // setModalOpen(true);
+                                          handeledit(SingleSite);
+                                        }}
+                                        className='ti-btn ti-btn-primary-full ti-btn-wave !gap-0  bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
+                                      >
+                                        <i className='ri-edit-line'></i> Edit
+                                      </div>
+                                      <div
+                                        style={{ cursor: 'pointer' }}
+                                        aria-label='anchor'
+                                        // onClick={() => {
+                                        //   handleDelete(user.id);
+                                        // }}
+                                        className='ti-btn ti-btn-primary-full ti-btn-wave !gap-0 !ms-2 bg-danger/10 text-white hover:bg-danger hover:text-white hover:border-danger'
+                                      >
+                                        <i className='ri-delete-bin-line'></i> Delete
                                       </div>
                                     </div>
                                   </div>
                                 </div>
                               </div>
                             </div>
-                          ))
+                          </div>
+                        ))
                         : null}
                     </div>
                   </div>

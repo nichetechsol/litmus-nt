@@ -449,9 +449,9 @@ const Page = () => {
     ) {
       const domainsArray = domainInput.endsWith(',')
         ? domainInput
-            .split(',')
-            .map((domain) => domain.trim())
-            .filter((domain) => domain !== '')
+          .split(',')
+          .map((domain) => domain.trim())
+          .filter((domain) => domain !== '')
         : domainInput.split(',').map((domain) => domain.trim());
       const newDomains = [];
       let errorMessage = '';
@@ -620,7 +620,7 @@ const Page = () => {
 
                               <div className='ti-modal-body !overflow-visible px-4'>
                                 <div className='grid grid-cols-12 gap-2'>
-                                  <div className='xl:col-span-12 col-span-12'>
+                                  <div className='xl:col-span-12 col-span-12 mb-2'>
                                     <label
                                       htmlFor='task-name'
                                       className='ti-form-label'
@@ -644,7 +644,7 @@ const Page = () => {
                                       </div>
                                     )}
                                   </div>
-                                  <div className='xl:col-span-12 col-span-12'>
+                                  <div className='xl:col-span-12 col-span-12 mb-2'>
                                     <label
                                       htmlFor='task-name'
                                       className='ti-form-label'
@@ -661,9 +661,8 @@ const Page = () => {
                                         type='text'
                                         className='form-control w-full me-2'
                                         id='task-name'
-                                        placeholder={`For eg: ${
-                                          email.split('@')[1]
-                                        }`}
+                                        placeholder={`For eg: ${email.split('@')[1]
+                                          }`}
                                         onChange={handleDomainChange}
                                         onKeyDown={handleKeyPress}
                                         value={domainInput}
@@ -707,10 +706,10 @@ const Page = () => {
                                                   onClick={() =>
                                                     removeDomain(index)
                                                   }
-                                                  //   onClick={()=>{
-                                                  //     domains.splice(index, 1);
-                                                  //   setDomains(domains);
-                                                  // }}
+                                                //   onClick={()=>{
+                                                //     domains.splice(index, 1);
+                                                //   setDomains(domains);
+                                                // }}
                                                 >
                                                   <span className='sr-only'>
                                                     Dismiss
@@ -738,7 +737,7 @@ const Page = () => {
                                                              <div className="alert alert-solid-primary alert-dismissible !ms-2 fade show flex" role="alert" id="dismiss-alert2"><div className="sm:flex-shrink-0"> A simple </div><div className="ms-auto"><div className="mx-1 my-1"><button type="button" className="inline-flex bg-teal-50 rounded-sm text-teal-500 focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-offset-teal-50 focus:ring-teal-600" data-hs-remove-element="#dismiss-alert2"><span className="sr-only">Dismiss</span><svg className="h-3 w-3" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M0.92524 0.687069C1.126 0.486219 1.39823 0.373377 1.68209 0.373377C1.96597 0.373377 2.2382 0.486219 2.43894 0.687069L8.10514 6.35813L13.7714 0.687069C13.8701 0.584748 13.9882 0.503105 14.1188 0.446962C14.2494 0.39082 14.3899 0.361248 14.5321 0.360026C14.6742 0.358783 14.8151 0.38589 14.9468 0.439762C15.0782 0.493633 15.1977 0.573197 15.2983 0.673783C15.3987 0.774389 15.4784 0.894026 15.5321 1.02568C15.5859 1.15736 15.6131 1.29845 15.6118 1.44071C15.6105 1.58297 15.5809 1.72357 15.5248 1.85428C15.4688 1.98499 15.3872 2.10324 15.2851 2.20206L9.61883 7.87312L15.2851 13.5441C15.4801 13.7462 15.588 14.0168 15.5854 14.2977C15.5831 14.5787 15.4705 14.8474 15.272 15.046C15.0735 15.2449 14.805 15.3574 14.5244 15.3599C14.2437 15.3623 13.9733 15.2543 13.7714 15.0591L8.10514 9.38812L2.43894 15.0591C2.23704 15.2543 1.96663 15.3623 1.68594 15.3599C1.40526 15.3574 1.13677 15.2449 0.938279 15.046C0.739807 14.8474 0.627232 14.5787 0.624791 14.2977C0.62235 14.0168 0.730236 13.7462 0.92524 13.5441L6.59144 7.87312L0.92524 2.20206C0.724562 2.00115 0.611816 1.72867 0.611816 1.44457C0.611816 1.16047 0.724562 0.887983 0.92524 0.687069Z" fill="currentColor"></path></svg></button></div></div></div> */}
                                     </div>
                                   </div>
-                                  <div className='xl:col-span-12 col-span-12'>
+                                  <div className='xl:col-span-12 col-span-12 mb-2'>
                                     <label
                                       htmlFor='task-name'
                                       className='ti-form-label'
@@ -772,7 +771,7 @@ const Page = () => {
                                     )}
                                   </div>
 
-                                  <div className='xl:col-span-12 col-span-12'>
+                                  <div className='xl:col-span-12 col-span-12 mb-2'>
                                     <label
                                       htmlFor='task-name'
                                       className='ti-form-label'
@@ -898,13 +897,13 @@ const Page = () => {
                                     setLoading(false);
                                   }
                                 }}
-                                // onClick={() => {
-                                //   localStorage.setItem(
-                                //     'org_id',
-                                //     org.id as string,
-                                //   );
-                                //   localStorage.setItem('org_name', org.name);
-                                // }}
+                              // onClick={() => {
+                              //   localStorage.setItem(
+                              //     'org_id',
+                              //     org.id as string,
+                              //   );
+                              //   localStorage.setItem('org_name', org.name);
+                              // }}
                               >
                                 <div className='flex items-center'>
                                   {/* <span className="me-2 leading-none">
@@ -948,6 +947,7 @@ const Page = () => {
                           className='xl:col-span-4 col-span-12 task-card'
                           key={org.org_id}
                         >
+
                           <div
                             className='box'
                             style={{ cursor: 'pointer' }}
@@ -971,6 +971,7 @@ const Page = () => {
                               navigate.push('/orgdashboard');
                             }}
                           >
+
                             {/* <button
                               className='hs-dropdown-toggle py-2 px-3 ti-btn bg-primary text-white !font-medium !mb-0'
                               data-hs-overlay='#todo-compose'
@@ -982,37 +983,13 @@ const Page = () => {
                             >
                               <i className='ri-edit-2-line'></i>
                             </button> */}
-                            <div
-                              style={{ cursor: 'pointer' }}
-                              aria-label='anchor'
-                              data-bs-target='#formmodal'
-                              data-bs-toggle='modal'
-                              data-bs-whatever='@fat'
-                              data-hs-overlay='#todo-compose'
-                              onClick={(e) => {
-                                e.stopPropagation(); // Prevent card click
-                                setModalOpen(true);
-                                handeledit(org);
-                              }}
-                              className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
-                            >
-                              <i className='ri-edit-line'></i>
-                            </div>
-                            <div
-                              style={{ cursor: 'pointer' }}
-                              aria-label='anchor'
-                              // onClick={() => {
-                              //   handleDelete(user.id);
-                              // }}
-                              className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
-                            >
-                              <i className='ri-delete-bin-line'></i>
-                            </div>
+
 
                             <div className='box-body contact-action'>
                               <div className='flex items-start '>
-                                <div className='flex flex-grow flex-wrap gap-2 items-center'>
-                                  <div className='avatar avatar-xl avatar-rounded me-3'>
+                                <div className='flex flex-grow justify-between gap-2 items-center'>
+
+                                  <div className='flex flex-grow  gap-2 items-center'> <div className='avatar avatar-xl avatar-rounded me-3'>
                                     <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
                                       {/* {SingleSite?.site?SingleSite?.site?.name[0].toUpperCase(): ""} */}
                                       {org.org_name ? (
@@ -1029,15 +1006,45 @@ const Page = () => {
                                       <i className='ri-building-fill text-black'>dd</i>
                                     </h4> */}
                                   </div>
-                                  <div>
-                                    <h6 className=' mb-1 font-semibold text-[1rem] text-site-name'>
-                                      {' '}
-                                      {org?.org_name}{' '}
-                                    </h6>
-                                    <p className='mb-1 text-[#8c9097] dark:text-white/50 contact-mail text-truncate'>
-                                      {org?.sites_count} sites
-                                    </p>
+                                    <div >
+                                      <h6 className=' mb-1 font-semibold text-[1rem] text-site-name'>
+                                        {' '}
+                                        {org?.org_name}{' '}
+                                      </h6>
+                                      <p className='mb-1 text-[#8c9097] dark:text-white/50 contact-mail text-truncate'>
+                                        {org?.sites_count} sites
+                                      </p>
+                                    </div>
                                   </div>
+                                  <div>
+                                    <div
+                                      style={{ cursor: 'pointer' }}
+                                      aria-label='anchor'
+                                      data-bs-target='#formmodal'
+                                      data-bs-toggle='modal'
+                                      data-bs-whatever='@fat'
+                                      data-hs-overlay='#todo-compose'
+                                      onClick={(e) => {
+                                        e.stopPropagation(); // Prevent card click
+                                        setModalOpen(true);
+                                        handeledit(org);
+                                      }}
+                                      className='ti-btn ti-btn-icon !me-2 ti-btn-wave !gap-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
+                                    >
+                                      <i className='ri-edit-line'></i>
+                                    </div>
+                                    <div
+                                      style={{ cursor: 'pointer' }}
+                                      aria-label='anchor'
+                                      // onClick={() => {
+                                      //   handleDelete(user.id);
+                                      // }}
+                                      className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem]  !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
+                                    >
+                                      <i className='ri-delete-bin-line'></i>
+                                    </div>
+                                  </div>
+
                                 </div>
                               </div>
                             </div>
