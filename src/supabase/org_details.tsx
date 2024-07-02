@@ -589,7 +589,7 @@ async function deleteDomains(
       { data: domainData, error: domainError },
     ] = await Promise.all([
       supabase.from('users').select('email').eq('id', user_id).single(),
-      supabase.from('domains').select('domain').eq('id', domain_id).single(),
+      supabase.from('domains').select('name').eq('id', domain_id).single(),
     ]);
 
     if (userError || !user) {
@@ -605,7 +605,7 @@ async function deleteDomains(
     }
 
     const userEmailDomain = user.email.split('@')[1];
-    const domainName = domainData.domain;
+    const domainName = domainData.name;
 
     // If the user's email domain matches the domain being deleted, do not delete
     if (userEmailDomain === domainName) {
