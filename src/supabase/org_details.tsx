@@ -705,7 +705,92 @@ async function deleteOrganization(org_id: any): Promise<Result<null>> {
     return { errorCode: 1, data: null };
   }
 }
+async function requestOrgDeletion(org_id: any): Promise<Result<any>> {
+  try {
+    const id = org_id;
 
+    // Check if the organization has associated sites
+    const { data: siteDetails, error: siteError } = await supabase
+      .from('sites_detail')
+      .select('id')
+      .eq('org_id', id);
+
+    if (siteError) {
+      return {
+        errorCode: 1,
+        message: 'Error fetching site details.',
+        data: null,
+      };
+    }
+
+    // Check if the organization has sites associated with it
+    if (siteDetails && siteDetails.length > 0) {
+      return {
+        errorCode: 2,
+        message: 'Organization has associated sites. Delete not allowed.',
+        data: org_id,
+      };
+    } else {
+      return {
+        errorCode: 0,
+        message: 'Organization can be deleted. No associated sites found.',
+        data: org_id,
+      };
+    }
+  } catch (error) {
+    // Handle unexpected errors
+    return {
+      errorCode: 1,
+      message: 'Unexpected error occurred while processing deletion request.',
+      data: null,
+    };
+  }
+}
+
+async function reqOrgDeleteMail(data: any): Promise<any> {
+  // Fetch email configuration
+  try {
+    const emailResult = await fetchEmailData('Org_Delete_Request');
+    if (emailResult.errorCode !== 0) {
+      return {
+        errorCode: 1,
+        message: 'Error fetching email configuration.',
+        data: null,
+      };
+    }
+
+    const userName: string = data.userName;
+    const orgName: string = data.org_name;
+    const emailData = emailResult.data;
+    const to: string = emailData.To;
+    const subject: string = emailData.email_subject;
+    const heading: string = emailData.email_heading;
+    const contentTemplate: string = emailData.email_content;
+
+    const headingData = heading
+      .replace('{{User Name}}', userName)
+      .replace('{{Org Name}}', orgName);
+    const contentData = contentTemplate
+      .replace('{{User Name}}', userName)
+      .replace('{{Org Name}}', orgName);
+
+    // Send email
+    await sendEmailFunction(to, subject, headingData, contentData, data.token);
+
+    return {
+      errorCode: 0,
+      message: 'Organization deletion request sent successfully.',
+      data: null,
+    };
+  } catch (error) {
+    // Handle unexpected errors
+    return {
+      errorCode: 1,
+      message: 'Unexpected error',
+      data: null,
+    };
+  }
+}
 async function getUserRole(): Promise<Result<UserRole[]>> {
   try {
     // Fetch user roles
@@ -732,6 +817,8 @@ export {
   getUserRole,
   organizationSearch,
   organizationSidebarList,
+  reqOrgDeleteMail,
+  requestOrgDeletion,
   updateOrganization,
   viewOrganization,
 };
