@@ -506,10 +506,6 @@ async function updateSite(updateData: any): Promise<Result<any>> {
       .neq('id', updateData.siteId);
 
     if (fetchError) {
-      console.error(
-        'Error checking uniqueness of site name:',
-        fetchError.message,
-      );
       return {
         errorCode: 1,
         message: 'Error checking uniqueness of site name',

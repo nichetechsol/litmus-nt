@@ -393,6 +393,62 @@ const insertDomains = async (orgId: any, domains: any) => {
   return domainInsertResults;
 };
 
+// async function updateOrganization(data: {
+//   name: string;
+//   description: string;
+//   type_id: any;
+//   status: string;
+//   domain: string[];
+//   org_id: any;
+// }): Promise<Result<any>> {
+//   // Replace `any` with the appropriate type if available
+//   try {
+//     // Update organization details
+//     const { data: updateData, error } = await supabase
+//       .from('org_details')
+//       .update({
+//         name: data.name,
+//         description: data.description,
+//         type_id: data.type_id,
+//         status: data.status,
+//       })
+//       .eq('id', data.org_id)
+//       .select();
+
+//     if (error) {
+//       return { errorCode: 1, data: null };
+//     } else {
+//       // Delete existing domains
+//       const { error: deleteDomainError } = await supabase
+//         .from('domains')
+//         .delete()
+//         .eq('org_id', data.org_id);
+
+//       if (deleteDomainError) {
+//         return { errorCode: 1, data: null };
+//       }
+
+//       // Insert new domains
+//       const domainInsertResults = [];
+//       for (const domain of data.domain) {
+//         const { data: insertDomain, error: domainError } = await supabase
+//           .from('domains')
+//           .insert([{ name: domain, org_id: data.org_id }])
+//           .select();
+
+//         if (domainError) {
+//           domainInsertResults.push({ success: false, error: domainError });
+//         } else {
+//           domainInsertResults.push({ success: true, data: insertDomain });
+//         }
+//       }
+
+//       return { errorCode: 0, data: { updateData, domainInsertResults } };
+//     }
+//   } catch (error) {
+//     return { errorCode: 1, data: null };
+//   }
+// }
 async function updateOrganization(data: {
   name: string;
   description: string;
@@ -401,8 +457,31 @@ async function updateOrganization(data: {
   domain: string[];
   org_id: any;
 }): Promise<Result<any>> {
-  // Replace `any` with the appropriate type if available
   try {
+    // Check if the new name already exists in the database, excluding the current org_id
+    const { data: existingOrg, error: fetchError } = await supabase
+      .from('org_details')
+      .select('id')
+      .eq('name', data.name)
+      .neq('id', data.org_id);
+
+    if (fetchError) {
+      return {
+        errorCode: 1,
+        message: 'Error checking uniqueness of Organization name',
+        data: null,
+      };
+    }
+
+    if (existingOrg && existingOrg.length > 0) {
+      return {
+        errorCode: 1,
+        message:
+          'Organization name is already taken. Please choose a different name.',
+        data: null,
+      };
+    }
+
     // Update organization details
     const { data: updateData, error } = await supabase
       .from('org_details')
@@ -416,37 +495,104 @@ async function updateOrganization(data: {
       .select();
 
     if (error) {
-      return { errorCode: 1, data: null };
-    } else {
-      // Delete existing domains
-      const { error: deleteDomainError } = await supabase
-        .from('domains')
-        .delete()
-        .eq('org_id', data.org_id);
+      return {
+        errorCode: 1,
+        message: 'Error updating organization details',
+        data: null,
+      };
+    }
 
-      if (deleteDomainError) {
-        return { errorCode: 1, data: null };
+    const domainInsertResults = [];
+
+    // Process each domain
+    for (const domain of data.domain) {
+      // Check if domain exists
+      const { data: existingDomain, error: checkError } = await supabase
+        .from('domains')
+        .select('*')
+        .eq('name', domain);
+
+      if (checkError) {
+        domainInsertResults.push({
+          success: false,
+          message: `Error checking domain '${domain}'`,
+          error: checkError,
+        });
+        continue;
       }
 
-      // Insert new domains
-      const domainInsertResults = [];
-      for (const domain of data.domain) {
+      let domainId;
+
+      if (existingDomain.length > 0) {
+        // Domain exists, get the existing ID
+        domainId = existingDomain[0].id;
+      } else {
+        // Domain does not exist, insert new domain
         const { data: insertDomain, error: domainError } = await supabase
           .from('domains')
-          .insert([{ name: domain, org_id: data.org_id }])
+          .insert({ name: domain })
           .select();
 
         if (domainError) {
-          domainInsertResults.push({ success: false, error: domainError });
-        } else {
-          domainInsertResults.push({ success: true, data: insertDomain });
+          domainInsertResults.push({
+            success: false,
+            message: `Error inserting domain '${domain}'`,
+            error: domainError,
+          });
+          continue;
         }
+
+        domainId = insertDomain[0].id;
       }
 
-      return { errorCode: 0, data: { updateData, domainInsertResults } };
+      domainInsertResults.push({ success: true, data: domainId });
+
+      // Check if the org_domain pair exists
+      const { data: orgDomainPair, error: orgDomainCheckError } = await supabase
+        .from('org_domains')
+        .select('*')
+        .eq('org_id', data.org_id)
+        .eq('domain_id', domainId);
+
+      if (orgDomainCheckError) {
+        domainInsertResults.push({
+          success: false,
+          message: `Error checking org_domain for domain '${domain}'`,
+          error: orgDomainCheckError,
+        });
+        continue;
+      }
+
+      if (orgDomainPair.length === 0) {
+        // Pair does not exist, insert it
+        const { data: insertOrgDomain, error: orgDomainInsertError } =
+          await supabase
+            .from('org_domains')
+            .insert([{ org_id: data.org_id, domain_id: domainId }])
+            .select();
+
+        if (orgDomainInsertError) {
+          domainInsertResults.push({
+            success: false,
+            message: `Error inserting org_domain for domain '${domain}'`,
+            error: orgDomainInsertError,
+          });
+          continue;
+        }
+      }
     }
+
+    return {
+      errorCode: 0,
+      message: 'Organization details updated successfully.',
+      data: { updateData, domainInsertResults },
+    };
   } catch (error) {
-    return { errorCode: 1, data: null };
+    return {
+      errorCode: 1,
+      message: 'An error occurred while updating the organization',
+      data: null,
+    };
   }
 }
 
