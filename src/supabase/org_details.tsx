@@ -718,10 +718,14 @@ async function viewOrganization(org_id: any): Promise<Result<any>> {
 //     };
 //   }
 // }
-async function deleteDomains(data: any): Promise<Result<any>> {
+async function deleteDomains(
+  org_id: any,
+  domain_id: any,
+  user_id: any,
+): Promise<Result<any>> {
   try {
     // Validate the input
-    if (!data.org_id || !data.domain_id) {
+    if (!org_id || !domain_id) {
       return { errorCode: 1, message: 'Invalid input', data: null };
     }
 
@@ -730,8 +734,8 @@ async function deleteDomains(data: any): Promise<Result<any>> {
       { data: user, error: userError },
       { data: domainData, error: domainError },
     ] = await Promise.all([
-      supabase.from('users').select('email').eq('id', data.user_id).single(),
-      supabase.from('domains').select('name').eq('id', data.domain_id).single(),
+      supabase.from('users').select('email').eq('id', user_id).single(),
+      supabase.from('domains').select('name').eq('id', domain_id).single(),
     ]);
 
     if (userError || !user) {
@@ -763,8 +767,8 @@ async function deleteDomains(data: any): Promise<Result<any>> {
       await supabase
         .from('org_domains')
         .select('org_id')
-        .eq('domain_id', data.domain_id)
-        .neq('org_id', data.org_id);
+        .eq('domain_id', domain_id)
+        .neq('org_id', org_id);
 
     if (checkOtherOrgsError) {
       return {
@@ -787,8 +791,8 @@ async function deleteDomains(data: any): Promise<Result<any>> {
     const { error: deleteOrgDomainError } = await supabase
       .from('org_domains')
       .delete()
-      .eq('org_id', data.org_id)
-      .eq('domain_id', data.domain_id);
+      .eq('org_id', org_id)
+      .eq('domain_id', domain_id);
 
     if (deleteOrgDomainError) {
       return {
@@ -800,17 +804,14 @@ async function deleteDomains(data: any): Promise<Result<any>> {
 
     // Check if the domain is associated with any other organization again
     const { data: domainAfterDelete, error: checkDomainAfterDeleteError } =
-      await supabase
-        .from('org_domains')
-        .select('*')
-        .eq('domain_id', data.domain_id);
+      await supabase.from('org_domains').select('*').eq('domain_id', domain_id);
 
     // If the domain is not found in any other org_domains entries, delete it from domains table
     if (!domainAfterDelete || domainAfterDelete.length === 0) {
       const { error: deleteDomainError } = await supabase
         .from('domains')
         .delete()
-        .eq('id', data.domain_id);
+        .eq('id', domain_id);
 
       if (deleteDomainError) {
         return {

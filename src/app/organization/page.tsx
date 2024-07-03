@@ -449,9 +449,9 @@ const Page = () => {
     ) {
       const domainsArray = domainInput.endsWith(',')
         ? domainInput
-            .split(',')
-            .map((domain) => domain.trim())
-            .filter((domain) => domain !== '')
+          .split(',')
+          .map((domain) => domain.trim())
+          .filter((domain) => domain !== '')
         : domainInput.split(',').map((domain) => domain.trim());
       const newDomains = [];
       let errorMessage = '';
@@ -661,9 +661,8 @@ const Page = () => {
                                         type='text'
                                         className='form-control w-full me-2'
                                         id='task-name'
-                                        placeholder={`For eg: ${
-                                          email.split('@')[1]
-                                        }`}
+                                        placeholder={`For eg: ${email.split('@')[1]
+                                          }`}
                                         onChange={handleDomainChange}
                                         onKeyDown={handleKeyPress}
                                         value={domainInput}
@@ -707,10 +706,10 @@ const Page = () => {
                                                   onClick={() =>
                                                     removeDomain(index)
                                                   }
-                                                  //   onClick={()=>{
-                                                  //     domains.splice(index, 1);
-                                                  //   setDomains(domains);
-                                                  // }}
+                                                //   onClick={()=>{
+                                                //     domains.splice(index, 1);
+                                                //   setDomains(domains);
+                                                // }}
                                                 >
                                                   <span className='sr-only'>
                                                     Dismiss
@@ -898,13 +897,13 @@ const Page = () => {
                                     setLoading(false);
                                   }
                                 }}
-                                // onClick={() => {
-                                //   localStorage.setItem(
-                                //     'org_id',
-                                //     org.id as string,
-                                //   );
-                                //   localStorage.setItem('org_name', org.name);
-                                // }}
+                              // onClick={() => {
+                              //   localStorage.setItem(
+                              //     'org_id',
+                              //     org.id as string,
+                              //   );
+                              //   localStorage.setItem('org_name', org.name);
+                              // }}
                               >
                                 <div className='flex items-center'>
                                   {/* <span className="me-2 leading-none">
@@ -948,6 +947,7 @@ const Page = () => {
                           className='xl:col-span-4 col-span-12 task-card'
                           key={org.org_id}
                         >
+
                           <div
                             className='box'
                             style={{ cursor: 'pointer' }}
@@ -971,6 +971,7 @@ const Page = () => {
                               navigate.push('/orgdashboard');
                             }}
                           >
+
                             {/* <button
                               className='hs-dropdown-toggle py-2 px-3 ti-btn bg-primary text-white !font-medium !mb-0'
                               data-hs-overlay='#todo-compose'
@@ -983,29 +984,29 @@ const Page = () => {
                               <i className='ri-edit-2-line'></i>
                             </button> */}
 
+
                             <div className='box-body contact-action'>
                               <div className='flex items-start '>
                                 <div className='flex flex-grow justify-between gap-2 items-center'>
-                                  <div className='flex flex-grow  gap-2 items-center'>
-                                    {' '}
-                                    <div className='avatar avatar-xl avatar-rounded me-3'>
-                                      <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
-                                        {/* {SingleSite?.site?SingleSite?.site?.name[0].toUpperCase(): ""} */}
-                                        {org.org_name ? (
-                                          <InitialsComponent
-                                            name={org.org_name}
-                                          />
-                                        ) : (
-                                          ''
-                                        )}
-                                      </span>
-                                      {/* <img src="../../../assets/images/faces/4.jpg" alt={org.org_name?org.org_name[0].toUpperCase(): ""} /> */}
-                                      {/* <h4>
+
+                                  <div className='flex flex-grow  gap-2 items-center'> <div className='avatar avatar-xl avatar-rounded me-3'>
+                                    <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
+                                      {/* {SingleSite?.site?SingleSite?.site?.name[0].toUpperCase(): ""} */}
+                                      {org.org_name ? (
+                                        <InitialsComponent
+                                          name={org.org_name}
+                                        />
+                                      ) : (
+                                        ''
+                                      )}
+                                    </span>
+                                    {/* <img src="../../../assets/images/faces/4.jpg" alt={org.org_name?org.org_name[0].toUpperCase(): ""} /> */}
+                                    {/* <h4>
                                       {' '}
                                       <i className='ri-building-fill text-black'>dd</i>
                                     </h4> */}
-                                    </div>
-                                    <div>
+                                  </div>
+                                    <div >
                                       <h6 className=' mb-1 font-semibold text-[1rem] text-site-name'>
                                         {' '}
                                         {org?.org_name}{' '}
@@ -1043,6 +1044,7 @@ const Page = () => {
                                       <i className='ri-delete-bin-line'></i>
                                     </div>
                                   </div>
+
                                 </div>
                               </div>
                             </div>
