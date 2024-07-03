@@ -408,7 +408,7 @@ html {
 @media (max-width: 767.98px) {
   .authentication {
     min-height: 90vh !important;
-}
+  }
   .header-element.header-fullscreen {
     @apply hidden;
   }
@@ -2413,7 +2413,7 @@ html {
   }
   .box-header .search-ti {
     width: 130px;
-    @apply h-[1.9rem]
+    @apply h-[1.9rem];
   }
   [data-nav-layout='horizontal']
     .landing-body
@@ -20189,20 +20189,20 @@ h6 {
   margin: 0px !important;
 } */
 
-input[type="color"],
-input[type="date"],
-input[type="datetime"],
-input[type="datetime-local"],
-input[type="email"],
-input[type="month"],
-input[type="number"],
-input[type="password"],
-input[type="search"],
-input[type="tel"],
-input[type="text"],
-input[type="time"],
-input[type="url"],
-input[type="week"],
+input[type='color'],
+input[type='date'],
+input[type='datetime'],
+input[type='datetime-local'],
+input[type='email'],
+input[type='month'],
+input[type='number'],
+input[type='password'],
+input[type='search'],
+input[type='tel'],
+input[type='text'],
+input[type='time'],
+input[type='url'],
+input[type='week'],
 select:focus,
 textarea {
   font-size: 16px;
