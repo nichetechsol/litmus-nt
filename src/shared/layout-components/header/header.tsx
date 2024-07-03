@@ -468,7 +468,7 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
               <div className='header-content-left'>
                 <div className='header-element'>
                   <div className='horizontal-logo'>
-                    <Link href='/organization' className='header-logo'>
+                    <a href='/organization' className='header-logo'>
                       <Image
                         src={`${
                           process.env.NODE_ENV === 'production' ? '' : ''
@@ -523,7 +523,7 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                         width={100}
                         height={100}
                       />
-                    </Link>
+                    </a>
                   </div>
                 </div>
                 <div

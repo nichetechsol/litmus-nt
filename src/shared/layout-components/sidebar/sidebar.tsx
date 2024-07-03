@@ -42,11 +42,12 @@ const Sidebar = ({ local_varaiable, ThemeChanger }: any) => {
     {
       path: '/sites',
       type: 'link',
-      active: p === '/sites' ? true : false,
-      selected: p === '/sites' ? true : false,
+      active: p === '/sites' || p === '/sitedashboard' ? true : false,
+      selected: p === '/sites' || p === '/sitedashboard' ? true : false,
       title: 'Sites',
       ico: 'ri-map-pin-line',
     },
+
     {
       path: '/products',
       type: 'link',
@@ -716,7 +717,7 @@ const Sidebar = ({ local_varaiable, ThemeChanger }: any) => {
         onMouseLeave={() => Outhover()}
       >
         <div className='main-sidebar-header'>
-          <Link
+          <a
             href='/organization'
             onClick={() => window.location.reload()}
             className='header-logo'
@@ -763,7 +764,7 @@ const Sidebar = ({ local_varaiable, ThemeChanger }: any) => {
               alt='logo'
               className='main-logo toggle-white'
             />
-          </Link>
+          </a>
         </div>
 
         <div className='main-sidebar ' id='sidebar-scroll'>

@@ -325,6 +325,7 @@ const Page = () => {
                                           }
                                           // href={files.downloadLink}
                                           className='text-[1rem] !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'
+                                          style={{ cursor: 'pointer' }}
                                         >
                                           <i className='ri-download-line text-[.8rem] text-white'></i>
                                         </a>
