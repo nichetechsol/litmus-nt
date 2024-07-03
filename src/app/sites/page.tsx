@@ -42,6 +42,7 @@ import {
 import {
   addSites,
   addSitesConfirm,
+  requestSiteDeletion,
   updateSite,
 } from '@/supabase/site_details_crud';
 import { fetchSiteType } from '@/supabase/site_type';
@@ -74,6 +75,7 @@ interface SiteDetailsWithUsers {
   ownerNames: string[];
   country: string | null;
   state: string | null;
+  user_role_id?: number | null;
 }
 interface SiteDetails {
   id: string;
@@ -702,6 +704,159 @@ const Page: React.FC = () => {
     // remaning descriptopn
     setChangeFlage(true);
   };
+  // const handelDelete = (SingleSite: any): any => {
+  //   swal({
+  //     title: 'Are you sure?',
+  //     text: 'Please type DELETE to confirm deletion',
+  //     content: {
+  //       element: 'input',
+  //       attributes: {
+  //         placeholder: 'Type DELETE here',
+  //         type: 'text',
+  //       },
+  //     },
+  //     icon: 'warning',
+  //     buttons: {
+  //       cancel: {
+  //         text: 'Cancel',
+  //         value: null,
+  //         visible: true,
+  //         className: '',
+  //         closeModal: true,
+  //       },
+  //       confirm: {
+  //         text: 'Delete',
+  //         value: 'DELETE',
+  //         visible: true,
+  //         className: '',
+  //         closeModal: true,
+  //       },
+  //     },
+  //   }).then((value) => {
+  //     // Validate the input and perform deletion if input is valid
+  //     const inputElement = document.querySelector(
+  //       'input[type="text"]',
+  //     ) as HTMLInputElement;
+  //     debugger;
+  //     if (
+  //       value === 'DELETE'
+  //       // inputElement?.value.trim().toUpperCase() === 'DELETE'
+  //     ) {
+  //       debugger;
+  //       const data = {
+  //         userName: SingleSite?.users[0]?.user.email,
+  //         siteName: SingleSite?.site.name,
+  //         orgName: orgName, // Make sure orgName is defined in your context
+  //         token: onlyToken, // Make sure onlyToken is defined in your context
+  //       };
+  //       console.log('this is data', data);
+
+  //       // Call your deletion API function
+  //       requestSiteDeletion(data)
+  //         .then((response) => {
+  //           if (response) {
+  //             console.log('Site deletion successful:', response);
+  //             // Optionally notify user of success
+  //             swal(response.message);
+  //             // Perform any additional actions after successful deletion
+  //           } else {
+  //             swal('Error!', 'There was a problem deleting the site.', 'error');
+  //           }
+  //         })
+  //         .catch((error) => {
+  //           console.error('Delete request failed:', error);
+  //           swal('Error!', 'There was a problem deleting the site.', 'error');
+  //         });
+  //     } else if (value !== 'DELETE') {
+  //       swal('Invalid input!', 'You need to type DELETE to confirm.', 'error');
+  //     } else if (value === '') {
+  //       // swal('Invalid input!', 'You need to type DELETE to confirm.', 'error');
+  //     }
+  //   });
+  // };
+
+  // const handelDelete = (SingleSite: any): any => {
+  //   swal({
+  //     title: 'Are you sure?',
+  //     text: 'Please type DELETE to confirm deletion',
+  //     content: {
+  //       element: 'input',
+  //       attributes: {
+  //         placeholder: 'Type DELETE here',
+  //         type: 'text',
+  //         id: 'delete-input',
+  //         oninput: (e: Event) => {
+  //           const target = e.target as HTMLInputElement;
+  //           let value = target.value;
+
+  //           // Allow only alphabetic characters
+  //           value = value.replace(/[^a-zA-Z]/g, '');
+
+  //           // Limit the length to 6 characters
+  //           if (value.length > 6) {
+  //             value = value.substring(0, 6);
+  //           }
+
+  //           // Convert to uppercase
+  //           value = value.toUpperCase();
+  //           target.value = value; // Update the input field with the transformed value
+  //         },
+  //       },
+  //     },
+  //     icon: 'warning',
+  //     buttons: {
+  //       cancel: {
+  //         text: 'Cancel',
+  //         value: null,
+  //         visible: true,
+  //         className: '',
+  //         closeModal: true,
+  //       },
+  //       confirm: {
+  //         text: 'Delete',
+  //         value: 'DELETE',
+  //         visible: true,
+  //         className: '',
+  //         closeModal: true,
+  //       },
+  //     },
+  //   }).then((value) => {
+  //     // Check the user input and handle accordingly
+  //     if (value === 'DELETE') {
+  //       const data = {
+  //         userName: SingleSite?.users[0]?.user.email,
+  //         siteName: SingleSite?.site.name,
+  //         orgName: orgName, // Make sure orgName is defined in your context
+  //         token: onlyToken, // Make sure onlyToken is defined in your context
+  //       };
+
+  //       // Call your deletion API function
+  //       setLoading(true);
+  //       requestSiteDeletion(data)
+  //         .then((response) => {
+  //           if (response) {
+  //             setLoading(false);
+  //             swal({
+  //               title: 'Success!',
+  //               text: response.message,
+  //               icon: 'success',
+  //             });
+  //           } else {
+  //             swal('Error!', 'There was a problem deleting the site.', 'error');
+  //           }
+  //         })
+  //         .catch((error) => {
+  //           swal('Error!', 'There was a problem deleting the site.', error);
+  //         });
+  //     } else if (value === null) {
+  //       // User pressed cancel, do nothing
+  //     } else {
+  //       // Invalid input, show error message
+  //       swal('Invalid input!', 'You need to type DELETE to confirm.', 'error');
+  //     }
+  //   });
+  // };
+
   return (
     <>
       <>
@@ -721,7 +876,7 @@ const Page: React.FC = () => {
                           className='hs-dropdown-toggle py-2  px-3 ti-btn bg-primary text-white !font-medium w-full !mb-0'
                           data-hs-overlay='#todo-compose'
                           onClick={Addsite}
-                        // onClick={() => handleCall()}
+                          // onClick={() => handleCall()}
                         >
                           <i className='ri-add-circle-line !text-[1rem]'></i>Add
                           Site
@@ -1109,146 +1264,200 @@ const Page: React.FC = () => {
                     >
                       {SitesList && SitesList.length > 0
                         ? SitesList.map((SingleSite) => (
-                          <div
-                            className='xl:col-span-6 col-span-12 task-card'
-                            key={SingleSite?.site?.id}
-                          >
-                            <div className='box task-pending-card '>
-                              <div
-                                className='box-body'
-                                style={{ cursor: 'pointer' }}
-                                onClick={() => {
-                                  const encryptedsiteid = encryptData(
-                                    SingleSite.site.id,
-                                  );
-                                  const encryptedsitename = encryptData(
-                                    SingleSite.site.name,
-                                  );
-                                  const encryptedsiteOwnerName = encryptData(
-                                    SingleSite.ownerNames,
-                                  );
-                                  localStorage.setItem(
-                                    'site_id',
-                                    encryptedsiteid,
-                                  );
-                                  localStorage.setItem(
-                                    'site_name',
-                                    encryptedsitename,
-                                  );
-                                  localStorage.setItem(
-                                    'site_owner_name',
-                                    encryptedsiteOwnerName,
-                                  );
-                                  navigate.push('/sitedashboard');
-                                }}
-                              >
-                                <div className='flex justify-between align-center flex-wrap gap-2'>
-                                  <h1
-                                    style={{
-                                      fontSize: '1.1rem',
-                                      fontWeight: 'bold',
-                                      marginBottom: '0.5rem',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                    }}
-                                  >
-                                    <Link
-                                      aria-label='anchor'
-                                      href='#!'
-                                    ></Link>
-                                    {SingleSite?.site
-                                      ? SingleSite?.site?.name
-                                      : ''}
-                                  </h1>
-                                  <div className='avatar avatar-xl avatar-rounded '>
-                                    {' '}
-                                    <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
-                                      <InitialsComponent
-                                        name={
-                                          SingleSite?.site
-                                            ? SingleSite?.site?.name
-                                            : ''
-                                        }
-                                      />
-                                    </span>
+                            <div
+                              className='xl:col-span-6 col-span-12 task-card'
+                              key={SingleSite?.site?.id}
+                            >
+                              <div className='box task-pending-card '>
+                                {/* {SingleSite?.user_role_id === 1 ||
+                                SingleSite?.user_role_id === 2 ? (
+                                  // <div className='hs-dropdown ti-dropdown'>
+                                  //   <Link
+                                  //     aria-label='anchor'
+                                  //     href='#!'
+                                  //     className='flex items-center justify-center w-[1.75rem] h-[1.75rem]  !text-[0.8rem] !py-1 !px-2 rounded-sm bg-light border-light shadow-none !font-medium'
+                                  //     aria-expanded='false'
+                                  //     onClick={(e) => {
+                                  //       e.preventDefault(); // Prevent default navigation action
+                                  //       e.stopPropagation(); // Prevent click from bubbling up
+                                  //     }}
+                                  //   >
+                                  //     <i className='fe fe-more-vertical text-[0.8rem]'></i>
+                                  //   </Link>
+                                  //   <ul className='hs-dropdown-menu ti-dropdown-menu hidden'>
+                                  //     <li>
+                                  //       <button
+                                  //         className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
+                                  //         data-bs-toggle='modal'
+                                  //         data-hs-overlay='#todo-compose'
+                                  //         onClick={(e) => {
+                                  //           e.stopPropagation(); // Prevent card click
+                                  //           handeledit(SingleSite); // Your function to handle the edit action
+                                  //         }}
+                                  //       >
+                                  //         Edit
+                                  //       </button>
+                                  //     </li>
+                                  //     <li>
+                                  //       <button
+                                  //         className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
+                                  //         onClick={(e: any) => {
+                                  //           e.stopPropagation(); // Prevent card click
+                                  //           handelDelete(SingleSite); // Your function to handle the edit action
+                                  //         }}
+                                  //       >
+                                  //         Delete
+                                  //       </button>
+                                  //     </li>
+                                  //   </ul>
+                                  // </div>
+                                ) : (
+                                  ''
+                                )} */}
+
+                                <div
+                                  className='box-body'
+                                  style={{ cursor: 'pointer' }}
+                                  onClick={() => {
+                                    const encryptedsiteid = encryptData(
+                                      SingleSite.site.id,
+                                    );
+                                    const encryptedsitename = encryptData(
+                                      SingleSite.site.name,
+                                    );
+                                    const encryptedsiteOwnerName = encryptData(
+                                      SingleSite.ownerNames,
+                                    );
+                                    localStorage.setItem(
+                                      'site_id',
+                                      encryptedsiteid,
+                                    );
+                                    localStorage.setItem(
+                                      'site_name',
+                                      encryptedsitename,
+                                    );
+                                    localStorage.setItem(
+                                      'site_owner_name',
+                                      encryptedsiteOwnerName,
+                                    );
+                                    navigate.push('/sitedashboard');
+                                  }}
+                                >
+                                  <div className='flex justify-between align-center flex-wrap gap-2'>
+                                    <h1
+                                      style={{
+                                        fontSize: '1.1rem',
+                                        fontWeight: 'bold',
+                                        marginBottom: '0.5rem',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                      }}
+                                    >
+                                      <Link
+                                        aria-label='anchor'
+                                        href='#!'
+                                      ></Link>
+                                      {SingleSite?.site
+                                        ? SingleSite?.site?.name
+                                        : ''}
+                                    </h1>
+                                    <div className='avatar avatar-xl avatar-rounded '>
+                                      {' '}
+                                      <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
+                                        <InitialsComponent
+                                          name={
+                                            SingleSite?.site
+                                              ? SingleSite?.site?.name
+                                              : ''
+                                          }
+                                        />
+                                      </span>
+                                    </div>
                                   </div>
-                                </div>
-                                <div className=''>
-                                  <div>
-                                    <ul className='list-group list-group-flush'>
-                                      <li className='flex list-group-item fw-semibold'>
-                                        <i className='bx bx-map align-middle me-2 text-muted'></i>
-                                        <b>Address </b>
-                                        <p className='ms-1 over-text text-muted fw-normal d-inline-block'>
-                                          {SingleSite?.site && (
-                                            <>
-                                              {SingleSite?.site?.address1}
-                                              {SingleSite?.site?.address2
-                                                ? `, ${SingleSite?.site?.address2}`
-                                                : ''}
-                                              {`, ${SingleSite?.site?.city}`}
-                                              {`, ${SingleSite?.state}`}
-                                              {`, ${SingleSite?.country}`}
-                                            </>
-                                          )}
-                                        </p>
-                                      </li>
-                                      <li className='list-group-item fw-semibold'>
-                                        <i className='bx bx-briefcase align-middle me-2 text-muted'></i>
-                                        <b>Owner</b>
-                                        <span className='ms-1 text-muted fw-normal d-inline-block'>
-                                          {SingleSite?.ownerNames?.join(', ')}
-                                        </span>
-                                      </li>
-                                      <li className='list-group-item fw-semibold'>
-                                        <i className='bx bx-user align-middle me-2 text-muted'></i>
-                                        <b>Number of users</b>
-                                        <span className='ms-1 text-muted fw-normal d-inline-block'>
-                                          {SingleSite?.users?.length}
-                                        </span>
-                                      </li>
-                                      <li className='list-group-item fw-semibold'>
-                                        <i className='bx bx-user align-middle me-2 text-muted'></i>
-                                        <b>Type</b>
-                                        <span className='ms-1 text-muted fw-normal d-inline-block'>
-                                          {SingleSite?.type_name}
-                                        </span>
-                                      </li>
-                                    </ul>
-                                    <div className='flex justify-center mt-3'>
-                                      <div
-                                        style={{ cursor: 'pointer' }}
-                                        aria-label='anchor'
-                                        data-bs-target='#formmodal'
-                                        data-bs-toggle='modal'
-                                        data-bs-whatever='@fat'
-                                        data-hs-overlay='#todo-compose'
-                                        onClick={(e) => {
-                                          e.stopPropagation(); // Prevent card click
-                                          // setModalOpen(true);
-                                          handeledit(SingleSite);
-                                        }}
-                                        className='ti-btn ti-btn-primary-full ti-btn-wave !gap-0  bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
-                                      >
-                                        <i className='ri-edit-line'></i> Edit
-                                      </div>
-                                      <div
-                                        style={{ cursor: 'pointer' }}
-                                        aria-label='anchor'
-                                        // onClick={() => {
-                                        //   handleDelete(user.id);
-                                        // }}
-                                        className='ti-btn ti-btn-primary-full ti-btn-wave !gap-0 !ms-2 bg-danger/10 text-white hover:bg-danger hover:text-white hover:border-danger'
-                                      >
-                                        <i className='ri-delete-bin-line'></i> Delete
-                                      </div>
+                                  <div className=''>
+                                    <div>
+                                      <ul className='list-group list-group-flush'>
+                                        <li className='flex list-group-item fw-semibold'>
+                                          <i className='bx bx-map align-middle me-2 text-muted'></i>
+                                          <b>Address </b>
+                                          <p className='ms-1 over-text text-muted fw-normal d-inline-block'>
+                                            {SingleSite?.site && (
+                                              <>
+                                                {SingleSite?.site?.address1}
+                                                {SingleSite?.site?.address2
+                                                  ? `, ${SingleSite?.site?.address2}`
+                                                  : ''}
+                                                {`, ${SingleSite?.site?.city}`}
+                                                {`, ${SingleSite?.state}`}
+                                                {`, ${SingleSite?.country}`}
+                                              </>
+                                            )}
+                                          </p>
+                                        </li>
+                                        <li className='list-group-item fw-semibold'>
+                                          <i className='bx bx-briefcase align-middle me-2 text-muted'></i>
+                                          <b>Owner</b>
+                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                            {SingleSite?.ownerNames?.join(', ')}
+                                          </span>
+                                        </li>
+                                        <li className='list-group-item fw-semibold'>
+                                          <i className='bx bx-user align-middle me-2 text-muted'></i>
+                                          <b>Number of users</b>
+                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                            {SingleSite?.users?.length}
+                                          </span>
+                                        </li>
+                                        <li className='list-group-item fw-semibold'>
+                                          <i className='bx bx-user align-middle me-2 text-muted'></i>
+                                          <b>Type</b>
+                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                            {SingleSite?.type_name}
+                                          </span>
+                                        </li>
+                                      </ul>
+                                      {SingleSite?.user_role_id === 1 ||
+                                      SingleSite?.user_role_id === 2 ? (
+                                        <div className='flex justify-center mt-3'>
+                                          <div
+                                            style={{ cursor: 'pointer' }}
+                                            aria-label='anchor'
+                                            data-bs-target='#formmodal'
+                                            data-bs-toggle='modal'
+                                            data-bs-whatever='@fat'
+                                            data-hs-overlay='#todo-compose'
+                                            onClick={(e) => {
+                                              e.stopPropagation(); // Prevent card click
+                                              // setModalOpen(true);
+                                              handeledit(SingleSite);
+                                            }}
+                                            className='ti-btn ti-btn-primary-full ti-btn-wave !gap-0  bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
+                                          >
+                                            <i className='ri-edit-line'></i>{' '}
+                                            Edit
+                                          </div>
+                                          {/* <div
+                                            style={{ cursor: 'pointer' }}
+                                            aria-label='anchor'
+                                            // onClick={() => {
+                                            //   handleDelete(user.id);
+                                            // }}
+                                            className='ti-btn ti-btn-primary-full ti-btn-wave !gap-0 !ms-2 bg-danger/10 text-white hover:bg-danger hover:text-white hover:border-danger'
+                                          >
+                                            <i className='ri-delete-bin-line'></i>{' '}
+                                            Delete
+                                          </div> */}
+                                        </div>
+                                      ) : (
+                                        ''
+                                      )}
                                     </div>
                                   </div>
                                 </div>
                               </div>
+                              {/* )) */}
                             </div>
-                          </div>
-                        ))
+                          ))
                         : null}
                     </div>
                   </div>

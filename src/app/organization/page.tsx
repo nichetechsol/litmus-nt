@@ -3,13 +3,7 @@
 'use client';
 import Link from 'next/link';
 import { redirect, useRouter } from 'next/navigation';
-import React, {
-  Fragment,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import swal from 'sweetalert';
 import * as Yup from 'yup';
@@ -27,10 +21,13 @@ import {
 import Seo from '@/shared/layout-components/seo/seo';
 import {
   addOrganization,
+  deleteDomains,
   fetchOrganizationAndSiteDetails,
   fetchOrganizationTypes,
   getUserRole,
   organizationSidebarList,
+  updateOrganization,
+  viewOrganization,
 } from '@/supabase/org_details';
 import { refreshToken } from '@/supabase/session';
 import Loader from '@/utils/Loader/Loader';
@@ -48,6 +45,7 @@ interface OrganizationWithSiteCount {
   org_type_id: string;
   org_name: string;
   sites_count: number;
+  user_role_id: number | any;
 }
 
 interface organizationSidebarList {
@@ -92,12 +90,15 @@ const Page = () => {
   const [user_role, setUserrole] = useState<any>('');
   const [email, setEmail] = useState<any>('');
   const [add_orgUser, setadd_orgUser] = useState<any>('');
+  const [allDomain, setAllDomain] = useState<any>('');
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [searchTerm, setSearchTerm] = useState<any>();
 
   const [orgsWithSites, setOrgsWithSites] = useState<
     OrganizationWithSiteCount[] | null
   >(null);
+
   const [sidebarOrgs, setSidebarOrgs] = useState<SidebarOrgs | null>({
     data: [],
   });
@@ -367,76 +368,153 @@ const Page = () => {
       return false;
     }
   };
-
+  const [orgidForupdatetion, setorgidForupdatetion] = useState();
   const handleSubmit = async () => {
-    if (domainInput.trim() !== '') {
-      try {
-        const v = await DomainSchema.validate(domainInput);
-        if (v) {
-          setDomainError('Please press Enter key');
+    if (changeFlage == true) {
+      if (domainInput.trim() !== '') {
+        try {
+          const v = await DomainSchema.validate(domainInput);
+          if (v) {
+            setDomainError('Please press the Enter key');
+          }
+        } catch (error) {
+          if (error instanceof Yup.ValidationError) {
+            setDomainError(error.message);
+          }
         }
-      } catch (error) {
-        if (error instanceof Yup.ValidationError) {
-          setDomainError(error.message);
+      } else {
+        const isValid = await validateForm();
+
+        if (isValid) {
+          const selectedTypeId =
+            typeDropdown?.find((type) => type.name === selectedType)?.id ??
+            null;
+
+          const data: any = {
+            user_id: user_id,
+            user_role: user_role,
+            name: organizationName,
+            description: message,
+            type_id: selectedTypeId,
+            status: 'Y',
+            domain: domains,
+            token: onlyToken,
+            userName: email,
+            type_name: selectedType,
+          };
+          try {
+            setLoading(true);
+            await refreshToken();
+            const result = await addOrganization(data);
+
+            if (result.data != null && result.errorCode == 0) {
+              setLoading(false);
+              toast.success('Organization added successfully', {
+                autoClose: 3000,
+              });
+            } else {
+              setLoading(false);
+              if (result.errorCode === 1) {
+                swal(result.data, { icon: 'error' });
+              }
+            }
+            if (closeModalButtonRef.current) {
+              closeModalButtonRef.current.click();
+            }
+
+            setDomainInput('');
+            setOrganizationName('');
+            setSelectedType('');
+            // const defaultDomain = getDefaultDomainFromEmail();
+            // if (defaultDomain) {
+            //   setDomains([defaultDomain]);
+            // }
+            setMessage('');
+            setOrganizationNameError('');
+            setDomainError('');
+            setTypeDropdownError('');
+            setMessageError('');
+            fetchData();
+            fetchData1();
+            setDomainError('');
+          } catch (error) {
+            setLoading(false);
+            toast.error('Error Adding Organization', { autoClose: 3000 });
+          }
         }
       }
-    } else {
-      const isValid = await validateForm();
+    }
 
-      if (isValid) {
-        const selectedTypeId =
-          typeDropdown?.find((type) => type.name === selectedType)?.id ?? null;
-
-        const data: any = {
-          user_id: user_id,
-          user_role: user_role,
-          name: organizationName,
-          description: message,
-          type_id: selectedTypeId,
-          status: 'Y',
-          domain: domains,
-          token: onlyToken,
-          userName: email,
-          type_name: selectedType,
-        };
+    if (changeFlage == false) {
+      if (domainInput.trim() !== '') {
         try {
-          setLoading(true);
-          await refreshToken();
-          const result = await addOrganization(data);
-
-          if (result.data != null && result.errorCode == 0) {
-            setLoading(false);
-            toast.success('Organization added successfully', {
-              autoClose: 3000,
-            });
-          } else {
-            setLoading(false);
-            if (result.errorCode === 1) {
-              swal(result.data, { icon: 'error' });
-            }
+          const v = await DomainSchema.validate(domainInput);
+          if (v) {
+            setDomainError('Please press the Enter key');
           }
-          if (closeModalButtonRef.current) {
-            closeModalButtonRef.current.click();
-          }
-
-          setDomainInput('');
-          setOrganizationName('');
-          setSelectedType('');
-          // const defaultDomain = getDefaultDomainFromEmail();
-          // if (defaultDomain) {
-          //   setDomains([defaultDomain]);
-          // }
-          setMessage('');
-          setOrganizationNameError('');
-          setDomainError('');
-          setTypeDropdownError('');
-          setMessageError('');
-          fetchData();
-          fetchData1();
-          setDomainError('');
         } catch (error) {
-          setLoading(false);
-          toast.error('Error Adding Organization', { autoClose: 3000 });
+          if (error instanceof Yup.ValidationError) {
+            setDomainError(error.message);
+          }
+        }
+      } else {
+        const isValid = await validateForm();
+
+        if (isValid) {
+          const selectedTypeId =
+            typeDropdown?.find((type) => type.name === selectedType)?.id ??
+            null;
+          const updateData: any = {
+            org_id: orgidForupdatetion,
+            name: organizationName,
+            description: message,
+            type_id: selectedTypeId,
+            status: 'Y',
+            domain: domains,
+            token: onlyToken,
+            userName: email,
+            type_name: selectedType,
+          };
+
+          try {
+            setLoading(true);
+            await refreshToken();
+            const result = await updateOrganization(updateData);
+
+            if (result.data != null && result.errorCode == 0) {
+              setLoading(false);
+              toast.success(result.message, {
+                autoClose: 3000,
+              });
+            } else {
+              setLoading(false);
+              if (result.errorCode === 1) {
+                swal(result.data, { icon: 'error' });
+              }
+            }
+            if (closeModalButtonRef.current) {
+              closeModalButtonRef.current.click();
+            }
+
+            setDomainInput('');
+            setOrganizationName('');
+            setSelectedType('');
+            // const defaultDomain = getDefaultDomainFromEmail();
+            // if (defaultDomain) {
+            //   setDomains([defaultDomain]);
+            // }
+            setMessage('');
+            setOrganizationNameError('');
+            setDomainError('');
+            setTypeDropdownError('');
+            setMessageError('');
+            fetchData();
+            fetchData1();
+            setDomainError('');
+          } catch (error) {
+            setLoading(false);
+            toast.error('Error Editing Organization', { autoClose: 3000 });
+          }
         }
       }
     }
@@ -444,14 +522,14 @@ const Page = () => {
 
   const addDomain = async () => {
     if (
-      (domainError === '' || domainError === 'Please press Enter key') &&
+      (domainError === '' || domainError === 'Please press the Enter key') &&
       domainInput.trim() !== ''
     ) {
       const domainsArray = domainInput.endsWith(',')
         ? domainInput
-          .split(',')
-          .map((domain) => domain.trim())
-          .filter((domain) => domain !== '')
+            .split(',')
+            .map((domain) => domain.trim())
+            .filter((domain) => domain !== '')
         : domainInput.split(',').map((domain) => domain.trim());
       const newDomains = [];
       let errorMessage = '';
@@ -514,7 +592,10 @@ const Page = () => {
   //     // }
   // };
 
-  const removeDomain = (index: number) => {
+  const removeDomain = async (index: number, domain: any) => {
+    const id: any =
+      allDomain && allDomain.find((i: any) => i.domainname == domain);
+
     const newdom = domains.filter((i, idx) => idx != index);
     if (newdom.length == 0) {
       setDomainError('Domain is required. Please enter a domain.');
@@ -522,18 +603,51 @@ const Page = () => {
       setDomainError('');
     }
     setDomains(newdom);
+    if (changeFlage === false && id.domainid) {
+      // let data:any={
+      //   org_id:orgidForupdatetion,
+      //   domain_id:122,
+      //   user_id:user_id
+      // }
+      const data = {
+        org_id: orgidForupdatetion,
+        domain_id: id.domainid,
+        user_id: user_id,
+      };
+
+      await deleteDomains(data);
+    }
   };
   useEffect(() => {
     /* */
   }, [domains]);
 
   ///// for edit ///
+
   const handeledit = async (org: any) => {
-    // const result = await viewOrganization(org.org_id);
+    const EditView = await viewOrganization(org.org_id);
+    setorgidForupdatetion(org.org_id);
+    setOrganizationName(EditView?.data?.name);
+    const domains = EditView?.data?.domains.map((domain: any) => {
+      return {
+        domainname: domain.name,
+        domainid: domain.id,
+      };
+    });
+
+    setDomains(domains ? domains.map((name: any) => name.domainname) : []);
+    setAllDomain(domains ? domains.map((name: any) => name) : []);
+
+    const selectedTypeId =
+      typeDropdown?.find((type) => type.id === EditView?.data.type_id)?.name ??
+      null;
+    setSelectedType(selectedTypeId ? selectedTypeId : '');
+
+    setMessage(EditView?.data.description);
 
     setChangeFlage(false);
 
-    setOrganizationName(org.org_name);
+    // setOrganizationName(org.org_name);
   };
   const addorg = () => {
     setDomainInput('');
@@ -661,8 +775,9 @@ const Page = () => {
                                         type='text'
                                         className='form-control w-full me-2'
                                         id='task-name'
-                                        placeholder={`For eg: ${email.split('@')[1]
-                                          }`}
+                                        placeholder={`For eg: ${
+                                          email.split('@')[1]
+                                        }`}
                                         onChange={handleDomainChange}
                                         onKeyDown={handleKeyPress}
                                         value={domainInput}
@@ -696,6 +811,7 @@ const Page = () => {
                                           >
                                             <div className='sm:flex-shrink-0 domain-name-div'>
                                               {domain}
+                                              {/* {domain} */}
                                             </div>
                                             <div className='ms-auto'>
                                               <div className='mx-1 my-1'>
@@ -704,12 +820,12 @@ const Page = () => {
                                                   className='inline-flex bg-teal-50 rounded-sm text-teal-500 focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-offset-teal-50 focus:ring-teal-600'
                                                   // data-hs-remove-element='#dismiss-alert2'
                                                   onClick={() =>
-                                                    removeDomain(index)
+                                                    removeDomain(index, domain)
                                                   }
-                                                //   onClick={()=>{
-                                                //     domains.splice(index, 1);
-                                                //   setDomains(domains);
-                                                // }}
+                                                  //   onClick={()=>{
+                                                  //     domains.splice(index, 1);
+                                                  //   setDomains(domains);
+                                                  // }}
                                                 >
                                                   <span className='sr-only'>
                                                     Dismiss
@@ -897,13 +1013,13 @@ const Page = () => {
                                     setLoading(false);
                                   }
                                 }}
-                              // onClick={() => {
-                              //   localStorage.setItem(
-                              //     'org_id',
-                              //     org.id as string,
-                              //   );
-                              //   localStorage.setItem('org_name', org.name);
-                              // }}
+                                // onClick={() => {
+                                //   localStorage.setItem(
+                                //     'org_id',
+                                //     org.id as string,
+                                //   );
+                                //   localStorage.setItem('org_name', org.name);
+                                // }}
                               >
                                 <div className='flex items-center'>
                                   {/* <span className="me-2 leading-none">
@@ -947,7 +1063,6 @@ const Page = () => {
                           className='xl:col-span-4 col-span-12 task-card'
                           key={org.org_id}
                         >
-
                           <div
                             className='box'
                             style={{ cursor: 'pointer' }}
@@ -971,7 +1086,6 @@ const Page = () => {
                               navigate.push('/orgdashboard');
                             }}
                           >
-
                             {/* <button
                               className='hs-dropdown-toggle py-2 px-3 ti-btn bg-primary text-white !font-medium !mb-0'
                               data-hs-overlay='#todo-compose'
@@ -983,13 +1097,38 @@ const Page = () => {
                             >
                               <i className='ri-edit-2-line'></i>
                             </button> */}
-
+                            {/* <div
+                              style={{ cursor: 'pointer' }}
+                              aria-label='anchor'
+                              data-bs-target='#formmodal'
+                              data-bs-toggle='modal'
+                              data-bs-whatever='@fat'
+                              data-hs-overlay='#todo-compose'
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevent card click
+                                setModalOpen(true);
+                                handeledit(org);
+                              }}
+                              className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
+                            >
+                              <i className='ri-edit-line'></i>
+                            </div>
+                            <div
+                              style={{ cursor: 'pointer' }}
+                              aria-label='anchor'
+                              // onClick={() => {
+                              //   handleDelete(user.id);
+                              // }}
+                              className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
+                            >
+                              <i className='ri-delete-bin-line'></i>
+                            </div> */}
 
                             <div className='box-body contact-action'>
-                              <div className='flex items-start '>
-                                <div className='flex flex-grow justify-between gap-2 items-center'>
-
-                                  <div className='flex flex-grow  gap-2 items-center'> <div className='avatar avatar-xl avatar-rounded me-3'>
+                              <div className='flex items-center '>
+                                <div className='avtariv flex flex-grow justify-between gap-2 items-center'>
+                                  {' '}
+                                  <div className='avatar avatar-xl avatar-rounded me-1  '>
                                     <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
                                       {/* {SingleSite?.site?SingleSite?.site?.name[0].toUpperCase(): ""} */}
                                       {org.org_name ? (
@@ -1006,46 +1145,61 @@ const Page = () => {
                                       <i className='ri-building-fill text-black'>dd</i>
                                     </h4> */}
                                   </div>
-                                    <div >
-                                      <h6 className=' mb-1 font-semibold text-[1rem] text-site-name'>
-                                        {' '}
-                                        {org?.org_name}{' '}
-                                      </h6>
-                                      <p className='mb-1 text-[#8c9097] dark:text-white/50 contact-mail text-truncate'>
-                                        {org?.sites_count} sites
-                                      </p>
-                                    </div>
-                                  </div>
                                   <div>
-                                    <div
-                                      style={{ cursor: 'pointer' }}
-                                      aria-label='anchor'
-                                      data-bs-target='#formmodal'
-                                      data-bs-toggle='modal'
-                                      data-bs-whatever='@fat'
-                                      data-hs-overlay='#todo-compose'
-                                      onClick={(e) => {
-                                        e.stopPropagation(); // Prevent card click
-                                        setModalOpen(true);
-                                        handeledit(org);
-                                      }}
-                                      className='ti-btn ti-btn-icon !me-2 ti-btn-wave !gap-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
-                                    >
-                                      <i className='ri-edit-line'></i>
-                                    </div>
-                                    <div
-                                      style={{ cursor: 'pointer' }}
-                                      aria-label='anchor'
-                                      // onClick={() => {
-                                      //   handleDelete(user.id);
-                                      // }}
-                                      className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem]  !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
-                                    >
-                                      <i className='ri-delete-bin-line'></i>
-                                    </div>
+                                    <h6 className=' mb-1 font-semibold text-[1rem] text-site-name'>
+                                      {' '}
+                                      {org?.org_name}{' '}
+                                    </h6>
+                                    <p className='mb-1 text-[#8c9097] dark:text-white/50 contact-mail text-truncate'>
+                                      {org?.sites_count} sites
+                                    </p>
                                   </div>
-
+                                  <div></div>
                                 </div>
+                                {org?.user_role_id == 1 ? (
+                                  <div className='hs-dropdown ti-dropdown'>
+                                    <Link
+                                      aria-label='anchor'
+                                      href='#!'
+                                      className='flex items-center justify-center w-[1.75rem] h-[1.75rem]  !text-[0.8rem] !py-1 !px-2 rounded-sm bg-light border-light shadow-none !font-medium'
+                                      aria-expanded='false'
+                                      onClick={(e) => {
+                                        e.preventDefault(); // Prevent default navigation action
+                                        e.stopPropagation(); // Prevent click from bubbling up
+                                      }}
+                                    >
+                                      <i className='ri-more-2-line text-[0.8rem]'></i>
+                                    </Link>
+                                    <ul className='hs-dropdown-menu ti-dropdown-menu hidden'>
+                                      <li>
+                                        <button
+                                          data-hs-overlay='#todo-compose'
+                                          className='ti-dd-btn  ti-dropdown-item  !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
+                                          onClick={(e) => {
+                                            e.stopPropagation(); // Prevent card click
+                                            setModalOpen(true);
+                                            handeledit(org);
+                                          }}
+                                        >
+                                          Edit
+                                        </button>
+                                      </li>
+                                      <li>
+                                        {/* <button
+                                          className='ti-dd-btn  ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
+                                          onClick={(e) => {
+                                            e.stopPropagation(); // Prevent card click
+                                            // Your function to handle the delete action
+                                          }}
+                                        >
+                                          Delete
+                                        </button> */}
+                                      </li>
+                                    </ul>
+                                  </div>
+                                ) : (
+                                  ''
+                                )}
                               </div>
                             </div>
                           </div>
