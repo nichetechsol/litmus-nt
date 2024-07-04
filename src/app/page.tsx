@@ -315,7 +315,7 @@ const LoginForm = () => {
 
                     <div className='box !p-[3rem]'>
                       <div
-                        className='box-body'
+                        className='box-body !p-0'
                         role='tabpanel'
                         id='pills-with-brand-color-01'
                         aria-labelledby='pills-with-brand-color-item-1'
@@ -392,7 +392,7 @@ const LoginForm = () => {
                               <div className='form-check !ps-0'>
                                 <input
                                   style={{ cursor: 'pointer' }}
-                                  className='form-check-input'
+                                  className='form-check-input check-1'
                                   type='checkbox'
                                   value=''
                                   id='defaultCheck1'

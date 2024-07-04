@@ -2409,7 +2409,7 @@ html {
     @apply h-[34rem];
   }
   .ic-product-p p {
-    width: 14.5rem !important;
+    width: 10.5rem !important;
   }
   .box-header .search-ti {
     width: 130px;
@@ -15513,7 +15513,7 @@ input.gridjs-input {
 }
 
 .form-check-input {
-  @apply h-[0.9rem] w-[0.9rem] bg-light dark:bg-bodybg dark:border-white/10 border border-solid border-inputborder rounded-sm;
+  @apply h-[1.2rem] w-[1.2rem] bg-light dark:bg-bodybg dark:border-white/10 border border-solid border-inputborder rounded-sm;
   vertical-align: text-bottom;
 }
 /* .form-check-input:focus {
@@ -19462,7 +19462,7 @@ pre[class*='language-'] {
 }
 @media (max-width: 460px) {
   .main-header-container .header-content-right .ti-dropdown-menu {
-    @apply w-full;
+    right: 0px !important;
   }
 }
 h3 {
@@ -20216,4 +20216,20 @@ body.modal-open {
 .ti-dd-btn {
   width: 100%;
   border: none;
+}
+
+.check-1 {
+  vertical-align: bottom;
+}
+body {
+  position: relative;
+  margin: 0;
+  height: 100%;
+  scroll-behavior: smooth;
+  background-color: rgb(var(--body-bg));
+  text-align: start;
+  font-family: Inter, sans-serif;
+  font-size: 0.813rem;
+  font-weight: 400;
+  color: rgb(var(--default-text-color));
 }

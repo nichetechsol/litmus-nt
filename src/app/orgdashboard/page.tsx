@@ -727,7 +727,7 @@ const OrgDashboard = () => {
                       <div className='flex  gap-2'>
                         <div>
                           <input
-                            className='ti-form-control form-control-sm'
+                            className='ti-form-control form-control-sm search-ti'
                             type='text'
                             placeholder='Search here'
                             aria-label='.form-control-sm example'
