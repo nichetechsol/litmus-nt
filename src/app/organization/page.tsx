@@ -635,6 +635,7 @@ const Page = () => {
   ///// for edit ///
 
   const handeledit = async (org: any) => {
+    setLoading(true);
     const EditView = await viewOrganization(org.org_id);
     setorgidForupdatetion(org.org_id);
     setOrganizationName(EditView?.data?.name);
@@ -656,7 +657,7 @@ const Page = () => {
     setMessage(EditView?.data.description);
 
     setChangeFlage(false);
-
+    setLoading(false);
     // setOrganizationName(org.org_name);
   };
   const addorg = () => {

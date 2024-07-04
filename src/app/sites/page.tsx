@@ -683,6 +683,7 @@ const Page: React.FC = () => {
   }, []);
   ///// for edit
   const handeledit = (SingleSite: any) => {
+    setLoading(true);
     setChangeFlage(false);
     setAddSiteName(SingleSite.site.name);
     setSelectedValueDropdown(SingleSite?.site.type_id);
@@ -697,6 +698,7 @@ const Page: React.FC = () => {
     // remaning descriptopn
 
     handleCall();
+    setLoading(false);
   };
   const Addsite = () => {
     handleCall();
