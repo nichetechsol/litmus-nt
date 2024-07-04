@@ -209,7 +209,8 @@ async function fetchSiteDetails(
           role_id,
           user:users (
             id,
-            firstname
+            firstname,
+            email
           )
         )
       `,

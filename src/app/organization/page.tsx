@@ -489,7 +489,7 @@ const Page = () => {
             } else {
               setLoading(false);
               if (result.errorCode === 1) {
-                swal(result.data, { icon: 'error' });
+                toast.error(result.message, { autoClose: 3000 });
               }
             }
             if (closeModalButtonRef.current) {
@@ -1156,7 +1156,7 @@ const Page = () => {
                                   </div>
                                   <div></div>
                                 </div>
-                                {org?.user_role_id == 1 ? (
+                                {org?.user_role_id == 1 || org?.user_role_id == 2? (
                                   <div className='hs-dropdown ti-dropdown'>
                                     <Link
                                       aria-label='anchor'

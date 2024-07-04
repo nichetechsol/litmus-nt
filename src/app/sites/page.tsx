@@ -1399,6 +1399,7 @@ const Page: React.FC = () => {
                                           <b>Owner</b>
                                           <span className='ms-1 text-muted fw-normal d-inline-block'>
                                             {SingleSite?.ownerNames?.join(', ')}
+                                            {/* {SingleSite?.ownerNames?.length ? SingleSite.ownerNames.join(', ') : '--'} */}
                                           </span>
                                         </li>
                                         <li className='list-group-item fw-semibold'>
