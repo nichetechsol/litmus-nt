@@ -464,16 +464,17 @@ const Page = () => {
             role_id: role,
             user_id: userNameId,
             site_id: site_id,
+            modifying_user_id: user_id,
           };
           result = await modifyUserOfSites(userData);
           if (result.errorCode == 0) {
-            toast.success('Updated Successfully', { autoClose: 3000 });
+            toast.success(result.message, { autoClose: 3000 });
             const button = document.getElementById('close-modal-btn');
             if (button) {
               button.click();
             }
           } else {
-            toast.error("Couldn't Update", { autoClose: 3000 });
+            toast.error(result.message, { autoClose: 3000 });
             const button = document.getElementById('close-modal-btn');
             if (button) {
               button.click();
@@ -601,7 +602,7 @@ const Page = () => {
               </p>
             </div>
           </div>
-          <div className='grid grid-cols-12 gap-x-6'>
+          <div className='grid grid-cols-12 gap-x-6 mt-5'>
             <div className='xxl:col-span-12 xl:col-span-12  col-span-12'>
               <div className='grid grid-cols-12 gap-x-6'>
                 <div className='xxl:col-span-12  xl:col-span-12  col-span-12'>

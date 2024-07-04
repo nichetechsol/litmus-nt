@@ -28,6 +28,7 @@ interface modifyUserData {
   role_id?: any;
   org_id?: any;
   token?: any;
+  modifying_user_id: any;
 }
 
 interface User {
@@ -200,16 +201,74 @@ async function addUserToOrganization(
   }
 }
 
-// Function to change the role of a user in an organization
 async function modifyUserOfOrganization(
   UserData: modifyUserData,
-): Promise<Result<OrgUser[]>> {
+): Promise<Result<any>> {
   // Validate inputs
-  if (!UserData.user_id || !UserData.role_id || !UserData.org_id) {
-    return { errorCode: 1, data: null };
+  if (
+    !UserData.user_id ||
+    !UserData.role_id ||
+    !UserData.org_id ||
+    !UserData.modifying_user_id
+  ) {
+    return { errorCode: 1, message: 'Invalid input data', data: null };
   }
 
   try {
+    // Fetch the role of the modifying user
+    const { data: modifyingUserRoleData, error: modifyingUserRoleError } =
+      await supabase
+        .from('org_users')
+        .select('role_id')
+        .eq('user_id', UserData.modifying_user_id)
+        .eq('org_id', UserData.org_id);
+
+    if (modifyingUserRoleError || !modifyingUserRoleData) {
+      return {
+        errorCode: 1,
+        message: 'Error fetching modifying user role',
+        data: null,
+      };
+    }
+
+    const modifyingUserRoleId = modifyingUserRoleData[0].role_id;
+
+    // Fetch the role of the target user
+    const { data: targetUserRoleData, error: targetUserRoleError } =
+      await supabase
+        .from('org_users')
+        .select('role_id')
+        .eq('user_id', UserData.user_id)
+        .eq('org_id', UserData.org_id);
+
+    if (targetUserRoleError || !targetUserRoleData) {
+      return {
+        errorCode: 1,
+        message: 'Error fetching target user role',
+        data: null,
+      };
+    }
+
+    const targetUserRoleId = targetUserRoleData[0].role_id;
+
+    if (modifyingUserRoleId === 2) {
+      // Admin can modify non-owner roles (Admin and Member)
+      if (UserData.role_id == 1) {
+        return {
+          errorCode: 1,
+          message: 'Admin cannot assign Owner role',
+          data: null,
+        };
+      }
+      if (targetUserRoleId == 1) {
+        return {
+          errorCode: 1,
+          message: 'Admin cannot modify an Owner role',
+          data: null,
+        };
+      }
+    }
+
     // Update the role_id of the user in the 'org_users' table based on user_id
     const { data, error } = await supabase
       .from('org_users')
@@ -218,15 +277,18 @@ async function modifyUserOfOrganization(
       .eq('org_id', UserData.org_id)
       .select();
 
-    // Check for errors during the update operation
     if (error) {
-      return { errorCode: 1, data: null };
+      return { errorCode: 1, message: 'Error updating user role', data: null };
     } else {
-      return { errorCode: 0, data: data };
+      return {
+        errorCode: 0,
+        message: 'User role updated successfully',
+        data: data,
+      };
     }
   } catch (error) {
     // Log any unexpected errors
-    return { errorCode: -1, data: null };
+    return { errorCode: -1, message: 'Unexpected error occurred', data: null };
   }
 }
 

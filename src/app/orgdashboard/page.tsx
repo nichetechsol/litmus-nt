@@ -466,17 +466,18 @@ const OrgDashboard = () => {
             role_id: role,
             user_id: userNameId,
             org_id: org_id,
+            modifying_user_id: user_id,
           };
           result = await modifyUserOfOrganization(userData);
           if (result.errorCode == 0) {
-            toast.success('Updated Successfully', { autoClose: 3000 });
+            toast.success(result.message, { autoClose: 3000 });
 
             const button = document.getElementById('close-modal-btn');
             if (button) {
               button.click(); // Directly trigger click event on button
             }
           } else {
-            toast.error("Couldn't Update", { autoClose: 3000 });
+            toast.error(result.message, { autoClose: 3000 });
             const button = document.getElementById('close-modal-btn');
             if (button) {
               button.click(); // Directly trigger click event on button

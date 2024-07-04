@@ -227,7 +227,7 @@ async function fetchSiteDetails(
       const siteUsers = site.users || [];
       const siteOwners =
         site.owners.filter((owner: any) => owner.role_id === 1) || [];
-      const ownerNames = siteOwners.map((owner: any) => owner.user.firstname);
+      const ownerNames = siteOwners.map((owner: any) => owner.user.email);
       // Find the role of the logged-in user
       const loggedInUserRole = siteUsers.find(
         (user: any) => user.user_id === user_id,

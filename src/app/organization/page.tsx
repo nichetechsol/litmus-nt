@@ -597,25 +597,35 @@ const Page = () => {
       allDomain && allDomain.find((i: any) => i.domainname == domain);
 
     const newdom = domains.filter((i, idx) => idx != index);
-    if (newdom.length == 0) {
-      setDomainError('Domain is required. Please enter a domain.');
-    } else {
-      setDomainError('');
-    }
-    setDomains(newdom);
-    if (changeFlage === false && id.domainid) {
-      // let data:any={
-      //   org_id:orgidForupdatetion,
-      //   domain_id:122,
-      //   user_id:user_id
-      // }
+
+    if (changeFlage === false && id?.domainid) {
       const data = {
         org_id: orgidForupdatetion,
         domain_id: id.domainid,
         user_id: user_id,
       };
 
-      await deleteDomains(data);
+      const result = await deleteDomains(data);
+      if (result && result.errorCode === 0) {
+        toast.success(result.message, {
+          autoClose: 3000,
+        });
+        setDomains(newdom);
+        if (newdom.length == 0) {
+          setDomainError('Domain is required. Please enter a domain.');
+        } else {
+          setDomainError('');
+        }
+      } else {
+        toast.error(result.message, { autoClose: 3000 });
+      }
+    } else {
+      if (newdom.length == 0) {
+        setDomainError('Domain is required. Please enter a domain.');
+      } else {
+        setDomainError('');
+      }
+      setDomains(newdom);
     }
   };
   useEffect(() => {
@@ -1162,7 +1172,7 @@ const Page = () => {
                                     <Link
                                       aria-label='anchor'
                                       href='#!'
-                                      className='flex items-center justify-center w-[1.75rem] h-[1.75rem]  !text-[0.8rem] !py-1 !px-2 rounded-sm bg-light border-light shadow-none !font-medium'
+                                      className='ti-dd-btn  ti-dropdown-item text-start  !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
                                       aria-expanded='false'
                                       onClick={(e) => {
                                         e.preventDefault(); // Prevent default navigation action
@@ -1175,7 +1185,7 @@ const Page = () => {
                                       <li>
                                         <button
                                           data-hs-overlay='#todo-compose'
-                                          className='ti-dd-btn  ti-dropdown-item  !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
+                                          className='ti-dd-btn  ti-dropdown-item text-start  !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
                                           onClick={(e) => {
                                             e.stopPropagation(); // Prevent card click
                                             setModalOpen(true);
@@ -1184,6 +1194,17 @@ const Page = () => {
                                         >
                                           Edit
                                         </button>
+                                        {/* <button
+                                          data-hs-overlay='#todo-compose'
+                                          className='ti-dd-btn  ti-dropdown-item text-start !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
+                                          onClick={(e) => {
+                                            e.stopPropagation(); // Prevent card click
+                                            setModalOpen(true);
+                                            handeledit(org);
+                                          }}
+                                        >
+                                          Delete Request
+                                        </button> */}
                                       </li>
                                       <li>
                                         {/* <button

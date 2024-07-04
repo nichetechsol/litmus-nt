@@ -704,159 +704,124 @@ const Page: React.FC = () => {
     // remaning descriptopn
     setChangeFlage(true);
   };
-  // const handelDelete = (SingleSite: any): any => {
-  //   swal({
-  //     title: 'Are you sure?',
-  //     text: 'Please type DELETE to confirm deletion',
-  //     content: {
-  //       element: 'input',
-  //       attributes: {
-  //         placeholder: 'Type DELETE here',
-  //         type: 'text',
-  //       },
-  //     },
-  //     icon: 'warning',
-  //     buttons: {
-  //       cancel: {
-  //         text: 'Cancel',
-  //         value: null,
-  //         visible: true,
-  //         className: '',
-  //         closeModal: true,
-  //       },
-  //       confirm: {
-  //         text: 'Delete',
-  //         value: 'DELETE',
-  //         visible: true,
-  //         className: '',
-  //         closeModal: true,
-  //       },
-  //     },
-  //   }).then((value) => {
-  //     // Validate the input and perform deletion if input is valid
-  //     const inputElement = document.querySelector(
-  //       'input[type="text"]',
-  //     ) as HTMLInputElement;
-  //     debugger;
-  //     if (
-  //       value === 'DELETE'
-  //       // inputElement?.value.trim().toUpperCase() === 'DELETE'
-  //     ) {
-  //       debugger;
-  //       const data = {
-  //         userName: SingleSite?.users[0]?.user.email,
-  //         siteName: SingleSite?.site.name,
-  //         orgName: orgName, // Make sure orgName is defined in your context
-  //         token: onlyToken, // Make sure onlyToken is defined in your context
-  //       };
-  //       console.log('this is data', data);
+  const handelDelete = (SingleSite: any): any => {
+    // const showError = (message: string) => {
+    //   swal({
+    //     title: 'Invalid input!',
+    //     text: message,
+    //     icon: 'error',
+    //     buttons: false as unknown as (string | boolean)[],
+    //   });
+    // };
 
-  //       // Call your deletion API function
-  //       requestSiteDeletion(data)
-  //         .then((response) => {
-  //           if (response) {
-  //             console.log('Site deletion successful:', response);
-  //             // Optionally notify user of success
-  //             swal(response.message);
-  //             // Perform any additional actions after successful deletion
-  //           } else {
-  //             swal('Error!', 'There was a problem deleting the site.', 'error');
-  //           }
-  //         })
-  //         .catch((error) => {
-  //           console.error('Delete request failed:', error);
-  //           swal('Error!', 'There was a problem deleting the site.', 'error');
-  //         });
-  //     } else if (value !== 'DELETE') {
-  //       swal('Invalid input!', 'You need to type DELETE to confirm.', 'error');
-  //     } else if (value === '') {
-  //       // swal('Invalid input!', 'You need to type DELETE to confirm.', 'error');
-  //     }
-  //   });
-  // };
+    // Function to show SweetAlert modal
 
-  // const handelDelete = (SingleSite: any): any => {
-  //   swal({
-  //     title: 'Are you sure?',
-  //     text: 'Please type DELETE to confirm deletion',
-  //     content: {
-  //       element: 'input',
-  //       attributes: {
-  //         placeholder: 'Type DELETE here',
-  //         type: 'text',
-  //         id: 'delete-input',
-  //         oninput: (e: Event) => {
-  //           const target = e.target as HTMLInputElement;
-  //           let value = target.value;
+    const showDeleteModal = () => {
+      swal({
+        title: 'Are you sure?',
+        text: `Please type DELETE/ ${SingleSite?.site.name} to confirm deletion`,
+        content: {
+          element: 'input',
+          attributes: {
+            placeholder: 'Type here',
+            type: 'text',
+            id: 'delete-input',
+            // oninput: (e: Event) => {
+            //   const target = e.target as HTMLInputElement;
+            //   let value = target.value;
 
-  //           // Allow only alphabetic characters
-  //           value = value.replace(/[^a-zA-Z]/g, '');
+            //   // // Allow only alphabetic characters
+            //   // value = value.replace(/[^a-zA-Z]/g, '');
 
-  //           // Limit the length to 6 characters
-  //           if (value.length > 6) {
-  //             value = value.substring(0, 6);
-  //           }
+            //   // Limit the length to 6 characters
+            //   // if (value.length > 6) {
+            //   //   value = value.substring(0, 6);
+            //   // }
 
-  //           // Convert to uppercase
-  //           value = value.toUpperCase();
-  //           target.value = value; // Update the input field with the transformed value
-  //         },
-  //       },
-  //     },
-  //     icon: 'warning',
-  //     buttons: {
-  //       cancel: {
-  //         text: 'Cancel',
-  //         value: null,
-  //         visible: true,
-  //         className: '',
-  //         closeModal: true,
-  //       },
-  //       confirm: {
-  //         text: 'Delete',
-  //         value: 'DELETE',
-  //         visible: true,
-  //         className: '',
-  //         closeModal: true,
-  //       },
-  //     },
-  //   }).then((value) => {
-  //     // Check the user input and handle accordingly
-  //     if (value === 'DELETE') {
-  //       const data = {
-  //         userName: SingleSite?.users[0]?.user.email,
-  //         siteName: SingleSite?.site.name,
-  //         orgName: orgName, // Make sure orgName is defined in your context
-  //         token: onlyToken, // Make sure onlyToken is defined in your context
-  //       };
+            //   // Convert to uppercase
+            //   // value = value.toUpperCase();
+            //   // target.value = value; // Update the input field with the transformed value
+            // },
+          },
+        },
+        icon: 'warning',
+        buttons: {
+          cancel: {
+            text: 'Cancel',
+            value: null,
+            visible: true,
+            className: '',
+            closeModal: true,
+          },
+          confirm: {
+            text: 'Delete',
+            visible: true,
+            className: '',
+            closeModal: false, // Keep modal open for validation
+          },
+        },
+      }).then((value) => {
+        const inputElem = document.getElementById(
+          'delete-input',
+        ) as HTMLInputElement;
+        const userInput = inputElem?.value;
 
-  //       // Call your deletion API function
-  //       setLoading(true);
-  //       requestSiteDeletion(data)
-  //         .then((response) => {
-  //           if (response) {
-  //             setLoading(false);
-  //             swal({
-  //               title: 'Success!',
-  //               text: response.message,
-  //               icon: 'success',
-  //             });
-  //           } else {
-  //             swal('Error!', 'There was a problem deleting the site.', 'error');
-  //           }
-  //         })
-  //         .catch((error) => {
-  //           swal('Error!', 'There was a problem deleting the site.', error);
-  //         });
-  //     } else if (value === null) {
-  //       // User pressed cancel, do nothing
-  //     } else {
-  //       // Invalid input, show error message
-  //       swal('Invalid input!', 'You need to type DELETE to confirm.', 'error');
-  //     }
-  //   });
-  // };
+        if (userInput === 'DELETE' || userInput == SingleSite?.site.name) {
+          // Clear any existing error message
+          const email = decryptData(localStorage.getItem('user_email'));
+          const data = {
+            userName: email,
+            siteName: SingleSite?.site.name,
+            orgName: orgName, // Ensure orgName is defined
+            token: onlyToken, // Ensure onlyToken is defined
+          };
 
+          // Call your deletion API function
+          setLoading(true); // Set loading state to true
+          requestSiteDeletion(data)
+            .then((response) => {
+              setLoading(false); // Reset loading state
+              if (response) {
+                swal({
+                  title: 'Success!',
+                  text: response.message,
+                  icon: 'success',
+                });
+              } else {
+                swal({
+                  title: 'Error!',
+                  text: 'There was a problem deleting the site.',
+                  icon: 'error',
+                });
+              }
+            })
+            .catch(() => {
+              setLoading(false); // Reset loading state on error
+              swal({
+                title: 'Error!',
+                text: 'There was a problem deleting the site.',
+                icon: 'error',
+              });
+            });
+        } else if (value === null) {
+          // User pressed cancel, do nothing
+        } else {
+          // Invalid input, show error message and show modal again
+          // showError('You need to type DELETE to confirm.');
+          toast.error(
+            `You need to type DELETE/${SingleSite?.site.name} to confirm`,
+          );
+          showDeleteModal();
+          // setTimeout(() => {
+          //   showDeleteModal(); // Show modal again
+          // }, 3000);
+        }
+      });
+    };
+
+    // Initial call to show the modal
+    showDeleteModal();
+  };
   return (
     <>
       <>
@@ -1436,20 +1401,21 @@ const Page: React.FC = () => {
                                             }}
                                             className='ti-btn ti-btn-primary-full ti-btn-wave !gap-0  bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
                                           >
-                                            <i className='ri-edit-line'></i>{' '}
+                                            <i className='ri-edit-line me-1'></i>{' '}
                                             Edit
                                           </div>
-                                          {/* <div
+                                          <div
                                             style={{ cursor: 'pointer' }}
                                             aria-label='anchor'
-                                            // onClick={() => {
-                                            //   handleDelete(user.id);
-                                            // }}
-                                            className='ti-btn ti-btn-primary-full ti-btn-wave !gap-0 !ms-2 bg-danger/10 text-white hover:bg-danger hover:text-white hover:border-danger'
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handelDelete(SingleSite);
+                                            }}
+                                            className='ti-btn ti-btn-danger-full ti-btn-wave !gap-0 !ms-2 bg-danger/10 text-white hover:bg-white hover:text-danger hover:border-danger'
                                           >
-                                            <i className='ri-delete-bin-line'></i>{' '}
+                                            <i className='ri-delete-bin-line me-1'></i>{' '}
                                             Delete
-                                          </div> */}
+                                          </div>
                                         </div>
                                       ) : (
                                         ''

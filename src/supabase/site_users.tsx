@@ -21,6 +21,7 @@ interface UserData {
   userName: any;
   siteName: any;
   orgName: any;
+  modifying_user_id: any;
 }
 interface SiteUser {
   user_id: any;
@@ -270,12 +271,72 @@ async function modifyUserOfSites(
   UserData: UserData,
 ): Promise<ModifyResult<SiteUser[]>> {
   // Check if required UserData properties are present
-  if (!UserData.user_id || !UserData.role_id || !UserData.site_id) {
+  if (
+    !UserData.user_id ||
+    !UserData.role_id ||
+    !UserData.site_id ||
+    !UserData.modifying_user_id
+  ) {
     return { errorCode: 1, message: 'Missing required fields', data: null };
   }
 
   try {
-    // Update the role_id for the specified user_id and site_id
+    // Fetch the role of the modifying user
+    const { data: modifyingUserRoleData, error: modifyingUserRoleError } =
+      await supabase
+        .from('site_users')
+        .select('role_id')
+        .eq('user_id', UserData.modifying_user_id)
+        .eq('site_id', UserData.site_id);
+
+    if (modifyingUserRoleError || !modifyingUserRoleData) {
+      return {
+        errorCode: 1,
+        message: 'Error fetching modifying user role',
+        data: null,
+      };
+    }
+
+    const modifyingUserRoleId = modifyingUserRoleData[0].role_id;
+
+    // Fetch the role of the target user
+    const { data: targetUserRoleData, error: targetUserRoleError } =
+      await supabase
+        .from('site_users')
+        .select('role_id')
+        .eq('user_id', UserData.user_id)
+        .eq('site_id', UserData.site_id);
+
+    if (targetUserRoleError || !targetUserRoleData) {
+      return {
+        errorCode: 1,
+        message: 'Error fetching target user role',
+        data: null,
+      };
+    }
+
+    const targetUserRoleId = targetUserRoleData[0].role_id;
+
+    // Owner can modify any role
+    if (modifyingUserRoleId === 2) {
+      // Admin can modify non-owner roles (Admin and Member)
+      if (targetUserRoleId == 1) {
+        return {
+          errorCode: 2,
+          message: 'Admin cannot modify an Owner role',
+          data: null,
+        };
+      }
+      if (UserData.role_id == 1) {
+        return {
+          errorCode: 2,
+          message: 'Admin cannot assign Owner role',
+          data: null,
+        };
+      }
+    }
+
+    // Update the role_id of the user in the 'site_users' table based on user_id and site_id
     const { data, error } = await supabase
       .from('site_users')
       .update({ role_id: UserData.role_id })
@@ -283,26 +344,18 @@ async function modifyUserOfSites(
       .eq('site_id', UserData.site_id)
       .select();
 
-    // Handle potential errors from the update operation
     if (error) {
-      return { errorCode: 1, message: error.message, data: null };
+      return { errorCode: 1, message: 'Error updating user role', data: null };
+    } else {
+      return {
+        errorCode: 0,
+        message: 'User role updated successfully',
+        data: data,
+      };
     }
-
-    if (data.length === 0) {
-      const message =
-        'No records were updated. Please check if the user_id and site_id are correct.';
-
-      return { errorCode: 1, message: message, data: null };
-    }
-
-    // Return success with the updated data
-    return {
-      errorCode: 0,
-      message: 'User role updated successfully',
-      data: data,
-    };
   } catch (error) {
-    // Handle any unexpected errors
+    // Log any unexpected errors
+    // console.error('Unexpected Error:', error);
     return { errorCode: -1, message: 'Unexpected error occurred', data: null };
   }
 }
