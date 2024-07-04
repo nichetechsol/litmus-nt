@@ -1156,7 +1156,8 @@ const Page = () => {
                                   </div>
                                   <div></div>
                                 </div>
-                                {org?.user_role_id == 1 || org?.user_role_id == 2? (
+                                {org?.user_role_id == 1 ||
+                                org?.user_role_id == 2 ? (
                                   <div className='hs-dropdown ti-dropdown'>
                                     <Link
                                       aria-label='anchor'

@@ -1380,7 +1380,7 @@ const Page = () => {
                 </div>
                 {activity_log && activity_log.length > 0 && (
                   <div className='xxl:col-span-12 xl:col-span-12 col-span-12'>
-                    <div className='box overflow-hidden'>
+                    <div className='box'>
                       <div className='box-header flex justify-between'>
                         <div className='box-title'>Activity Logs</div>
                         <div>
