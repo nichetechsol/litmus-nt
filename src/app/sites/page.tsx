@@ -115,7 +115,9 @@ const Page: React.FC = () => {
     setorgName(decryptedOrgName);
     setUseremail(decrypteduserEmail);
     if (!decryptedOrgId) {
+      document.body.classList.add('no-scroll');
       swal('Please select organization', { icon: 'error' }).then(() => {
+        document.body.classList.remove('no-scroll');
         navigate.push('/organization');
       });
     }
@@ -570,6 +572,7 @@ const Page: React.FC = () => {
               closeModalButtonRef.current.click();
             }
             handelclosemodel();
+            document.body.classList.add('no-scroll');
             swal({
               title: result.message,
               text: 'You have exceeded the Entitlement limit. Do you want to proceed?',
@@ -591,6 +594,7 @@ const Page: React.FC = () => {
                 },
               },
             }).then(async (willProceed) => {
+              document.body.classList.remove('no-scroll');
               if (willProceed) {
                 await refreshToken();
                 setLoading(true);
@@ -708,11 +712,14 @@ const Page: React.FC = () => {
   };
   const handelDelete = (SingleSite: any): any => {
     const showError = (message: string) => {
+      document.body.classList.add('no-scroll');
       swal({
         title: 'Invalid input!',
         text: message,
         icon: 'error',
         buttons: false as unknown as (string | boolean)[],
+      }).then(() => {
+        document.body.classList.remove('no-scroll');
       });
     };
 
@@ -721,6 +728,7 @@ const Page: React.FC = () => {
     const showDeleteModal = () => {
       // document.body.style.overflow = 'hidden';
       // document.body.style.position = 'fixed';
+      document.body.classList.add('no-scroll');
       swal({
         title: 'Are you sure?',
         text: `Please type DELETE/ ${SingleSite?.site.name} to confirm deletion`,
@@ -765,6 +773,7 @@ const Page: React.FC = () => {
           },
         },
       }).then((value) => {
+        document.body.classList.remove('no-scroll');
         const inputElem = document.getElementById(
           'delete-input',
         ) as HTMLInputElement;
@@ -786,25 +795,34 @@ const Page: React.FC = () => {
             .then((response) => {
               setLoading(false); // Reset loading state
               if (response) {
+                document.body.classList.add('no-scroll');
                 swal({
                   title: 'Success!',
                   text: response.message,
                   icon: 'success',
+                }).then(() => {
+                  document.body.classList.remove('no-scroll');
                 });
               } else {
+                document.body.classList.add('no-scroll');
                 swal({
                   title: 'Error!',
                   text: 'There was a problem deleting the site.',
                   icon: 'error',
+                }).then(() => {
+                  document.body.classList.remove('no-scroll');
                 });
               }
             })
             .catch(() => {
               setLoading(false); // Reset loading state on error
+              document.body.classList.add('no-scroll');
               swal({
                 title: 'Error!',
                 text: 'There was a problem deleting the site.',
                 icon: 'error',
+              }).then(() => {
+                document.body.classList.remove('no-scroll');
               });
             });
         } else if (value === null) {
@@ -1346,42 +1364,60 @@ const Page: React.FC = () => {
                                           : ''}
                                       </h1>
                                     </div>
-                                    <div className='hs-dropdown ti-dropdown'>
-                                      <Link
-                                        aria-label='anchor'
-                                        href='#!'
-                                        className='flex items-center justify-center w-[1.75rem] h-[1.75rem]  !text-[0.8rem] !py-1 !px-2 rounded-sm bg-light border-light shadow-none !font-medium'
-                                        aria-expanded='false'
-                                      >
-                                        <i className='ri-more-2-line text-[0.8rem]'></i>
-                                      </Link>
-                                      <ul className='hs-dropdown-menu ti-dropdown-menu hidden'>
-                                        <li>
-                                          <Link
-                                            className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
-                                            href='#!'
-                                          >
-                                            Week
-                                          </Link>
-                                        </li>
-                                        <li>
-                                          <Link
-                                            className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
-                                            href='#!'
-                                          >
-                                            Month
-                                          </Link>
-                                        </li>
-                                        <li>
-                                          <Link
-                                            className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
-                                            href='#!'
-                                          >
-                                            Year
-                                          </Link>
-                                        </li>
-                                      </ul>
-                                    </div>
+                                    {SingleSite?.user_role_id === 1 ||
+                                    SingleSite?.user_role_id === 2 ? (
+                                      <div className='hs-dropdown ti-dropdown'>
+                                        <Link
+                                          aria-label='anchor'
+                                          href='#!'
+                                          className='flex items-center justify-center w-[1.75rem] h-[1.75rem]  !text-[0.8rem] !py-1 !px-2 rounded-sm bg-light border-light shadow-none !font-medium'
+                                          aria-expanded='false'
+                                          onClick={(e) => {
+                                            e.preventDefault(); // Prevent default navigation action
+                                            e.stopPropagation(); // Prevent click from bubbling up
+                                          }}
+                                        >
+                                          <i className='ri-more-2-line text-[0.8rem]'></i>
+                                        </Link>
+                                        <ul className='hs-dropdown-menu ti-dropdown-menu hidden'>
+                                          <li>
+                                            <button
+                                              className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
+                                              // href='#!'
+                                              style={{ cursor: 'pointer' }}
+                                              aria-label='anchor'
+                                              data-bs-target='#formmodal'
+                                              data-bs-toggle='modal'
+                                              data-bs-whatever='@fat'
+                                              data-hs-overlay='#todo-compose'
+                                              onClick={(e) => {
+                                                e.stopPropagation(); // Prevent card click
+                                                // setModalOpen(true);
+                                                handeledit(SingleSite);
+                                              }}
+                                            >
+                                              Edit
+                                            </button>
+                                          </li>
+                                          <li>
+                                            <button
+                                              className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
+                                              // href='#!'
+                                              style={{ cursor: 'pointer' }}
+                                              aria-label='anchor'
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handelDelete(SingleSite);
+                                              }}
+                                            >
+                                              Delete Request
+                                            </button>
+                                          </li>
+                                        </ul>
+                                      </div>
+                                    ) : (
+                                      ''
+                                    )}
                                   </div>
                                   <div className=''>
                                     <div>
@@ -1428,7 +1464,7 @@ const Page: React.FC = () => {
                                           </span>
                                         </li>
                                       </ul>
-                                      {SingleSite?.user_role_id === 1 ||
+                                      {/* {SingleSite?.user_role_id === 1 ||
                                       SingleSite?.user_role_id === 2 ? (
                                         <div className='flex justify-center mt-3'>
                                           <div
@@ -1463,7 +1499,7 @@ const Page: React.FC = () => {
                                         </div>
                                       ) : (
                                         ''
-                                      )}
+                                      )} */}
                                     </div>
                                   </div>
                                 </div>
