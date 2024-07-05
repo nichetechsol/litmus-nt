@@ -559,7 +559,7 @@ async function updateSite(updateData: any): Promise<Result<any>> {
       org_id: updateData.org_id,
       site_id: updateData.siteId,
       user_id: updateData.user_id,
-      activity_type: 'create_site',
+      activity_type: 'update_site',
     });
     // Return success response
     return {

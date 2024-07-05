@@ -474,6 +474,7 @@ const Page = () => {
             token: onlyToken,
             userName: email,
             type_name: selectedType,
+            user_id: user_id,
           };
 
           try {

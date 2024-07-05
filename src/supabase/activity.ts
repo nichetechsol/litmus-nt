@@ -33,6 +33,7 @@ const valid_activity_types: string[] = [
   'add_licence',
   'download_file',
   'update_site',
+  'update_org',
 ];
 
 const logActivity = async ({

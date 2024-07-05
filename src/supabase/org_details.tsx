@@ -456,6 +456,7 @@ async function updateOrganization(data: {
   status: string;
   domain: string[];
   org_id: any;
+  user_id: any;
 }): Promise<Result<any>> {
   try {
     // Check if the new name already exists in the database, excluding the current org_id
@@ -581,7 +582,11 @@ async function updateOrganization(data: {
         }
       }
     }
-
+    await logActivity({
+      org_id: data.org_id,
+      user_id: data.user_id,
+      activity_type: 'update_org',
+    });
     return {
       errorCode: 0,
       message: 'Organization details updated successfully.',
