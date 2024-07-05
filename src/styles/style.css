@@ -16948,6 +16948,9 @@ hr {
 .ti-modal {
   @apply w-full h-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto;
 }
+.ti-modal {
+  overflow: hidden;
+}
 .ti-modal .ti-modal-header {
   @apply flex justify-between items-center py-3 px-4 border-b dark:border-white/10;
 }
@@ -20119,9 +20122,9 @@ h6 {
 .swal-button--confirm:hover {
   @apply bg-primary-important text-white-important;
 }
-.swal-overlay--show-modal {
+/* .swal-overlay--show-modal {
   pointer-events: none !important;
-}
+} */
 .swal-button:hover {
   background-color: #032125 !important;
   color: #fff !important;
@@ -20232,4 +20235,12 @@ body {
   font-size: 0.813rem;
   font-weight: 400;
   color: rgb(var(--default-text-color));
+}
+.swal-overlay--show-modal {
+  pointer-events: none;
+}
+body.no-scroll {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
 }

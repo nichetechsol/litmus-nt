@@ -719,6 +719,8 @@ const Page: React.FC = () => {
     // Function to show SweetAlert modal
 
     const showDeleteModal = () => {
+      // document.body.style.overflow = 'hidden';
+      // document.body.style.position = 'fixed';
       swal({
         title: 'Are you sure?',
         text: `Please type DELETE/ ${SingleSite?.site.name} to confirm deletion`,
@@ -1312,35 +1314,73 @@ const Page: React.FC = () => {
                                     navigate.push('/sitedashboard');
                                   }}
                                 >
-                                  <div className='flex justify-between align-center flex-wrap gap-2'>
-                                    <h1
-                                      style={{
-                                        fontSize: '1.1rem',
-                                        fontWeight: 'bold',
-                                        marginBottom: '0.5rem',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                      }}
-                                    >
+                                  <div className='flex justify-between items-center flex-wrap gap-2'>
+                                    <div className='flex'>
+                                      <div className='avatar avatar-xl avatar-rounded '>
+                                        {' '}
+                                        <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
+                                          <InitialsComponent
+                                            name={
+                                              SingleSite?.site
+                                                ? SingleSite?.site?.name
+                                                : ''
+                                            }
+                                          />
+                                        </span>
+                                      </div>
+                                      <h1
+                                        style={{
+                                          fontSize: '1.1rem',
+                                          fontWeight: 'bold',
+                                          marginBottom: '0.5rem',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                        }}
+                                      >
+                                        <Link
+                                          aria-label='anchor'
+                                          href='#!'
+                                        ></Link>
+                                        {SingleSite?.site
+                                          ? SingleSite?.site?.name
+                                          : ''}
+                                      </h1>
+                                    </div>
+                                    <div className='hs-dropdown ti-dropdown'>
                                       <Link
                                         aria-label='anchor'
                                         href='#!'
-                                      ></Link>
-                                      {SingleSite?.site
-                                        ? SingleSite?.site?.name
-                                        : ''}
-                                    </h1>
-                                    <div className='avatar avatar-xl avatar-rounded '>
-                                      {' '}
-                                      <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
-                                        <InitialsComponent
-                                          name={
-                                            SingleSite?.site
-                                              ? SingleSite?.site?.name
-                                              : ''
-                                          }
-                                        />
-                                      </span>
+                                        className='flex items-center justify-center w-[1.75rem] h-[1.75rem]  !text-[0.8rem] !py-1 !px-2 rounded-sm bg-light border-light shadow-none !font-medium'
+                                        aria-expanded='false'
+                                      >
+                                        <i className='ri-more-2-line text-[0.8rem]'></i>
+                                      </Link>
+                                      <ul className='hs-dropdown-menu ti-dropdown-menu hidden'>
+                                        <li>
+                                          <Link
+                                            className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
+                                            href='#!'
+                                          >
+                                            Week
+                                          </Link>
+                                        </li>
+                                        <li>
+                                          <Link
+                                            className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
+                                            href='#!'
+                                          >
+                                            Month
+                                          </Link>
+                                        </li>
+                                        <li>
+                                          <Link
+                                            className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
+                                            href='#!'
+                                          >
+                                            Year
+                                          </Link>
+                                        </li>
+                                      </ul>
                                     </div>
                                   </div>
                                   <div className=''>
