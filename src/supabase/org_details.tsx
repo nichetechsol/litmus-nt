@@ -877,7 +877,8 @@ async function requestOrgDeletion(org_id: any): Promise<Result<any>> {
     if (siteDetails && siteDetails.length > 0) {
       return {
         errorCode: 2,
-        message: 'Organization has associated sites. Delete not allowed.',
+        message:
+          'Organization has associated sites. Do you really want to delete?',
         data: org_id,
       };
     } else {

@@ -26,6 +26,8 @@ import {
   fetchOrganizationTypes,
   getUserRole,
   organizationSidebarList,
+  reqOrgDeleteMail,
+  requestOrgDeletion,
   updateOrganization,
   viewOrganization,
 } from '@/supabase/org_details';
@@ -675,6 +677,138 @@ const Page = () => {
     setChangeFlage(true);
     setModalOpen(true);
   };
+
+  ////HANDLE DELETE FOR ORG
+  const handleDelete = async (org: any) => {
+    const showError = (message: string) => {
+      swal({
+        title: 'Invalid input!',
+        text: message,
+        icon: 'error',
+        buttons: false as unknown as (string | boolean)[],
+      });
+    };
+    const showDeleteModal = () => {
+      swal({
+        title: 'Are you sure?',
+        text: `Please type DELETE/${org.org_name} to confirm deletion`,
+        content: {
+          element: 'input',
+          attributes: {
+            placeholder: 'Type here',
+            type: 'text',
+            id: 'delete-input',
+          },
+        },
+        icon: 'warning',
+        buttons: {
+          cancel: {
+            text: 'Cancel',
+            value: null,
+            visible: true,
+            className: '',
+            closeModal: true,
+          },
+          confirm: {
+            text: 'Delete Request',
+            visible: true,
+            className: '',
+            closeModal: false,
+          },
+        },
+      }).then((value) => {
+        setLoading(true);
+        const inputElem = document.getElementById(
+          'delete-input',
+        ) as HTMLInputElement;
+        const userInput = inputElem?.value;
+
+        if (userInput === 'DELETE' || userInput == org.org_name) {
+          // Clear any existing error message
+          const email = decryptData(localStorage.getItem('user_email'));
+          const data = {
+            org_id: org.org_id,
+            user_id: 1,
+            userName: email,
+            org_name: org.org_name,
+            token: onlyToken,
+          };
+
+          // Call your deletion API function
+          // Set loading state to true
+          reqOrgDeleteMail(data)
+            .then((response) => {
+              setLoading(false); // Reset loading state
+              if (response) {
+                swal({
+                  title: 'Success!',
+                  text: response.message,
+                  icon: 'success',
+                });
+              } else {
+                swal({
+                  title: 'Error!',
+                  text: 'There was a problem deleting the organization.',
+                  icon: 'error',
+                });
+              }
+            })
+            .catch(() => {
+              setLoading(false); // Reset loading state on error
+              swal({
+                title: 'Error!',
+                text: 'There was a problem deleting the organization.',
+                icon: 'error',
+              });
+            });
+        } else if (value === null) {
+          setLoading(false);
+        } else {
+          setLoading(false);
+          showError(`You need to type DELETE/${org.org_name} to confirm`);
+
+          setTimeout(() => {
+            showDeleteModal();
+          }, 3000);
+        }
+      });
+    };
+    setLoading(true);
+    const response = await requestOrgDeletion(org.org_id);
+    if (response && response.errorCode === 2) {
+      setLoading(false);
+      swal({
+        title: 'Are you Sure?',
+        text: response.message,
+        icon: 'warning',
+        buttons: {
+          cancel: {
+            text: 'No, cancel',
+            value: false,
+            visible: true,
+            className: '',
+            closeModal: true,
+          },
+          confirm: {
+            text: 'Yes, proceed!',
+            value: true,
+            visible: true,
+            className: '',
+            closeModal: true,
+          },
+        },
+      }).then(async (willProceed) => {
+        if (willProceed) {
+          showDeleteModal();
+        }
+      });
+    } else if (response && response.errorCode === 0) {
+      setLoading(false);
+      showDeleteModal();
+    } else {
+      setLoading(false);
+    }
+  };
   return (
     <>
       {loading && <Loader />}
@@ -1196,17 +1330,19 @@ const Page = () => {
                                         >
                                           Edit
                                         </button>
-                                        {/* <button
-                                          data-hs-overlay='#todo-compose'
-                                          className='ti-dd-btn  ti-dropdown-item text-start !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
-                                          onClick={(e) => {
-                                            e.stopPropagation(); // Prevent card click
-                                            setModalOpen(true);
-                                            handeledit(org);
-                                          }}
-                                        >
-                                          Delete Request
-                                        </button> */}
+                                        {org?.user_role_id == 1 ? (
+                                          <button
+                                            className='ti-dd-btn  ti-dropdown-item text-start !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleDelete(org);
+                                            }}
+                                          >
+                                            Delete Request
+                                          </button>
+                                        ) : (
+                                          ''
+                                        )}
                                       </li>
                                       <li>
                                         {/* <button

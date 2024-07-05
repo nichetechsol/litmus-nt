@@ -707,14 +707,14 @@ const Page: React.FC = () => {
     setChangeFlage(true);
   };
   const handelDelete = (SingleSite: any): any => {
-    // const showError = (message: string) => {
-    //   swal({
-    //     title: 'Invalid input!',
-    //     text: message,
-    //     icon: 'error',
-    //     buttons: false as unknown as (string | boolean)[],
-    //   });
-    // };
+    const showError = (message: string) => {
+      swal({
+        title: 'Invalid input!',
+        text: message,
+        icon: 'error',
+        buttons: false as unknown as (string | boolean)[],
+      });
+    };
 
     // Function to show SweetAlert modal
 
@@ -756,7 +756,7 @@ const Page: React.FC = () => {
             closeModal: true,
           },
           confirm: {
-            text: 'Delete',
+            text: 'Delete Request',
             visible: true,
             className: '',
             closeModal: false, // Keep modal open for validation
@@ -809,14 +809,16 @@ const Page: React.FC = () => {
           // User pressed cancel, do nothing
         } else {
           // Invalid input, show error message and show modal again
-          // showError('You need to type DELETE to confirm.');
-          toast.error(
+          showError(
             `You need to type DELETE/${SingleSite?.site.name} to confirm`,
           );
-          showDeleteModal();
-          // setTimeout(() => {
-          //   showDeleteModal(); // Show modal again
-          // }, 3000);
+          // toast.error(
+          //   `You need to type DELETE/${SingleSite?.site.name} to confirm`,
+          // );
+          // showDeleteModal();
+          setTimeout(() => {
+            showDeleteModal(); // Show modal again
+          }, 3000);
         }
       });
     };
