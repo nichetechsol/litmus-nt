@@ -417,7 +417,10 @@ const Page = () => {
             } else {
               setLoading(false);
               if (result.errorCode === 1) {
-                swal(result.data, { icon: 'error' });
+                document.body.classList.add('no-scroll');
+                swal(result.data, { icon: 'error' }).then(() => {
+                  document.body.classList.remove('no-scroll');
+                });
               }
             }
             if (closeModalButtonRef.current) {
@@ -681,14 +684,18 @@ const Page = () => {
   ////HANDLE DELETE FOR ORG
   const handleDelete = async (org: any) => {
     const showError = (message: string) => {
+      document.body.classList.add('no-scroll');
       swal({
         title: 'Invalid input!',
         text: message,
         icon: 'error',
         buttons: false as unknown as (string | boolean)[],
+      }).then(() => {
+        document.body.classList.remove('no-scroll');
       });
     };
     const showDeleteModal = () => {
+      document.body.classList.add('no-scroll');
       swal({
         title: 'Are you sure?',
         text: `Please type DELETE/${org.org_name} to confirm deletion`,
@@ -717,6 +724,7 @@ const Page = () => {
           },
         },
       }).then((value) => {
+        document.body.classList.remove('no-scroll');
         setLoading(true);
         const inputElem = document.getElementById(
           'delete-input',
@@ -740,25 +748,34 @@ const Page = () => {
             .then((response) => {
               setLoading(false); // Reset loading state
               if (response) {
+                document.body.classList.add('no-scroll');
                 swal({
                   title: 'Success!',
                   text: response.message,
                   icon: 'success',
+                }).then(() => {
+                  document.body.classList.remove('no-scroll');
                 });
               } else {
+                document.body.classList.add('no-scroll');
                 swal({
                   title: 'Error!',
                   text: 'There was a problem deleting the organization.',
                   icon: 'error',
+                }).then(() => {
+                  document.body.classList.remove('no-scroll');
                 });
               }
             })
             .catch(() => {
               setLoading(false); // Reset loading state on error
+              document.body.classList.add('no-scroll');
               swal({
                 title: 'Error!',
                 text: 'There was a problem deleting the organization.',
                 icon: 'error',
+              }).then(() => {
+                document.body.classList.remove('no-scroll');
               });
             });
         } else if (value === null) {
@@ -777,6 +794,7 @@ const Page = () => {
     const response = await requestOrgDeletion(org.org_id);
     if (response && response.errorCode === 2) {
       setLoading(false);
+      document.body.classList.add('no-scroll');
       swal({
         title: 'Are you Sure?',
         text: response.message,
@@ -798,6 +816,7 @@ const Page = () => {
           },
         },
       }).then(async (willProceed) => {
+        document.body.classList.remove('no-scroll');
         if (willProceed) {
           showDeleteModal();
         }

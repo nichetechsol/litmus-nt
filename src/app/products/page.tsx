@@ -62,13 +62,17 @@ const Page = () => {
     if (decryptedOrgId) {
       setorg_id(decryptedOrgId);
       if (!decryptedSiteId) {
+        document.body.classList.add('no-scroll');
         swal('Please select a Site', { icon: 'error' }).then(() => {
+          document.body.classList.remove('no-scroll');
           navigate.push('/sites');
           // redirect('/organization');
         });
       }
     } else {
+      document.body.classList.add('no-scroll');
       swal('Please select a  Organization', { icon: 'error' }).then(() => {
+        document.body.classList.remove('no-scroll');
         navigate.push('/organization');
         return;
         // redirect('/organization');

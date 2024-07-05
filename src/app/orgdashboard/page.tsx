@@ -119,7 +119,9 @@ const OrgDashboard = () => {
     if (!decryptedOrgId) {
       // swal('Please select organization', { icon: 'error' });
       // redirect('/organization');
+      document.body.classList.add('no-scroll');
       swal('Please select organization', { icon: 'error' }).then(() => {
+        document.body.classList.remove('no-scroll');
         navigate.push('/organization');
         // redirect('/organization');
       });
@@ -359,6 +361,7 @@ const OrgDashboard = () => {
     setChangeFlage(true);
   };
   const handleDelete = (id: any) => {
+    document.body.classList.add('no-scroll');
     swal({
       title: 'Confirm Delete',
       text: 'Are you sure you want to delete?',
@@ -366,6 +369,7 @@ const OrgDashboard = () => {
       buttons: ['Cancel', 'Delete'],
       dangerMode: true,
     }).then(async (willDelete: any) => {
+      document.body.classList.remove('no-scroll');
       if (willDelete) {
         try {
           setLoading(true);
@@ -379,18 +383,30 @@ const OrgDashboard = () => {
             if (id === user_id) {
               navigate.push('/organization');
             } else {
-              swal('User deleted successfully!', { icon: 'success' });
-              fetchData2();
+              document.body.classList.add('no-scroll');
+              swal('User deleted successfully!', { icon: 'success' }).then(
+                () => {
+                  document.body.classList.remove('no-scroll');
+
+                  fetchData2();
+                },
+              );
             }
             setLoading(false);
             // Optionally, update your state or refetch data here
           } else {
-            swal('Error deleting record!', { icon: 'error' });
-            setLoading(false);
+            document.body.classList.add('no-scroll');
+            swal('Error deleting record!', { icon: 'error' }).then(() => {
+              document.body.classList.remove('no-scroll');
+              setLoading(false);
+            });
           }
         } catch (error) {
-          swal('Unexpected error occurred!', { icon: 'error' });
-          setLoading(false);
+          document.body.classList.add('no-scroll');
+          swal('Unexpected error occurred!', { icon: 'error' }).then(() => {
+            document.body.classList.remove('no-scroll');
+            setLoading(false);
+          });
         }
       }
     });

@@ -516,6 +516,7 @@ const Page = () => {
     setChangeFlage(true);
   };
   const handleDelete = (id: any) => {
+    document.body.classList.add('no-scroll');
     swal({
       title: 'Confirm Delete',
       text: 'Are you sure you want to delete?',
@@ -523,6 +524,7 @@ const Page = () => {
       buttons: ['Cancel', 'Delete'],
       dangerMode: true,
     }).then(async (willDelete: any) => {
+      document.body.classList.remove('no-scroll');
       if (willDelete) {
         try {
           setLoading(true);
@@ -531,17 +533,26 @@ const Page = () => {
             if (id === user_id) {
               navigate.push('/sites');
             } else {
-              swal(response.data, { icon: 'success' });
-              fetchUserData();
+              document.body.classList.add('no-scroll');
+              swal(response.data, { icon: 'success' }).then(() => {
+                document.body.classList.remove('no-scroll');
+                fetchUserData();
+              });
             }
             setLoading(false);
           } else {
-            swal('Error deleting record!', { icon: 'error' });
-            setLoading(false);
+            document.body.classList.add('no-scroll');
+            swal('Error deleting record!', { icon: 'error' }).then(() => {
+              document.body.classList.remove('no-scroll');
+              setLoading(false);
+            });
           }
         } catch (error) {
-          swal('Unexpected error occurred!', { icon: 'error' });
-          setLoading(false);
+          document.body.classList.add('no-scroll');
+          swal('Unexpected error occurred!', { icon: 'error' }).then(() => {
+            document.body.classList.remove('no-scroll');
+            setLoading(false);
+          });
         }
       }
     });
