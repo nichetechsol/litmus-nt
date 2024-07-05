@@ -825,7 +825,11 @@ async function deleteDomains(data: any): Promise<Result<any>> {
         };
       }
     }
-
+    await logActivity({
+      user_id: data.user_id,
+      org_id: data.org_id,
+      activity_type: 'remove_domain',
+    });
     return { errorCode: 0, message: 'Domain deleted successfully', data: null };
   } catch (error) {
     return { errorCode: 1, message: 'Unexpected error', data: null };

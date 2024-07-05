@@ -233,14 +233,6 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
                     UserData.token,
                   );
                 }
-                // Send the invitation email
-                // await sendEmailFunction(
-                //   'shruti@nichetech.in', // To
-                //   'Add User To Site', // Subject
-                //   'add_siteUser', // Type
-                //   UserData.token, // Token (Generate or provide the actual token)
-                //   emaildata, // Data
-                // );
                 await logActivity({
                   user_id: UserData.user_id,
                   org_id: UserData.org_id,
@@ -303,10 +295,9 @@ async function modifyUserOfSites(
     const { data: targetUserRoleData, error: targetUserRoleError } =
       await supabase
         .from('site_users')
-        .select('role_id')
+        .select('role_id,user_role(name)')
         .eq('user_id', UserData.user_id)
         .eq('site_id', UserData.site_id);
-
     if (targetUserRoleError || !targetUserRoleData) {
       return {
         errorCode: 1,
@@ -317,6 +308,7 @@ async function modifyUserOfSites(
 
     const targetUserRoleId = targetUserRoleData[0].role_id;
 
+    const oldUserRoleId = targetUserRoleId;
     // Owner can modify any role
     if (modifyingUserRoleId === 2) {
       // Admin can modify non-owner roles (Admin and Member)
@@ -346,16 +338,57 @@ async function modifyUserOfSites(
 
     if (error) {
       return { errorCode: 1, message: 'Error updating user role', data: null };
-    } else {
-      return {
-        errorCode: 0,
-        message: 'User role updated successfully',
-        data: data,
-      };
     }
+
+    // Send email notifications based on role changes
+    let action = '';
+    if (UserData.role_id > 1) {
+      action = 'User_Role_Demoted';
+    } else {
+      action = 'User_Role_Promoted';
+    }
+
+    if (action) {
+      const userName: any = UserData.userName;
+      const orgName: any = UserData.orgName;
+      const siteName: any = UserData.siteName;
+      const role: any = targetUserRoleData[0].user_role;
+      const roleName: any = role.name;
+      const email_data = await fetchEmailData(action);
+      if (email_data.errorCode === 0) {
+        const target_user = UserData.email;
+        const { data: emailConfig } = email_data;
+        const to = email_data.data.To;
+        const subject = emailConfig.email_subject;
+        const heading = emailConfig.email_heading;
+        const content = emailConfig.email_content;
+        const headingData = heading
+          .replace('{{Target User Name}}', target_user)
+          .replace('{{Site Name}}', siteName)
+          .replace('{{Org Name}}', orgName)
+          .replace('{{Role Name}}', roleName);
+        const contentData = content
+          .replace('{{Target User Name}}', target_user)
+          .replace('{{Site Name}}', siteName)
+          .replace('{{Org Name}}', orgName)
+          .replace('{{User Name}}', userName)
+          .replace('{{Role Name}}', roleName);
+
+        await sendEmailFunction(
+          to,
+          subject,
+          headingData,
+          contentData,
+          UserData.token,
+        );
+      }
+    }
+    return {
+      errorCode: 0,
+      message: 'User role updated successfully',
+      data: data,
+    };
   } catch (error) {
-    // Log any unexpected errors
-    // console.error('Unexpected Error:', error);
     return { errorCode: -1, message: 'Unexpected error occurred', data: null };
   }
 }

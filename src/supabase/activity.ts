@@ -34,6 +34,7 @@ const valid_activity_types: string[] = [
   'download_file',
   'update_site',
   'update_org',
+  'remove_domain',
 ];
 
 const logActivity = async ({
