@@ -183,7 +183,27 @@ const Page = () => {
 
     fetchData2();
   }, [user_role]);
+  const [isOpen, setIsOpen] = useState(false);
+  const openModal = () => {
+    setIsOpen(true);
+    document.body.classList.add('no-scroll1');
+  };
 
+  const closeModal = () => {
+    setIsOpen(false);
+    document.body.classList.remove('no-scroll1');
+  };
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('overflow-hidden');
+    } else {
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    return () => {
+      document.body.classList.remove('overflow-hidden');
+    };
+  }, [isOpen]);
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -442,8 +462,10 @@ const Page = () => {
             fetchData();
             fetchData1();
             setDomainError('');
+            closeModal();
           } catch (error) {
             setLoading(false);
+            closeModal();
             toast.error('Error Adding Organization', { autoClose: 3000 });
           }
         }
@@ -641,6 +663,7 @@ const Page = () => {
   ///// for edit ///
 
   const handeledit = async (org: any) => {
+    openModal();
     setLoading(true);
     const EditView = await viewOrganization(org.org_id);
     setorgidForupdatetion(org.org_id);
@@ -667,6 +690,7 @@ const Page = () => {
     // setOrganizationName(org.org_name);
   };
   const addorg = () => {
+    openModal();
     setDomainInput('');
     setOrganizationName('');
     setSelectedType('');
@@ -877,6 +901,7 @@ const Page = () => {
                                     setDomainInput('');
                                     setOrganizationName('');
                                     setSelectedType('');
+                                    closeModal();
                                     // const defaultDomain =
                                     //   getDefaultDomainFromEmail();
                                     // if (defaultDomain) {
@@ -1030,6 +1055,7 @@ const Page = () => {
                                       className='form-select'
                                       value={selectedType}
                                       onChange={handleTypeDropdownChange}
+                                      disabled={!changeFlage}
                                     >
                                       <option value='' hidden>
                                         Select Type
@@ -1098,6 +1124,7 @@ const Page = () => {
                                     setDomainError('');
                                     setTypeDropdownError('');
                                     setMessageError('');
+                                    closeModal();
                                     // fetchData();
                                     // fetchData1();
                                   }}
@@ -1251,44 +1278,6 @@ const Page = () => {
                               navigate.push('/orgdashboard');
                             }}
                           >
-                            {/* <button
-                              className='hs-dropdown-toggle py-2 px-3 ti-btn bg-primary text-white !font-medium !mb-0'
-                              data-hs-overlay='#todo-compose'
-                              onClick={(e) => {
-                                e.stopPropagation(); // Prevent card click
-                                setModalOpen(true);
-                                handeledit(org);
-                              }}
-                            >
-                              <i className='ri-edit-2-line'></i>
-                            </button> */}
-                            {/* <div
-                              style={{ cursor: 'pointer' }}
-                              aria-label='anchor'
-                              data-bs-target='#formmodal'
-                              data-bs-toggle='modal'
-                              data-bs-whatever='@fat'
-                              data-hs-overlay='#todo-compose'
-                              onClick={(e) => {
-                                e.stopPropagation(); // Prevent card click
-                                setModalOpen(true);
-                                handeledit(org);
-                              }}
-                              className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
-                            >
-                              <i className='ri-edit-line'></i>
-                            </div>
-                            <div
-                              style={{ cursor: 'pointer' }}
-                              aria-label='anchor'
-                              // onClick={() => {
-                              //   handleDelete(user.id);
-                              // }}
-                              className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
-                            >
-                              <i className='ri-delete-bin-line'></i>
-                            </div> */}
-
                             <div className='box-body contact-action'>
                               <div className='flex items-center '>
                                 <div className='avtariv flex flex-grow justify-between gap-2 items-center'>

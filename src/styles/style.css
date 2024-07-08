@@ -20245,3 +20245,8 @@ body.no-scroll {
   width: 100%;
   pointer-events: none;
 }
+body.no-scroll1 {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}

@@ -146,6 +146,9 @@ const Page = () => {
     };
     refresh();
   }, []);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
