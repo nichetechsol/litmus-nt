@@ -20250,3 +20250,24 @@ body.no-scroll1 {
   position: fixed;
   width: 100%;
 }
+.swal-icon--error__line {
+  background-color: #d13838 !important;
+}
+.swal-icon--error {
+  border-color: #d13838 !important;
+}
+.Toastify__close-button--light {
+  opacity: 1 !important;
+}
+.ti-modal .ti-modal-body .ti-form-label {
+  font-weight: 600 !important;
+}
+.form-select option[hidden] {
+  color: #999 !important;
+}
+.deselect-main {
+  color: #999 !important;
+}
+.form-select option {
+  color: #000;
+}

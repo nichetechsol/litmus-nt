@@ -300,6 +300,16 @@ const OrgDashboard = () => {
 
     fetchRoles();
   }, []);
+  const [isOpen, setIsOpen] = useState(false);
+  const openModal = () => {
+    setIsOpen(true);
+    document.body.classList.add('no-scroll1');
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+    document.body.classList.remove('no-scroll1');
+  };
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newEmail = e.target.value.trim();
     setEmail(newEmail);
@@ -339,6 +349,7 @@ const OrgDashboard = () => {
       .catch((err: Yup.ValidationError) => setRoleError(err.message));
   };
   const handleEdit = (user: any) => {
+    openModal();
     setChangeFlage(false);
     setUserNameId(user.id);
     setEmail(user.email ? user.email : '');
@@ -347,6 +358,7 @@ const OrgDashboard = () => {
     setRole(user.role_id);
   };
   const handleFiledClear = () => {
+    closeModal();
     setEmailError('');
     setFirstNameError('');
     setLastNameError('');
@@ -354,13 +366,14 @@ const OrgDashboard = () => {
   };
 
   const handleAddUser = () => {
+    openModal();
     setEmail('');
     setFirstName('');
     setLastName('');
     setRole('');
     setChangeFlage(true);
   };
-  const handleDelete = (id: any) => {
+  const handleDelete = (user: any) => {
     document.body.classList.add('no-scroll');
     swal({
       title: 'Confirm Delete',
@@ -374,29 +387,29 @@ const OrgDashboard = () => {
         try {
           setLoading(true);
           const response = await removeUserFromOrganization(
-            id,
+            user.id,
             org_id,
             user_id,
+            userrole2,
+            user.role_id,
           );
 
           if (response.errorCode === 0) {
-            if (id === user_id) {
+            if (user.id === user_id) {
               navigate.push('/organization');
             } else {
               document.body.classList.add('no-scroll');
-              swal('User deleted successfully!', { icon: 'success' }).then(
-                () => {
-                  document.body.classList.remove('no-scroll');
+              swal(response.data, { icon: 'success' }).then(() => {
+                document.body.classList.remove('no-scroll');
 
-                  fetchData2();
-                },
-              );
+                fetchData2();
+              });
             }
             setLoading(false);
             // Optionally, update your state or refetch data here
           } else {
             document.body.classList.add('no-scroll');
-            swal('Error deleting record!', { icon: 'error' }).then(() => {
+            swal(response.data, { icon: 'error' }).then(() => {
               document.body.classList.remove('no-scroll');
               setLoading(false);
             });
@@ -459,6 +472,7 @@ const OrgDashboard = () => {
             token: onlyToken,
             userName: userEmail,
             orgName: orgName,
+            user_role_id: userrole2,
           };
           await refreshToken();
           result = await addUserToOrganization(userData);
@@ -504,14 +518,18 @@ const OrgDashboard = () => {
         if (closeModalButtonRef.current) {
           closeModalButtonRef.current.click();
         }
+        closeModal();
         fetchData2();
+        roleChange();
         CountData();
         setLoading(false);
       } catch (error) {
+        closeModal();
         setLoading(false);
         //
       }
     } else {
+      closeModal();
       setLoading(false);
       //
     }
@@ -523,22 +541,21 @@ const OrgDashboard = () => {
     }
   };
   const [userrole2, setuserrole2] = useState();
-  useEffect(() => {
-    const fetchData2 = async () => {
-      try {
-        const data: any = await getOrgUserRole(user_id, org_id);
+  const roleChange = async () => {
+    try {
+      const data: any = await getOrgUserRole(user_id, org_id);
 
-        if (data) {
-          setuserrole2(data.data.id);
-        } else {
-          //
-        }
-      } catch (error: any) {
+      if (data) {
+        setuserrole2(data.data.id);
+      } else {
         //
       }
-    };
-
-    fetchData2();
+    } catch (error: any) {
+      //
+    }
+  };
+  useEffect(() => {
+    roleChange();
   }, [user_id, org_id]);
   return (
     <>
@@ -892,7 +909,9 @@ const OrgDashboard = () => {
                                         <span className='text-danger'>*</span>
                                       </label>
                                       <select
-                                        className='form-select'
+                                        className={`form-select ${
+                                          role === '' ? 'deselect-main' : ''
+                                        }`}
                                         onChange={handleRoleChange}
                                         value={role}
                                       >
@@ -1030,7 +1049,7 @@ const OrgDashboard = () => {
                                             style={{ cursor: 'pointer' }}
                                             aria-label='anchor'
                                             onClick={() => {
-                                              handleDelete(user.id);
+                                              handleDelete(user);
                                             }}
                                             className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
                                           >

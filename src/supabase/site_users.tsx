@@ -22,6 +22,7 @@ interface UserData {
   siteName: any;
   orgName: any;
   modifying_user_id: any;
+  user_role_id: any;
 }
 interface SiteUser {
   user_id: any;
@@ -86,7 +87,11 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
   try {
     let users: User[] | null = null;
     let selectError: any;
-
+    if (UserData.user_role_id == 2) {
+      if (UserData.role_id == 1) {
+        return { errorCode: 1, data: 'Admin cannot add the Owner' };
+      }
+    }
     if (UserData.email && UserData.email !== '') {
       ({ data: users, error: selectError } = await supabase
         .from('users')
@@ -398,11 +403,17 @@ async function removeUserFromSites(
   target_user_id: any,
   site_id: any,
   user_id: any,
+  user_role_id: any,
+  role_id: any,
 ): Promise<Result<string>> {
   if (!target_user_id || !site_id) {
-    return { errorCode: 1, data: null };
+    return { errorCode: 1, data: 'Please enter proper data' };
   }
-
+  if (user_role_id == 2) {
+    if (role_id == 1) {
+      return { errorCode: 1, data: 'Admin cannot delete the Owner' };
+    }
+  }
   try {
     const { error } = await supabase
       .from('site_users')
@@ -411,7 +422,7 @@ async function removeUserFromSites(
       .eq('site_id', site_id);
 
     if (error) {
-      return { errorCode: 1, data: null };
+      return { errorCode: 1, data: 'Site user not found' };
     } else {
       // Log the activity
       await logActivity({
@@ -424,7 +435,7 @@ async function removeUserFromSites(
       return { errorCode: 0, data: 'Site user deleted successfully' };
     }
   } catch (error) {
-    return { errorCode: -1, data: null };
+    return { errorCode: -1, data: 'Error while delete user' };
   }
 }
 

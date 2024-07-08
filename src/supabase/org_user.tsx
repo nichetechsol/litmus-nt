@@ -19,6 +19,7 @@ interface UserData {
   token?: any;
   userName: any;
   orgName: any;
+  user_role_id: any;
 }
 interface modifyUserData {
   email?: string;
@@ -46,7 +47,7 @@ interface OrgUser {
 interface Result<T> {
   errorCode: number;
   message?: string;
-  data: T | null;
+  data: any;
 }
 
 // Function to add a user to an organization based on email or name
@@ -58,7 +59,11 @@ async function addUserToOrganization(
 
     let users: User[] | null = null;
     let selectError: any = null;
-
+    if (UserData.user_role_id == 2) {
+      if (UserData.role_id == 1) {
+        return { errorCode: 1, data: 'Admin cannot add the Owner' };
+      }
+    }
     // Check if the email is provided and not empty
     if (UserData.email && UserData.email !== '') {
       // Select the user from the 'users' table using the email
@@ -297,12 +302,18 @@ async function removeUserFromOrganization(
   id: any,
   org_id: any,
   user_id: any,
+  user_role_id: any,
+  role_id: any,
 ): Promise<Result<null>> {
   // Validate the input
   if (!id || !org_id) {
-    return { errorCode: 1, data: null };
+    return { errorCode: 1, data: 'Please enter proper data' };
   }
-
+  if (user_role_id == 2) {
+    if (role_id == 1) {
+      return { errorCode: 1, data: 'Admin cannot delete the Owner' };
+    }
+  }
   try {
     // Delete the user from the 'org_users' table based on user ID
     const { error } = await supabase
@@ -313,7 +324,7 @@ async function removeUserFromOrganization(
 
     // Check for errors during the delete operation
     if (error) {
-      return { errorCode: 1, data: null };
+      return { errorCode: 1, data: 'User not found' };
     } else {
       const logResult = await logActivity({
         org_id: org_id,
@@ -322,11 +333,11 @@ async function removeUserFromOrganization(
         activity_type: 'remove_user',
       });
 
-      return { errorCode: 0, data: null };
+      return { errorCode: 0, data: 'User deleted succesfully' };
     }
   } catch (error) {
     // Log any unexpected errors
-    return { errorCode: -1, data: null };
+    return { errorCode: -1, data: 'User not found' };
   }
 }
 

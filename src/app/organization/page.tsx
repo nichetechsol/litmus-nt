@@ -626,7 +626,7 @@ const Page = () => {
 
     const newdom = domains.filter((i, idx) => idx != index);
 
-    if (changeFlage === false && id?.domainid) {
+    if (changeFlage === false && id?.domainid && newdom.length >= 1) {
       const data = {
         org_id: orgidForupdatetion,
         domain_id: id.domainid,
@@ -649,11 +649,12 @@ const Page = () => {
       }
     } else {
       if (newdom.length == 0) {
-        setDomainError('Domain is required. Please enter a domain.');
+        // setDomainError("Atleast one domain is required.You can't delete it.");
+        toast.error('Atleast one domain must be entered.', { autoClose: 3000 });
       } else {
         setDomainError('');
+        setDomains(newdom);
       }
-      setDomains(newdom);
     }
   };
   useEffect(() => {
@@ -1052,7 +1053,11 @@ const Page = () => {
                                       <span className='text-danger'>*</span>
                                     </label>
                                     <select
-                                      className='form-select'
+                                      className={`form-select ${
+                                        selectedType === ''
+                                          ? 'deselect-main'
+                                          : ''
+                                      }`}
                                       value={selectedType}
                                       onChange={handleTypeDropdownChange}
                                       disabled={!changeFlage}

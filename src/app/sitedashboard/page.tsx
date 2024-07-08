@@ -298,20 +298,20 @@ const Page = () => {
     }
   };
   const [userrole3, setuserrole3] = useState<any>('');
-  useEffect(() => {
-    const fetchData2 = async () => {
-      try {
-        const data: any = await getSiteUserRole(user_id, site_id);
-        if (data) {
-          setuserrole3(data.data.id);
-        } else {
-          //
-        }
-      } catch (error: any) {
+  const roleChange = async () => {
+    try {
+      const data: any = await getSiteUserRole(user_id, site_id);
+      if (data) {
+        setuserrole3(data.data.id);
+      } else {
         //
       }
-    };
-    fetchData2();
+    } catch (error: any) {
+      //
+    }
+  };
+  useEffect(() => {
+    roleChange();
   }, [site_id, user_id]);
 
   useEffect(() => {
@@ -342,7 +342,15 @@ const Page = () => {
     fetchData();
   }, [site_id]);
 
+  const openModal = () => {
+    document.body.classList.add('no-scroll1');
+  };
+
+  const closeModal = () => {
+    document.body.classList.remove('no-scroll1');
+  };
   const handleFiledClear = () => {
+    closeModal();
     setEmailError('');
     setFirstNameError('');
     setLastNameError('');
@@ -443,6 +451,7 @@ const Page = () => {
             siteName: site_name,
             orgName: orgName,
             site_id: site_id,
+            user_role_id: userrole3,
           };
           await refreshToken();
           result = await addUserToSites(userData);
@@ -488,13 +497,17 @@ const Page = () => {
           closeModalButtonRef.current.click();
         }
         fetchUserData();
+        closeModal();
+        roleChange();
         countData();
         setLoading(false);
       } catch (error) {
+        closeModal();
         setLoading(false);
       }
     } else {
       setLoading(false);
+      closeModal();
     }
   };
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -503,6 +516,7 @@ const Page = () => {
     }
   };
   const handleEdit = (user: any) => {
+    openModal();
     setChangeFlage(false);
     setUserNameId(user.user_id);
     setEmail(user.email ? user.email : '');
@@ -512,13 +526,14 @@ const Page = () => {
     setsite_id(user.site_id);
   };
   const handleAddUser = () => {
+    openModal();
     setEmail('');
     setFirstName('');
     setLastName('');
     setRole('');
     setChangeFlage(true);
   };
-  const handleDelete = (id: any) => {
+  const handleDelete = (user: any) => {
     document.body.classList.add('no-scroll');
     swal({
       title: 'Confirm Delete',
@@ -531,9 +546,15 @@ const Page = () => {
       if (willDelete) {
         try {
           setLoading(true);
-          const response = await removeUserFromSites(id, site_id, user_id);
+          const response = await removeUserFromSites(
+            user.user_id,
+            site_id,
+            user_id,
+            userrole3,
+            user.role_id,
+          );
           if (response.errorCode === 0 && response.data) {
-            if (id === user_id) {
+            if (user.user_id === user_id) {
               navigate.push('/sites');
             } else {
               document.body.classList.add('no-scroll');
@@ -543,6 +564,12 @@ const Page = () => {
               });
             }
             setLoading(false);
+          } else if (response.errorCode === 1 && response.data) {
+            document.body.classList.add('no-scroll');
+            swal(response.data, { icon: 'error' }).then(() => {
+              document.body.classList.remove('no-scroll');
+              setLoading(false);
+            });
           } else {
             document.body.classList.add('no-scroll');
             swal('Error deleting record!', { icon: 'error' }).then(() => {
@@ -1216,7 +1243,9 @@ const Page = () => {
                                         <span className='text-danger'>*</span>
                                       </label>
                                       <select
-                                        className='form-select'
+                                        className={`form-select ${
+                                          role === '' ? 'deselect-main' : ''
+                                        }`}
                                         onChange={handleRoleChange}
                                         value={role}
                                       >
@@ -1345,7 +1374,7 @@ const Page = () => {
                                             style={{ cursor: 'pointer' }}
                                             aria-label='anchor'
                                             onClick={() => {
-                                              handleDelete(user.user_id);
+                                              handleDelete(user);
                                             }}
                                             className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
                                           >

@@ -154,7 +154,9 @@ const Page: React.FC = () => {
     null,
   );
   const [typeDropdownError, setTypeDropdownError] = useState<string>('');
-  const [SelectedValueDropdown, setSelectedValueDropdown] = useState<number>();
+  const [SelectedValueDropdown, setSelectedValueDropdown] = useState<
+    number | string
+  >('');
 
   const [Address1, setAddress1] = useState<string>('');
   const [Address1Error, setAddress1Error] = useState<string>('');
@@ -182,6 +184,13 @@ const Page: React.FC = () => {
   const [messageError, setMessageError] = useState('');
   const closeModalButtonRef = useRef<HTMLButtonElement>(null);
 
+  const openModal = () => {
+    document.body.classList.add('no-scroll1');
+  };
+
+  const closeModal = () => {
+    document.body.classList.remove('no-scroll1');
+  };
   /// for getting details of site
   const FetchSiteDetails = async () => {
     try {
@@ -265,8 +274,9 @@ const Page: React.FC = () => {
   };
   /// for submit
   const handelclosemodel = () => {
+    closeModal();
     setAddSiteName('');
-    setSelectedValueDropdown(undefined);
+    setSelectedValueDropdown('');
     setAddress1('');
     setAddress2('');
     SetSelectedValueCounrty('');
@@ -572,6 +582,7 @@ const Page: React.FC = () => {
               closeModalButtonRef.current.click();
             }
             handelclosemodel();
+            closeModal();
             document.body.classList.add('no-scroll');
             swal({
               title: result.message,
@@ -653,6 +664,7 @@ const Page: React.FC = () => {
               closeModalButtonRef.current.click();
             }
             handelclosemodel();
+            closeModal();
             FetchSiteDetails();
             fetchData1();
             toast.success(result.message, { autoClose: 3000 });
@@ -662,10 +674,12 @@ const Page: React.FC = () => {
               closeModalButtonRef.current.click();
             }
             handelclosemodel();
+            closeModal();
             toast.error(result.message, { autoClose: 3000 });
           }
         } catch (error) {
           setLoading(false);
+          closeModal();
         }
       }
     }
@@ -687,6 +701,7 @@ const Page: React.FC = () => {
   }, []);
   ///// for edit
   const handeledit = (SingleSite: any) => {
+    openModal();
     setLoading(true);
     setChangeFlage(false);
     setAddSiteName(SingleSite.site.name);
@@ -705,6 +720,7 @@ const Page: React.FC = () => {
     setLoading(false);
   };
   const Addsite = () => {
+    openModal();
     handleCall();
     handelclosemodel();
     // remaning descriptopn
@@ -930,7 +946,11 @@ const Page: React.FC = () => {
                                       <span className='text-danger'>*</span>
                                     </label>
                                     <select
-                                      className='form-select'
+                                      className={`form-select ${
+                                        SelectedValueDropdown === ''
+                                          ? 'deselect-main'
+                                          : ''
+                                      }`}
                                       onChange={handelchangeTypeDropDown}
                                       value={SelectedValueDropdown}
                                     >
@@ -1004,7 +1024,11 @@ const Page: React.FC = () => {
                                       <span className='text-danger'>*</span>
                                     </label>
                                     <select
-                                      className='form-select'
+                                      className={`form-select ${
+                                        SelectedValueCounrty === ''
+                                          ? 'deselect-main'
+                                          : ''
+                                      }`}
                                       onChange={handelchangeCountry}
                                       value={SelectedValueCounrty}
                                     >
@@ -1037,7 +1061,11 @@ const Page: React.FC = () => {
                                       <span className='text-danger'>*</span>
                                     </label>
                                     <select
-                                      className='form-select'
+                                      className={`form-select ${
+                                        SelectedValueState === ''
+                                          ? 'deselect-main'
+                                          : ''
+                                      }`}
                                       onChange={handelchangeState}
                                       value={SelectedValueState}
                                     >
@@ -1382,7 +1410,7 @@ const Page: React.FC = () => {
                                         <ul className='hs-dropdown-menu ti-dropdown-menu hidden'>
                                           <li>
                                             <button
-                                              className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
+                                              className='ti-dropdown-item w-full text-start !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
                                               // href='#!'
                                               style={{ cursor: 'pointer' }}
                                               aria-label='anchor'
@@ -1401,7 +1429,7 @@ const Page: React.FC = () => {
                                           </li>
                                           <li>
                                             <button
-                                              className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
+                                              className='ti-dropdown-item w-full text-start !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
                                               // href='#!'
                                               style={{ cursor: 'pointer' }}
                                               aria-label='anchor'
