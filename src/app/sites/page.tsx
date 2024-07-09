@@ -1387,12 +1387,17 @@ const Page: React.FC = () => {
                                           {SingleSite?.site
                                             ? SingleSite?.site?.name
                                             : ''}
-                                          <span
-                                            className='hs-tooltip-content  ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm '
-                                            role='tooltip'
-                                          >
-                                            new toolti
-                                          </span>
+                                          {SingleSite?.site?.name.length >
+                                            18 && (
+                                            <span
+                                              className='hs-tooltip-content  ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm '
+                                              role='tooltip'
+                                            >
+                                              {SingleSite?.site
+                                                ? SingleSite?.site?.name
+                                                : ''}
+                                            </span>
+                                          )}
                                         </h1>
                                       </div>
                                     </div>

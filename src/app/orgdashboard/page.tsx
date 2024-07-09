@@ -71,7 +71,7 @@ interface activitylogs {
   target_user_role: object;
   target_user_id: { email: string; firstname: string; lastname: string };
   org_id: { name: string };
-  details: { filename: string };
+  details: any;
   site_id: { name: string };
   user_id: { email: string; firstname: string; lastname: string };
 }
@@ -1175,7 +1175,15 @@ const OrgDashboard = () => {
                                         activity?.activity_type ===
                                           'create_site' ||
                                         activity?.activity_type ===
-                                          'download_file') && (
+                                          'download_file' ||
+                                        activity?.activity_type ===
+                                          'update_org' ||
+                                        activity?.activity_type ===
+                                          'remove_domain' ||
+                                        activity?.activity_type ===
+                                          'add_domain' ||
+                                        activity?.activity_type ===
+                                          'edit_org_description') && (
                                         <tr
                                           className='border hover:bg-gray-100 dark:hover:bg-light dark:border-defaultborder/10 border-defaultborder !border-x-0'
                                           key={index}
@@ -1282,24 +1290,7 @@ const OrgDashboard = () => {
                                                       } within the organization '${
                                                         activity.org_id.name
                                                       }'`
-                                                    : // : activity?.activity_type ===
-                                                    //   'add_licence'
-                                                    // ? `${
-                                                    //     activity.user_id
-                                                    //       .firstname &&
-                                                    //     activity.user_id
-                                                    //       .lastname
-                                                    //       ? activity.user_id
-                                                    //           .firstname +
-                                                    //         ' ' +
-                                                    //         activity.user_id
-                                                    //           .lastname
-                                                    //       : activity.user_id
-                                                    //           .email
-                                                    //   } added a new license within the organization ${
-                                                    //     activity.org_id.name
-                                                    //   }`
-                                                    activity?.activity_type ===
+                                                    : activity?.activity_type ===
                                                       'download_file'
                                                     ? `${
                                                         activity.user_id
@@ -1319,6 +1310,15 @@ const OrgDashboard = () => {
                                                       }' within the site '${
                                                         activity.org_id.name
                                                       }'`
+                                                    : activity?.activity_type ===
+                                                        'update_org' ||
+                                                      activity?.activity_type ===
+                                                        'remove_domain' ||
+                                                      activity?.activity_type ===
+                                                        'add_domain' ||
+                                                      activity?.activity_type ===
+                                                        'edit_org_description'
+                                                    ? `${activity.details}`
                                                     : ''}
                                                 </p>
                                               </div>

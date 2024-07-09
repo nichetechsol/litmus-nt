@@ -1323,12 +1323,14 @@ const Page = () => {
                                       <h6 className=' hs-tooltip-toggle w-100 mb-1 font-semibold text-[1rem] text-site-name'>
                                         {' '}
                                         {org?.org_name}{' '}
-                                        <span
-                                          className='hs-tooltip-content  ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm '
-                                          role='tooltip'
-                                        >
-                                          new toolti
-                                        </span>
+                                        {org?.org_name.length > 18 && (
+                                          <span
+                                            className='hs-tooltip-content  ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm '
+                                            role='tooltip'
+                                          >
+                                            {org?.org_name}
+                                          </span>
+                                        )}
                                       </h6>
                                     </div>
                                     <p className='mb-1 text-[#8c9097] dark:text-white/50 contact-mail text-truncate'>
