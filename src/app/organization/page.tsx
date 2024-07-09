@@ -169,7 +169,7 @@ const Page = () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const data: any = await getUserRole();
 
-        if (data && data.data && data.data.length > 0) {
+        if (data.data && data.data.length > 0) {
           for (let i = 0; i < data.data.length; i++) {
             if (data.data[i].id == user_role) {
               setLoading(false);
@@ -643,7 +643,7 @@ const Page = () => {
       };
 
       const result = await deleteDomains(data);
-      if (result && result.errorCode === 0) {
+      if (result.errorCode === 0) {
         toast.success(result.message, {
           autoClose: 3000,
         });

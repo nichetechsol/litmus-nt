@@ -874,8 +874,8 @@ const Page: React.FC = () => {
               <div className='xl:col-span-3 col-span-12'>
                 <div className='box'>
                   <div className='box-body !p-0'>
-                    {userrole2 == '1' || userrole2 == '2' ? (
-                      <div className='p-4 grid border-b border-dashed dark:border-defaultborder/10'>
+                    <div className='p-4 grid border-b border-dashed dark:border-defaultborder/10'>
+                      {userrole2 == '1' || userrole2 == '2' ? (
                         <Link
                           href=''
                           className='hs-dropdown-toggle py-2  px-3 ti-btn bg-primary text-white !font-medium w-full !mb-0'
@@ -886,306 +886,301 @@ const Page: React.FC = () => {
                           <i className='ri-add-circle-line !text-[1rem]'></i>Add
                           Site
                         </Link>
-                        <div
-                          id='todo-compose'
-                          className='hs-overlay hidden ti-modal  [--overlay-backdrop:static]'
-                        >
-                          <div className='hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto'>
-                            <div className='ti-modal-content'>
-                              <div className='ti-modal-header'>
-                                <h6
-                                  className='modal-title text-[1rem] font-semibold'
-                                  id='mail-ComposeLabel'
-                                >
-                                  {changeFlage === true
-                                    ? 'Add Site'
-                                    : 'Edit Site'}
-                                </h6>
-                                <button
-                                  type='button'
-                                  className='hs-dropdown-toggle !text-[1rem] !font-semibold !text-defaulttextcolor'
-                                  data-hs-overlay='#todo-compose'
-                                  ref={closeModalButtonRef}
-                                  onClick={handelclosemodel}
-                                >
-                                  <span className='sr-only'>Close</span>
-                                  <i className='ri-close-line'></i>
-                                </button>
-                              </div>
-                              <div className='ti-modal-body !overflow-visible px-4'>
-                                <div className='grid grid-cols-12 gap-2'>
-                                  <div className='xl:col-span-6 col-span-6'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      Site Name{' '}
-                                      <span className='text-danger'>*</span>
-                                    </label>
-                                    <input
-                                      type='text'
-                                      className='form-control '
-                                      id='task-name'
-                                      placeholder='Enter Site Name'
-                                      onChange={handelAddSiteName}
-                                      value={AddSiteName}
-                                      maxLength={256}
-                                    />
-                                    {AddSiteNameError && (
-                                      <div className='text-danger'>
-                                        {AddSiteNameError}
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className='xl:col-span-6 col-span-6'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      Type{' '}
-                                      <span className='text-danger'>*</span>
-                                    </label>
-                                    <select
-                                      className={`form-select ${
-                                        SelectedValueDropdown === ''
-                                          ? 'deselect-main'
-                                          : ''
-                                      }`}
-                                      onChange={handelchangeTypeDropDown}
-                                      value={SelectedValueDropdown}
-                                    >
-                                      <option value='' hidden>
-                                        Select Type
-                                      </option>
-                                      {typeDropdown &&
-                                        typeDropdown.map((type) => (
-                                          <option key={type.id} value={type.id}>
-                                            {type.name}
-                                          </option>
-                                        ))}
-                                    </select>
+                      ) : (
+                        <div></div>
+                      )}
+                      <div
+                        id='todo-compose'
+                        className='hs-overlay hidden ti-modal  [--overlay-backdrop:static]'
+                      >
+                        <div className='hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto'>
+                          <div className='ti-modal-content'>
+                            <div className='ti-modal-header'>
+                              <h6
+                                className='modal-title text-[1rem] font-semibold'
+                                id='mail-ComposeLabel'
+                              >
+                                {changeFlage === true
+                                  ? 'Add Site'
+                                  : 'Edit Site'}
+                              </h6>
+                              <button
+                                type='button'
+                                className='hs-dropdown-toggle !text-[1rem] !font-semibold !text-defaulttextcolor'
+                                data-hs-overlay='#todo-compose'
+                                ref={closeModalButtonRef}
+                                onClick={handelclosemodel}
+                              >
+                                <span className='sr-only'>Close</span>
+                                <i className='ri-close-line'></i>
+                              </button>
+                            </div>
+                            <div className='ti-modal-body !overflow-visible px-4'>
+                              <div className='grid grid-cols-12 gap-2'>
+                                <div className='xl:col-span-6 col-span-6'>
+                                  <label
+                                    htmlFor='task-name'
+                                    className='ti-form-label'
+                                  >
+                                    Site Name{' '}
+                                    <span className='text-danger'>*</span>
+                                  </label>
+                                  <input
+                                    type='text'
+                                    className='form-control '
+                                    id='task-name'
+                                    placeholder='Enter Site Name'
+                                    onChange={handelAddSiteName}
+                                    value={AddSiteName}
+                                    maxLength={256}
+                                  />
+                                  {AddSiteNameError && (
+                                    <div className='text-danger'>
+                                      {AddSiteNameError}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className='xl:col-span-6 col-span-6'>
+                                  <label
+                                    htmlFor='task-name'
+                                    className='ti-form-label'
+                                  >
+                                    Type <span className='text-danger'>*</span>
+                                  </label>
+                                  <select
+                                    className={`form-select ${
+                                      SelectedValueDropdown === ''
+                                        ? 'deselect-main'
+                                        : ''
+                                    }`}
+                                    onChange={handelchangeTypeDropDown}
+                                    value={SelectedValueDropdown}
+                                  >
+                                    <option value='' hidden>
+                                      Select Type
+                                    </option>
+                                    {typeDropdown &&
+                                      typeDropdown.map((type) => (
+                                        <option key={type.id} value={type.id}>
+                                          {type.name}
+                                        </option>
+                                      ))}
+                                  </select>
 
-                                    {typeDropdownError && (
-                                      <div className='text-danger'>
-                                        {typeDropdownError}
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className='xl:col-span-6 col-span-6'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      Address 1{' '}
-                                      <span className='text-danger'>*</span>
-                                    </label>
-                                    <input
-                                      type='text'
-                                      className='form-control w-full'
-                                      id='task-name'
-                                      placeholder='Enter Address 1'
-                                      onChange={handelchangeAddress1}
-                                      value={Address1}
-                                      maxLength={255}
-                                    />
-                                    {Address1Error && (
-                                      <div className='text-danger'>
-                                        {Address1Error}
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className='xl:col-span-6 col-span-6'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      Address 2
-                                    </label>
-                                    <input
-                                      type='text'
-                                      className='form-control w-full'
-                                      id='task-name'
-                                      placeholder='Enter Address 2'
-                                      onChange={handelchangeAddress2}
-                                      value={Address2}
-                                    />
-                                    {Address2Error && (
-                                      <div className='text-danger'>
-                                        {Address2Error}
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className='xl:col-span-6 col-span-6'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      Country{' '}
-                                      <span className='text-danger'>*</span>
-                                    </label>
-                                    <select
-                                      className={`form-select ${
-                                        SelectedValueCounrty === ''
-                                          ? 'deselect-main'
-                                          : ''
-                                      }`}
-                                      onChange={handelchangeCountry}
-                                      value={SelectedValueCounrty}
-                                    >
-                                      <option value='' hidden>
-                                        Select Country
-                                      </option>
-                                      {FetchdropDCounrty &&
-                                        FetchdropDCounrty.map((Contry) => (
-                                          <option
-                                            key={Contry.id}
-                                            value={Contry.id}
-                                          >
-                                            {Contry.name}
-                                          </option>
-                                        ))}
-                                    </select>
+                                  {typeDropdownError && (
+                                    <div className='text-danger'>
+                                      {typeDropdownError}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className='xl:col-span-6 col-span-6'>
+                                  <label
+                                    htmlFor='task-name'
+                                    className='ti-form-label'
+                                  >
+                                    Address 1{' '}
+                                    <span className='text-danger'>*</span>
+                                  </label>
+                                  <input
+                                    type='text'
+                                    className='form-control w-full'
+                                    id='task-name'
+                                    placeholder='Enter Address 1'
+                                    onChange={handelchangeAddress1}
+                                    value={Address1}
+                                    maxLength={255}
+                                  />
+                                  {Address1Error && (
+                                    <div className='text-danger'>
+                                      {Address1Error}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className='xl:col-span-6 col-span-6'>
+                                  <label
+                                    htmlFor='task-name'
+                                    className='ti-form-label'
+                                  >
+                                    Address 2
+                                  </label>
+                                  <input
+                                    type='text'
+                                    className='form-control w-full'
+                                    id='task-name'
+                                    placeholder='Enter Address 2'
+                                    onChange={handelchangeAddress2}
+                                    value={Address2}
+                                  />
+                                  {Address2Error && (
+                                    <div className='text-danger'>
+                                      {Address2Error}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className='xl:col-span-6 col-span-6'>
+                                  <label
+                                    htmlFor='task-name'
+                                    className='ti-form-label'
+                                  >
+                                    Country{' '}
+                                    <span className='text-danger'>*</span>
+                                  </label>
+                                  <select
+                                    className={`form-select ${
+                                      SelectedValueCounrty === ''
+                                        ? 'deselect-main'
+                                        : ''
+                                    }`}
+                                    onChange={handelchangeCountry}
+                                    value={SelectedValueCounrty}
+                                  >
+                                    <option value='' hidden>
+                                      Select Country
+                                    </option>
+                                    {FetchdropDCounrty &&
+                                      FetchdropDCounrty.map((Contry) => (
+                                        <option
+                                          key={Contry.id}
+                                          value={Contry.id}
+                                        >
+                                          {Contry.name}
+                                        </option>
+                                      ))}
+                                  </select>
 
-                                    {CountryListError && (
-                                      <div className='text-danger'>
-                                        {CountryListError}
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className='xl:col-span-6 col-span-6'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      State{' '}
-                                      <span className='text-danger'>*</span>
-                                    </label>
-                                    <select
-                                      className={`form-select ${
-                                        SelectedValueState === ''
-                                          ? 'deselect-main'
-                                          : ''
-                                      }`}
-                                      onChange={handelchangeState}
-                                      value={SelectedValueState}
-                                    >
-                                      <option value='' hidden>
-                                        Select State
-                                      </option>
-                                      {FetchdropDState &&
-                                        FetchdropDState.map((state) => (
-                                          <option
-                                            key={state.id}
-                                            value={state.id}
-                                          >
-                                            {state.name}
-                                          </option>
-                                        ))}
-                                    </select>
+                                  {CountryListError && (
+                                    <div className='text-danger'>
+                                      {CountryListError}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className='xl:col-span-6 col-span-6'>
+                                  <label
+                                    htmlFor='task-name'
+                                    className='ti-form-label'
+                                  >
+                                    State <span className='text-danger'>*</span>
+                                  </label>
+                                  <select
+                                    className={`form-select ${
+                                      SelectedValueState === ''
+                                        ? 'deselect-main'
+                                        : ''
+                                    }`}
+                                    onChange={handelchangeState}
+                                    value={SelectedValueState}
+                                  >
+                                    <option value='' hidden>
+                                      Select State
+                                    </option>
+                                    {FetchdropDState &&
+                                      FetchdropDState.map((state) => (
+                                        <option key={state.id} value={state.id}>
+                                          {state.name}
+                                        </option>
+                                      ))}
+                                  </select>
 
-                                    {stateListError && (
-                                      <div className='text-danger'>
-                                        {stateListError}
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className='xl:col-span-6 col-span-6'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      City{' '}
-                                      <span className='text-danger'>*</span>
-                                    </label>
-                                    <input
-                                      type='text'
-                                      className='form-control w-full'
-                                      id='task-name'
-                                      placeholder='Enter City'
-                                      onChange={handelAddSiteCity}
-                                      value={City}
-                                      maxLength={100}
-                                    />
-                                    {CityError && (
-                                      <div className='text-danger'>
-                                        {CityError}
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className='xl:col-span-6 col-span-6'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      Zip Code{' '}
-                                      <span className='text-danger'>*</span>
-                                    </label>
-                                    <input
-                                      type='text'
-                                      className='form-control w-full'
-                                      id='task-name'
-                                      placeholder='Enter Zip Code'
-                                      onChange={handelAddSitePincode}
-                                      value={Pincode}
-                                      minLength={5}
-                                      maxLength={10}
-                                    />
-                                    {PincodeError && (
-                                      <div className='text-danger'>
-                                        {PincodeError}
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className='xl:col-span-12 col-span-12'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      Description
-                                    </label>
-                                    <textarea
-                                      className='form-control w-full'
-                                      style={{ resize: 'none' }}
-                                      id='task-name'
-                                      placeholder='Enter Description'
-                                      onChange={handleMessageChange}
-                                      value={message}
-                                    />
-                                    {messageError && (
-                                      <div className='text-danger'>
-                                        {messageError}
-                                      </div>
-                                    )}
-                                  </div>
+                                  {stateListError && (
+                                    <div className='text-danger'>
+                                      {stateListError}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className='xl:col-span-6 col-span-6'>
+                                  <label
+                                    htmlFor='task-name'
+                                    className='ti-form-label'
+                                  >
+                                    City <span className='text-danger'>*</span>
+                                  </label>
+                                  <input
+                                    type='text'
+                                    className='form-control w-full'
+                                    id='task-name'
+                                    placeholder='Enter City'
+                                    onChange={handelAddSiteCity}
+                                    value={City}
+                                    maxLength={100}
+                                  />
+                                  {CityError && (
+                                    <div className='text-danger'>
+                                      {CityError}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className='xl:col-span-6 col-span-6'>
+                                  <label
+                                    htmlFor='task-name'
+                                    className='ti-form-label'
+                                  >
+                                    Zip Code{' '}
+                                    <span className='text-danger'>*</span>
+                                  </label>
+                                  <input
+                                    type='text'
+                                    className='form-control w-full'
+                                    id='task-name'
+                                    placeholder='Enter Zip Code'
+                                    onChange={handelAddSitePincode}
+                                    value={Pincode}
+                                    minLength={5}
+                                    maxLength={10}
+                                  />
+                                  {PincodeError && (
+                                    <div className='text-danger'>
+                                      {PincodeError}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className='xl:col-span-12 col-span-12'>
+                                  <label
+                                    htmlFor='task-name'
+                                    className='ti-form-label'
+                                  >
+                                    Description
+                                  </label>
+                                  <textarea
+                                    className='form-control w-full'
+                                    style={{ resize: 'none' }}
+                                    id='task-name'
+                                    placeholder='Enter Description'
+                                    onChange={handleMessageChange}
+                                    value={message}
+                                  />
+                                  {messageError && (
+                                    <div className='text-danger'>
+                                      {messageError}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
-                              <div className='ti-modal-footer'>
-                                <button
-                                  type='button'
-                                  className='hs-dropdown-toggle ti-btn  ti-btn-light align-middle'
-                                  data-hs-overlay='#todo-compose'
-                                  ref={closeModalButtonRef}
-                                  onClick={handelclosemodel}
-                                >
-                                  Cancel
-                                </button>
-                                <button
-                                  type='button'
-                                  className='ti-btn bg-primary text-white !font-medium'
-                                  onClick={handleSubmit}
-                                >
-                                  {changeFlage === true
-                                    ? 'Add Site'
-                                    : 'Edit Site'}
-                                </button>
-                              </div>
+                            </div>
+                            <div className='ti-modal-footer'>
+                              <button
+                                type='button'
+                                className='hs-dropdown-toggle ti-btn  ti-btn-light align-middle'
+                                data-hs-overlay='#todo-compose'
+                                ref={closeModalButtonRef}
+                                onClick={handelclosemodel}
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                type='button'
+                                className='ti-btn bg-primary text-white !font-medium'
+                                onClick={handleSubmit}
+                              >
+                                {changeFlage === true
+                                  ? 'Add Site'
+                                  : 'Edit Site'}
+                              </button>
                             </div>
                           </div>
                         </div>
                       </div>
-                    ) : (
-                      <div></div>
-                    )}
+                    </div>
+
                     <div className='p-4 border-b border-dashed dark:border-defaultborder/10'>
                       <div className='input-group'>
                         <input

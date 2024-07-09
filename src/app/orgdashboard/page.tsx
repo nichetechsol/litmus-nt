@@ -208,15 +208,17 @@ const OrgDashboard = () => {
       if (org_id) {
         const data: any = await orgUserList(org_id, start, end, search);
 
-        if (data) {
+        if (data.data) {
           setOrgUserData(data.data.userList);
           setTotalItemsCount(data.data?.totalCount); // Set total items count for pagination
           setLoading(false);
         } else {
+          toast.error(data.message, { autoClose: 3000 });
           setLoading(false);
         }
       }
     } catch (error: any) {
+      toast.error(error.message, { autoClose: 3000 });
       setLoading(false);
     }
   };
@@ -232,16 +234,16 @@ const OrgDashboard = () => {
         if (org_id) {
           const data: any = await orgEntitlementList(org_id, start, end);
 
-          if (data) {
+          if (data.data) {
             setEntitlementListData(data?.data?.entitlements);
-            setTotalItemsCount2(data.data?.totalCount); // Set total items count for pagination
+            setTotalItemsCount2(data.data?.totalCount);
             // setLoading(false);
           } else {
-            // setLoading(false);
+            toast.error(data.message, { autoClose: 3000 });
           }
         }
       } catch (error: any) {
-        // setLoading(false);
+        toast.error(error.message, { autoClose: 3000 });
       }
     };
 
@@ -256,11 +258,11 @@ const OrgDashboard = () => {
           const sets = { org_id: org_id };
           const data: any = await getLocationOfSites(sets);
 
-          if (data) {
+          if (data.data) {
             setLocationOfSites(data.data);
             // setLoading(false);
           } else {
-            //
+            toast.error(data.message, { autoClose: 3000 });
           }
         }
       } catch (error: any) {
@@ -291,12 +293,14 @@ const OrgDashboard = () => {
 
         const result1: any = await getUserRole(); // Replace with your actual API call
 
-        if (result1 && result1.data) {
+        if (result1.data) {
           setRoles(result1.data);
           // setLoading(false);
+        } else {
+          toast.error(result1.message, { autoClose: 3000 });
         }
       } catch (error: any) {
-        //
+        toast.error(error.message, { autoClose: 3000 });
       }
     };
 
@@ -528,7 +532,6 @@ const OrgDashboard = () => {
       } catch (error) {
         closeModal();
         setLoading(false);
-        //
       }
     } else {
       closeModal();
@@ -547,13 +550,13 @@ const OrgDashboard = () => {
     try {
       const data: any = await getOrgUserRole(user_id, org_id);
 
-      if (data) {
+      if (data.data) {
         setuserrole2(data.data.id);
       } else {
-        //
+        toast.error(data.message, { autoClose: 3000 });
       }
     } catch (error: any) {
-      //
+      toast.error(error.message, { autoClose: 3000 });
     }
   };
   useEffect(() => {
