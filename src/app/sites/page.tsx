@@ -652,6 +652,8 @@ const Page: React.FC = () => {
           user_id: user_id,
           token: onlyToken,
           siteId: editsiteid,
+          userName: userEmail,
+          org_name: orgName,
         };
         try {
           setLoading(true);

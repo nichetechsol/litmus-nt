@@ -639,6 +639,8 @@ const Page = () => {
         org_id: orgidForupdatetion,
         domain_id: id.domainid,
         user_id: user_id,
+        name: organizationName,
+        userName: email,
       };
 
       const result = await deleteDomains(data);

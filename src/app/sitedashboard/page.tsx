@@ -477,6 +477,11 @@ const Page = () => {
             user_id: userNameId,
             site_id: site_id,
             modifying_user_id: user_id,
+            token: onlyToken,
+            userName: userEmail,
+            siteName: site_name,
+            orgName: orgName,
+            user_role_id: userrole3,
           };
           result = await modifyUserOfSites(userData);
           if (result.errorCode == 0) {

@@ -466,8 +466,30 @@ async function updateOrganization(data: {
   domain: string[];
   org_id: any;
   user_id: any;
+  details: any;
+  userName: any;
+  orgName: any;
+  oldOrgName: any;
 }): Promise<Result<any>> {
   try {
+    const userName: any = data.userName;
+    const orgName: any = data.name;
+    const { data: orgDetails, error: fetchOrgError } = await supabase
+      .from('org_details')
+      .select('name,description')
+      .eq('id', data.org_id)
+      .single();
+
+    if (fetchOrgError) {
+      return {
+        errorCode: 1,
+        message: 'Error fetching current organization details',
+        data: null,
+      };
+    }
+
+    const oldOrgName = orgDetails.name; // Store the old organization name
+    const oldDescription = orgDetails.description; // Store the old description
     // Check if the new name already exists in the database, excluding the current org_id
     const { data: existingOrg, error: fetchError } = await supabase
       .from('org_details')
@@ -513,6 +535,7 @@ async function updateOrganization(data: {
     }
 
     const domainInsertResults = [];
+    let domainAdded = false;
 
     // Process each domain
     for (const domain of data.domain) {
@@ -553,9 +576,20 @@ async function updateOrganization(data: {
         }
 
         domainId = insertDomain[0].id;
+        // if (insertDomain) {
+        //   // Log activity for adding domains
+        //   await logActivity({
+        //     org_id: data.org_id,
+        //     user_id: data.user_id,
+        //     activity_type: 'add_domain',
+        //     details: `${userName} added the domain ${domain} to the organization ${orgName}.`
+        //     // {{User Name}} added the domain {{Domain Name}} within the organization {{Org Name}}
+        //   });
+        // }
       }
 
       domainInsertResults.push({ success: true, data: domainId });
+      domainAdded = true;
 
       // Check if the org_domain pair exists
       const { data: orgDomainPair, error: orgDomainCheckError } = await supabase
@@ -589,13 +623,34 @@ async function updateOrganization(data: {
           });
           continue;
         }
+        if (insertOrgDomain) {
+          await logActivity({
+            org_id: data.org_id,
+            user_id: data.user_id,
+            activity_type: 'add_domain',
+            details: `${userName} added the domain ${domain} to the organization ${orgName}.`,
+            // {{User Name}} added the domain {{Domain Name}} within the organization {{Org Name}}
+          });
+        }
       }
     }
-    await logActivity({
-      org_id: data.org_id,
-      user_id: data.user_id,
-      activity_type: 'update_org',
-    });
+    if (oldDescription !== data.description) {
+      // Log activity for updating the organization description
+      await logActivity({
+        org_id: data.org_id,
+        user_id: data.user_id,
+        activity_type: 'edit_org_description',
+        details: `${userName} changed the organization description within the organization ${orgName}.`,
+      });
+    }
+    if (oldOrgName !== orgName) {
+      await logActivity({
+        org_id: data.org_id,
+        user_id: data.user_id,
+        activity_type: 'update_org',
+        details: ` ${userName} changed the organization name from ${oldOrgName} to ${orgName}.`,
+      });
+    }
     return {
       errorCode: 0,
       message: 'Organization details updated successfully.',
@@ -834,10 +889,13 @@ async function deleteDomains(data: any): Promise<Result<any>> {
         };
       }
     }
+    const userName = data.userName;
+    const orgName = data.name;
     await logActivity({
       user_id: data.user_id,
       org_id: data.org_id,
       activity_type: 'remove_domain',
+      details: ` ${userName} removed the domain ${domainName} within the organization ${orgName}`,
     });
     return { errorCode: 0, message: 'Domain deleted successfully', data: null };
   } catch (error) {

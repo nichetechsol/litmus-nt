@@ -497,7 +497,20 @@ async function updateSite(updateData: any): Promise<Result<any>> {
         data: null,
       };
     }
+    // Fetch current site details
+    const { data: currentSite, error: fetchCurrentError } = await supabase
+      .from('sites_detail')
+      .select('*')
+      .eq('id', updateData.siteId)
+      .single();
 
+    if (fetchCurrentError) {
+      return {
+        errorCode: 1,
+        message: 'Error fetching current site details',
+        data: null,
+      };
+    }
     // Check if the new name already exists in the database, excluding the current site ID
     const { data: existingSites, error: fetchError } = await supabase
       .from('sites_detail')
@@ -555,12 +568,75 @@ async function updateSite(updateData: any): Promise<Result<any>> {
         data: null,
       };
     }
-    await logActivity({
-      org_id: updateData.org_id,
-      site_id: updateData.siteId,
-      user_id: updateData.user_id,
-      activity_type: 'update_site',
-    });
+    // Log each change individually
+    const logPromises = [];
+
+    if (currentSite.name !== updateData.name) {
+      const activityType = 'edit_site_name';
+      const activityDetails = `${updateData.userName} changed the site name from ${currentSite.name} to ${updateData.name} within the organization ${updateData.orgName}.`;
+      logPromises.push(
+        logActivity({
+          org_id: updateData.org_id,
+          site_id: updateData.siteId,
+          user_id: updateData.user_id,
+          activity_type: activityType,
+          details: activityDetails,
+        }),
+      );
+    }
+
+    if (currentSite.type_id !== updateData.type_id) {
+      const activityType = 'edit_site_type';
+      const activityDetails = `${updateData.userName} changed the site type from ${currentSite.type_id} to ${updateData.type_id} within the site ${currentSite.name}.`;
+      logPromises.push(
+        logActivity({
+          org_id: updateData.org_id,
+          site_id: updateData.siteId,
+          user_id: updateData.user_id,
+          activity_type: activityType,
+          details: activityDetails,
+        }),
+      );
+    }
+
+    if (currentSite.about_site !== updateData.about_site) {
+      const activityType = 'edit_site_description';
+      const activityDetails = `${updateData.userName} changed the site description within the organization ${updateData.orgName}.`;
+      logPromises.push(
+        logActivity({
+          org_id: updateData.org_id,
+          site_id: updateData.siteId,
+          user_id: updateData.user_id,
+          activity_type: activityType,
+          details: activityDetails,
+        }),
+      );
+    }
+
+    if (
+      currentSite.address1 !== updateData.address1 ||
+      currentSite.address2 !== updateData.address2 ||
+      currentSite.city !== updateData.city ||
+      currentSite.pin_code !== updateData.pin_code ||
+      currentSite.status !== updateData.status ||
+      currentSite.country_id !== updateData.country_id ||
+      currentSite.state_id !== updateData.state_id
+    ) {
+      const activityType = 'update_site';
+      const activityDetails = `${updateData.userName} changed the site details within the organization ${updateData.orgName}.`;
+      logPromises.push(
+        logActivity({
+          org_id: updateData.org_id,
+          site_id: updateData.siteId,
+          user_id: updateData.user_id,
+          activity_type: activityType,
+          details: activityDetails,
+        }),
+      );
+    }
+
+    // Wait for all log activities to complete
+    await Promise.all(logPromises);
     // Return success response
     return {
       errorCode: 0,

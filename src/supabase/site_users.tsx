@@ -282,7 +282,7 @@ async function modifyUserOfSites(
     const { data: modifyingUserRoleData, error: modifyingUserRoleError } =
       await supabase
         .from('site_users')
-        .select('role_id')
+        .select(`role_id,user_role(name)`)
         .eq('user_id', UserData.modifying_user_id)
         .eq('site_id', UserData.site_id);
 
@@ -357,8 +357,21 @@ async function modifyUserOfSites(
       const userName: any = UserData.userName;
       const orgName: any = UserData.orgName;
       const siteName: any = UserData.siteName;
-      const role: any = targetUserRoleData[0].user_role;
-      const roleName: any = role.name;
+      // const role: any = modifyingUserRoleData[0].user_role;
+      // const role: any = targetUserRoleData[0].user_role;
+      // const role: any = UserData.user_role_id;
+      const role: any = UserData.role_id;
+      let roleName: any;
+      if (role == 1) {
+        roleName = 'Owner';
+      }
+      if (role == 2) {
+        roleName = 'Admin';
+      }
+      if (role == 3) {
+        roleName = 'Member';
+      }
+
       const email_data = await fetchEmailData(action);
       if (email_data.errorCode === 0) {
         const target_user = UserData.email;

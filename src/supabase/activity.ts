@@ -9,7 +9,7 @@ interface LogActivityParams {
   target_user_id?: any;
   target_user_role?: any;
   activity_type?: string;
-  details?: { filename: string };
+  details?: any;
 }
 
 interface GetOrgActivitiesParams {
@@ -35,6 +35,11 @@ const valid_activity_types: string[] = [
   'update_site',
   'update_org',
   'remove_domain',
+  'add_domain',
+  'edit_org_description',
+  'edit_site_description',
+  'edit_site_type',
+  'edit_site_name',
 ];
 
 const logActivity = async ({
