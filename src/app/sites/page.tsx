@@ -881,7 +881,7 @@ const Page: React.FC = () => {
                           className='hs-dropdown-toggle py-2  px-3 ti-btn bg-primary text-white !font-medium w-full !mb-0'
                           data-hs-overlay='#todo-compose'
                           onClick={Addsite}
-                        // onClick={() => handleCall()}
+                          // onClick={() => handleCall()}
                         >
                           <i className='ri-add-circle-line !text-[1rem]'></i>Add
                           Site
@@ -948,10 +948,11 @@ const Page: React.FC = () => {
                                     Type <span className='text-danger'>*</span>
                                   </label>
                                   <select
-                                    className={`form-select ${SelectedValueDropdown === ''
-                                      ? 'deselect-main'
-                                      : ''
-                                      }`}
+                                    className={`form-select ${
+                                      SelectedValueDropdown === ''
+                                        ? 'deselect-main'
+                                        : ''
+                                    }`}
                                     onChange={handelchangeTypeDropDown}
                                     value={SelectedValueDropdown}
                                   >
@@ -1025,10 +1026,11 @@ const Page: React.FC = () => {
                                     <span className='text-danger'>*</span>
                                   </label>
                                   <select
-                                    className={`form-select ${SelectedValueCounrty === ''
-                                      ? 'deselect-main'
-                                      : ''
-                                      }`}
+                                    className={`form-select ${
+                                      SelectedValueCounrty === ''
+                                        ? 'deselect-main'
+                                        : ''
+                                    }`}
                                     onChange={handelchangeCountry}
                                     value={SelectedValueCounrty}
                                   >
@@ -1060,10 +1062,11 @@ const Page: React.FC = () => {
                                     State <span className='text-danger'>*</span>
                                   </label>
                                   <select
-                                    className={`form-select ${SelectedValueState === ''
-                                      ? 'deselect-main'
-                                      : ''
-                                      }`}
+                                    className={`form-select ${
+                                      SelectedValueState === ''
+                                        ? 'deselect-main'
+                                        : ''
+                                    }`}
                                     onChange={handelchangeState}
                                     value={SelectedValueState}
                                   >
@@ -1273,12 +1276,12 @@ const Page: React.FC = () => {
                     >
                       {SitesList && SitesList.length > 0
                         ? SitesList.map((SingleSite) => (
-                          <div
-                            className='xl:col-span-6 col-span-12 task-card'
-                            key={SingleSite?.site?.id}
-                          >
-                            <div className='box task-pending-card '>
-                              {/* {SingleSite?.user_role_id === 1 ||
+                            <div
+                              className='xl:col-span-6 col-span-12 task-card'
+                              key={SingleSite?.site?.id}
+                            >
+                              <div className='box task-pending-card '>
+                                {/* {SingleSite?.user_role_id === 1 ||
                                 SingleSite?.user_role_id === 2 ? (
                                   // <div className='hs-dropdown ti-dropdown'>
                                   //   <Link
@@ -1324,174 +1327,174 @@ const Page: React.FC = () => {
                                   ''
                                 )} */}
 
-                              <div
-                                className='box-body'
-                                style={{ cursor: 'pointer' }}
-                                onClick={() => {
-                                  const encryptedsiteid = encryptData(
-                                    SingleSite.site.id,
-                                  );
-                                  const encryptedsitename = encryptData(
-                                    SingleSite.site.name,
-                                  );
-                                  const encryptedsiteOwnerName = encryptData(
-                                    SingleSite.ownerNames,
-                                  );
-                                  localStorage.setItem(
-                                    'site_id',
-                                    encryptedsiteid,
-                                  );
-                                  localStorage.setItem(
-                                    'site_name',
-                                    encryptedsitename,
-                                  );
-                                  localStorage.setItem(
-                                    'site_owner_name',
-                                    encryptedsiteOwnerName,
-                                  );
-                                  navigate.push('/sitedashboard');
-                                }}
-                              >
-                                <div className='flex justify-between items-center  gap-2'>
-                                  <div className='flex items-center'>
-                                    <div className='avatar avatar-xl avatar-rounded '>
-                                      {' '}
-                                      <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
-                                        <InitialsComponent
-                                          name={
-                                            SingleSite?.site
-                                              ? SingleSite?.site?.name
-                                              : ''
-                                          }
-                                        />
-                                      </span>
+                                <div
+                                  className='box-body'
+                                  style={{ cursor: 'pointer' }}
+                                  onClick={() => {
+                                    const encryptedsiteid = encryptData(
+                                      SingleSite.site.id,
+                                    );
+                                    const encryptedsitename = encryptData(
+                                      SingleSite.site.name,
+                                    );
+                                    const encryptedsiteOwnerName = encryptData(
+                                      SingleSite.ownerNames,
+                                    );
+                                    localStorage.setItem(
+                                      'site_id',
+                                      encryptedsiteid,
+                                    );
+                                    localStorage.setItem(
+                                      'site_name',
+                                      encryptedsitename,
+                                    );
+                                    localStorage.setItem(
+                                      'site_owner_name',
+                                      encryptedsiteOwnerName,
+                                    );
+                                    navigate.push('/sitedashboard');
+                                  }}
+                                >
+                                  <div className='flex justify-between items-center  gap-2'>
+                                    <div className='flex items-center'>
+                                      <div className='avatar avatar-xl avatar-rounded '>
+                                        {' '}
+                                        <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
+                                          <InitialsComponent
+                                            name={
+                                              SingleSite?.site
+                                                ? SingleSite?.site?.name
+                                                : ''
+                                            }
+                                          />
+                                        </span>
+                                      </div>
+                                      <div className='hs-tooltip ti-main-tooltip '>
+                                        <h1
+                                          className='h1-new hs-tooltip-toggle w-100'
+                                          style={{
+                                            fontSize: '1.1rem',
+                                            fontWeight: 'bold',
+                                            marginBottom: '0.5rem',
+                                          }}
+                                        >
+                                          <Link
+                                            aria-label='anchor'
+                                            href='#!'
+                                          ></Link>
+                                          {SingleSite?.site
+                                            ? SingleSite?.site?.name
+                                            : ''}
+                                          <span
+                                            className='hs-tooltip-content  ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm '
+                                            role='tooltip'
+                                          >
+                                            new toolti
+                                          </span>
+                                        </h1>
+                                      </div>
                                     </div>
-                                    <div className='hs-tooltip ti-main-tooltip '>
-                                      <h1 className='h1-new hs-tooltip-toggle w-100'
-                                        style={{
-                                          fontSize: '1.1rem',
-                                          fontWeight: 'bold',
-                                          marginBottom: '0.5rem',
-
-
-                                        }}
-                                      >
+                                    {SingleSite?.user_role_id === 1 ||
+                                    SingleSite?.user_role_id === 2 ? (
+                                      <div className='hs-dropdown ti-dropdown'>
                                         <Link
                                           aria-label='anchor'
                                           href='#!'
-                                        ></Link>
-                                        {SingleSite?.site
-                                          ? SingleSite?.site?.name
-                                          : ''}
-                                        <span
-                                          className="hs-tooltip-content  ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm "
-                                          role="tooltip">
-                                          new toolti
-                                        </span>
-                                      </h1>
-                                    </div>
+                                          className='flex items-center justify-center w-[1.75rem] h-[1.75rem]  !text-[0.8rem] !py-1 !px-2 rounded-sm bg-light border-light shadow-none !font-medium'
+                                          aria-expanded='false'
+                                          onClick={(e) => {
+                                            e.preventDefault(); // Prevent default navigation action
+                                            e.stopPropagation(); // Prevent click from bubbling up
+                                          }}
+                                        >
+                                          <i className='ri-more-2-line text-[0.8rem]'></i>
+                                        </Link>
+                                        <ul className='hs-dropdown-menu ti-dropdown-menu hidden'>
+                                          <li>
+                                            <button
+                                              className='ti-dropdown-item w-full text-start !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
+                                              // href='#!'
+                                              style={{ cursor: 'pointer' }}
+                                              aria-label='anchor'
+                                              data-bs-target='#formmodal'
+                                              data-bs-toggle='modal'
+                                              data-bs-whatever='@fat'
+                                              data-hs-overlay='#todo-compose'
+                                              onClick={(e) => {
+                                                e.stopPropagation(); // Prevent card click
+                                                // setModalOpen(true);
+                                                handeledit(SingleSite);
+                                              }}
+                                            >
+                                              Edit
+                                            </button>
+                                          </li>
+                                          <li>
+                                            <button
+                                              className='ti-dropdown-item w-full text-start !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
+                                              // href='#!'
+                                              style={{ cursor: 'pointer' }}
+                                              aria-label='anchor'
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handelDelete(SingleSite);
+                                              }}
+                                            >
+                                              Delete Request
+                                            </button>
+                                          </li>
+                                        </ul>
+                                      </div>
+                                    ) : (
+                                      ''
+                                    )}
                                   </div>
-                                  {SingleSite?.user_role_id === 1 ||
-                                    SingleSite?.user_role_id === 2 ? (
-                                    <div className='hs-dropdown ti-dropdown'>
-                                      <Link
-                                        aria-label='anchor'
-                                        href='#!'
-                                        className='flex items-center justify-center w-[1.75rem] h-[1.75rem]  !text-[0.8rem] !py-1 !px-2 rounded-sm bg-light border-light shadow-none !font-medium'
-                                        aria-expanded='false'
-                                        onClick={(e) => {
-                                          e.preventDefault(); // Prevent default navigation action
-                                          e.stopPropagation(); // Prevent click from bubbling up
-                                        }}
-                                      >
-                                        <i className='ri-more-2-line text-[0.8rem]'></i>
-                                      </Link>
-                                      <ul className='hs-dropdown-menu ti-dropdown-menu hidden'>
-                                        <li>
-                                          <button
-                                            className='ti-dropdown-item w-full text-start !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
-                                            // href='#!'
-                                            style={{ cursor: 'pointer' }}
-                                            aria-label='anchor'
-                                            data-bs-target='#formmodal'
-                                            data-bs-toggle='modal'
-                                            data-bs-whatever='@fat'
-                                            data-hs-overlay='#todo-compose'
-                                            onClick={(e) => {
-                                              e.stopPropagation(); // Prevent card click
-                                              // setModalOpen(true);
-                                              handeledit(SingleSite);
-                                            }}
-                                          >
-                                            Edit
-                                          </button>
+                                  <div className=''>
+                                    <div>
+                                      <ul className='list-group list-group-flush'>
+                                        <li className='flex list-group-item fw-semibold'>
+                                          <i className='bx bx-map align-middle me-2 text-muted'></i>
+                                          <b>Address </b>
+                                          <p className='ms-1 over-text text-muted fw-normal d-inline-block'>
+                                            {SingleSite?.site && (
+                                              <>
+                                                {SingleSite?.site?.address1}
+                                                {SingleSite?.site?.address2
+                                                  ? `, ${SingleSite?.site?.address2}`
+                                                  : ''}
+                                                {`, ${SingleSite?.site?.city}`}
+                                                {`, ${SingleSite?.state}`}
+                                                {`, ${SingleSite?.country}`}
+                                              </>
+                                            )}
+                                          </p>
                                         </li>
-                                        <li>
-                                          <button
-                                            className='ti-dropdown-item w-full text-start !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
-                                            // href='#!'
-                                            style={{ cursor: 'pointer' }}
-                                            aria-label='anchor'
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              handelDelete(SingleSite);
-                                            }}
-                                          >
-                                            Delete Request
-                                          </button>
+                                        <li className='list-group-item fw-semibold'>
+                                          <i className='bx bx-briefcase align-middle me-2 text-muted'></i>
+                                          <b>Owner</b>
+                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                            {/* {SingleSite?.ownerNames?.join(', ')} */}
+                                            {SingleSite?.ownerNames?.length
+                                              ? SingleSite.ownerNames.join(', ')
+                                              : '--'}
+                                          </span>
+                                        </li>
+                                        <li className='list-group-item fw-semibold'>
+                                          <i className='bx bx-user align-middle me-2 text-muted'></i>
+                                          <b>Number of users</b>
+                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                            {SingleSite?.users?.length}
+                                          </span>
+                                        </li>
+                                        <li className='list-group-item fw-semibold'>
+                                          <i className='bx bx-user align-middle me-2 text-muted'></i>
+                                          <b>Type</b>
+                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                            {SingleSite?.type_name}
+                                          </span>
                                         </li>
                                       </ul>
-                                    </div>
-                                  ) : (
-                                    ''
-                                  )}
-                                </div>
-                                <div className=''>
-                                  <div>
-                                    <ul className='list-group list-group-flush'>
-                                      <li className='flex list-group-item fw-semibold'>
-                                        <i className='bx bx-map align-middle me-2 text-muted'></i>
-                                        <b>Address </b>
-                                        <p className='ms-1 over-text text-muted fw-normal d-inline-block'>
-                                          {SingleSite?.site && (
-                                            <>
-                                              {SingleSite?.site?.address1}
-                                              {SingleSite?.site?.address2
-                                                ? `, ${SingleSite?.site?.address2}`
-                                                : ''}
-                                              {`, ${SingleSite?.site?.city}`}
-                                              {`, ${SingleSite?.state}`}
-                                              {`, ${SingleSite?.country}`}
-                                            </>
-                                          )}
-                                        </p>
-                                      </li>
-                                      <li className='list-group-item fw-semibold'>
-                                        <i className='bx bx-briefcase align-middle me-2 text-muted'></i>
-                                        <b>Owner</b>
-                                        <span className='ms-1 text-muted fw-normal d-inline-block'>
-                                          {/* {SingleSite?.ownerNames?.join(', ')} */}
-                                          {SingleSite?.ownerNames?.length
-                                            ? SingleSite.ownerNames.join(', ')
-                                            : '--'}
-                                        </span>
-                                      </li>
-                                      <li className='list-group-item fw-semibold'>
-                                        <i className='bx bx-user align-middle me-2 text-muted'></i>
-                                        <b>Number of users</b>
-                                        <span className='ms-1 text-muted fw-normal d-inline-block'>
-                                          {SingleSite?.users?.length}
-                                        </span>
-                                      </li>
-                                      <li className='list-group-item fw-semibold'>
-                                        <i className='bx bx-user align-middle me-2 text-muted'></i>
-                                        <b>Type</b>
-                                        <span className='ms-1 text-muted fw-normal d-inline-block'>
-                                          {SingleSite?.type_name}
-                                        </span>
-                                      </li>
-                                    </ul>
-                                    {/* {SingleSite?.user_role_id === 1 ||
+                                      {/* {SingleSite?.user_role_id === 1 ||
                                       SingleSite?.user_role_id === 2 ? (
                                         <div className='flex justify-center mt-3'>
                                           <div
@@ -1527,13 +1530,13 @@ const Page: React.FC = () => {
                                       ) : (
                                         ''
                                       )} */}
+                                    </div>
                                   </div>
                                 </div>
                               </div>
+                              {/* )) */}
                             </div>
-                            {/* )) */}
-                          </div>
-                        ))
+                          ))
                         : null}
                     </div>
                   </div>

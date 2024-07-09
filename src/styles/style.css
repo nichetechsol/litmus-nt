@@ -18468,7 +18468,7 @@ caption {
 /* End Table Styles */
 /* Start Tooltip Styles */
 .ti-main-tooltip {
-  @apply inline-block relative ms-1;
+  @apply inline-block relative;
 }
 .ti-main-tooltip .ti-main-tooltip-toggle {
   @apply block text-center;
@@ -20274,13 +20274,11 @@ body.no-scroll1 {
 .form-select option {
   color: #000;
 }
-.h1-new{ 
-    
+.h1-new {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
   word-break: break-all;
   padding: 0px 10px 0px 0px;
-  
 }

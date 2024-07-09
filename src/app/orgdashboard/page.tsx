@@ -1184,7 +1184,7 @@ const OrgDashboard = () => {
                                             <div className='flex items-center'>
                                               {/* <img src={idx.src} alt="" className="avatar avatar-md p-1 bg-light avatar-rounded me-2 !mb-0" /> */}
                                               <div>
-                                                <p className='font-semibold mb-0 text-wrap'>
+                                                <p className='font-semibold mb-0 text-wrap p-new'>
                                                   {activity?.activity_type ===
                                                   'create_org'
                                                     ? `${
