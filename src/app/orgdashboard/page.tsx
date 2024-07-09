@@ -161,8 +161,10 @@ const OrgDashboard = () => {
       if (org_id) {
         const data: any = await orgDashboardCounts(org_id);
         // setLoading(false);
-        if (data) {
+        if (data.data) {
           setOrgData(data.data);
+        } else {
+          toast.error(data.message, { autoClose: 3000 });
         }
       }
     } catch (error: any) {

@@ -175,9 +175,11 @@ const Page = () => {
               setLoading(false);
             }
           }
+        } else {
+          toast.error(data.message, { autoClose: 3000 });
         }
-      } catch (error: unknown) {
-        /* empty */
+      } catch (error: any) {
+        toast.error(error, { autoClose: 3000 });
       }
     };
 
@@ -207,14 +209,18 @@ const Page = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const data: any = await fetchOrganizationAndSiteDetails(user_id);
+      if (user_id) {
+        const data: any = await fetchOrganizationAndSiteDetails(user_id);
 
-      if (data) {
-        setOrgsWithSites(data);
+        if (data.errorCode === 0) {
+          setOrgsWithSites(data.data);
+        } else {
+          toast.error(data.message, { autoClose: 3000 });
+        }
       }
       setLoading(false);
     } catch (error: any) {
-      toast.error('Error Fetching Data!!', { autoClose: 3000 });
+      toast.error('Error Fetching Data!', { autoClose: 3000 });
     }
   };
 
@@ -233,6 +239,7 @@ const Page = () => {
         setSidebarOrgs({ data: result1.data });
       } else if (result1.errorCode === 1) {
         setSidebarOrgs({ data: [] });
+        toast.error(result1.message, { autoClose: 3000 });
       } else {
         if (searchTerm) {
           setSidebarOrgs({
@@ -348,8 +355,10 @@ const Page = () => {
       try {
         const data = await fetchOrganizationTypes();
 
-        if (data && data.data) {
+        if (data.data) {
           setTypeDropdown(data.data);
+        } else {
+          toast.error(data.message, { autoClose: 3000 });
         }
       } catch (error: any) {
         toast.error('Error Fetching Type..', { autoClose: 3000 });
@@ -429,7 +438,7 @@ const Page = () => {
             await refreshToken();
             const result = await addOrganization(data);
 
-            if (result.data != null && result.errorCode == 0) {
+            if (result.errorCode == 0) {
               setLoading(false);
               toast.success('Organization added successfully', {
                 autoClose: 3000,
@@ -666,7 +675,11 @@ const Page = () => {
   const handeledit = async (org: any) => {
     openModal();
     setLoading(true);
-    const EditView = await viewOrganization(org.org_id);
+    const EditView: any = await viewOrganization(org.org_id);
+    if (EditView.errorcode === 1) {
+      toast.error(EditView.message, { autoClose: 3000 });
+      return;
+    }
     setorgidForupdatetion(org.org_id);
     setOrganizationName(EditView?.data?.name);
     const domains = EditView?.data?.domains.map((domain: any) => {

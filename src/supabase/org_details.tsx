@@ -23,7 +23,7 @@ interface UserRole {
 // Define return types for the functions
 interface Result<T> {
   errorCode: number;
-  message?: string;
+  message?: any;
   data: T | null;
 }
 
@@ -92,7 +92,7 @@ interface OrganizationWithSiteCount {
 // }
 async function fetchOrganizationAndSiteDetails(
   user_id: any | null,
-): Promise<OrganizationWithSiteCount[] | null> {
+): Promise<Result<OrganizationWithSiteCount[] | null>> {
   try {
     // Fetch organization and site details in one query
     const { data, error } = await supabase
@@ -116,7 +116,11 @@ async function fetchOrganizationAndSiteDetails(
       .order('created_at', { ascending: false });
 
     if (error) {
-      throw error;
+      return {
+        errorCode: 1,
+        data: null,
+        message: 'Error fetching Organization details',
+      };
     }
 
     // Transform the data to get the required structure
@@ -133,9 +137,14 @@ async function fetchOrganizationAndSiteDetails(
       };
     });
 
-    return orgsWithSitesCount;
+    // return orgsWithSitesCount;
+    return { errorCode: 0, data: orgsWithSitesCount };
   } catch (error) {
-    return null;
+    return {
+      errorCode: 1,
+      data: null,
+      message: 'Error fetching Organization details',
+    };
   }
 }
 
@@ -151,7 +160,7 @@ async function organizationSidebarList(
       .eq('user_id', user_id);
 
     if (userOrgError) {
-      throw userOrgError;
+      return { errorCode: 1, data: null, message: 'Error fetching details' };
     }
 
     // Extract the org_ids from userOrgs
@@ -167,7 +176,7 @@ async function organizationSidebarList(
         .ilike('name', `%${search}%`);
 
       if (error) {
-        return { errorCode: 1, data: null };
+        return { errorCode: 1, data: null, message: 'Error fetching details' };
       } else {
         orgDetails = data ?? [];
       }
@@ -175,7 +184,7 @@ async function organizationSidebarList(
 
     return { errorCode: 0, data: orgDetails };
   } catch (error) {
-    return { errorCode: 1, data: null };
+    return { errorCode: 1, data: null, message: 'Error fetching details' };
   }
 }
 
@@ -207,12 +216,12 @@ async function fetchOrganizationTypes(): Promise<Result<any[]>> {
       .select('*');
 
     if (error) {
-      return { errorCode: 1, data: null };
+      return { errorCode: 1, data: null, message: error.message };
     } else {
       return { errorCode: 0, data: orgTypes };
     }
   } catch (error) {
-    return { errorCode: 1, data: null };
+    return { errorCode: 1, data: null, message: error };
   }
 }
 
@@ -617,7 +626,7 @@ async function viewOrganization(org_id: any): Promise<Result<any>> {
     const { data: orgDomainIds, error: domainIdsError } = orgDomainIdsResult;
 
     if (orgError || !orgDetails || domainIdsError || !orgDomainIds) {
-      return { errorCode: 1, data: null };
+      return { errorCode: 1, data: null, message: 'Error fetching Details' };
     }
 
     // Fetch organization type name and domain details in parallel
@@ -640,7 +649,7 @@ async function viewOrganization(org_id: any): Promise<Result<any>> {
     const { data: domains, error: domainsError } = domainsResult;
 
     if (orgTypeError || !orgType || domainsError || !domains) {
-      return { errorCode: 1, data: null };
+      return { errorCode: 1, data: null, message: 'Error fetching Details' };
     }
 
     // Construct the OrgDetail object
@@ -659,7 +668,7 @@ async function viewOrganization(org_id: any): Promise<Result<any>> {
 
     return { errorCode: 0, data: orgWithDomains };
   } catch (error) {
-    return { errorCode: 1, data: null };
+    return { errorCode: 1, data: null, message: 'Error fetching Details' };
   }
 }
 // async function deleteDomains(
@@ -954,12 +963,16 @@ async function getUserRole(): Promise<Result<UserRole[]>> {
       .select('*');
 
     if (error) {
-      return { errorCode: 1, data: null };
+      return { errorCode: 1, data: null, message: error.message };
     } else {
       return { errorCode: 0, data: userRoles };
     }
   } catch (error) {
-    return { errorCode: 1, data: null };
+    return {
+      errorCode: 1,
+      data: null,
+      message: 'Unexpected error occurred while fetching user roles',
+    };
   }
 }
 
