@@ -1256,7 +1256,7 @@ const Page: React.FC = () => {
                       <div className='box-body !p-0'>
                         <div className='md:flex px-4 py-6 items-center justify-between'>
                           <div>
-                            <h6 className='font-semibold mb-0 text-[1rem]'>
+                            <h6 className='font-semibold mb-0 p-new text-[1rem]'>
                               Sites ({orgName})
                             </h6>
                           </div>
@@ -1370,6 +1370,7 @@ const Page: React.FC = () => {
                                         </span>
                                       </div>
                                       <h1
+                                        className='p-new'
                                         style={{
                                           fontSize: '1.1rem',
                                           fontWeight: 'bold',

@@ -638,7 +638,7 @@ const Page = () => {
           <ToastContainer />
           <div className='md:flex block items-center justify-between my-[1.5rem] page-header-breadcrumb'>
             <div>
-              <p className='font-semibold text-[1.125rem] text-defaulttextcolor dark:text-defaulttextcolor/70 !mb-0 '>
+              <p className='font-semibold text-[1.125rem] p-new text-defaulttextcolor dark:text-defaulttextcolor/70 !mb-0 '>
                 Site Dashboard({site_name})
               </p>
             </div>
@@ -1473,7 +1473,7 @@ const Page = () => {
                                         <th scope='col'>
                                           <div className='flex items-center'>
                                             <div>
-                                              <p className='font-semibold mb-0 text-wrap'>
+                                              <p className='font-semibold mb-0 p-new text-wrap'>
                                                 {activity?.activity_type ===
                                                 'create_site'
                                                   ? `${

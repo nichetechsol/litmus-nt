@@ -239,7 +239,6 @@ const Page = () => {
         setSidebarOrgs({ data: result1.data });
       } else if (result1.errorCode === 1) {
         setSidebarOrgs({ data: [] });
-        toast.error(result1.message, { autoClose: 3000 });
       } else {
         if (searchTerm) {
           setSidebarOrgs({
@@ -658,8 +657,8 @@ const Page = () => {
       }
     } else {
       if (newdom.length == 0) {
-        // setDomainError("Atleast one domain is required.You can't delete it.");
-        toast.error('Atleast one domain must be entered.', { autoClose: 3000 });
+        setDomainError("Atleast one domain is required.You can't delete it.");
+        // toast.error('Atleast one domain must be entered.', { autoClose: 3000 });
       } else {
         setDomainError('');
         setDomains(newdom);
