@@ -20081,8 +20081,11 @@ h6 {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
+  word-break: break-all;
 }
-
+.p-new{
+  word-break: break-all;
+}
 /* .ic-product i {
   @apply text-[0.625rem];
 } */
