@@ -677,8 +677,29 @@ const Page = () => {
     openModal();
     setLoading(true);
     const EditView: any = await viewOrganization(org.org_id);
-    if (EditView.errorcode === 1) {
+    if (EditView.errorCode === 1) {
       toast.error(EditView.message, { autoClose: 3000 });
+      setLoading(false);
+      if (closeModalButtonRef.current) {
+        closeModalButtonRef.current.click();
+      }
+
+      setDomainInput('');
+      setOrganizationName('');
+      setSelectedType('');
+      // const defaultDomain = getDefaultDomainFromEmail();
+      // if (defaultDomain) {
+      //   setDomains([defaultDomain]);
+      // }
+      setMessage('');
+      setOrganizationNameError('');
+      setDomainError('');
+      setTypeDropdownError('');
+      setMessageError('');
+      fetchData();
+      fetchData1();
+      setDomainError('');
+      closeModal();
       return;
     }
     setorgidForupdatetion(org.org_id);
