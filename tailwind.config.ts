@@ -249,6 +249,14 @@ const config: Config = {
       xxl: '1400px',
       xxxl: '1800px',
     },
+    theme: {
+      extend: {
+        zIndex: {
+          '10': '10',
+        },
+        // add other custom styles here
+      },
+    },
   },
   variants: {},
   plugins: [

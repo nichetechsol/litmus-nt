@@ -126,12 +126,14 @@ const Page: React.FC = () => {
   useEffect(() => {
     const fetchData2 = async () => {
       try {
-        const data: any = await getOrgUserRole(user_id, org_id);
+        if (user_id && org_id) {
+          const data: any = await getOrgUserRole(user_id, org_id);
 
-        if (data) {
-          setuserrole2(data.data.id);
-        } else {
-          //
+          if (data) {
+            setuserrole2(data.data.id);
+          } else {
+            //
+          }
         }
       } catch (error: any) {
         //
@@ -653,7 +655,7 @@ const Page: React.FC = () => {
           token: onlyToken,
           siteId: editsiteid,
           userName: userEmail,
-          org_name: orgName,
+          orgName: orgName,
         };
         try {
           setLoading(true);
@@ -1371,7 +1373,19 @@ const Page: React.FC = () => {
                                           />
                                         </span>
                                       </div>
-                                      <div className='hs-tooltip ti-main-tooltip '>
+                                      <div className='relative group'>
+                                        <h1 className='mb-1 font-semibold p-new text-[1rem] text-site-name'>
+                                          {SingleSite?.site
+                                            ? SingleSite?.site?.name
+                                            : ''}
+                                        </h1>
+                                        <div className='absolute hidden group-hover:block bg-gray-400 text-black text-xs rounded p-2 z-10 bottom-full mb-2 w-max max-w-xs break-words'>
+                                          {SingleSite?.site
+                                            ? SingleSite?.site?.name
+                                            : ''}
+                                        </div>
+                                      </div>
+                                      {/* <div className='hs-tooltip ti-main-tooltip '>
                                         <h1
                                           className='h1-new hs-tooltip-toggle w-100'
                                           style={{
@@ -1399,7 +1413,7 @@ const Page: React.FC = () => {
                                             </span>
                                           )}
                                         </h1>
-                                      </div>
+                                      </div> */}
                                     </div>
                                     {SingleSite?.user_role_id === 1 ||
                                     SingleSite?.user_role_id === 2 ? (

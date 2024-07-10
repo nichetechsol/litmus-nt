@@ -968,11 +968,12 @@ const Page = () => {
                                       htmlFor='task-name'
                                       className='ti-form-label'
                                     >
-                                      Domains{' '}
+                                      Domain/s{' '}
                                       <span className='text-danger'>*</span>{' '}
                                       <small className='form-text text-muted'>
-                                        (Separate Domain with a comma, and press
-                                        enter to add them to your list)
+                                        (For multiple domains, press enter after
+                                        each domain, or separate them by comma
+                                        to add them all at once)
                                       </small>
                                     </label>
                                     <div className='flex'>
@@ -1319,25 +1320,31 @@ const Page = () => {
                                     </h4> */}
                                   </div>
                                   <div>
-                                    <div className='hs-tooltip ti-main-tooltip '>
+                                    <div className='relative group'>
+                                      <h6 className='mb-1 font-semibold p-new text-[1rem] text-site-name'>
+                                        {org?.org_name}
+                                      </h6>
+                                      <div className='absolute hidden group-hover:block bg-gray-200 text-black text-xs rounded p-2 z-10 bottom-full mb-2 w-max max-w-xs break-words'>
+                                        {org?.org_name}
+                                      </div>
+                                    </div>
+                                    {/* <div className='hs-tooltip ti-main-tooltip '>
                                       <h6 className=' hs-tooltip-toggle w-100 mb-1 font-semibold text-[1rem] text-site-name'>
                                         {' '}
                                         {org?.org_name}{' '}
-                                        {org?.org_name.length > 18 && (
-                                          <span
-                                            className='hs-tooltip-content  ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm '
-                                            role='tooltip'
-                                          >
-                                            {org?.org_name}
-                                          </span>
-                                        )}
+                                        <span
+                                          className='hs-tooltip-content  ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm '
+                                          role='tooltip'
+                                        >
+                                          {org?.org_name}
+                                        </span>
                                       </h6>
-                                    </div>
+                                    </div> */}
                                     <p className='mb-1 text-[#8c9097] dark:text-white/50 contact-mail text-truncate'>
                                       {org?.sites_count} sites
                                     </p>
                                   </div>
-                                  <div></div>
+                                  <div> </div>
                                 </div>
                                 {org?.user_role_id == 1 ||
                                 org?.user_role_id == 2 ? (

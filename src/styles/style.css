@@ -16948,9 +16948,9 @@ hr {
 .ti-modal {
   @apply w-full h-full fixed top-0 start-0 z-[60] overflow-x-hidden overflow-y-auto;
 }
-.ti-modal {
+/* .ti-modal { 
   overflow: hidden;
-}
+} */
 .ti-modal .ti-modal-header {
   @apply flex justify-between items-center py-3 px-4 border-b dark:border-white/10;
 }
