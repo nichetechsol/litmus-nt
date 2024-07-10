@@ -680,8 +680,35 @@ async function viewOrganization(org_id: any): Promise<Result<any>> {
     const { data: orgDetails, error: orgError } = orgDetailsResult;
     const { data: orgDomainIds, error: domainIdsError } = orgDomainIdsResult;
 
-    if (orgError || !orgDetails || domainIdsError || !orgDomainIds) {
-      return { errorCode: 1, data: null, message: 'Error fetching Details' };
+    if (orgError) {
+      // throw new Error('Failed to fetch organization details.');
+      return {
+        errorCode: 1,
+        data: null,
+        message: 'Failed to fetch organization details',
+      };
+    }
+    if (!orgDetails) {
+      return {
+        errorCode: 1,
+        data: null,
+        message: 'Organization details not found',
+      };
+    }
+
+    if (domainIdsError) {
+      return {
+        errorCode: 1,
+        data: null,
+        message: 'Failed to fetch organization domains',
+      };
+    }
+    if (!orgDomainIds || orgDomainIds.length === 0) {
+      return {
+        errorCode: 1,
+        data: null,
+        message: 'Domains not found for the organization',
+      };
     }
 
     // Fetch organization type name and domain details in parallel

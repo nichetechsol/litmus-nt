@@ -347,7 +347,7 @@ async function getOrgUserRole(
 ): Promise<Result<null>> {
   // Validate the input
   if (!user_id || !org_id) {
-    return { errorCode: 1, data: null };
+    return { errorCode: 1, data: null, message: 'Please provide valid inputs' };
   }
 
   try {
@@ -361,7 +361,11 @@ async function getOrgUserRole(
 
     // Check for errors during the fetch operation
     if (orgUserError) {
-      return { errorCode: 1, data: null };
+      return {
+        errorCode: 1,
+        data: null,
+        message: 'Failed to fetch organization user details.',
+      };
     }
 
     // Extract the role_id from the fetched data
@@ -376,14 +380,22 @@ async function getOrgUserRole(
 
     // Check for errors during the fetch operation
     if (userRoleError) {
-      return { errorCode: 1, data: null };
+      return {
+        errorCode: 1,
+        data: null,
+        message: 'Failed to fetch user role details.',
+      };
     }
 
     // Log the user role details and return them
     return { errorCode: 0, data: userRole };
   } catch (error) {
     // Log any unexpected errors
-    return { errorCode: -1, data: null };
+    return {
+      errorCode: -1,
+      data: null,
+      message: 'An unexpected error occurred.',
+    };
   }
 }
 

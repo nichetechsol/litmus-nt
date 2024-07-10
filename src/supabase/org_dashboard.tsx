@@ -17,6 +17,7 @@ interface Country {
 interface Result<T> {
   errorCode: number;
   data: T | null;
+  message?: any;
 }
 
 async function getLocationOfSites(data: {
@@ -32,11 +33,19 @@ async function getLocationOfSites(data: {
       .eq('org_id', org_id);
 
     if (sitesError) {
-      return { errorCode: 1, data: null };
+      return {
+        errorCode: 1,
+        data: null,
+        message: 'Failed to fetch site details.',
+      };
     }
 
     if (!sites_detail || sites_detail.length === 0) {
-      return { errorCode: 0, data: [] };
+      return {
+        errorCode: 0,
+        data: [],
+        message: 'No sites found for the organization.',
+      };
     }
 
     const countryIds = sites_detail.map((site: SiteDetail) => site.country_id);
@@ -48,7 +57,11 @@ async function getLocationOfSites(data: {
       .in('id', countryIds);
 
     if (countriesError) {
-      return { errorCode: 1, data: null };
+      return {
+        errorCode: 1,
+        data: null,
+        message: 'Failed to fetch country details.',
+      };
     }
 
     const countryMap = new Map<number, string>();
@@ -71,7 +84,11 @@ async function getLocationOfSites(data: {
 
     return { errorCode: 0, data: result };
   } catch (error) {
-    return { errorCode: 1, data: null };
+    return {
+      errorCode: 1,
+      data: null,
+      message: 'An unexpected error occurred.',
+    };
   }
 }
 

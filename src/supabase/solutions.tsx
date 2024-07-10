@@ -201,7 +201,12 @@ async function listSolutions() {
           folder: item.name,
           errorCode: 0,
           message: 'Success',
-          data: folderData.length > 0 ? { FileName: folderData[0].name } : null,
+          data:
+            folderData.length > 0
+              ? folderData[0].name === '.emptyFolderPlaceholder'
+                ? { FileName: '' }
+                : { FileName: folderData[0].name }
+              : null,
         };
       }),
     );

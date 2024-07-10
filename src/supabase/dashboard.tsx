@@ -259,6 +259,7 @@ async function orgUserList(
       return {
         errorCode: 1,
         data: null,
+        message: 'Failed to retrieve User.',
       };
     }
 
@@ -290,6 +291,7 @@ async function orgUserList(
       return {
         errorCode: 1,
         data: null,
+        message: 'Failed to retrieve User.',
       };
     }
 
@@ -302,6 +304,7 @@ async function orgUserList(
       return {
         errorCode: 1,
         data: null,
+        message: 'Failed to retrieve User Role.',
       };
     }
 
@@ -345,6 +348,7 @@ async function orgUserList(
     return {
       errorCode: 1,
       data: null,
+      message: 'Failed to retrieve User.',
     };
   }
 }
@@ -484,6 +488,7 @@ async function orgEntitlementList(
       return {
         errorCode: 1,
         data: null,
+        message: 'Failed to fetch entitlements details.',
       };
     }
 
@@ -533,6 +538,7 @@ async function orgEntitlementList(
     return {
       errorCode: 1,
       data: null,
+      message: 'An unexpected error occurred.',
     };
   }
 }
