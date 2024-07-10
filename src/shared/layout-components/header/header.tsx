@@ -390,12 +390,14 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
   useEffect(() => {
     const fetchData2 = async () => {
       try {
-        const data: any = await getOrgUserRole(user_id, org_id);
+        if (user_id && org_id) {
+          const data: any = await getOrgUserRole(user_id, org_id);
 
-        if (data) {
-          setuserrole2(data.data.name);
-        } else {
-          //
+          if (data) {
+            setuserrole2(data.data.name);
+          } else {
+            //
+          }
         }
       } catch (error: any) {
         //

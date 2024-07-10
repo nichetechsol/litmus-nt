@@ -1056,43 +1056,47 @@ const Page = () => {
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>
                         {solutions && solutions.length > 0
-                          ? solutions.map((solution, index) => (
-                              <li className='mb-[0.9rem]' key={index}>
-                                <h5 className='box-title items-start'>
-                                  {solution.folder}
-                                </h5>
-                                <div className='flex items-center'>
-                                  <div className='me-2 ic-product'>
-                                    <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
-                                      <i className='ri-folder-line text-[1rem]  text-white'></i>
-                                    </span>
+                          ? solutions
+                              .filter(
+                                (solution) => solution.data.FileName !== '',
+                              )
+                              .map((solution, index) => (
+                                <li className='mb-[0.9rem]' key={index}>
+                                  <h5 className='box-title items-start'>
+                                    {solution.folder}
+                                  </h5>
+                                  <div className='flex items-center'>
+                                    <div className='me-2 ic-product'>
+                                      <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
+                                        <i className='ri-folder-line text-[1rem]  text-white'></i>
+                                      </span>
+                                    </div>
+                                    <div className='flex-grow ic-product-p'>
+                                      <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                        {solution.data.FileName}
+                                      </p>
+                                    </div>
+                                    <div className='font-semibold text-[0.9375rem] '>
+                                      <a
+                                        onClick={() => {
+                                          handleDownload(
+                                            solution.data.FileName,
+                                            solution.folder.split('/')[0],
+                                            solution.folder.includes('/')
+                                              ? solution.folder.split('/')[-1]
+                                              : '',
+                                            'S',
+                                          );
+                                        }}
+                                        // href={solution.data.downloadLink}
+                                        className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
+                                      >
+                                        <i className='ri-download-line  text-[.8rem]  text-white'></i>
+                                      </a>
+                                    </div>
                                   </div>
-                                  <div className='flex-grow ic-product-p'>
-                                    <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                      {solution.data.FileName}
-                                    </p>
-                                  </div>
-                                  <div className='font-semibold text-[0.9375rem] '>
-                                    <a
-                                      onClick={() => {
-                                        handleDownload(
-                                          solution.data.FileName,
-                                          solution.folder.split('/')[0],
-                                          solution.folder.includes('/')
-                                            ? solution.folder.split('/')[-1]
-                                            : '',
-                                          'S',
-                                        );
-                                      }}
-                                      // href={solution.data.downloadLink}
-                                      className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
-                                    >
-                                      <i className='ri-download-line  text-[.8rem]  text-white'></i>
-                                    </a>
-                                  </div>
-                                </div>
-                              </li>
-                            ))
+                                </li>
+                              ))
                           : null}
                         {solutions && solutions.length === 0 && (
                           <div className='col-md-12 w-100 mt-4'>
@@ -1470,7 +1474,15 @@ const Page = () => {
                                       activity?.activity_type ===
                                         'add_licence' ||
                                       activity?.activity_type ===
-                                        'download_file') && (
+                                        'download_file' ||
+                                      activity?.activity_type ===
+                                        'edit_site_name' ||
+                                      activity?.activity_type ===
+                                        'update_site' ||
+                                      activity?.activity_type ===
+                                        'edit_site_type' ||
+                                      activity?.activity_type ===
+                                        'edit_site_description') && (
                                       <tr
                                         className='border hover:bg-gray-100 dark:hover:bg-light dark:border-defaultborder/10 border-defaultborder !border-x-0'
                                         key={index}
@@ -1589,6 +1601,15 @@ const Page = () => {
                                                       .details
                                                       ?.filename}' within the site '${activity
                                                       ?.site_id.name}'`
+                                                  : activity?.activity_type ===
+                                                      'edit_site_name' ||
+                                                    activity?.activity_type ===
+                                                      'update_site' ||
+                                                    activity?.activity_type ===
+                                                      'edit_site_type' ||
+                                                    activity?.activity_type ===
+                                                      'edit_site_description'
+                                                  ? `${activity?.details}`
                                                   : ''}
                                               </p>
                                             </div>

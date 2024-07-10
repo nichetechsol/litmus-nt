@@ -49,8 +49,8 @@ const emailSchemaSign = Yup.string()
   .max(320, 'It must be at most 320 characters long.')
   .email('Invalid email address format. Please enter a valid email address.')
   .matches(
-    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|co.in|in)$/,
-    // /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+    // /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|co.in|in)$/,
+    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
     'Invalid email address format. Please enter a valid email address.',
   );
 const emailSchema = Yup.string()
@@ -59,8 +59,8 @@ const emailSchema = Yup.string()
   .max(320, 'It must be at most 320 characters long.')
   .email('Please enter a valid email address.')
   .matches(
-    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|co.in|in)$/,
-    // /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+    // /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|co.in|in)$/,
+    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
     'Please enter a valid email address.',
   );
 

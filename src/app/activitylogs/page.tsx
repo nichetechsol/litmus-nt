@@ -176,7 +176,11 @@ export default function Activitylogs() {
                         activity?.activity_type === 'add_user' ||
                         activity?.activity_type === 'remove_user' ||
                         activity?.activity_type === 'create_site' ||
-                        activity?.activity_type === 'download_file') && (
+                        activity?.activity_type === 'download_file' ||
+                        activity?.activity_type === 'update_org' ||
+                        activity?.activity_type === 'remove_domain' ||
+                        activity?.activity_type === 'add_domain' ||
+                        activity?.activity_type === 'edit_org_description') && (
                         <tr
                           className='border  hover:bg-gray-100 dark:hover:bg-light dark:border-defaultborder/10 border-defaultborder !border-x-0'
                           key={index}
@@ -272,6 +276,15 @@ export default function Activitylogs() {
                                         ?.details
                                         ?.filename}' within the site '${activity
                                         ?.org_id.name}'`
+                                    : activity?.activity_type ===
+                                        'update_org' ||
+                                      activity?.activity_type ===
+                                        'remove_domain' ||
+                                      activity?.activity_type ===
+                                        'add_domain' ||
+                                      activity?.activity_type ===
+                                        'edit_org_description'
+                                    ? `${activity.details}`
                                     : ''}
                                 </p>
                               </div>
@@ -318,7 +331,11 @@ export default function Activitylogs() {
                       activity?.activity_type === 'add_user' ||
                       activity?.activity_type === 'remove_user' ||
                       activity?.activity_type === 'add_licence' ||
-                      activity?.activity_type === 'download_file') && (
+                      activity?.activity_type === 'download_file' ||
+                      activity?.activity_type === 'edit_site_name' ||
+                      activity?.activity_type === 'update_site' ||
+                      activity?.activity_type === 'edit_site_type' ||
+                      activity?.activity_type === 'edit_site_description') && (
                       <tr
                         className='border hover:bg-gray-100 dark:hover:bg-light dark:border-defaultborder/10 border-defaultborder !border-x-0'
                         key={index}
@@ -399,6 +416,14 @@ export default function Activitylogs() {
                                       .details?.filename}' within the site '${
                                       activity.site_id.name
                                     }'`
+                                  : activity?.activity_type ===
+                                      'edit_site_name' ||
+                                    activity?.activity_type === 'update_site' ||
+                                    activity?.activity_type ===
+                                      'edit_site_type' ||
+                                    activity?.activity_type ===
+                                      'edit_site_description'
+                                  ? `${activity?.details}`
                                   : ''}
                               </p>
                             </div>

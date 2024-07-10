@@ -109,10 +109,15 @@ const Page = () => {
 
   function handleFolderClick(folder: any) {
     setSelectedFolder(folder);
-    setSubFolders(folder.data);
-    setCurrentTrue(folder.data[0].subFolder);
-    if (folder.data[0].subFolder != '') {
-      setfile3(folder.data[0].files);
+    if (folder.folder && folder.data.length > 0) {
+      setSubFolders(folder.data);
+      setCurrentTrue(folder.data[0].subFolder);
+      if (folder.data[0].subFolder != '') {
+        setfile3(folder.data[0].files);
+      }
+    } else {
+      setSubFolders(null);
+      setfile3(null);
     }
   }
 

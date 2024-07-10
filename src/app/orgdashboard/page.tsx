@@ -548,12 +548,14 @@ const OrgDashboard = () => {
   const [userrole2, setuserrole2] = useState();
   const roleChange = async () => {
     try {
-      const data: any = await getOrgUserRole(user_id, org_id);
+      if (user_id && org_id) {
+        const data: any = await getOrgUserRole(user_id, org_id);
 
-      if (data.data) {
-        setuserrole2(data.data.id);
-      } else {
-        toast.error(data.message, { autoClose: 3000 });
+        if (data.data) {
+          setuserrole2(data.data.id);
+        } else {
+          toast.error(data.message, { autoClose: 3000 });
+        }
       }
     } catch (error: any) {
       toast.error(error.message, { autoClose: 3000 });
