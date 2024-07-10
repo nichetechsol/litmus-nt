@@ -114,10 +114,10 @@ Background Image
 /* body{
   touch-action: none;
 } */
-body,
+/* body,
 html {
   overflow: auto;
-}
+} */
 :root {
   --body-bg: 240 241 247;
   --primary: 3 33 37;
@@ -406,6 +406,14 @@ html {
 /* End::Header theme-mode icon style */
 /* Start::Header fullscreen responsive */
 @media (max-width: 767.98px) {
+  .h-90 {
+    height: 100% !important;
+  }
+  .owner-details {
+    justify-content: start;
+    text-align: left;
+    padding: 10px 20px;
+  }
   .authentication {
     min-height: 90vh !important;
   }
@@ -16457,6 +16465,7 @@ h5 {
 }
 .h-90 {
   height: 90vh;
+  overflow: auto;
 }
 .ti-img-thumbnail {
   @apply p-1 rounded-md border border-defaultborder dark:border-defaultborder/10 max-w-full h-auto dark:bg-bodybg2 mx-auto;
@@ -19578,6 +19587,11 @@ th.gridjs-th {
 }
 
 @media (max-width: 991.98px) {
+  .owner-details {
+    justify-content: start;
+    text-align: left;
+    padding: 10px 20px;
+  }
   .mail-navigation {
     @apply hidden;
   }
@@ -20085,6 +20099,7 @@ h6 {
 }
 .p-new {
   word-break: break-all;
+  overflow-wrap: break-word;
 }
 /* .ic-product i {
   @apply text-[0.625rem];
@@ -20227,7 +20242,7 @@ body.modal-open {
 .check-1 {
   vertical-align: bottom;
 }
-body {
+/* body {
   position: relative;
   margin: 0;
   height: 100%;
@@ -20238,7 +20253,7 @@ body {
   font-size: 0.813rem;
   font-weight: 400;
   color: rgb(var(--default-text-color));
-}
+} */
 .swal-overlay--show-modal {
   pointer-events: none;
 }
@@ -20248,7 +20263,7 @@ body.no-scroll {
   width: 100%;
   pointer-events: none;
 }
-body.no-scroll1 {
+body.no-scroll-no {
   overflow: hidden;
   position: fixed;
   width: 100%;
@@ -20281,4 +20296,12 @@ body.no-scroll1 {
   overflow: hidden;
   word-break: break-all;
   padding: 0px 10px 0px 0px;
+}
+.pnew-white-space {
+  word-break: break-all;
+  white-space: break-spaces;
+}
+
+.login-div input {
+  background-color: #e8f0fe;
 }

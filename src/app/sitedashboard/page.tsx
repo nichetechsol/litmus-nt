@@ -794,9 +794,9 @@ const Page = () => {
                         <div className='box text-default shadow border dark:border-defaulttextcolor/10'>
                           <div className='box-body !p-0'>
                             <div className='sm:grid grid-cols-12'>
-                              <div className='xl:col-span-4 xxl:col-span-4 lg:col-span-4 md:col-span-4 col-span-4 about-company-stats-border'>
-                                <div className='text-center p-6 w-full h-full flex justify-center'>
-                                  <span className='font-semibold me-2'>
+                              <div className='xl:col-span-4 xxl:col-span-4 lg:col-span-4 md:col-span-12 col-span-4 about-company-stats-border'>
+                                <div className='text-center owner-details p-6 w-full h-full flex justify-center'>
+                                  <span className='font-semibold me-2 text-[.875rem]'>
                                     Owner:
                                   </span>
                                   <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
@@ -805,9 +805,9 @@ const Page = () => {
                                   </p>
                                 </div>
                               </div>
-                              <div className='xl:col-span-4 xxl:col-span-4 lg:col-span-4 md:col-span-4 col-span-4 about-company-stats-border'>
-                                <div className='text-center p-6 w-full h-full flex justify-center'>
-                                  <span className='font-semibold me-2'>
+                              <div className='xl:col-span-4 xxl:col-span-4 lg:col-span-4 md:col-span-12 col-span-4 about-company-stats-border'>
+                                <div className='text-center owner-details p-6 w-full h-full flex justify-center'>
+                                  <span className='font-semibold me-2 text-[.875rem]'>
                                     Organization Name:
                                   </span>
                                   <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
@@ -816,9 +816,9 @@ const Page = () => {
                                   </p>
                                 </div>
                               </div>
-                              <div className='xl:col-span-4 xxl:col-span-4 lg:col-span-4 md:col-span-4 col-span-4'>
-                                <div className='text-center p-6 w-full h-full flex justify-center'>
-                                  <span className='font-semibold'>
+                              <div className='xl:col-span-4 xxl:col-span-4 lg:col-span-4 md:col-span-12 col-span-4'>
+                                <div className='text-center owner-details p-6 w-full h-full flex justify-center'>
+                                  <span className='font-semibold text-[.875rem]'>
                                     {siteCountData &&
                                     siteCountData.data.sites_details[0]
                                       .created_at

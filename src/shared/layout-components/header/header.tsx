@@ -617,7 +617,7 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
 
                       <li
                         onClick={() => {
-                          document.body.classList.add('no-scroll');
+                          // document.body.classList.add('no-scroll');
                           swal({
                             title: 'Are you sure?',
                             text: 'Do you really want to logout?',
@@ -640,7 +640,7 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                               },
                             },
                           }).then((willLogout: any) => {
-                            document.body.classList.remove('no-scroll');
+                            // document.body.classList.remove('no-scroll');
                             if (willLogout) {
                               setLoading(true);
                               localStorage.removeItem(

@@ -343,7 +343,7 @@ export default function Activitylogs() {
                         <th scope='col'>
                           <div className='flex items-center'>
                             <div>
-                              <p className='font-semibold mb-0'>
+                              <p className='font-semibold mb-0 p-new pnew-white-space'>
                                 {activity?.activity_type === 'create_site'
                                   ? `${
                                       activity.user_id.firstname &&
