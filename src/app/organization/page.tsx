@@ -635,6 +635,7 @@ const Page = () => {
     const newdom = domains.filter((i, idx) => idx != index);
 
     if (changeFlage === false && id?.domainid && newdom.length >= 1) {
+      setLoading(true);
       const data = {
         org_id: orgidForupdatetion,
         domain_id: id.domainid,
@@ -645,23 +646,29 @@ const Page = () => {
 
       const result = await deleteDomains(data);
       if (result.errorCode === 0) {
+        setLoading(false);
         toast.success(result.message, {
           autoClose: 3000,
         });
         setDomains(newdom);
         if (newdom.length == 0) {
+          setLoading(false);
           setDomainError('Domain is required. Please enter a domain.');
         } else {
+          setLoading(false);
           setDomainError('');
         }
       } else {
+        setLoading(false);
         toast.error(result.message, { autoClose: 3000 });
       }
     } else {
       if (newdom.length == 0) {
+        setLoading(false);
         setDomainError("Atleast one domain is required.You can't delete it.");
         // toast.error('Atleast one domain must be entered.', { autoClose: 3000 });
       } else {
+        setLoading(false);
         setDomainError('');
         setDomains(newdom);
       }
