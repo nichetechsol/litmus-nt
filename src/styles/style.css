@@ -786,7 +786,7 @@ html {
 }
 
 .list-group-item {
-  @apply text-defaulttextcolor dark:text-defaulttextcolor/70 border-b-0 border-t border-e border-s border-inherit border-solid py-[0.65rem] px-[1.25rem] dark:border-defaultborder/10;
+  @apply text-defaulttextcolor dark:text-defaulttextcolor/70 border-b-0 border-t border-e border-s border-inherit border-solid py-[0.65rem] px-[1.15rem] dark:border-defaultborder/10;
 }
 .list-group-item:last-child {
   @apply border-b;
@@ -20086,11 +20086,10 @@ h6 {
   flex-direction: column;
 }
 .over-text {
-  word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 .text-site-name {
-  @apply w-[125px];
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
