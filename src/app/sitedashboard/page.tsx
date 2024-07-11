@@ -1076,7 +1076,7 @@ const Page = () => {
                                         {solution.data.FileName}
                                       </p>
                                     </div>
-                                    <div className='font-semibold text-[0.9375rem] '>
+                                    <div className='font-semibold text-[0.9375rem]  cursor-pointer'>
                                       <a
                                         onClick={() => {
                                           handleDownload(

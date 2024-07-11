@@ -730,12 +730,33 @@ const Page: React.FC = () => {
     // remaning descriptopn
     setChangeFlage(true);
   };
+  function createCustomContent(name: any) {
+    return `
+    <div>
+      <p>Please type "<b>DELETE</b>" or "<b>${name}</b>" to confirm deletion</p>
+      <input type="text" class="swal-content__input" id="delete-input" placeholder="Type here">
+    </div>
+  `;
+  }
+  function createCustomContent2(name: any) {
+    return `
+    <div>
+      <p>Please type "<b>DELETE</b>" or "<b>${name}</b>" to confirm deletion</p>
+    </div>
+  `;
+  }
+
   const handelDelete = (SingleSite: any): any => {
-    const showError = (message: string) => {
+    const showError = () => {
       document.body.classList.add('no-scroll');
       swal({
         title: 'Invalid input!',
-        text: message,
+        content: {
+          element: 'div',
+          attributes: {
+            innerHTML: createCustomContent2(SingleSite?.site.name),
+          },
+        },
         icon: 'error',
         buttons: false as unknown as (string | boolean)[],
       }).then(() => {
@@ -751,29 +772,35 @@ const Page: React.FC = () => {
       document.body.classList.add('no-scroll');
       swal({
         title: 'Are you sure?',
-        text: `Please type DELETE/ ${SingleSite?.site.name} to confirm deletion`,
+        // text: `Please type DELETE/ ${SingleSite?.site.name} to confirm deletion`,
+        // content: {
+        //   element: 'input',
+        //   attributes: {
+        //     placeholder: 'Type here',
+        //     type: 'text',
+        //     id: 'delete-input',
+        //     // oninput: (e: Event) => {
+        //     //   const target = e.target as HTMLInputElement;
+        //     //   let value = target.value;
+
+        //     //   // // Allow only alphabetic characters
+        //     //   // value = value.replace(/[^a-zA-Z]/g, '');
+
+        //     //   // Limit the length to 6 characters
+        //     //   // if (value.length > 6) {
+        //     //   //   value = value.substring(0, 6);
+        //     //   // }
+
+        //     //   // Convert to uppercase
+        //     //   // value = value.toUpperCase();
+        //     //   // target.value = value; // Update the input field with the transformed value
+        //     // },
+        //   },
+        // },
         content: {
-          element: 'input',
+          element: 'div',
           attributes: {
-            placeholder: 'Type here',
-            type: 'text',
-            id: 'delete-input',
-            // oninput: (e: Event) => {
-            //   const target = e.target as HTMLInputElement;
-            //   let value = target.value;
-
-            //   // // Allow only alphabetic characters
-            //   // value = value.replace(/[^a-zA-Z]/g, '');
-
-            //   // Limit the length to 6 characters
-            //   // if (value.length > 6) {
-            //   //   value = value.substring(0, 6);
-            //   // }
-
-            //   // Convert to uppercase
-            //   // value = value.toUpperCase();
-            //   // target.value = value; // Update the input field with the transformed value
-            // },
+            innerHTML: createCustomContent(SingleSite?.site.name),
           },
         },
         icon: 'warning',
@@ -849,9 +876,7 @@ const Page: React.FC = () => {
           // User pressed cancel, do nothing
         } else {
           // Invalid input, show error message and show modal again
-          showError(
-            `You need to type DELETE/${SingleSite?.site.name} to confirm`,
-          );
+          showError();
           // toast.error(
           //   `You need to type DELETE/${SingleSite?.site.name} to confirm`,
           // );

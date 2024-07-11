@@ -740,14 +740,36 @@ const Page = () => {
     setChangeFlage(true);
     setModalOpen(true);
   };
+  // const orgName = 'YourOrganizationName';
+  function createCustomContent(orgName: any) {
+    return `
+    <div>
+      <p>Please type "<b>DELETE</b>" or "<b>${orgName}</b>" to confirm deletion</p>
+      <input type="text" class="swal-content__input" id="delete-input" placeholder="Type here">
+    </div>
+  `;
+  }
+  function createCustomContent2(orgName: any) {
+    return `
+    <div>
+      <p>Please type "<b>DELETE</b>" or "<b>${orgName}</b>" to confirm deletion</p>
+    </div>
+  `;
+  }
 
   ////HANDLE DELETE FOR ORG
   const handleDelete = async (org: any) => {
-    const showError = (message: string) => {
+    const showError = () => {
       document.body.classList.add('no-scroll');
+
       swal({
         title: 'Invalid input!',
-        text: message,
+        content: {
+          element: 'div',
+          attributes: {
+            innerHTML: createCustomContent2(org.org_name),
+          },
+        },
         icon: 'error',
         buttons: false as unknown as (string | boolean)[],
       }).then(() => {
@@ -758,15 +780,24 @@ const Page = () => {
       document.body.classList.add('no-scroll');
       swal({
         title: 'Are you sure?',
-        text: `Please type DELETE/${org.org_name} to confirm deletion`,
+
+        // text: `Please type "DELETE" or "${org.org_name}" to confirm deletion`,
+        // html: `Please type <b>DELETE</b> or <b>${org.org_name}</b> to confirm deletion`,
         content: {
-          element: 'input',
+          element: 'div',
           attributes: {
-            placeholder: 'Type here',
-            type: 'text',
-            id: 'delete-input',
+            innerHTML: createCustomContent(org.org_name),
           },
         },
+        // content: {
+        //   element: 'input',
+        //   attributes: {
+        //     placeholder: 'Type here',
+        //     type: 'text',
+        //     id: 'delete-input',
+        //   },
+        // },
+
         icon: 'warning',
         buttons: {
           cancel: {
@@ -783,7 +814,8 @@ const Page = () => {
             closeModal: false,
           },
         },
-      }).then((value) => {
+        html: true,
+      } as any).then((value) => {
         document.body.classList.remove('no-scroll');
         setLoading(true);
         const inputElem = document.getElementById(
@@ -842,8 +874,10 @@ const Page = () => {
           setLoading(false);
         } else {
           setLoading(false);
-          showError(`You need to type DELETE/${org.org_name} to confirm`);
-
+          // showError(
+          //   `You need to type <b>DELETE</b> or <b>${org.org_name}</b> to confirm`,
+          // );
+          showError();
           setTimeout(() => {
             showDeleteModal();
           }, 3000);
