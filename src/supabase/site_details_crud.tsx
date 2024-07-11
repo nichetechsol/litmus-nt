@@ -500,9 +500,8 @@ async function updateSite(updateData: any): Promise<Result<any>> {
     // Fetch current site details
     const { data: currentSite, error: fetchCurrentError } = await supabase
       .from('sites_detail')
-      .select('*')
-      .eq('id', updateData.siteId)
-      .single();
+      .select(`*,site_types(name)`)
+      .eq('id', updateData.siteId);
 
     if (fetchCurrentError) {
       return {
@@ -549,8 +548,12 @@ async function updateSite(updateData: any): Promise<Result<any>> {
         country_id: updateData.country_id,
         state_id: updateData.state_id,
       })
-      .eq('id', updateData.siteId)
-      .select();
+      .eq('id', updateData.siteId).select(`
+        *,
+        site_types (
+          name
+        )
+      `);
 
     // Handle update errors
     if (error) {
@@ -570,10 +573,9 @@ async function updateSite(updateData: any): Promise<Result<any>> {
     }
     // Log each change individually
     const logPromises = [];
-
-    if (currentSite.name !== updateData.name) {
+    if (currentSite[0].name !== updateData.name) {
       const activityType = 'edit_site_name';
-      const activityDetails = `${updateData.userName} changed the site name from ${currentSite.name} to ${updateData.name} within the organization ${updateData.orgName}.`;
+      const activityDetails = `${updateData.userName} changed the site name from ${currentSite[0].name} to ${updateData.name} within the organization ${updateData.orgName}.`;
       logPromises.push(
         logActivity({
           org_id: updateData.org_id,
@@ -584,10 +586,15 @@ async function updateSite(updateData: any): Promise<Result<any>> {
         }),
       );
     }
+    const currentSite_typeName = currentSite[0].site_types;
+    const type_name = currentSite_typeName.name;
+    const updatetypeName = data[0].site_types;
+    const update_typeName = updatetypeName.name;
 
-    if (currentSite.type_id !== updateData.type_id) {
+    if (currentSite[0].type_id !== updateData.type_id) {
       const activityType = 'edit_site_type';
-      const activityDetails = `${updateData.userName} changed the site type from ${currentSite.type_id} to ${updateData.type_id} within the site ${currentSite.name}.`;
+      const activityDetails = `${updateData.userName} changed the site type from ${type_name} to ${update_typeName} within the site ${currentSite[0].name}.`;
+      // const activityDetails = `${updateData.userName} changed the site type from ${currentSite.type_id.name} to ${updateData.type_id.name} within the site ${currentSite.name}.`;
       logPromises.push(
         logActivity({
           org_id: updateData.org_id,
@@ -599,7 +606,7 @@ async function updateSite(updateData: any): Promise<Result<any>> {
       );
     }
 
-    if (currentSite.about_site !== updateData.about_site) {
+    if (currentSite[0].about_site !== updateData.about_site) {
       const activityType = 'edit_site_description';
       const activityDetails = `${updateData.userName} changed the site description within the organization ${updateData.orgName}.`;
       logPromises.push(
@@ -614,13 +621,13 @@ async function updateSite(updateData: any): Promise<Result<any>> {
     }
 
     if (
-      currentSite.address1 !== updateData.address1 ||
-      currentSite.address2 !== updateData.address2 ||
-      currentSite.city !== updateData.city ||
-      currentSite.pin_code !== updateData.pin_code ||
-      currentSite.status !== updateData.status ||
-      currentSite.country_id !== updateData.country_id ||
-      currentSite.state_id !== updateData.state_id
+      currentSite[0].address1 !== updateData.address1 ||
+      currentSite[0].address2 !== updateData.address2 ||
+      currentSite[0].city !== updateData.city ||
+      currentSite[0].pin_code !== updateData.pin_code ||
+      currentSite[0].status !== updateData.status ||
+      currentSite[0].country_id !== updateData.country_id ||
+      currentSite[0].state_id !== updateData.state_id
     ) {
       const activityType = 'update_site';
       const activityDetails = `${updateData.userName} changed the site details within the organization ${updateData.orgName}.`;
@@ -644,7 +651,7 @@ async function updateSite(updateData: any): Promise<Result<any>> {
       data: data,
     };
   } catch (error) {
-    console.error('Unexpected error during site update:');
+    // console.error('Unexpected error during site update:');
     return {
       errorCode: 1,
       message: 'Unexpected error occurred. Please contact support.',
