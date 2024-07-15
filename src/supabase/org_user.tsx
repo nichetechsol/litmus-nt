@@ -49,7 +49,7 @@ interface Result<T> {
   message?: string;
   data: any;
 }
-async function searchUsers(search?: any): Promise<Result<User[]>> {
+async function searchUsers(search: any): Promise<Result<User[]>> {
   try {
     // Construct the base query for searching users
     let userQuery = supabase.from('users').select('*'); // Limit to 10 results for suggestions
