@@ -191,7 +191,7 @@ const LoginForm = () => {
         const user_role: any = result.user[0]?.user_role;
         const user_firstname: any = result.user[0]?.firstname;
         const user_lastname: any = result.user[0]?.lastname;
-        const add_orgUser: any = result.add_orgUser?"true":"false";
+        const add_orgUser: any = result.add_orgUser ? 'true' : 'false';
 
         const encryptedUserId = encryptData(user_id);
         const encryptedUserRole = encryptData(user_role);

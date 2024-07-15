@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabase } from './db';
 
@@ -103,7 +104,9 @@ async function Login(email: string, password: string): Promise<LoginResult> {
     }
 
     let add_orgUser = false;
+    let org_exists = false;
     if (orgUsersData.length > 0) {
+      org_exists = true;
       for (const orgUser of orgUsersData) {
         if (orgUser.role_id === 1) {
           add_orgUser = true;
@@ -111,6 +114,7 @@ async function Login(email: string, password: string): Promise<LoginResult> {
       }
     } else {
       add_orgUser = false;
+      org_exists = false;
     }
     if (userData.length > 0) {
       return {
