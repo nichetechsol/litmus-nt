@@ -205,9 +205,9 @@ const Page = () => {
   useEffect(() => {
     if (org_exists === 'false') {
       modalRef.current?.classList.remove('hidden');
-      modalRef.current?.classList.add('open');
+      modalRef.current?.classList.add('open', 'new-modal-open');
     } else {
-      modalRef.current?.classList.remove('open');
+      modalRef.current?.classList.remove('open', ' new-modal-open');
       modalRef.current?.classList.add('hidden');
     }
   }, [modalOpen, org_exists]);
@@ -981,7 +981,7 @@ const Page = () => {
                         <div
                           id='todo-compose'
                           ref={modalRef}
-                          // className='hs-overlay hidden ti-modal open'
+                          // className='hs-overlay hidden ti-modal open '
                           className='hs-overlay hidden ti-modal [--overlay-backdrop:static]'
                         >
                           <div className='hs-overlay-open:mt-7  ti-modal-box mt-0 ease-out'>

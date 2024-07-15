@@ -20097,8 +20097,11 @@ h6 {
   word-break: break-all;
 }
 .p-new {
-  word-break: break-all;
+  word-break: inherit;
   overflow-wrap: break-word;
+}
+.new-modal-open {
+  background: rgba(0, 0, 0, 0.6);
 }
 /* .ic-product i {
   @apply text-[0.625rem];
