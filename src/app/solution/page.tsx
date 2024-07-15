@@ -5,13 +5,13 @@
 
 import { redirect, useRouter } from 'next/navigation';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
+import swal from 'sweetalert';
 
 import { decryptData } from '@/helper/Encryption_Decryption';
 import { logActivity } from '@/supabase/activity';
 import { refreshToken } from '@/supabase/session';
 import { generateSignedUrl, listOfAllSolutions } from '@/supabase/solutions';
 import Loader from '@/utils/Loader/Loader';
-
 interface subFolder {
   files: [];
   subFolder: string;
@@ -92,9 +92,9 @@ const Page = () => {
     //     });
     //   }
     // }
-    if (!encryptedOrgId) {
+    if (!decryptedOrgId) {
       document.body.classList.add('no-scroll');
-      swal('Please select a  Organization', { icon: 'error' }).then(() => {
+      swal('Please select a Organization', { icon: 'error' }).then(() => {
         document.body.classList.remove('no-scroll');
         navigate.push('/organization');
         return;

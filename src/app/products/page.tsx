@@ -71,7 +71,7 @@ const Page = () => {
       }
     } else {
       document.body.classList.add('no-scroll');
-      swal('Please select a  Organization', { icon: 'error' }).then(() => {
+      swal('Please select a Organization', { icon: 'error' }).then(() => {
         document.body.classList.remove('no-scroll');
         navigate.push('/organization');
         return;

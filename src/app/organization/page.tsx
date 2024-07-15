@@ -212,7 +212,7 @@ const Page = () => {
   useEffect(() => {
     if (org_exists === 'false') {
       modalRef.current?.classList.remove('hidden');
-      modalRef.current?.classList.add('open ');
+      modalRef.current?.classList.add('open');
     } else {
       modalRef.current?.classList.remove('open');
       modalRef.current?.classList.add('hidden');
@@ -1216,8 +1216,8 @@ const Page = () => {
                                 <button
                                   type='button'
                                   className='hs-dropdown-toggle ti-btn  ti-btn-light align-middle'
-                                  data-hs-overlay='#todo-compose'
-                                  ref={closeModalButtonRef}
+                                  // data-hs-overlay='#todo-compose'
+                                  // ref={closeModalButtonRef}
                                   onClick={() => {
                                     setDomainInput('');
                                     setOrganizationName('');
@@ -1233,12 +1233,12 @@ const Page = () => {
                                     setDomainError('');
                                     setTypeDropdownError('');
                                     setMessageError('');
-                                    closeModal();
+                                    // closeModal();
                                     // fetchData();
                                     // fetchData1();
                                   }}
                                 >
-                                  Cancel
+                                  Clear
                                 </button>
                                 <button
                                   type='button'
@@ -1314,13 +1314,6 @@ const Page = () => {
                                     setLoading(false);
                                   }
                                 }}
-                                // onClick={() => {
-                                //   localStorage.setItem(
-                                //     'org_id',
-                                //     org.id as string,
-                                //   );
-                                //   localStorage.setItem('org_name', org.name);
-                                // }}
                               >
                                 <div className='flex items-center'>
                                   {/* <span className="me-2 leading-none">
