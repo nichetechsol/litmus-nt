@@ -196,14 +196,7 @@ const Page = () => {
     setIsOpen(true);
     document.body.classList.add('no-scroll1');
   };
-  useEffect(() => {
-    if (org_exists === 'false') {
-      const addButton = document.getElementById('add-org-button');
-      if (addButton) {
-        addButton.click();
-      }
-    }
-  }, [org_exists]);
+
   const closeModal = () => {
     setIsOpen(false);
     document.body.classList.remove('no-scroll1');
@@ -219,12 +212,19 @@ const Page = () => {
     }
   }, [modalOpen, org_exists]);
   useEffect(() => {
-    if (org_exists)
-      if (isOpen) {
-        document.body.classList.add('overflow-hidden');
-      } else {
-        document.body.classList.remove('overflow-hidden');
+    if (org_exists === 'false') {
+      const addButton = document.getElementById('add-org-button');
+      if (addButton) {
+        addButton.click();
       }
+    }
+  }, [org_exists]);
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('overflow-hidden');
+    } else {
+      document.body.classList.remove('overflow-hidden');
+    }
 
     return () => {
       document.body.classList.remove('overflow-hidden');
@@ -429,7 +429,7 @@ const Page = () => {
         try {
           const v = await DomainSchema.validate(domainInput);
           if (v) {
-            setDomainError('Please press the Enter key');
+            setDomainError('Please press the Enter key.');
           }
         } catch (error) {
           if (error instanceof Yup.ValidationError) {
@@ -509,7 +509,7 @@ const Page = () => {
         try {
           const v = await DomainSchema.validate(domainInput);
           if (v) {
-            setDomainError('Please press the Enter key');
+            setDomainError('Please press the Enter key.');
           }
         } catch (error) {
           if (error instanceof Yup.ValidationError) {
@@ -582,7 +582,7 @@ const Page = () => {
 
   const addDomain = async () => {
     if (
-      (domainError === '' || domainError === 'Please press the Enter key') &&
+      (domainError === '' || domainError === 'Please press the Enter key.') &&
       domainInput.trim() !== ''
     ) {
       const domainsArray = domainInput.endsWith(',')
@@ -993,7 +993,7 @@ const Page = () => {
                                 >
                                   {changeFlage === true
                                     ? 'Add Organization'
-                                    : 'Save Changes'}
+                                    : 'Edit Organization'}
                                 </h6>
                                 <button
                                   type='button'
@@ -1302,6 +1302,9 @@ const Page = () => {
                                     const encryptedOrgName = encryptData(
                                       org.name,
                                     );
+                                    localStorage.removeItem('site_id');
+                                    localStorage.removeItem('site_name');
+                                    localStorage.removeItem('site_owner_name');
                                     localStorage.setItem(
                                       'org_id',
                                       encryptedOrgId,
@@ -1370,6 +1373,9 @@ const Page = () => {
                               const encryptOrgTypeId = encryptData(
                                 org.org_type_id,
                               );
+                              localStorage.removeItem('site_id');
+                              localStorage.removeItem('site_name');
+                              localStorage.removeItem('site_owner_name');
                               localStorage.setItem('org_id', encryptedOrgId);
                               localStorage.setItem(
                                 'org_name',
