@@ -1123,7 +1123,13 @@ const OrgDashboard = () => {
                   <div className='xxl:col-span-12 xl:col-span-12 col-span-12'>
                     <div className='box overflow-hidden'>
                       <div className='box-header flex justify-between'>
-                        <div className='box-title'>Activity Logs</div>
+                        <div className='box-title'>
+                          Activity Logs
+                          <span className='text-gray-600'>
+                            {' '}
+                            (Last 7 days Activities)
+                          </span>
+                        </div>
                         {/* <div className="hs-dropdown ti-dropdown">
                               <Link href="#!" className="text-[0.75rem] px-2 font-normal text-[#8c9097] dark:text-white/50"
                                   aria-expanded="false">

@@ -1435,7 +1435,13 @@ const Page = () => {
                   <div className='xxl:col-span-12 xl:col-span-12 col-span-12'>
                     <div className='box'>
                       <div className='box-header flex justify-between'>
-                        <div className='box-title'>Activity Logs</div>
+                        <div className='box-title'>
+                          Activity Logs
+                          <span className='text-gray-600'>
+                            {' '}
+                            (Last 7 days Activities)
+                          </span>
+                        </div>
                         <div>
                           {activity_log.length >= 10 ? (
                             <button

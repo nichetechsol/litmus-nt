@@ -466,6 +466,13 @@ const Page = () => {
               toast.success('Organization added successfully', {
                 autoClose: 3000,
               });
+              const org_exists = 'true';
+              const encryptedOrgExists = encryptData(
+                org_exists ? org_exists : '',
+              );
+              if (encryptedOrgExists) {
+                localStorage.setItem('org_exists', encryptedOrgExists);
+              }
             } else {
               setLoading(false);
               if (result.errorCode === 1) {
@@ -1411,7 +1418,7 @@ const Page = () => {
                                   </div>
                                   <div>
                                     <div className='relative group'>
-                                      <h6 className='mb-1 font-semibold p-new text-[1rem] text-site-name'>
+                                      <h6 className='mb-1 font-semibold p-new  text-[1rem] text-site-name'>
                                         {org?.org_name}
                                       </h6>
                                       <div className='absolute hidden group-hover:block bg-gray-400 text-black text-xs rounded p-2 z-10 bottom-full mb-2 w-max max-w-xs break-words'>
