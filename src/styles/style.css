@@ -20097,7 +20097,7 @@ h6 {
   word-break: break-all;
 }
 .p-new {
-  word-break: inherit;
+  word-break: break-all;
   overflow-wrap: break-word;
 }
 .new-modal-open {

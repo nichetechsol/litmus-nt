@@ -207,7 +207,7 @@ const Page = () => {
       modalRef.current?.classList.remove('hidden');
       modalRef.current?.classList.add('open', 'new-modal-open');
     } else {
-      modalRef.current?.classList.remove('open', ' new-modal-open');
+      modalRef.current?.classList.remove('open');
       modalRef.current?.classList.add('hidden');
     }
   }, [modalOpen, org_exists]);
