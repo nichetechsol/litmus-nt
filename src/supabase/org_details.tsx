@@ -253,7 +253,7 @@ async function addOrganization(data: {
       .select();
 
     if (insertError) {
-      return { errorCode: 1, data: 'Organization is not added' };
+      return { errorCode: 1, data: 'Organization is already exist' };
     }
 
     // Insert organization user

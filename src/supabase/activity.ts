@@ -136,7 +136,8 @@ const getActivitiesByOrgId = async ({
       )
       .eq('org_id', orgId)
       .range(start, end)
-      .limit(limit);
+      .limit(limit)
+      .order('activity_date', { ascending: false });
 
     if (error) {
       throw error;
@@ -189,7 +190,8 @@ const getActivitiesBySiteID = async ({
       )
       .eq('site_id', siteID)
       .range(start, end)
-      .limit(limit);
+      .limit(limit)
+      .order('activity_date', { ascending: false });
 
     if (error) {
       throw error;

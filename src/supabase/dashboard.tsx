@@ -243,6 +243,119 @@ async function orgDashboardCounts(
 //     };
 //   }
 // }
+
+// --------------------------correctly working code -----------------------------------
+// async function orgUserList(
+//   org_id: any,
+//   start: any,
+//   end: any,
+//   search: any,
+// ): Promise<Result<{ userList: UserList[]; totalCount: any }>> {
+//   try {
+//     const { data: orgUsers, error: orgUsersError } = await supabase
+//       .from('org_users')
+//       .select('*')
+//       .eq('org_id', org_id);
+
+//     if (orgUsersError) {
+//       return {
+//         errorCode: 1,
+//         data: null,
+//         message: 'Failed to retrieve User.',
+//       };
+//     }
+
+//     const userIds = orgUsers.map((orgUser: any) => orgUser.user_id);
+//     const roleIds = orgUsers.map((orgUser: any) => orgUser.role_id);
+
+//     let userQuery = supabase
+//       .from('users')
+//       .select(
+//         `
+//         id,
+//         email,
+//         firstname,
+//         lastname
+//       `,
+//       )
+//       .in('id', userIds)
+//       .range(start, end);
+
+//     if (search) {
+//       userQuery = userQuery.ilike('firstname', `%${search}%`);
+//     } else {
+//       userQuery = userQuery.or('firstname.ilike.%,firstname.is.null');
+//     }
+
+//     const { data: users, error: usersError } = await userQuery;
+
+//     if (usersError) {
+//       return {
+//         errorCode: 1,
+//         data: null,
+//         message: 'Failed to retrieve User.',
+//       };
+//     }
+
+//     const { data: userRoles, error: userRolesError } = await supabase
+//       .from('user_role')
+//       .select('id, name')
+//       .in('id', roleIds);
+
+//     if (userRolesError) {
+//       return {
+//         errorCode: 1,
+//         data: null,
+//         message: 'Failed to retrieve User Role.',
+//       };
+//     }
+
+//     const roleMap: Record<number, string> = {};
+//     userRoles.forEach((role) => {
+//       roleMap[role.id] = role.name;
+//     });
+
+//     const userList = users
+//       .map((user) => {
+//         const orgUser = orgUsers.find((orgUser) => orgUser.user_id === user.id);
+//         if (!orgUser) {
+//           return null; // Handle case where orgUser is not found
+//         }
+//         return {
+//           ...user,
+//           role_id: orgUser.role_id,
+//           role: roleMap[orgUser.role_id],
+//         };
+//       })
+//       .filter(Boolean) as UserList[];
+
+//     const totalCountQuery = supabase
+//       .from('users')
+//       .select('*', { count: 'exact' })
+//       .in('id', userIds);
+
+//     if (search) {
+//       totalCountQuery.ilike('firstname', `%${search}%`);
+//     } else {
+//       totalCountQuery.or('firstname.ilike.%,firstname.is.null');
+//     }
+
+//     const { count: totalCount } = await totalCountQuery;
+
+//     return {
+//       errorCode: 0,
+//       data: { userList, totalCount },
+//     };
+//   } catch (error) {
+//     return {
+//       errorCode: 1,
+//       data: null,
+//       message: 'Failed to retrieve User.',
+//     };
+//   }
+// }
+
+// ------------- for email search perfect-------------------------
 async function orgUserList(
   org_id: any,
   start: any,
@@ -280,9 +393,9 @@ async function orgUserList(
       .range(start, end);
 
     if (search) {
-      userQuery = userQuery.ilike('firstname', `%${search}%`);
-    } else {
-      userQuery = userQuery.or('firstname.ilike.%,firstname.is.null');
+      userQuery = userQuery.or(
+        `firstname.ilike.%${search}%,lastname.ilike.%${search}%,email.ilike.%${search}%`,
+      );
     }
 
     const { data: users, error: usersError } = await userQuery;
@@ -327,15 +440,15 @@ async function orgUserList(
       })
       .filter(Boolean) as UserList[];
 
-    const totalCountQuery = supabase
+    let totalCountQuery = supabase
       .from('users')
       .select('*', { count: 'exact' })
       .in('id', userIds);
 
     if (search) {
-      totalCountQuery.ilike('firstname', `%${search}%`);
-    } else {
-      totalCountQuery.or('firstname.ilike.%,firstname.is.null');
+      totalCountQuery = totalCountQuery.or(
+        `firstname.ilike.%${search}%,lastname.ilike.%${search}%,email.ilike.%${search}%`,
+      );
     }
 
     const { count: totalCount } = await totalCountQuery;
