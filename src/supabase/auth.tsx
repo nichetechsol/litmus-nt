@@ -21,6 +21,7 @@ interface LoginResult {
   auth?: AuthData;
   user?: UserData[];
   add_orgUser?: any;
+  org_exists?: any;
 }
 
 // // Function for logging in
@@ -121,6 +122,7 @@ async function Login(email: string, password: string): Promise<LoginResult> {
         errorCode: 0,
         auth: authData,
         user: userData,
+        org_exists: org_exists,
         add_orgUser: add_orgUser,
       };
     } else {
