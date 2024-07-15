@@ -628,7 +628,7 @@ async function updateOrganization(data: {
             org_id: data.org_id,
             user_id: data.user_id,
             activity_type: 'add_domain',
-            details: `${userName} added the domain ${domain} to the organization ${orgName}.`,
+            details: `'${userName}' added the domain '${domain}' to the organization '${orgName}'.`,
             // {{User Name}} added the domain {{Domain Name}} within the organization {{Org Name}}
           });
         }
@@ -640,7 +640,7 @@ async function updateOrganization(data: {
         org_id: data.org_id,
         user_id: data.user_id,
         activity_type: 'edit_org_description',
-        details: `${userName} changed the organization description within the organization ${orgName}.`,
+        details: `'${userName}' changed the organization description within the organization '${orgName}'.`,
       });
     }
     if (oldOrgName !== orgName) {
@@ -648,7 +648,7 @@ async function updateOrganization(data: {
         org_id: data.org_id,
         user_id: data.user_id,
         activity_type: 'update_org',
-        details: ` ${userName} changed the organization name from ${oldOrgName} to ${orgName}.`,
+        details: `'${userName}' changed the organization name from '${oldOrgName}' to '${orgName}'.`,
       });
     }
     return {
@@ -922,7 +922,7 @@ async function deleteDomains(data: any): Promise<Result<any>> {
       user_id: data.user_id,
       org_id: data.org_id,
       activity_type: 'remove_domain',
-      details: ` ${userName} removed the domain ${domainName} within the organization ${orgName}`,
+      details: `'${userName}' removed the domain '${domainName}' within the organization '${orgName}'`,
     });
     return { errorCode: 0, message: 'Domain deleted successfully', data: null };
   } catch (error) {

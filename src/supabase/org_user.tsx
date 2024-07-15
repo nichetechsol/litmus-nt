@@ -49,7 +49,53 @@ interface Result<T> {
   message?: string;
   data: any;
 }
+async function searchUsers(search?: any): Promise<Result<User[]>> {
+  try {
+    // Construct the base query for searching users
+    let userQuery = supabase.from('users').select('*'); // Limit to 10 results for suggestions
 
+    // Add search criteria if provided
+    if (search) {
+      const searchLower = `%${search.toLowerCase()}%`;
+      userQuery = userQuery.or(
+        `firstname.ilike.${searchLower},lastname.ilike.${searchLower},email.ilike.${searchLower}`,
+      );
+    }
+
+    // Execute the query
+    const { data: users, error: userError } = await userQuery;
+
+    // Handle potential errors from fetching user details
+    if (userError) {
+      return {
+        errorCode: 1,
+        message: 'Failed to retrieve users.',
+        data: null,
+      };
+    }
+    // Handle case where no users are found
+    if (!users || users.length === 0) {
+      return {
+        errorCode: 1,
+        message: 'User not found',
+        data: null,
+      };
+    }
+
+    return {
+      errorCode: 0,
+      message: 'Success',
+      data: users,
+    };
+  } catch (err) {
+    // Handle any other errors (e.g., network issues)
+    return {
+      errorCode: 1,
+      message: 'Unexpected error during fetching users',
+      data: null,
+    };
+  }
+}
 // Function to add a user to an organization based on email or name
 async function addUserToOrganization(
   UserData: UserData,
@@ -404,4 +450,5 @@ export {
   getOrgUserRole,
   modifyUserOfOrganization,
   removeUserFromOrganization,
+  searchUsers,
 };

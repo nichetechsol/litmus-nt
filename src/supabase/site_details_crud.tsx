@@ -575,7 +575,7 @@ async function updateSite(updateData: any): Promise<Result<any>> {
     const logPromises = [];
     if (currentSite[0].name !== updateData.name) {
       const activityType = 'edit_site_name';
-      const activityDetails = `${updateData.userName} changed the site name from ${currentSite[0].name} to ${updateData.name} within the organization ${updateData.orgName}.`;
+      const activityDetails = `'${updateData.userName}' changed the site name from '${currentSite[0].name}' to' ${updateData.name}' within the organization '${updateData.orgName}'.`;
       logPromises.push(
         logActivity({
           org_id: updateData.org_id,
@@ -593,8 +593,7 @@ async function updateSite(updateData: any): Promise<Result<any>> {
 
     if (currentSite[0].type_id !== updateData.type_id) {
       const activityType = 'edit_site_type';
-      const activityDetails = `${updateData.userName} changed the site type from ${type_name} to ${update_typeName} within the site ${currentSite[0].name}.`;
-      // const activityDetails = `${updateData.userName} changed the site type from ${currentSite.type_id.name} to ${updateData.type_id.name} within the site ${currentSite.name}.`;
+      const activityDetails = `'${updateData.userName}' changed the site type from '${type_name}' to '${update_typeName}' within the site '${currentSite[0].name}'.`;
       logPromises.push(
         logActivity({
           org_id: updateData.org_id,
@@ -608,7 +607,7 @@ async function updateSite(updateData: any): Promise<Result<any>> {
 
     if (currentSite[0].about_site !== updateData.about_site) {
       const activityType = 'edit_site_description';
-      const activityDetails = `${updateData.userName} changed the site description within the organization ${updateData.orgName}.`;
+      const activityDetails = `'${updateData.userName}' changed the site description within the organization '${updateData.orgName}'.`;
       logPromises.push(
         logActivity({
           org_id: updateData.org_id,
@@ -630,7 +629,7 @@ async function updateSite(updateData: any): Promise<Result<any>> {
       currentSite[0].state_id !== updateData.state_id
     ) {
       const activityType = 'update_site';
-      const activityDetails = `${updateData.userName} changed the site details within the organization ${updateData.orgName}.`;
+      const activityDetails = `'${updateData.userName}' changed the site details within the organization '${updateData.orgName}'.`;
       logPromises.push(
         logActivity({
           org_id: updateData.org_id,
