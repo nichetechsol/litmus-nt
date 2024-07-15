@@ -192,6 +192,7 @@ const LoginForm = () => {
         const user_firstname: any = result.user[0]?.firstname;
         const user_lastname: any = result.user[0]?.lastname;
         const add_orgUser: any = result.add_orgUser ? 'true' : 'false';
+        const org_exists: any = result.org_exists ? 'true' : 'false';
 
         const encryptedUserId = encryptData(user_id);
         const encryptedUserRole = encryptData(user_role);
@@ -202,6 +203,7 @@ const LoginForm = () => {
           user_lastname ? user_lastname : '',
         );
         const encryptedAddOrgUser = encryptData(add_orgUser ? add_orgUser : '');
+        const encryptedOrgExists = encryptData(org_exists ? org_exists : '');
 
         if (encryptedUserId) {
           localStorage.setItem('user_id', encryptedUserId);
@@ -217,6 +219,9 @@ const LoginForm = () => {
         }
         if (encryptedAddOrgUser) {
           localStorage.setItem('add_orgUser', encryptedAddOrgUser);
+        }
+        if (encryptedOrgExists) {
+          localStorage.setItem('org_exists', encryptedOrgExists);
         }
         navigate.push('/organization');
         setLoading(false);

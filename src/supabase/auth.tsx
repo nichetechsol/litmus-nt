@@ -114,7 +114,7 @@ async function Login(email: string, password: string): Promise<LoginResult> {
         }
       }
     } else {
-      add_orgUser = false;
+      add_orgUser = true;
       org_exists = false;
     }
     if (userData.length > 0) {

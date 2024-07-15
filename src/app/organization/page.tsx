@@ -92,6 +92,7 @@ const Page = () => {
   const [user_role, setUserrole] = useState<any>('');
   const [email, setEmail] = useState<any>('');
   const [add_orgUser, setadd_orgUser] = useState<any>('');
+  const [org_exists, setorg_exists] = useState<any>('');
   const [allDomain, setAllDomain] = useState<any>('');
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -123,11 +124,13 @@ const Page = () => {
     const encryptedUserRole = localStorage.getItem('user_role');
     const encryptedemail = localStorage.getItem('user_email');
     const encryptedaddorg = localStorage.getItem('add_orgUser');
+    const encryptedorgexist = localStorage.getItem('org_exists');
 
     const decryptedUserId = decryptData(encryptedUserId);
     const decryptedUserRole = decryptData(encryptedUserRole);
     const decryptemail = decryptData(encryptedemail);
     const decryptaddorg = decryptData(encryptedaddorg);
+    const decryptorgexist = decryptData(encryptedorgexist);
 
     if (decryptedUserId) {
       setuser_id(decryptedUserId);
@@ -141,26 +144,29 @@ const Page = () => {
     if (decryptaddorg) {
       setadd_orgUser(decryptaddorg);
     }
+    if (decryptorgexist) {
+      setorg_exists(decryptorgexist);
+    }
   }, []);
 
   //To re-open chipbox default domain open this comment and open all comments of setDomains([defaultDomain])
-  // const getDefaultDomainFromEmail = () => {
-  //   const email1 = localStorage.getItem('user_email');
-  //   const decryptemail = decryptData(email1);
+  const getDefaultDomainFromEmail = () => {
+    const email1 = localStorage.getItem('user_email');
+    const decryptemail = decryptData(email1);
 
-  //   if (decryptemail) {
-  //     const domain = decryptemail.split('@')[1];
-  //     return domain || '';
-  //   }
-  //   return '';
-  // };
-  // useEffect(() => {
-  //   // Set the default domain on component mount
-  //   const defaultDomain = getDefaultDomainFromEmail();
-  //   if (defaultDomain) {
-  //     setDomains([defaultDomain]);
-  //   }
-  // }, []);
+    if (decryptemail) {
+      const domain = decryptemail.split('@')[1];
+      return domain || '';
+    }
+    return '';
+  };
+  useEffect(() => {
+    // Set the default domain on component mount
+    const defaultDomain = getDefaultDomainFromEmail();
+    if (defaultDomain) {
+      setDomains([defaultDomain]);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchData2 = async () => {
@@ -190,7 +196,14 @@ const Page = () => {
     setIsOpen(true);
     document.body.classList.add('no-scroll1');
   };
-
+  useEffect(() => {
+    if (org_exists === 'false') {
+      const addButton = document.getElementById('add-org-button');
+      if (addButton) {
+        addButton.click();
+      }
+    }
+  }, [org_exists]);
   const closeModal = () => {
     setIsOpen(false);
     document.body.classList.remove('no-scroll1');
@@ -458,10 +471,10 @@ const Page = () => {
             setDomainInput('');
             setOrganizationName('');
             setSelectedType('');
-            // const defaultDomain = getDefaultDomainFromEmail();
-            // if (defaultDomain) {
-            //   setDomains([defaultDomain]);
-            // }
+            const defaultDomain = getDefaultDomainFromEmail();
+            if (defaultDomain) {
+              setDomains([defaultDomain]);
+            }
             setMessage('');
             setOrganizationNameError('');
             setDomainError('');
@@ -535,10 +548,10 @@ const Page = () => {
             setDomainInput('');
             setOrganizationName('');
             setSelectedType('');
-            // const defaultDomain = getDefaultDomainFromEmail();
-            // if (defaultDomain) {
-            //   setDomains([defaultDomain]);
-            // }
+            const defaultDomain = getDefaultDomainFromEmail();
+            if (defaultDomain) {
+              setDomains([defaultDomain]);
+            }
             setMessage('');
             setOrganizationNameError('');
             setDomainError('');
@@ -694,10 +707,10 @@ const Page = () => {
       setDomainInput('');
       setOrganizationName('');
       setSelectedType('');
-      // const defaultDomain = getDefaultDomainFromEmail();
-      // if (defaultDomain) {
-      //   setDomains([defaultDomain]);
-      // }
+      const defaultDomain = getDefaultDomainFromEmail();
+      if (defaultDomain) {
+        setDomains([defaultDomain]);
+      }
       setMessage('');
       setOrganizationNameError('');
       setDomainError('');
@@ -737,10 +750,10 @@ const Page = () => {
     setDomainInput('');
     setOrganizationName('');
     setSelectedType('');
-    // const defaultDomain = getDefaultDomainFromEmail();
-    // if (defaultDomain) {
-    //   setDomains([defaultDomain]);
-    // }
+    const defaultDomain = getDefaultDomainFromEmail();
+    if (defaultDomain) {
+      setDomains([defaultDomain]);
+    }
     setMessage('');
     fetchData();
     fetchData1();
@@ -944,6 +957,7 @@ const Page = () => {
                     <div className='p-4 grid border-b border-dashed dark:border-defaultborder/10'>
                       <Link
                         href=''
+                        id='add-org-button'
                         className='hs-dropdown-toggle py-2  px-3 ti-btn bg-primary text-white !font-medium w-full !mb-0'
                         data-hs-overlay='#todo-compose'
                         // onClick={() => setModalOpen(true) }
@@ -956,7 +970,7 @@ const Page = () => {
                         <div
                           id='todo-compose'
                           // className='hs-overlay hidden ti-modal open'
-                          className='hs-overlay hidden ti-modal  [--overlay-backdrop:static]'
+                          className='hs-overlay hidden ti-modal [--overlay-backdrop:static]'
                         >
                           <div className='hs-overlay-open:mt-7  ti-modal-box mt-0 ease-out'>
                             <div className='ti-modal-content'>
@@ -979,12 +993,12 @@ const Page = () => {
                                     setOrganizationName('');
                                     setSelectedType('');
                                     closeModal();
-                                    // const defaultDomain =
-                                    //   getDefaultDomainFromEmail();
-                                    // if (defaultDomain) {
-                                    //   setDomains([defaultDomain]);
-                                    // }
-                                    setDomains([]);
+                                    const defaultDomain =
+                                      getDefaultDomainFromEmail();
+                                    if (defaultDomain) {
+                                      setDomains([defaultDomain]);
+                                    }
+                                    // setDomains([]);
                                     setMessage('');
                                     setOrganizationNameError('');
                                     setDomainError('');
@@ -1043,9 +1057,10 @@ const Page = () => {
                                         type='text'
                                         className='form-control w-full me-2'
                                         id='task-name'
-                                        placeholder={`For eg: ${
-                                          email.split('@')[1]
-                                        }`}
+                                        // placeholder={`For eg: ${
+                                        //   email.split('@')[1]
+                                        // }`}
+                                        placeholder='For eg: example.com'
                                         onChange={handleDomainChange}
                                         onKeyDown={handleKeyPress}
                                         value={domainInput}
@@ -1195,12 +1210,12 @@ const Page = () => {
                                     setDomainInput('');
                                     setOrganizationName('');
                                     setSelectedType('');
-                                    // const defaultDomain =
-                                    //   getDefaultDomainFromEmail();
-                                    // if (defaultDomain) {
-                                    //   setDomains([defaultDomain]);
-                                    // }
-                                    setDomains([]);
+                                    const defaultDomain =
+                                      getDefaultDomainFromEmail();
+                                    if (defaultDomain) {
+                                      setDomains([defaultDomain]);
+                                    }
+                                    // setDomains([]);
                                     setMessage('');
                                     setOrganizationNameError('');
                                     setDomainError('');
@@ -1299,7 +1314,9 @@ const Page = () => {
                                   {/* <span className="me-2 leading-none">
                                             <i className="ri-task-line align-middle text-[.875rem]"></i>
                                         </span> */}
-                                  <span className='flex-grow'>{org?.name}</span>
+                                  <span className='flex-grow p-new'>
+                                    {org?.name}
+                                  </span>
                                   {/* <span className="badge bg-success/10 text-success rounded-full">167</span> */}
                                 </div>
                               </li>
