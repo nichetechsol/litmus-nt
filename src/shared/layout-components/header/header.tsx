@@ -656,6 +656,9 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                               localStorage.removeItem('user_fname');
                               localStorage.removeItem('user_lname');
                               localStorage.removeItem('org_type_id');
+                              localStorage.removeItem('user_email');
+                              localStorage.removeItem('add_orgUser');
+                              localStorage.removeItem('ActivityLogs');
                               history.push('/');
                               setLoading(false);
                             }

@@ -208,12 +208,23 @@ const Page = () => {
     setIsOpen(false);
     document.body.classList.remove('no-scroll1');
   };
+  const modalRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add('overflow-hidden');
+    if (org_exists === 'false') {
+      modalRef.current?.classList.remove('hidden');
+      modalRef.current?.classList.add('open ');
     } else {
-      document.body.classList.remove('overflow-hidden');
+      modalRef.current?.classList.remove('open');
+      modalRef.current?.classList.add('hidden');
     }
+  }, [modalOpen, org_exists]);
+  useEffect(() => {
+    if (org_exists)
+      if (isOpen) {
+        document.body.classList.add('overflow-hidden');
+      } else {
+        document.body.classList.remove('overflow-hidden');
+      }
 
     return () => {
       document.body.classList.remove('overflow-hidden');
@@ -969,6 +980,7 @@ const Page = () => {
                       {modalOpen && modalOpen ? (
                         <div
                           id='todo-compose'
+                          ref={modalRef}
                           // className='hs-overlay hidden ti-modal open'
                           className='hs-overlay hidden ti-modal [--overlay-backdrop:static]'
                         >
@@ -981,7 +993,7 @@ const Page = () => {
                                 >
                                   {changeFlage === true
                                     ? 'Add Organization'
-                                    : 'Edit Organization'}
+                                    : 'Save Changes'}
                                 </h6>
                                 <button
                                   type='button'
@@ -1235,7 +1247,7 @@ const Page = () => {
                                 >
                                   {changeFlage === true
                                     ? 'Add Organization'
-                                    : 'Edit Organization'}
+                                    : 'Save Changes'}
                                 </button>
                               </div>
                             </div>

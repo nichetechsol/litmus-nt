@@ -5,7 +5,6 @@
 
 import { redirect, useRouter } from 'next/navigation';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import swal from 'sweetalert';
 
 import { decryptData } from '@/helper/Encryption_Decryption';
 import { logActivity } from '@/supabase/activity';
@@ -82,16 +81,18 @@ const Page = () => {
     const decryptedUserId = decryptData(encryptedUserId);
     const decryptedOrgId = decryptData(encryptedOrgId);
     const decryptedSiteId = decryptData(encryptedSiteId);
-    if (decryptedOrgId) {
-      setorg_id(decryptedOrgId);
-      if (!decryptedSiteId) {
-        document.body.classList.add('no-scroll');
-        swal('Please select a Site', { icon: 'error' }).then(() => {
-          document.body.classList.remove('no-scroll');
-          navigate.push('/sites');
-        });
-      }
-    } else {
+
+    // if (decryptedOrgId) {
+    //   setorg_id(decryptedOrgId);
+    //   if (!decryptedSiteId) {
+    //     document.body.classList.add('no-scroll');
+    //     swal('Please select a Site', { icon: 'error' }).then(() => {
+    //       document.body.classList.remove('no-scroll');
+    //       navigate.push('/sites');
+    //     });
+    //   }
+    // }
+    if (!encryptedOrgId) {
       document.body.classList.add('no-scroll');
       swal('Please select a  Organization', { icon: 'error' }).then(() => {
         document.body.classList.remove('no-scroll');
@@ -99,6 +100,10 @@ const Page = () => {
         return;
       });
     }
+    if (decryptedOrgId) {
+      setorg_id(decryptedOrgId);
+    }
+
     if (decryptedSiteId) {
       setsite_id(decryptedSiteId);
     }
@@ -256,39 +261,43 @@ const Page = () => {
                   </div>
                   <div className='box-body'>
                     <ul className='list-none crm-top-deals mb-0'>
-                      {file3 && file3?.length > 0
-                        ? file3?.map((file: any, index: number) => (
-                            <li
-                              key={index}
-                              className='mb-[0.9rem] p-4 hover:bg-light border dark:border-defaultborder/10 rounded-md relative'
-                            >
-                              <div className='flex items-center '>
-                                <div className='me-2'>
-                                  <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
-                                    <i className='ri-file-line text-[1rem] text-white'></i>
-                                  </span>
-                                </div>
-                                <div className='flex-grow'>
-                                  <p className='font-semibold mb-[1.4px]  text-[0.813rem] word-break'>
-                                    {file.FileName}
-                                  </p>
-                                </div>
-                                <div className='font-semibold text-[0.9375rem]'>
-                                  <a
-                                    onClick={() => {
-                                      handleDownload(file.FileName);
-                                    }}
-                                    // href={file.downloadLink}
-                                    className='text-[1rem] !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'
-                                    style={{ cursor: 'pointer' }}
-                                  >
-                                    <i className='ri-download-line text-[.8rem] text-white'></i>
-                                  </a>
-                                </div>
+                      {file3 && file3?.length > 0 ? (
+                        file3?.map((file: any, index: number) => (
+                          <li
+                            key={index}
+                            className='mb-[0.9rem] p-4 hover:bg-light border dark:border-defaultborder/10 rounded-md relative'
+                          >
+                            <div className='flex items-center '>
+                              <div className='me-2'>
+                                <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
+                                  <i className='ri-file-line text-[1rem] text-white'></i>
+                                </span>
                               </div>
-                            </li>
-                          ))
-                        : null}
+                              <div className='flex-grow'>
+                                <p className='font-semibold mb-[1.4px]  text-[0.813rem] word-break'>
+                                  {file.FileName}
+                                </p>
+                              </div>
+                              <div className='font-semibold text-[0.9375rem]'>
+                                <a
+                                  onClick={() => {
+                                    handleDownload(file.FileName);
+                                  }}
+                                  // href={file.downloadLink}
+                                  className='text-[1rem] !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'
+                                  style={{ cursor: 'pointer' }}
+                                >
+                                  <i className='ri-download-line text-[.8rem] text-white'></i>
+                                </a>
+                              </div>
+                            </div>
+                          </li>
+                        ))
+                      ) : (
+                        <div className='col-md-12 w-100 mt-4'>
+                          <p className='text-center'>No Files Found</p>
+                        </div>
+                      )}
                       {file3?.length === 0 && (
                         <div className='col-md-12 w-100 mt-4'>
                           <p className='text-center'>No Files Found</p>
