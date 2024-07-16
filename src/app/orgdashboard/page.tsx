@@ -33,6 +33,7 @@ import {
   getOrgUserRole,
   modifyUserOfOrganization,
   removeUserFromOrganization,
+  searchUsers,
 } from '@/supabase/org_user';
 import { refreshToken } from '@/supabase/session';
 import Loader from '@/utils/Loader/Loader';
@@ -370,7 +371,29 @@ const OrgDashboard = () => {
     setLastNameError('');
     setRoleError('');
   };
+  const [DataTOAutoFill, setDataTOAutoFill] = useState<string[]>([]);
+  useEffect(() => {
+    const DetailsFORAddUser = async () => {
+      try {
+        // setLoading(true);
 
+        const result1: any = await searchUsers(firstName || lastName || email); // Replace with your actual API call
+
+        if (result1.data) {
+          // setRoles(result1.data);
+          setDataTOAutoFill(result1.data);
+
+          // setLoading(false);
+        } else {
+          // toast.error(result1.message, { autoClose: 3000 });
+        }
+      } catch (error: any) {
+        // toast.error(error.message, { autoClose: 3000 });
+      }
+    };
+
+    DetailsFORAddUser();
+  }, [email, lastName, firstName]);
   const handleAddUser = () => {
     openModal();
     setEmail('');
@@ -564,6 +587,13 @@ const OrgDashboard = () => {
   useEffect(() => {
     roleChange();
   }, [user_id, org_id]);
+  const handelautofill = (e: any) => {
+    if (e) {
+      setEmail(e.email);
+      setFirstName(e.firstname);
+      setLastName(e.lastname);
+    }
+  };
   return (
     <>
       {loading && <Loader />}
@@ -849,6 +879,15 @@ const OrgDashboard = () => {
                                         maxLength={320}
                                         value={email}
                                       />
+                                      {DataTOAutoFill.map((e: any) => (
+                                        <li
+                                          style={{ cursor: 'pointer' }}
+                                          key={e}
+                                          onClick={() => handelautofill(e)}
+                                        >
+                                          {e.email}
+                                        </li>
+                                      ))}
                                       {emailError && (
                                         <div className='text-danger'>
                                           {emailError}
@@ -875,6 +914,9 @@ const OrgDashboard = () => {
                                         maxLength={255}
                                         value={firstName}
                                       />
+                                      {DataTOAutoFill.map((e: any) => (
+                                        <li key={e}>{e.firstname}</li>
+                                      ))}
                                       {firstNameError && (
                                         <div className='text-danger'>
                                           {firstNameError}
@@ -900,6 +942,9 @@ const OrgDashboard = () => {
                                         maxLength={255}
                                         value={lastName}
                                       />
+                                      {DataTOAutoFill.map((e: any) => (
+                                        <li key={e}>{e.lastname}</li>
+                                      ))}
                                       {lastNameError && (
                                         <div className='text-danger'>
                                           {lastNameError}
