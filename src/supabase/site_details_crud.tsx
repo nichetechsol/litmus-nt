@@ -792,6 +792,25 @@ async function requestSiteDeletion(data: any): Promise<Result<any>> {
 
     // Send email
     await sendEmailFunction(to, subject, headingData, contentData, data.token);
+    const emailData: any = await fetchEmailData('Site_Delete_Request_User');
+    const toUser = data.email;
+    const subjectUser = emailData.data.email_subject;
+    const headingUser = emailData.data.email_heading;
+    const contentUser = emailData.data.email_content;
+    const toData = toUser.replace('{{Target User EMail}}', toUser);
+    const headingUserData = headingUser.replace('{{Site Name}}', siteName);
+    const contentUserData = contentUser
+      .replace('{{Site Name}}', siteName)
+      .replace('{{Org Name}}', orgName);
+
+    // Send email
+    await sendEmailFunction(
+      toData,
+      subjectUser,
+      headingUserData,
+      contentUserData,
+      data.token,
+    );
     return {
       errorCode: 0,
       message: 'Site deletion request sent successfully.',

@@ -248,6 +248,7 @@ async function addOrganization(data: {
           description: data.description,
           type_id: data.type_id,
           status: data.status,
+          retention_setting: 1,
         },
       ])
       .select();
@@ -1000,14 +1001,6 @@ async function reqOrgDeleteMail(data: any): Promise<any> {
   // Fetch email configuration
   try {
     const emailResult = await fetchEmailData('Org_Delete_Request');
-    if (emailResult.errorCode !== 0) {
-      return {
-        errorCode: 1,
-        message: 'Error fetching email configuration.',
-        data: null,
-      };
-    }
-
     const userName: string = data.userName;
     const orgName: string = data.org_name;
     const emailData = emailResult.data;
@@ -1026,6 +1019,23 @@ async function reqOrgDeleteMail(data: any): Promise<any> {
     // Send email
     await sendEmailFunction(to, subject, headingData, contentData, data.token);
 
+    const email_data: any = await fetchEmailData('Org_Delete_Request_User');
+    const toUser = data.userName;
+    const subjectUser = email_data.data.email_subject;
+    const headingUser = email_data.data.email_heading;
+    const contentUser = email_data.data.email_content;
+    const toData = toUser.replace('{{Target User EMail}}', toUser);
+    const headingUserData = headingUser.replace('{{Org Name}}', orgName);
+    const contentUserData = contentUser.replace('{{Org Name}}', orgName);
+
+    // Send email
+    await sendEmailFunction(
+      toData,
+      subjectUser,
+      headingUserData,
+      contentUserData,
+      data.token,
+    );
     return {
       errorCode: 0,
       message: 'Organization deletion request sent successfully.',

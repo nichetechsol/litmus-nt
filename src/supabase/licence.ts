@@ -1,6 +1,9 @@
+/* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import supabase from '@/supabase/db';
+import { sendEmailFunction } from '@/supabase/email';
+import fetchEmailData from '@/supabase/email_configuration';
 
 interface GetSKUParams {
   orgId: number;
@@ -80,6 +83,112 @@ const getSKUList = async ({ orgId }: GetSKUParams): Promise<any> => {
     return null;
   }
 };
+// async function reqLicense (data:any):Promise<any>{
+//   const userName: string = data.userName;
+//   const orgName: string = data.org_name;
+//   try{
+//     const emailResult = await fetchEmailData('License_Request');
+//     if (emailResult.errorCode !== 0) {
+//       return {
+//         errorCode: 1,
+//         message: 'Error fetching email configuration.',
+//         data: null,
+//       };
+//     }
+//     const emailData = emailResult.data;
+
+//     const to: string = emailData.To;
+//     const subject: string = emailData.email_subject;
+//     const heading: string = emailData.email_heading;
+//     const contentTemplate: string = emailData.email_content;
+
+//     const headingData = heading
+//     .replace('{{User Name}}', userName)
+//     .replace('{{Org Name}}', orgName);
+//     const contentData = contentTemplate
+//     .replace('{{User Name}}', userName)
+//     .replace('{{Org Name}}', orgName);
+
+//     // Send email
+//     await sendEmailFunction(to, subject, headingData, contentData, data.token);
+
+//     return {
+//       errorCode: 0,
+//       message: 'Organization deletion request sent successfully.',
+//       data: null,
+//     };
+
+//   } catch (error) {
+//     // Handle unexpected errors
+//     return {
+//       errorCode: 1,
+//       message: 'Unexpected error',
+//       data: null,
+//     };
+//   }
+// }
+
+async function reqLicense(data: any) {
+  const userName: any = data.userName;
+  const orgName: any = data.name;
+  const siteName: any = data.siteName;
+  const license_sku_name: any = data.license_sku_name;
+
+  try {
+    // Fetch email data for License_Request
+    const email_data: any = await fetchEmailData('License_Request');
+    const to = email_data.data.To; //here To is email_config table's To
+    const subject = email_data.data.email_subject;
+    const heading = email_data.data.email_heading;
+    const content = email_data.data.email_content;
+
+    const headingData = heading.replace('{{User Name}}', userName);
+    const contentData = content
+      .replace('{{User Name}}', userName)
+      .replace('{{Site Name}}', siteName)
+      .replace('{{Org Name}}', orgName)
+      .replace('{{License SKU}}', license_sku_name);
+
+    await sendEmailFunction(to, subject, headingData, contentData, data.token);
+
+    // Fetch email data for License_Request_User
+    const emailData: any = await fetchEmailData('License_Request_User');
+
+    const toRequestUser = data.userName;
+    const subjectRequestUser = emailData.data.email_subject;
+    const headingRequestUser = emailData.data.email_heading;
+    const contentRequestUser = emailData.data.email_content;
+
+    const toData = toRequestUser.replace(
+      '{{Target User EMail}}',
+      toRequestUser,
+    );
+    const contentDataRequestUser = contentRequestUser
+      .replace('{{Site Name}}', siteName)
+      .replace('{{Org Name}}', orgName)
+      .replace('{{License SKU}}', license_sku_name);
+
+    await sendEmailFunction(
+      toData,
+      subjectRequestUser,
+      headingRequestUser,
+      contentDataRequestUser,
+      data.token,
+    );
+    return {
+      errorCode: 0,
+      message: 'License request sent successfully.',
+      data: null,
+    };
+  } catch (error) {
+    return {
+      errorCode: 1,
+      message: 'Unexpected error',
+      data: null,
+    };
+  }
+}
+
 const addLicence = async ({
   user_id,
   expiry,
@@ -157,4 +266,4 @@ const getLicenceData = async ({
   }
 };
 
-export { addLicence, getLicenceData, getSKUList };
+export { addLicence, getLicenceData, getSKUList, reqLicense };
