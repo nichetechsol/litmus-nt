@@ -443,6 +443,10 @@ const Page = () => {
 
     validate();
   }, [organizationName, domains, selectedType, message]);
+
+  const [domainIdsToBeRemoved, setDomainIdsToBeRemoved] = useState<
+    { domainname: string; domainid: number }[]
+  >([]);
   const handleSubmit = async () => {
     if (changeFlage == true) {
       if (domainInput.trim() !== '') {
@@ -547,6 +551,44 @@ const Page = () => {
         const isValid = await validateForm();
 
         if (isValid) {
+          if (domainIdsToBeRemoved.length > 0) {
+            try {
+              const deletePromises = domainIdsToBeRemoved.map(async (id) => {
+                const data = {
+                  org_id: orgidForupdatetion,
+                  domain_id: id.domainid,
+                  user_id: user_id,
+                  name: organizationName,
+                  userName: email,
+                };
+                const result = await deleteDomains(data);
+                if (result.errorCode != 0) {
+                  toast.error(result.message, { autoClose: 3000 });
+                  setDomains([...domains, id.domainname]);
+                  throw new Error(result.message);
+                } else {
+                  toast.success(result.message, { autoClose: 3000 });
+                }
+              });
+
+              await Promise.all(deletePromises);
+            } catch (error) {
+              return;
+            }
+            // domainIdsToBeRemoved.map(async (id) => {
+            //   const data = {
+            //     org_id: orgidForupdatetion,
+            //     domain_id: id.domainid,
+            //     user_id: user_id,
+            //     name: organizationName,
+            //     userName: email,
+            //   };
+            //   const result = await deleteDomains(data);
+            //   if (result.errorCode != 0) {
+            //     toast.error(result.message, { autoClose: 3000 });
+            //   }
+            // });
+          }
           const selectedTypeId =
             typeDropdown?.find((type) => type.name === selectedType)?.id ??
             null;
@@ -686,38 +728,36 @@ const Page = () => {
     const newdom = domains.filter((i, idx) => idx != index);
 
     if (changeFlage === false && id?.domainid && newdom.length >= 1) {
-      setLoading(true);
-      const data = {
-        org_id: orgidForupdatetion,
-        domain_id: id.domainid,
-        user_id: user_id,
-        name: organizationName,
-        userName: email,
-      };
+      // const data = {
+      //   org_id: orgidForupdatetion,
+      //   domain_id: id.domainid,
+      //   user_id: user_id,
+      //   name: organizationName,
+      //   userName: email,
+      // };
+      setDomainIdsToBeRemoved([...domainIdsToBeRemoved, id]);
+      // const result = await deleteDomains(data);
+      // if (result.errorCode === 0) {
 
-      const result = await deleteDomains(data);
-      if (result.errorCode === 0) {
+      setDomains(newdom);
+      if (newdom.length == 0) {
         setLoading(false);
-        toast.success(result.message, {
-          autoClose: 3000,
-        });
-        setDomains(newdom);
-        if (newdom.length == 0) {
-          setLoading(false);
-          setDomainError('Domain is required. Please enter a domain.');
-        } else {
-          setLoading(false);
-          setDomainError('');
-        }
+        setDomainError('Domain is required. Please enter a domain.');
+        // setDomains(newdom);
       } else {
         setLoading(false);
-        toast.error(result.message, { autoClose: 3000 });
+        setDomainError('');
       }
+      // } else {
+      //   setLoading(false);
+      //   toast.error(result.message, { autoClose: 3000 });
+      // }
     } else {
       if (newdom.length == 0) {
         setLoading(false);
         setDomainError("Atleast one domain is required.You can't delete it.");
         // toast.error('Atleast one domain must be entered.', { autoClose: 3000 });
+        setDomains(newdom);
       } else {
         setLoading(false);
         setDomainError('');
@@ -1099,7 +1139,12 @@ const Page = () => {
                                     <div className='flex'>
                                       <input
                                         type='text'
-                                        className='form-control w-full me-2'
+                                        // className='form-control w-full me-2'
+                                        className={`form-control w-full me-2 ${
+                                          domainError === ''
+                                            ? ''
+                                            : 'input-error'
+                                        }`}
                                         id='task-name'
                                         // placeholder={`For eg: ${
                                         //   email.split('@')[1]
