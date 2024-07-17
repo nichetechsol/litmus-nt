@@ -317,6 +317,117 @@ async function sitesDetails(site_id: any): Promise<SiteDetailResponse> {
 }
 
 // Function to fetch and log the number of users, licenses, and sandboxes for a given site
+// async function sitesCounts(site_id: any, org_id: any): Promise<FunctionReturn> {
+//   // Validate the input
+//   if (!site_id || !org_id) {
+//     return {
+//       errorCode: 1,
+//       message: 'Invalid input: site_id and org_id cannot be null or empty',
+//       data: null,
+//     };
+//   }
+
+//   try {
+//     let products1: any = 0;
+//     const { data: products, error } = await supabase.storage
+//       .from('Litmus_Products')
+//       .list();
+//     if (!error) {
+//       products1 = products.length;
+//     }
+//     // Fetch the users associated with the site
+//     const { data: sites_details, error: siteDetailError } = await supabase
+//       .from('sites_detail')
+//       .select('*')
+//       .eq('id', site_id);
+//     const { data: site_users, error: userError } = await supabase
+//       .from('site_users')
+//       .select('*')
+//       .eq('site_id', site_id);
+
+//     // Check for errors during the fetch operation for users
+//     if (userError) {
+//       return {
+//         errorCode: 1,
+//         message: 'Error while fetching site users',
+//         data: null,
+//       };
+//     }
+
+//     // Fetch the licenses associated with the site
+//     const { data: licence, error: licenceError } = await supabase
+//       .from('licence')
+//       .select('*')
+//       .eq('site_id', site_id);
+
+//     // Check for errors during the fetch operation for licenses
+//     if (licenceError) {
+//       return {
+//         errorCode: 1,
+//         message: 'Error while fetching site licenses',
+//         data: null,
+//       };
+//     }
+
+//     // Fetch the entitlements package associated with the site
+//     const { data: entitlements_package, error: entitlementsPackageError } =
+//       await supabase
+//         .from('entitlements_package')
+//         .select('*')
+//         .eq('entitlement_name_id', '12')
+//         .eq('site_id', site_id)
+//         .eq('org_id', org_id);
+
+//     // Check for errors during the fetch operation for entitlements package
+//     if (entitlementsPackageError) {
+//       return {
+//         errorCode: 1,
+//         message: 'Error while fetching entitlements package',
+//         data: null,
+//       };
+//     }
+
+//     let entitlementsPackageCount = 0;
+//     if (entitlements_package.length > 0) {
+//       const { data: entitlements_values, error } = await supabase
+//         .from('entitlements_values')
+//         .select('*')
+//         .eq('id', entitlements_package[0].entitlement_value_id);
+//       if (error) {
+//         return {
+//           errorCode: 1,
+//           message: 'Error while fetching entitlements_values',
+//           data: null,
+//         };
+//       }
+//       if (entitlements_values) {
+//         entitlementsPackageCount = entitlements_values[0].value_number;
+//       } else {
+//         entitlementsPackageCount = 0;
+//       }
+//     }
+
+//     // Return the number of users, licenses, and sandboxes
+//     return {
+//       errorCode: 0,
+//       message: 'Success',
+//       data: {
+//         usersCount: site_users.length,
+//         licencesCount: licence.length,
+//         sandboxesCount: entitlementsPackageCount,
+//         productCount: products1,
+//         sites_details: sites_details,
+//       },
+//     };
+//   } catch (error) {
+//     // Log any unexpected errors
+//     return {
+//       errorCode: -1,
+//       message: 'Unexpected error during fetching site data',
+//       data: null,
+//     };
+//   }
+// }
 async function sitesCounts(site_id: any, org_id: any): Promise<FunctionReturn> {
   // Validate the input
   if (!site_id || !org_id) {
@@ -328,24 +439,40 @@ async function sitesCounts(site_id: any, org_id: any): Promise<FunctionReturn> {
   }
 
   try {
-    let products1: any = 0;
-    const { data: products, error } = await supabase.storage
+    let productsCount = 0;
+    const { data: products, error: productsError } = await supabase.storage
       .from('Litmus_Products')
       .list();
-    if (!error) {
-      products1 = products.length;
+    if (!productsError && products) {
+      productsCount = products.length;
     }
-    // Fetch the users associated with the site
+
+    // Fetch the site details including country and state names
     const { data: sites_details, error: siteDetailError } = await supabase
       .from('sites_detail')
-      .select('*')
-      .eq('id', site_id);
+      .select(
+        `
+        *,
+        country:country_id ( name ),
+        state:state_id ( name )
+      `,
+      )
+      .eq('id', site_id)
+      .single();
+
+    if (siteDetailError || !sites_details) {
+      return {
+        errorCode: 1,
+        message: 'Error while fetching site details',
+        data: null,
+      };
+    }
+
     const { data: site_users, error: userError } = await supabase
       .from('site_users')
       .select('*')
       .eq('site_id', site_id);
 
-    // Check for errors during the fetch operation for users
     if (userError) {
       return {
         errorCode: 1,
@@ -354,13 +481,11 @@ async function sitesCounts(site_id: any, org_id: any): Promise<FunctionReturn> {
       };
     }
 
-    // Fetch the licenses associated with the site
     const { data: licence, error: licenceError } = await supabase
       .from('licence')
       .select('*')
       .eq('site_id', site_id);
 
-    // Check for errors during the fetch operation for licenses
     if (licenceError) {
       return {
         errorCode: 1,
@@ -369,7 +494,6 @@ async function sitesCounts(site_id: any, org_id: any): Promise<FunctionReturn> {
       };
     }
 
-    // Fetch the entitlements package associated with the site
     const { data: entitlements_package, error: entitlementsPackageError } =
       await supabase
         .from('entitlements_package')
@@ -378,7 +502,6 @@ async function sitesCounts(site_id: any, org_id: any): Promise<FunctionReturn> {
         .eq('site_id', site_id)
         .eq('org_id', org_id);
 
-    // Check for errors during the fetch operation for entitlements package
     if (entitlementsPackageError) {
       return {
         errorCode: 1,
@@ -388,26 +511,26 @@ async function sitesCounts(site_id: any, org_id: any): Promise<FunctionReturn> {
     }
 
     let entitlementsPackageCount = 0;
-    if (entitlements_package.length > 0) {
-      const { data: entitlements_values, error } = await supabase
-        .from('entitlements_values')
-        .select('*')
-        .eq('id', entitlements_package[0].entitlement_value_id);
-      if (error) {
+    if (entitlements_package && entitlements_package.length > 0) {
+      const { data: entitlements_values, error: entitlementsValuesError } =
+        await supabase
+          .from('entitlements_values')
+          .select('*')
+          .eq('id', entitlements_package[0].entitlement_value_id);
+
+      if (entitlementsValuesError) {
         return {
           errorCode: 1,
           message: 'Error while fetching entitlements_values',
           data: null,
         };
       }
-      if (entitlements_values) {
+
+      if (entitlements_values && entitlements_values.length > 0) {
         entitlementsPackageCount = entitlements_values[0].value_number;
-      } else {
-        entitlementsPackageCount = 0;
       }
     }
 
-    // Return the number of users, licenses, and sandboxes
     return {
       errorCode: 0,
       message: 'Success',
@@ -415,12 +538,15 @@ async function sitesCounts(site_id: any, org_id: any): Promise<FunctionReturn> {
         usersCount: site_users.length,
         licencesCount: licence.length,
         sandboxesCount: entitlementsPackageCount,
-        productCount: products1,
-        sites_details: sites_details,
+        productCount: productsCount,
+        sites_details: {
+          ...sites_details,
+          country: sites_details.country.name,
+          state: sites_details.state.name,
+        },
       },
     };
   } catch (error) {
-    // Log any unexpected errors
     return {
       errorCode: -1,
       message: 'Unexpected error during fetching site data',
