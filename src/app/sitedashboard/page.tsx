@@ -389,6 +389,7 @@ const Page = () => {
     fetchRoles();
   }, []);
   const [DataTOAutoFill, setDataTOAutoFill] = useState<string[]>([]);
+  const [isFocusedOnEmail, setIsFocusedOnEmail] = useState(false);
   const handleEmailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setDataTOAutoFill1([]);
     setDataTOAutoFill2([]);
@@ -408,6 +409,7 @@ const Page = () => {
       .catch((err: Yup.ValidationError) => setEmailError(err.message));
   };
   const [DataTOAutoFill1, setDataTOAutoFill1] = useState<string[]>([]);
+  const [isFocusedOnFName, setIsFocusedOnFName] = useState(false);
   const handleFirstNameChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -429,6 +431,7 @@ const Page = () => {
       .catch((err: Yup.ValidationError) => setFirstNameError(err.message));
   };
   const [DataTOAutoFill2, setDataTOAutoFill2] = useState<string[]>([]);
+  const [isFocusedOnLName, setIsFocusedOnLName] = useState(false);
   const handleLastNameChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -1237,11 +1240,18 @@ const Page = () => {
                                         disabled={!changeFlage}
                                         placeholder='Enter Email'
                                         onChange={handleEmailChange}
+                                        onFocus={() =>
+                                          setIsFocusedOnEmail(true)
+                                        }
+                                        onBlur={() =>
+                                          setIsFocusedOnEmail(false)
+                                        }
                                         onKeyDown={handleKeyPress}
                                         maxLength={320}
                                         value={email}
                                       />
-                                      {DataTOAutoFill &&
+                                      {isFocusedOnEmail &&
+                                        DataTOAutoFill &&
                                         DataTOAutoFill.length > 0 && (
                                           <ul className='auto-fill-list'>
                                             {DataTOAutoFill.map((e: any) => (
@@ -1279,11 +1289,18 @@ const Page = () => {
                                         disabled={!changeFlage}
                                         placeholder='Enter First Name'
                                         onChange={handleFirstNameChange}
+                                        onFocus={() =>
+                                          setIsFocusedOnFName(true)
+                                        }
+                                        onBlur={() =>
+                                          setIsFocusedOnFName(false)
+                                        }
                                         onKeyDown={handleKeyPress}
                                         maxLength={255}
                                         value={firstName}
                                       />
-                                      {DataTOAutoFill1 &&
+                                      {isFocusedOnFName &&
+                                        DataTOAutoFill1 &&
                                         DataTOAutoFill1.length > 0 && (
                                           <ul className='auto-fill-list'>
                                             {DataTOAutoFill1.map((e: any) => (
@@ -1319,11 +1336,18 @@ const Page = () => {
                                         placeholder='Enter Last Name'
                                         disabled={!changeFlage}
                                         onChange={handleLastNameChange}
+                                        onFocus={() =>
+                                          setIsFocusedOnLName(true)
+                                        }
+                                        onBlur={() =>
+                                          setIsFocusedOnLName(false)
+                                        }
                                         onKeyDown={handleKeyPress}
                                         maxLength={255}
                                         value={lastName}
                                       />
-                                      {DataTOAutoFill2 &&
+                                      {isFocusedOnLName &&
+                                        DataTOAutoFill2 &&
                                         DataTOAutoFill2.length > 0 && (
                                           <ul className='auto-fill-list'>
                                             {DataTOAutoFill2.map((e: any) => (

@@ -1000,7 +1000,6 @@ const Page = () => {
                         id='add-org-button'
                         className='hs-dropdown-toggle py-2  px-3 ti-btn bg-primary text-white !font-medium w-full !mb-0'
                         data-hs-overlay='#todo-compose'
-                        // onClick={() => setModalOpen(true) }
                         onClick={addorg}
                       >
                         <i className='ri-add-circle-line !text-[1rem]'></i>Add
@@ -1275,6 +1274,7 @@ const Page = () => {
                                 </button>
                                 <button
                                   type='button'
+                                  disabled={!addbuttonclass}
                                   // className='ti-btn bg-primary text-white !font-medium'
                                   className={
                                     addbuttonclass
