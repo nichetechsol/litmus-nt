@@ -37,7 +37,7 @@ import {
   licenceData,
   sitesCounts,
 } from '@/supabase/sitedashboard';
-import { generateSignedUrl, listSolutions } from '@/supabase/solutions';
+import { generateSignedUrl } from '@/supabase/solutions';
 import Loader from '@/utils/Loader/Loader';
 
 interface licenseData {
@@ -86,7 +86,20 @@ interface roles {
   created_at: any;
 }
 interface about_site {
+  id: number;
+  name: string;
+  type_id: number;
+  status: string;
   about_site: string;
+  address1: string;
+  address2?: string;
+  city: string;
+  pin_code: number;
+  org_id: number;
+  state_id: number;
+  state: string;
+  country_id: number;
+  country: string;
   created_at: string;
 }
 interface activitylogs {
@@ -134,7 +147,7 @@ const Page = () => {
   const [activePage2, setActivePage2] = useState(1);
   const [perPage2] = useState(10);
   const [products, setProducts] = useState<Products[] | null>(null);
-  const [solutions, setSolution] = useState<Products[] | null>(null);
+  // const [solutions, setSolution] = useState<Products[] | null>(null);
   const [activity_log, setActivity_log] = useState<activitylogs[] | null>(null);
   const [onlyToken, setOnlyToken] = useState('');
   useEffect(() => {
@@ -195,11 +208,12 @@ const Page = () => {
       sandboxesCount: number;
       usersCount: number;
       productCount: number;
-      sites_details: about_site[];
+      sites_details: about_site;
     };
     errorCode: number;
     message: string;
   } | null>(null);
+
   const [productSiteCount, setProductSiteCount] = useState<number | null>(null);
   useEffect(() => {
     const fetchData = async () => {
@@ -268,22 +282,22 @@ const Page = () => {
   useEffect(() => {
     fetchData8();
   }, [site_id]);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // setLoading(true);
-        const data: any = await listSolutions();
-        if (data) {
-          setSolution(data.data);
-        }
-        // setLoading(false);
-      } catch (error: any) {
-        // setLoading(false);
-        //
-      }
-    };
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       // setLoading(true);
+  //       const data: any = await listSolutions();
+  //       if (data) {
+  //         setSolution(data.data);
+  //       }
+  //       // setLoading(false);
+  //     } catch (error: any) {
+  //       // setLoading(false);
+  //       //
+  //     }
+  //   };
+  //   fetchData();
+  // }, []);
 
   const fetchUserData = async () => {
     try {
@@ -831,7 +845,7 @@ const Page = () => {
                     <div className='box-body'>
                       <div className='ms-6'>
                         {siteCountData &&
-                        siteCountData.data.sites_details[0].about_site
+                        siteCountData.data.sites_details.about_site
                           ? ''
                           : // <h5 className='text-[1.25rem] text-defaulttextcolor dark:text-defaulttextcolor/70 font-medium'>
 
@@ -840,10 +854,10 @@ const Page = () => {
 
                         <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
                           {siteCountData
-                            ? siteCountData.data.sites_details[0].about_site
+                            ? siteCountData.data.sites_details.about_site
                             : null}
                           {siteCountData &&
-                            siteCountData.data.sites_details[0].about_site ===
+                            siteCountData.data.sites_details.about_site ===
                               '' &&
                             'No Description'}
                         </p>
@@ -878,8 +892,7 @@ const Page = () => {
                                 <div className='text-center owner-details p-6 w-full h-full flex justify-center'>
                                   <span className='font-semibold text-[.875rem]'>
                                     {siteCountData &&
-                                    siteCountData.data.sites_details[0]
-                                      .created_at
+                                    siteCountData.data.sites_details.created_at
                                       ? 'Created: '
                                       : ''}
                                   </span>
@@ -888,7 +901,7 @@ const Page = () => {
                                     {' '}
                                     {siteCountData
                                       ? moment(
-                                          siteCountData.data.sites_details[0]
+                                          siteCountData.data.sites_details
                                             .created_at,
                                         ).format('MM/DD/YYYY HH:mm')
                                       : //  siteCountData.data.sites_details[0].created_at.split(
@@ -911,17 +924,19 @@ const Page = () => {
                   <div className='box'>
                     <div className='box-header flex justify-between'>
                       <div className='box-title'>License</div>
-                      <div className='grid border-b border-dashed'>
-                        <button
-                          onClick={() => {
-                            navigate.push('/license');
-                          }}
-                          className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
-                        >
-                          <i className='ri-add-circle-line !text-[1rem]'></i>Add
-                          License
-                        </button>
-                      </div>
+                      {userrole3 === 1 || userrole3 === 2 ? (
+                        <div className='grid border-b border-dashed'>
+                          <button
+                            onClick={() => {
+                              navigate.push('/license');
+                            }}
+                            className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
+                          >
+                            <i className='ri-add-circle-line !text-[1rem]'></i>
+                            Add License
+                          </button>
+                        </div>
+                      ) : null}
                     </div>
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>
@@ -1109,10 +1124,10 @@ const Page = () => {
                 <div className='xxl:col-span-6 xl:col-span-6  col-span-12'>
                   <div className='box'>
                     <div className='box-header flex justify-between'>
-                      <div className='box-title'>Solutions</div>
+                      <div className='box-title'>Billing Address</div>
                     </div>
-                    <div className='box-body'>
-                      <ul className='list-none crm-top-deals mb-0'>
+                    {/* <div className='box-body'> */}
+                    {/* <ul className='list-none crm-top-deals mb-0'>
                         {solutions && solutions.length > 0
                           ? solutions
                               .filter(
@@ -1161,7 +1176,239 @@ const Page = () => {
                             <p className='text-center'>No Solution Found</p>{' '}
                           </div>
                         )}
-                      </ul>
+                      </ul> */}
+
+                    {/* </div> */}
+                    <div
+                      className='box-body'
+                      // style={{ cursor: 'pointer' }}
+                      // onClick={() => {
+                      //   const encryptedsiteid = encryptData(SingleSite.site.id);
+                      //   const encryptedsitename = encryptData(
+                      //     SingleSite.site.name,
+                      //   );
+                      //   const encryptedsiteOwnerName = encryptData(
+                      //     SingleSite.ownerNames,
+                      //   );
+                      //   localStorage.setItem('site_id', encryptedsiteid);
+                      //   localStorage.setItem('site_name', encryptedsitename);
+                      //   localStorage.setItem(
+                      //     'site_owner_name',
+                      //     encryptedsiteOwnerName,
+                      //   );
+                      //   navigate.push('/sitedashboard');
+                      // }}
+                    >
+                      <div className='flex justify-between items-center  gap-2'>
+                        <div className='flex items-center'>
+                          {/* <div className='avatar avatar-xl avatar-rounded '>
+                            {' '}
+                            <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
+                              <InitialsComponent
+                                name={
+                                  SingleSite?.site ? SingleSite?.site?.name : ''
+                                }
+                              />
+                            </span>
+                          </div> */}
+                          {/* <div className='relative group'>
+                            <h1 className='mb-1 font-semibold p-new text-[1rem] text-site-name'>
+                              {SingleSite?.site ? SingleSite?.site?.name : ''}
+                            </h1>
+                            <div className='absolute hidden group-hover:block bg-gray-400 text-black text-xs rounded p-2 z-10 bottom-full mb-2 w-max max-w-xs break-words'>
+                              {SingleSite?.site ? SingleSite?.site?.name : ''}
+                            </div>
+                          </div> */}
+                          {/* <div className='hs-tooltip ti-main-tooltip '>
+                                        <h1
+                                          className='h1-new hs-tooltip-toggle w-100'
+                                          style={{
+                                            fontSize: '1.1rem',
+                                            fontWeight: 'bold',
+                                            marginBottom: '0.5rem',
+                                          }}
+                                        >
+                                          <Link
+                                            aria-label='anchor'
+                                            href='#!'
+                                          ></Link>
+                                          {SingleSite?.site
+                                            ? SingleSite?.site?.name
+                                            : ''}
+                                          {SingleSite?.site?.name.length >
+                                            18 && (
+                                            <span
+                                              className='hs-tooltip-content  ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm '
+                                              role='tooltip'
+                                            >
+                                              {SingleSite?.site
+                                                ? SingleSite?.site?.name
+                                                : ''}
+                                            </span>
+                                          )}
+                                        </h1>
+                                      </div> */}
+                        </div>
+
+                        {/* <div className='hs-dropdown ti-dropdown'>
+                          <Link
+                            aria-label='anchor'
+                            href='#!'
+                            className='flex items-center justify-center w-[1.75rem] h-[1.75rem]  !text-[0.8rem] !py-1 !px-2 rounded-sm bg-light border-light shadow-none !font-medium'
+                            aria-expanded='false'
+                            onClick={(e) => {
+                              e.preventDefault(); // Prevent default navigation action
+                              e.stopPropagation(); // Prevent click from bubbling up
+                            }}
+                          >
+                            <i className='ri-more-2-line text-[0.8rem]'></i>
+                          </Link>
+                          <ul className='hs-dropdown-menu ti-dropdown-menu hidden'>
+                            <li>
+                              <button
+                                className='ti-dropdown-item w-full text-start !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
+                                // href='#!'
+                                style={{ cursor: 'pointer' }}
+                                aria-label='anchor'
+                                data-bs-target='#formmodal'
+                                data-bs-toggle='modal'
+                                data-bs-whatever='@fat'
+                                data-hs-overlay='#todo-compose'
+                                onClick={(e) => {
+                                  e.stopPropagation(); // Prevent card click
+                                  // setModalOpen(true);
+                                  handeledit(SingleSite);
+                                }}
+                              >
+                                Edit
+                              </button>
+                            </li>
+                            <li>
+                              <button
+                                className='ti-dropdown-item w-full text-start !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
+                                // href='#!'
+                                style={{ cursor: 'pointer' }}
+                                aria-label='anchor'
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handelDelete(SingleSite);
+                                }}
+                              >
+                                Delete Request
+                              </button>
+                            </li>
+                          </ul>
+                        </div> */}
+                      </div>
+                      {}
+                      <div className=''>
+                        <div>
+                          <ul className='list-group list-group-flush'>
+                            <li className='flex list-group-item fw-semibold'>
+                              <i className='bx bx-map align-middle me-2 text-muted'></i>
+                              <b>Address : </b>
+                              <p className='ms-1 over-text text-muted fw-normal d-inline-block'>
+                                {/* {SingleSite?.site && (
+                                  <>
+                                    {SingleSite?.site?.address1}
+                                    {SingleSite?.site?.address2
+                                      ? `, ${SingleSite?.site?.address2}`
+                                      : ''}
+                                    {`, ${SingleSite?.site?.city}`}
+                                    {`, ${SingleSite?.state}`}
+                                    {`, ${SingleSite?.country}`}
+                                  </>
+                                )} */}
+                                {siteCountData &&
+                                  `${siteCountData?.data?.sites_details
+                                    ?.address1}${
+                                    siteCountData?.data?.sites_details?.address2
+                                      ? `, ${siteCountData?.data?.sites_details?.address2}`
+                                      : ''
+                                  }`}
+                                {/* {siteCountData?.data?.sites_details} */}
+                              </p>
+                            </li>
+                            <li className='list-group-item fw-semibold'>
+                              <i className='bx bx-briefcase align-middle me-2 text-muted'></i>
+                              <b>counrty :</b>
+                              <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                {/* {SingleSite?.ownerNames?.join(', ')} */}
+                                {/* {SingleSite?.ownerNames?.length
+                                  ? SingleSite.ownerNames.join(', ')
+                                  : '--'} */}
+                                {siteCountData &&
+                                  siteCountData?.data?.sites_details?.country}
+                              </span>
+                            </li>
+                            <li className='list-group-item fw-semibold'>
+                              <i className='bx bx-user align-middle me-2 text-muted'></i>
+                              <b>State :</b>
+                              <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                {/* {SingleSite?.users?.length} */}
+                                {siteCountData?.data?.sites_details?.state}
+                              </span>
+                            </li>
+                            <li className='list-group-item fw-semibold'>
+                              <i className='bx bx-user align-middle me-2 text-muted'></i>
+                              <b>city :</b>
+                              <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                {/* {SingleSite?.type_name} */}
+                                {siteCountData &&
+                                  siteCountData?.data?.sites_details.city}
+                              </span>
+                            </li>
+                            <li className='list-group-item fw-semibold'>
+                              <i className='bx bx-briefcase align-middle me-2 text-muted'></i>
+                              <b>Zip Code :</b>
+                              <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                {/* {SingleSite?.ownerNames?.join(', ')} */}
+                                {/* {SingleSite?.ownerNames?.length
+                                  ? SingleSite.ownerNames.join(', ')
+                                  : '--'} */}
+                                {siteCountData &&
+                                  siteCountData?.data?.sites_details?.pin_code}
+                              </span>
+                            </li>
+                          </ul>
+                          {/* {SingleSite?.user_role_id === 1 ||
+                                      SingleSite?.user_role_id === 2 ? (
+                                        <div className='flex justify-center mt-3'>
+                                          <div
+                                            style={{ cursor: 'pointer' }}
+                                            aria-label='anchor'
+                                            data-bs-target='#formmodal'
+                                            data-bs-toggle='modal'
+                                            data-bs-whatever='@fat'
+                                            data-hs-overlay='#todo-compose'
+                                            onClick={(e) => {
+                                              e.stopPropagation(); // Prevent card click
+                                              // setModalOpen(true);
+                                              handeledit(SingleSite);
+                                            }}
+                                            className='ti-btn ti-btn-primary-full ti-btn-wave !gap-0  bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
+                                          >
+                                            <i className='ri-edit-line me-1'></i>{' '}
+                                            Edit
+                                          </div>
+                                          <div
+                                            style={{ cursor: 'pointer' }}
+                                            aria-label='anchor'
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handelDelete(SingleSite);
+                                            }}
+                                            className='ti-btn ti-btn-danger-full ti-btn-wave !gap-0 !ms-2 bg-danger/10 text-white hover:bg-white hover:text-danger hover:border-danger'
+                                          >
+                                            <i className='ri-delete-bin-line me-1'></i>{' '}
+                                            Delete
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        ''
+                                      )} */}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
