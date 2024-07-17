@@ -343,34 +343,18 @@ const Page = () => {
     fetchData();
   }, [site_id]);
   // for auto fill in user form
-  const [DataTOAutoFill, setDataTOAutoFill] = useState<string[]>([]);
-  useEffect(() => {
-    const DetailsFORAddUser = async () => {
-      try {
-        // setLoading(true);
 
-        const result1: any = await searchUsers(firstName || lastName || email); // Replace with your actual API call
-
-        if (result1.data) {
-          // setRoles(result1.data);
-          setDataTOAutoFill(result1.data);
-
-          // setLoading(false);
-        } else {
-          // toast.error(result1.message, { autoClose: 3000 });
-        }
-      } catch (error: any) {
-        // toast.error(error.message, { autoClose: 3000 });
-      }
-    };
-
-    DetailsFORAddUser();
-  }, [email, lastName, firstName]);
   const handelautofill = (e: any) => {
     if (e) {
-      setEmail(e.email);
-      setFirstName(e.firstname);
-      setLastName(e.lastname);
+      setEmail(e.email ? e.email : '');
+      setFirstName(e.firstname ? e.firstname : '');
+      setLastName(e.lastname ? e.lastname : '');
+      setEmailError('');
+      setFirstNameError('');
+      setLastNameError('');
+      setDataTOAutoFill([]);
+      setDataTOAutoFill1([]);
+      setDataTOAutoFill2([]);
     }
   };
   /// end here /////
@@ -387,6 +371,9 @@ const Page = () => {
     setFirstNameError('');
     setLastNameError('');
     setRoleError('');
+    setDataTOAutoFill([]);
+    setDataTOAutoFill1([]);
+    setDataTOAutoFill2([]);
   };
   useEffect(() => {
     const fetchRoles = async () => {
@@ -401,26 +388,62 @@ const Page = () => {
     };
     fetchRoles();
   }, []);
-
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [DataTOAutoFill, setDataTOAutoFill] = useState<string[]>([]);
+  const handleEmailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDataTOAutoFill1([]);
+    setDataTOAutoFill2([]);
     const newEmail = e.target.value.trim();
     setEmail(newEmail);
+    try {
+      const result1: any = await searchUsers(newEmail);
+      if (result1.data) {
+        setDataTOAutoFill(result1.data);
+      }
+    } catch (error: any) {
+      // toast.error(error.message, { autoClose: 3000 });
+    }
     emailSchema
       .validate(newEmail)
       .then(() => setEmailError(''))
       .catch((err: Yup.ValidationError) => setEmailError(err.message));
   };
-  const handleFirstNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [DataTOAutoFill1, setDataTOAutoFill1] = useState<string[]>([]);
+  const handleFirstNameChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setDataTOAutoFill([]);
+    setDataTOAutoFill2([]);
     const newFirstName = e.target.value.trim().replace(/[^a-zA-Z]/g, '');
     setFirstName(newFirstName);
+    try {
+      const result1: any = await searchUsers(newFirstName);
+      if (result1.data) {
+        setDataTOAutoFill1(result1.data);
+      }
+    } catch (error: any) {
+      // toast.error(error.message, { autoClose: 3000 });
+    }
     nameSchema
       .validate(newFirstName)
       .then(() => setFirstNameError(''))
       .catch((err: Yup.ValidationError) => setFirstNameError(err.message));
   };
-  const handleLastNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [DataTOAutoFill2, setDataTOAutoFill2] = useState<string[]>([]);
+  const handleLastNameChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setDataTOAutoFill([]);
+    setDataTOAutoFill1([]);
     const newLastName = e.target.value.trim().replace(/[^a-zA-Z]/g, '');
     setLastName(newLastName);
+    try {
+      const result1: any = await searchUsers(newLastName);
+      if (result1.data) {
+        setDataTOAutoFill2(result1.data);
+      }
+    } catch (error: any) {
+      // toast.error(error.message, { autoClose: 3000 });
+    }
     nameSchema2
       .validate(newLastName)
       .then(() => setLastNameError(''))
@@ -1218,15 +1241,22 @@ const Page = () => {
                                         maxLength={320}
                                         value={email}
                                       />
-                                      {DataTOAutoFill.map((e: any) => (
-                                        <li
-                                          style={{ cursor: 'pointer' }}
-                                          key={e}
-                                          onClick={() => handelautofill(e)}
-                                        >
-                                          {e.email}
-                                        </li>
-                                      ))}
+                                      {DataTOAutoFill &&
+                                        DataTOAutoFill.length > 0 && (
+                                          <ul className='auto-fill-list'>
+                                            {DataTOAutoFill.map((e: any) => (
+                                              <li
+                                                style={{ cursor: 'pointer' }}
+                                                key={e}
+                                                onClick={() =>
+                                                  handelautofill(e)
+                                                }
+                                              >
+                                                {e.email}
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        )}
                                       {emailError && (
                                         <div className='text-danger'>
                                           {emailError}
@@ -1253,9 +1283,21 @@ const Page = () => {
                                         maxLength={255}
                                         value={firstName}
                                       />
-                                      {DataTOAutoFill.map((e: any) => (
-                                        <li key={e}>{e.firstname}</li>
-                                      ))}
+                                      {DataTOAutoFill1 &&
+                                        DataTOAutoFill1.length > 0 && (
+                                          <ul className='auto-fill-list'>
+                                            {DataTOAutoFill1.map((e: any) => (
+                                              <li
+                                                key={e}
+                                                onClick={() =>
+                                                  handelautofill(e)
+                                                }
+                                              >
+                                                {e.firstname}({e.email})
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        )}
                                       {firstNameError && (
                                         <div className='text-danger'>
                                           {firstNameError}
@@ -1281,9 +1323,21 @@ const Page = () => {
                                         maxLength={255}
                                         value={lastName}
                                       />
-                                      {DataTOAutoFill.map((e: any) => (
-                                        <li key={e}>{e.lastname}</li>
-                                      ))}
+                                      {DataTOAutoFill2 &&
+                                        DataTOAutoFill2.length > 0 && (
+                                          <ul className='auto-fill-list'>
+                                            {DataTOAutoFill2.map((e: any) => (
+                                              <li
+                                                key={e}
+                                                onClick={() =>
+                                                  handelautofill(e)
+                                                }
+                                              >
+                                                {e.lastname}({e.email})
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        )}
                                       {lastNameError && (
                                         <div className='text-danger'>
                                           {lastNameError}

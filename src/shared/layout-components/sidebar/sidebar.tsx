@@ -48,14 +48,14 @@ const Sidebar = ({ local_varaiable, ThemeChanger }: any) => {
       ico: 'ri-map-pin-line',
     },
 
-    {
-      path: '/products',
-      type: 'link',
-      active: p === '/products' ? true : false,
-      selected: p === '/products' ? true : false,
-      title: 'Products',
-      ico: 'ri-product-hunt-line',
-    },
+    // {
+    //   path: '/products',
+    //   type: 'link',
+    //   active: p === '/products' ? true : false,
+    //   selected: p === '/products' ? true : false,
+    //   title: 'Products',
+    //   ico: 'ri-product-hunt-line',
+    // },
     {
       path: '/solution',
       type: 'link',

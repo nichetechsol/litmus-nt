@@ -76,6 +76,8 @@ const Page = () => {
 
   const [organizationName, setOrganizationName] = useState('');
   const [organizationNameError, setOrganizationNameError] = useState('');
+  const [organizationNameError1, setOrganizationNameError1] =
+    useState<boolean>(true);
   const [domains, setDomains] = useState<any[]>([]);
   const [domainInput, setDomainInput] = useState<string>('');
 
@@ -309,9 +311,11 @@ const Page = () => {
     OrganizationNameSchema.validate(newOrganizationName)
       .then(() => {
         setOrganizationNameError('');
+        setOrganizationNameError1(false);
       })
       .catch((err: Yup.ValidationError) => {
         setOrganizationNameError(err.message);
+        setOrganizationNameError1(true);
       });
   };
   const handleDomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -423,6 +427,22 @@ const Page = () => {
     }
   };
   const [orgidForupdatetion, setorgidForupdatetion] = useState();
+  const [addbuttonclass, setaddbuttonclass] = useState<boolean>(false);
+  useEffect(() => {
+    const validate = async () => {
+      try {
+        await validationSchema.validate(
+          { organizationName, domains, selectedType, message },
+          { abortEarly: false },
+        );
+        setaddbuttonclass(true);
+      } catch (err) {
+        setaddbuttonclass(false);
+      }
+    };
+
+    validate();
+  }, [organizationName, domains, selectedType, message]);
   const handleSubmit = async () => {
     if (changeFlage == true) {
       if (domainInput.trim() !== '') {
@@ -714,6 +734,7 @@ const Page = () => {
   const handeledit = async (org: any) => {
     openModal();
     setLoading(true);
+    setOrganizationNameError1(false);
     const EditView: any = await viewOrganization(org.org_id);
     if (EditView.errorCode === 1) {
       toast.error(EditView.message, { autoClose: 3000 });
@@ -764,6 +785,7 @@ const Page = () => {
     // setOrganizationName(org.org_name);
   };
   const addorg = () => {
+    setOrganizationNameError1(true);
     openModal();
     setDomainInput('');
     setOrganizationName('');
@@ -1044,7 +1066,11 @@ const Page = () => {
                                     </label>
                                     <input
                                       type='text'
-                                      className='form-control w-full'
+                                      className={`form-control w-full ${
+                                        organizationNameError1
+                                          ? 'input-error'
+                                          : ''
+                                      }`}
                                       id='task-name'
                                       placeholder='Enter Organization Name'
                                       onChange={handleorganizationNameChange}
@@ -1166,7 +1192,7 @@ const Page = () => {
                                     <select
                                       className={`form-select ${
                                         selectedType === ''
-                                          ? 'deselect-main'
+                                          ? 'deselect-main input-error'
                                           : ''
                                       }`}
                                       value={selectedType}
@@ -1223,8 +1249,8 @@ const Page = () => {
                                 <button
                                   type='button'
                                   className='hs-dropdown-toggle ti-btn  ti-btn-light align-middle'
-                                  // data-hs-overlay='#todo-compose'
-                                  // ref={closeModalButtonRef}
+                                  data-hs-overlay='#todo-compose'
+                                  ref={closeModalButtonRef}
                                   onClick={() => {
                                     setDomainInput('');
                                     setOrganizationName('');
@@ -1240,16 +1266,21 @@ const Page = () => {
                                     setDomainError('');
                                     setTypeDropdownError('');
                                     setMessageError('');
-                                    // closeModal();
+                                    closeModal();
                                     // fetchData();
                                     // fetchData1();
                                   }}
                                 >
-                                  Clear
+                                  Cancel
                                 </button>
                                 <button
                                   type='button'
-                                  className='ti-btn bg-primary text-white !font-medium'
+                                  // className='ti-btn bg-primary text-white !font-medium'
+                                  className={
+                                    addbuttonclass
+                                      ? 'ti-btn bg-primary text-white !font-medium'
+                                      : 'ti-btn bg-gray-500 text-white !font-medium'
+                                  }
                                   onClick={handleSubmit}
                                 >
                                   {changeFlage === true
