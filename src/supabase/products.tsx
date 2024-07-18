@@ -655,6 +655,9 @@ const listofallFiles = async (data: any) => {
       if (entitlement.entitlement_value === true) {
         entitlement.entitlement_value = 'TRUE';
       }
+      if (entitlement.entitlement_value === false) {
+        entitlement.entitlement_value = 'FALSE';
+      }
       const { data: filePermissions, error: errorFilePermission } =
         await supabase
           .from('filedownload_permissions')
