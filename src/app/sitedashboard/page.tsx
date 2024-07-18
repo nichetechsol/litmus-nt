@@ -21,6 +21,7 @@ import {
   roleSchema,
 } from '@/helper/ValidationHelper';
 import { getActivitiesBySiteID, logActivity } from '@/supabase/activity';
+import { showReqLicenceButton } from '@/supabase/licence';
 import { getUserRole } from '@/supabase/org_details';
 import { searchUsers } from '@/supabase/org_user';
 import { downloadProduct, listLitmusProducts } from '@/supabase/products';
@@ -313,6 +314,7 @@ const Page = () => {
     }
   };
   const [userrole3, setuserrole3] = useState<any>('');
+  const [showReqLicBtn, setshowReqLicBtn] = useState<any>(false);
   const roleChange = async () => {
     try {
       const data: any = await getSiteUserRole(user_id, site_id);
@@ -320,6 +322,11 @@ const Page = () => {
         setuserrole3(data.data.id);
       } else {
         //
+      }
+      const result: any = await showReqLicenceButton({ siteID: site_id });
+
+      if ((data.data.id === 1 || data.data.id === 2) && result) {
+        setshowReqLicBtn(true);
       }
     } catch (error: any) {
       //
@@ -924,7 +931,7 @@ const Page = () => {
                   <div className='box'>
                     <div className='box-header flex justify-between'>
                       <div className='box-title'>License</div>
-                      {userrole3 === 1 || userrole3 === 2 ? (
+                      {showReqLicBtn ? (
                         <div className='grid border-b border-dashed'>
                           <button
                             onClick={() => {

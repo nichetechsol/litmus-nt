@@ -35,12 +35,12 @@ interface AddLicenceParams {
 }
 
 const getSKUList = async ({ orgId }: GetSKUParams): Promise<any> => {
-  if (orgId === undefined) {
+  if (!orgId) {
     return 'Invalid parameters';
   }
 
   try {
-    // Fetch entitlements and license data in a single operation
+    // Fetch entitlements package data
     const { data: entitlements_package, error: entitlementsError } =
       await supabase
         .from('entitlements_package')
@@ -50,7 +50,12 @@ const getSKUList = async ({ orgId }: GetSKUParams): Promise<any> => {
         entitlements_values(value_text)
       `,
         )
-        .in('entitlements_name.name', ['License Tier', 'License Catalog'])
+        .in('entitlements_name.name', [
+          'License Tier',
+          'License Catalog',
+          'License Plan',
+          'Add-on Licenses',
+        ])
         .eq('org_id', orgId)
         .returns<EntitlementPackage[]>();
 
@@ -58,13 +63,21 @@ const getSKUList = async ({ orgId }: GetSKUParams): Promise<any> => {
       throw entitlementsError;
     }
 
-    if (!entitlements_package) {
+    if (!entitlements_package || entitlements_package.length === 0) {
       return 'No entitlements_package found';
     }
 
+    const entPkgData: Record<string, string> = entitlements_package.reduce(
+      (acc, item) => {
+        acc[item.entitlements_name.name] = item.entitlements_values.value_text;
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
+
     // Extract entitlements values
     const entitlements_values = entitlements_package.map(
-      (e) => e.entitlements_values.value_text,
+      (item) => item.entitlements_values.value_text,
     );
 
     // Fetch license types
@@ -72,17 +85,45 @@ const getSKUList = async ({ orgId }: GetSKUParams): Promise<any> => {
       .from('licence_type')
       .select('id, name, license_sku_name, type')
       .in('license_tier', entitlements_values)
+      .in('license_plan', entitlements_values)
       .in('license_catalog', entitlements_values);
 
     if (licenseError) {
       throw licenseError;
     }
 
-    return licence_type;
+    let licence_addon_type: {
+      id: any;
+      name: any;
+      license_sku_name: any;
+      type: any;
+    }[] = [];
+
+    //Fetch Addons
+    if (entPkgData['Add-on Licenses'] == 'TRUE') {
+      const { data: addonType, error: licenseAddonError } = await supabase
+        .from('licence_type')
+        .select('id, name, license_sku_name, type')
+        .in('license_tier', entitlements_values)
+        .eq('type', 'addon')
+        .in('license_catalog', entitlements_values);
+
+      if (licenseAddonError) {
+        throw licenseAddonError;
+      }
+
+      licence_addon_type = addonType;
+    }
+
+    // Combine license types and add-on types if applicable
+    const allLicenses = [...licence_type, ...licence_addon_type];
+
+    return allLicenses;
   } catch (error: any) {
     return null;
   }
 };
+
 // async function reqLicense (data:any):Promise<any>{
 //   const userName: string = data.userName;
 //   const orgName: string = data.org_name;
@@ -265,5 +306,51 @@ const getLicenceData = async ({
     return null;
   }
 };
+const showReqLicenceButton = async ({
+  siteID,
+}: GetLicenceDataParams): Promise<boolean> => {
+  if (!siteID) {
+    return false;
+  }
 
-export { addLicence, getLicenceData, getSKUList, reqLicense };
+  try {
+    const { data: entitlements_package, error: entitlementsError } =
+      (await supabase
+        .from('entitlements_package')
+        .select(
+          `
+          entitlements_name!inner(name),
+          entitlements_values(value_text)
+        `,
+        )
+        .in('entitlements_name.name', [
+          'License Tier',
+          'License Catalog',
+          'License Plan',
+        ])
+        .eq('site_id', siteID)) as {
+        data: EntitlementPackage[] | null;
+        error: any;
+      };
+
+    if (
+      entitlementsError ||
+      !entitlements_package ||
+      entitlements_package.length === 0
+    ) {
+      return false;
+    }
+
+    return true;
+  } catch (error: any) {
+    return false;
+  }
+};
+
+export {
+  addLicence,
+  getLicenceData,
+  getSKUList,
+  reqLicense,
+  showReqLicenceButton,
+};
