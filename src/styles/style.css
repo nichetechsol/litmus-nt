@@ -20332,3 +20332,6 @@ body.no-scroll-no {
 .input-error {
   border: 1px solid #dc3545;
 }
+.highlighted {
+  background-color: #d3d3d3; /* Change this to your preferred highlight color */
+}

@@ -1106,7 +1106,8 @@ const Page = () => {
                                     <input
                                       type='text'
                                       className={`form-control w-full ${
-                                        organizationNameError1
+                                        organizationNameError1 ||
+                                        organizationNameError != ''
                                           ? 'input-error'
                                           : ''
                                       }`}

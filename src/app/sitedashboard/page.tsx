@@ -414,6 +414,7 @@ const Page = () => {
   const handleEmailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setDataTOAutoFill1([]);
     setDataTOAutoFill2([]);
+    setHighlightedIndex(-1);
     const newEmail = e.target.value.trim();
     setEmail(newEmail);
     try {
@@ -436,6 +437,7 @@ const Page = () => {
   ) => {
     setDataTOAutoFill([]);
     setDataTOAutoFill2([]);
+    setHighlightedIndex(-1);
     const newFirstName = e.target.value.trim().replace(/[^a-zA-Z]/g, '');
     setFirstName(newFirstName);
     try {
@@ -458,6 +460,7 @@ const Page = () => {
   ) => {
     setDataTOAutoFill([]);
     setDataTOAutoFill1([]);
+    setHighlightedIndex(-1);
     const newLastName = e.target.value.trim().replace(/[^a-zA-Z]/g, '');
     setLastName(newLastName);
     try {
@@ -594,9 +597,89 @@ const Page = () => {
       closeModal();
     }
   };
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const emailListRef = useRef<HTMLUListElement>(null);
+  const firstNameListRef = useRef<HTMLUListElement>(null);
+  const lastNameListRef = useRef<HTMLUListElement>(null);
+  useEffect(() => {
+    const scrollToHighlightedItem = (
+      listRef: React.RefObject<HTMLUListElement>,
+    ) => {
+      if (listRef.current && highlightedIndex !== -1) {
+        const list = listRef.current;
+        const selectedElement = list.children[highlightedIndex] as
+          | HTMLElement
+          | undefined;
+        if (selectedElement) {
+          selectedElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+          });
+        }
+      }
+    };
+    if (isFocusedOnEmail) {
+      scrollToHighlightedItem(emailListRef);
+    } else if (isFocusedOnFName) {
+      scrollToHighlightedItem(firstNameListRef);
+    } else if (isFocusedOnLName) {
+      scrollToHighlightedItem(lastNameListRef);
+    }
+  }, [highlightedIndex, isFocusedOnEmail, isFocusedOnFName, isFocusedOnLName]);
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleSubmit();
+      if (firstName && lastName && email && role) {
+        handleSubmit();
+      }
+    }
+    if (isFocusedOnLName && DataTOAutoFill2 && DataTOAutoFill2.length > 0) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setHighlightedIndex((prevIndex) =>
+          prevIndex < DataTOAutoFill2.length - 1 ? prevIndex + 1 : 0,
+        );
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setHighlightedIndex((prevIndex) =>
+          prevIndex > 0 ? prevIndex - 1 : DataTOAutoFill2.length - 1,
+        );
+      } else if (e.key === 'Enter' && highlightedIndex >= 0) {
+        e.preventDefault();
+        handelautofill(DataTOAutoFill2[highlightedIndex]);
+      }
+    }
+    if (isFocusedOnFName && DataTOAutoFill1 && DataTOAutoFill1.length > 0) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setHighlightedIndex((prevIndex) =>
+          prevIndex < DataTOAutoFill1.length - 1 ? prevIndex + 1 : 0,
+        );
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setHighlightedIndex((prevIndex) =>
+          prevIndex > 0 ? prevIndex - 1 : DataTOAutoFill1.length - 1,
+        );
+      } else if (e.key === 'Enter' && highlightedIndex >= 0) {
+        e.preventDefault();
+        handelautofill(DataTOAutoFill1[highlightedIndex]);
+      }
+    }
+    if (isFocusedOnEmail && DataTOAutoFill && DataTOAutoFill.length > 0) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setHighlightedIndex((prevIndex) =>
+          prevIndex < DataTOAutoFill.length - 1 ? prevIndex + 1 : 0,
+        );
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setHighlightedIndex((prevIndex) =>
+          prevIndex > 0 ? prevIndex - 1 : DataTOAutoFill.length - 1,
+        );
+      } else if (e.key === 'Enter' && highlightedIndex >= 0) {
+        e.preventDefault();
+        handelautofill(DataTOAutoFill[highlightedIndex]);
+      }
     }
   };
   const handleEdit = (user: any) => {
@@ -1358,22 +1441,33 @@ const Page = () => {
                                         onKeyDown={handleKeyPress}
                                         maxLength={320}
                                         value={email}
+                                        autoComplete='off'
                                       />
                                       {isFocusedOnEmail &&
                                         DataTOAutoFill &&
                                         DataTOAutoFill.length > 0 && (
-                                          <ul className='auto-fill-list'>
-                                            {DataTOAutoFill.map((e: any) => (
-                                              <li
-                                                style={{ cursor: 'pointer' }}
-                                                key={e}
-                                                onMouseDown={() =>
-                                                  handelautofill(e)
-                                                }
-                                              >
-                                                {e.email}
-                                              </li>
-                                            ))}
+                                          <ul
+                                            className='auto-fill-list'
+                                            ref={emailListRef}
+                                          >
+                                            {DataTOAutoFill.map(
+                                              (e: any, index) => (
+                                                <li
+                                                  style={{ cursor: 'pointer' }}
+                                                  key={e}
+                                                  onMouseDown={() =>
+                                                    handelautofill(e)
+                                                  }
+                                                  className={
+                                                    index === highlightedIndex
+                                                      ? 'highlighted'
+                                                      : ''
+                                                  }
+                                                >
+                                                  {e.email}
+                                                </li>
+                                              ),
+                                            )}
                                           </ul>
                                         )}
                                       {emailError && (
@@ -1407,16 +1501,29 @@ const Page = () => {
                                         onKeyDown={handleKeyPress}
                                         maxLength={255}
                                         value={firstName}
+                                        autoComplete='off'
                                       />
                                       {isFocusedOnFName &&
                                         DataTOAutoFill1 &&
                                         DataTOAutoFill1.length > 0 && (
-                                          <ul className='auto-fill-list'>
-                                            {DataTOAutoFill1.map((e: any) => (
+                                          <ul
+                                            className='auto-fill-list'
+                                            ref={firstNameListRef}
+                                          >
+                                            {DataTOAutoFill1.filter(
+                                              (e: any) =>
+                                                e.firstname != null &&
+                                                e.firstname != '',
+                                            ).map((e: any, index) => (
                                               <li
                                                 key={e}
                                                 onMouseDown={() =>
                                                   handelautofill(e)
+                                                }
+                                                className={
+                                                  index === highlightedIndex
+                                                    ? 'highlighted'
+                                                    : ''
                                                 }
                                               >
                                                 {e.firstname}({e.email})
@@ -1454,16 +1561,27 @@ const Page = () => {
                                         onKeyDown={handleKeyPress}
                                         maxLength={255}
                                         value={lastName}
+                                        autoComplete='off'
                                       />
                                       {isFocusedOnLName &&
                                         DataTOAutoFill2 &&
                                         DataTOAutoFill2.length > 0 && (
-                                          <ul className='auto-fill-list'>
-                                            {DataTOAutoFill2.map((e: any) => (
+                                          <ul
+                                            className='auto-fill-list'
+                                            ref={lastNameListRef}
+                                          >
+                                            {DataTOAutoFill2.filter(
+                                              (e: any) => e.lastname != null,
+                                            ).map((e: any, index) => (
                                               <li
                                                 key={e}
                                                 onMouseDown={() =>
                                                   handelautofill(e)
+                                                }
+                                                className={
+                                                  index === highlightedIndex
+                                                    ? 'highlighted'
+                                                    : ''
                                                 }
                                               >
                                                 {e.lastname}({e.email})
