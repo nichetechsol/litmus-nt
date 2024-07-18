@@ -766,7 +766,7 @@ async function entitlementSite(site_id: any, start: any, end: any) {
         `
         *,
         entitlements_name (
-          name
+          name,show_on_dashboard,entitlement_level
         ),
         entitlements_values (
           value_text,
@@ -823,7 +823,12 @@ async function entitlementSite(site_id: any, start: any, end: any) {
           entitlementValue: entitlementValueResolved,
         };
       })
-      .filter((entitlement) => entitlement !== null); // Filter out null values
+      .filter(
+        (entitlement) =>
+          entitlement && // Filter out nulls
+          entitlement.entitlements_name.entitlement_level == 'SITE' && // Filter by entitlement_level
+          entitlement.entitlements_name.show_on_dashboard === true,
+      ); // Filter by show_on_dashboard
 
     // Return the license details with type names
     return {

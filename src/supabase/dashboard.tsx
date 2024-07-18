@@ -589,7 +589,7 @@ async function orgEntitlementList(
       .select(
         `
         *,
-        entitlement_name:entitlements_name(name),
+        entitlement_name:entitlements_name(name,show_on_dashboard,entitlement_level),
         entitlement_value:entitlements_values(*)
       `,
         { count: 'exact' },
@@ -638,7 +638,12 @@ async function orgEntitlementList(
           entitlementValue: entitlementValueResolved,
         };
       })
-      .filter(Boolean); // Filter out any null values
+      .filter(
+        (entitlement) =>
+          entitlement && // Filter out nulls
+          entitlement.entitlement_name.entitlement_level === 'ORG' && // Filter by entitlement_level
+          entitlement.entitlement_name.show_on_dashboard === true,
+      ); // Filter by show_on_dashboard
 
     return {
       errorCode: 0,
