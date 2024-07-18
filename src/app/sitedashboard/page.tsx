@@ -622,7 +622,9 @@ const Page = () => {
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleSubmit();
+      if (firstName && lastName && email && role) {
+        handleSubmit();
+      }
     }
     if (isFocusedOnLName && DataTOAutoFill2 && DataTOAutoFill2.length > 0) {
       if (e.key === 'ArrowDown') {
@@ -1501,23 +1503,25 @@ const Page = () => {
                                             className='auto-fill-list'
                                             ref={firstNameListRef}
                                           >
-                                            {DataTOAutoFill1.map(
-                                              (e: any, index) => (
-                                                <li
-                                                  key={e}
-                                                  onMouseDown={() =>
-                                                    handelautofill(e)
-                                                  }
-                                                  className={
-                                                    index === highlightedIndex
-                                                      ? 'highlighted'
-                                                      : ''
-                                                  }
-                                                >
-                                                  {e.firstname}({e.email})
-                                                </li>
-                                              ),
-                                            )}
+                                            {DataTOAutoFill1.filter(
+                                              (e: any) =>
+                                                e.firstname != null &&
+                                                e.firstname != '',
+                                            ).map((e: any, index) => (
+                                              <li
+                                                key={e}
+                                                onMouseDown={() =>
+                                                  handelautofill(e)
+                                                }
+                                                className={
+                                                  index === highlightedIndex
+                                                    ? 'highlighted'
+                                                    : ''
+                                                }
+                                              >
+                                                {e.firstname}({e.email})
+                                              </li>
+                                            ))}
                                           </ul>
                                         )}
                                       {firstNameError && (
@@ -1559,23 +1563,23 @@ const Page = () => {
                                             className='auto-fill-list'
                                             ref={lastNameListRef}
                                           >
-                                            {DataTOAutoFill2.map(
-                                              (e: any, index) => (
-                                                <li
-                                                  key={e}
-                                                  onMouseDown={() =>
-                                                    handelautofill(e)
-                                                  }
-                                                  className={
-                                                    index === highlightedIndex
-                                                      ? 'highlighted'
-                                                      : ''
-                                                  }
-                                                >
-                                                  {e.lastname}({e.email})
-                                                </li>
-                                              ),
-                                            )}
+                                            {DataTOAutoFill2.filter(
+                                              (e: any) => e.lastname != null,
+                                            ).map((e: any, index) => (
+                                              <li
+                                                key={e}
+                                                onMouseDown={() =>
+                                                  handelautofill(e)
+                                                }
+                                                className={
+                                                  index === highlightedIndex
+                                                    ? 'highlighted'
+                                                    : ''
+                                                }
+                                              >
+                                                {e.lastname}({e.email})
+                                              </li>
+                                            ))}
                                           </ul>
                                         )}
                                       {lastNameError && (

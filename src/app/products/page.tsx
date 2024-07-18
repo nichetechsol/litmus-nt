@@ -10,17 +10,30 @@ import swal from 'sweetalert';
 
 import { decryptData } from '@/helper/Encryption_Decryption';
 import { logActivity } from '@/supabase/activity';
-import { allCurrentfiles, downloadProduct } from '@/supabase/products';
+import {
+  downloadProduct,
+  listofallFiles,
+  listofProducts,
+  listofProductsFolder,
+} from '@/supabase/products';
 import { refreshToken } from '@/supabase/session';
 import Loader from '@/utils/Loader/Loader';
 
-interface folder {
-  data: object;
-  errorCode: number;
-  folder: string;
-  message: string;
+interface folderDetailsData {
+  name: string;
+  product_type: string;
+}
+interface subfolderDetailsData {
+  name: string;
+  status: string;
 }
 
+interface files {
+  FileName: string;
+  status: string;
+  subfolder: string;
+  disabled: boolean;
+}
 const Page = () => {
   const navigate = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
@@ -29,13 +42,8 @@ const Page = () => {
   const [org_id, setorg_id] = useState<any>('');
   const [site_id, setsite_id] = useState<any>('');
   const [org_type_id, setOrg_type_id] = useState<any>('');
-  const [folder, setFolder] = useState<folder[] | null>(null);
   const [folderTrue, setFolderTrue] = useState(false);
-  const [innerFolder, setInnerFolder] = useState<any>('');
   const [selectedFolder, setSelectedFolder] = useState<any>('');
-  // const [selectedFolder, setSelectedFolder] = useState<selectedFolder | null>(
-  //   null,
-  // );
   const [filteredFiles, setFilteredFiles] = useState<any>('');
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
@@ -104,56 +112,9 @@ const Page = () => {
     };
     refresh();
   }, []);
-  // const [currentfiles, setCurrentfiles] = useState<any>('');
+
   const [currentTrue, setCurrentTrue] = useState(true);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        if (site_id && org_id && org_type_id) {
-          const data: any = await allCurrentfiles(site_id, org_id, org_type_id);
-          if (data.data) {
-            setFolder(data.data);
-          } else {
-            setFolder(null);
-            setFolderTrue(true);
-          }
-          // if (data.data.length >= 0) {
-          //   setCurrentfiles(data && data.data.filter((i: { folder: string; }) => i.folder == "Litmus_Edge"))
-          // }
-          setLoading(false);
-        }
-        // else{
-        //   setLoading(false)
-        // }
-      } catch (error: any) {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [org_id, org_type_id, site_id]);
 
-  function handlefolderclick(folder: any) {
-    setInnerFolder(folder.data);
-    setSelectedFolder(folder);
-  }
-  useEffect(() => {
-    if (folder) {
-      handlefolderclick(folder[0]);
-      setSelectedFolder(folder[0]);
-      setCurrentTrue(true);
-    }
-  }, [folder]);
-
-  useEffect(() => {
-    if (innerFolder) {
-      setFilteredFiles(
-        innerFolder?.filter((file: any) =>
-          currentTrue ? file.status === 'current' : file.status === 'archive',
-        ),
-      );
-    }
-  }, [currentTrue, innerFolder]);
   const handleDownload = async (fileName: string, subfolder: string) => {
     setLoading(true);
     const result = await downloadProduct(
@@ -190,6 +151,114 @@ const Page = () => {
       // fetchData8()
     }
   };
+
+  const [folder1, setFolder1] = useState<folderDetailsData[] | null>(null);
+  const [currentSubFolder, setCurrentSubFolder] =
+    useState<subfolderDetailsData | null>(null);
+  const [bucketName, setBucketName] = useState<string>('');
+  const [currentSelectedFolder, setCurrentSelectedFolder] =
+    useState<folderDetailsData | null>(null);
+  const [subFolder, setSubFolder] = useState<subfolderDetailsData[] | null>(
+    null,
+  );
+  const [files, setFiles] = useState<files[] | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        if (org_id) {
+          const data: any = await listofProducts(org_id);
+          if (data) {
+            setFolder1(data.data);
+            setCurrentTrue(true);
+            setBucketName(data.bucket_name);
+          } else {
+            setFolder1(null);
+            setFolderTrue(true);
+          }
+
+          setLoading(false);
+        }
+      } catch (error: any) {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [org_id]);
+
+  useEffect(() => {
+    if (folder1) {
+      handlefolderclick1(folder1[0]);
+      setCurrentTrue(true);
+    }
+  }, [folder1]);
+  function handlefolderclick1(folder: any) {
+    setCurrentSelectedFolder(folder);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        if (org_id) {
+          const data: any = await listofProductsFolder(folder.name, bucketName);
+          if (data) {
+            setSubFolder(data.data);
+            setCurrentTrue(true);
+          } else {
+            setSubFolder(null);
+          }
+
+          setLoading(false);
+        }
+      } catch (error: any) {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }
+  useEffect(() => {
+    if (subFolder) {
+      const current = subFolder.find((folder) => folder.status === 'current');
+      const archive = subFolder.find((folder) => folder.status === 'all');
+      if (currentTrue && current) {
+        setCurrentSubFolder(current);
+        handleSubFolderClick(current);
+      } else if (!currentTrue && archive) {
+        setCurrentSubFolder(archive);
+        handleSubFolderClick(archive);
+      }
+    }
+  }, [subFolder, currentTrue]);
+
+  const handleSubFolderClick = (subFolder: any) => {
+    setCurrentSubFolder(subFolder);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const data = {
+          bucket_name: bucketName,
+          folder: currentSelectedFolder?.name,
+          subfolder: subFolder.name,
+          version: subFolder.status,
+          product: currentSelectedFolder?.product_type,
+          org_type_id: org_type_id,
+          org_id: org_id,
+        };
+
+        const result: any = await listofallFiles(data);
+        if (result) {
+          setFiles(result.data);
+          // setCurrentTrue(true)
+        } else {
+          setFiles(null);
+        }
+
+        setLoading(false);
+      } catch (error: any) {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  };
   return (
     <>
       {loading && <Loader />}
@@ -207,8 +276,8 @@ const Page = () => {
                   </div>
                   <div className='box-body !p-0'>
                     <ul className='list-group nft-list'>
-                      {folder && folder.length > 0
-                        ? folder.map((folder: any) => (
+                      {folder1 && folder1.length > 0
+                        ? folder1.map((folder: any) => (
                             <>
                               <li
                                 style={{ cursor: 'pointer' }}
@@ -218,7 +287,7 @@ const Page = () => {
                                     ? 'checkforactive'
                                     : ''
                                 }`}
-                                onClick={() => handlefolderclick(folder)}
+                                onClick={() => handlefolderclick1(folder)}
                               >
                                 <div className='flex items-center gap-2'>
                                   <div>
@@ -230,13 +299,14 @@ const Page = () => {
                                 </span> */}
                                   </div>
                                   <div className='text-[.875rem] font-semibold my-auto '>
-                                    {folder?.folder}
+                                    {folder?.name}
                                   </div>
                                 </div>
                               </li>
                             </>
                           ))
                         : null}
+
                       {folderTrue && folderTrue === true && (
                         <div className='col-md-12 w-100 mt-4'>
                           <p className='text-center py-3'>No Folder Found</p>{' '}
@@ -282,10 +352,43 @@ const Page = () => {
                       </button>
                     </div>
                   </div>
+                  <div className='box-header'>
+                    <div className='box-header justify-between'>
+                      <div className='box-title'>Subfolders</div>
+                    </div>
+
+                    {subFolder && subFolder.length > 0 ? (
+                      <div className='flex-lg justify-between w-full'>
+                        {subFolder
+                          .filter((subFolder: subfolderDetailsData) => {
+                            return currentTrue
+                              ? subFolder.status === 'current'
+                              : subFolder.status === 'all';
+                          })
+                          .map((subFolder: subfolderDetailsData) => (
+                            <button
+                              key={subFolder.name}
+                              type='button'
+                              className={
+                                currentSubFolder === subFolder
+                                  ? 'ti-btn ti-btn-primary-full break-all btn-wave !me-3 w-full'
+                                  : 'ti-btn ti-btn-outline-primary break-all btn-wave !me-3 w-full'
+                              }
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => {
+                                handleSubFolderClick(subFolder);
+                              }}
+                            >
+                              {subFolder.name}{' '}
+                            </button>
+                          ))}
+                      </div>
+                    ) : null}
+                  </div>
                   <div className='box-body'>
                     <ul className='list-none crm-top-deals mb-0'>
-                      {filteredFiles && filteredFiles.length > 0
-                        ? filteredFiles?.map((files: any) => (
+                      {files && files.length > 0
+                        ? files?.map((file: any) => (
                             <>
                               <li className='mb-[0.9rem] p-4 hover:bg-light border dark:border-defaultborder/10 rounded-md relative"'>
                                 <div className='flex items-center flex-wrap'>
@@ -295,15 +398,12 @@ const Page = () => {
                                     </span>
                                   </div>
                                   <div className='flex-grow  ic-product-p'>
-                                    {/* {files.disabled === 'Y' ? ( */}
                                     <p
                                       className={`font-semibold mb-[1.4px]  text-[0.813rem] ${
-                                        files.disabled === 'Y'
-                                          ? ''
-                                          : 'text-gray-500'
+                                        file.disabled ? '' : 'text-gray-500'
                                       }`}
                                     >
-                                      {files.FileName}
+                                      {file.FileName}
                                     </p>
 
                                     {/* <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
@@ -311,20 +411,13 @@ const Page = () => {
                                   </p> */}
                                   </div>
                                   <div className='font-semibold text-[0.9375rem] '>
-                                    {/* <a
-                                      href={files.downloadLink}
-                                      className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
-                                    >
-                                      <i className='ri-download-line  text-[.8rem]  text-white'></i>
-                                    </a>
-                                  </div>                                   */}
                                     {
-                                      files.disabled === 'Y' ? (
+                                      file.disabled ? (
                                         <a
                                           onClick={() =>
                                             handleDownload(
-                                              files.FileName,
-                                              files.subfolder,
+                                              file.FileName,
+                                              file.subfolder,
                                             )
                                           }
                                           // href={files.downloadLink}

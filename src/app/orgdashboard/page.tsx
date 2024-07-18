@@ -620,7 +620,9 @@ const OrgDashboard = () => {
   }, [highlightedIndex, isFocusedOnEmail, isFocusedOnFName, isFocusedOnLName]);
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleSubmit();
+      if (firstName && lastName && email && role) {
+        handleSubmit();
+      }
     }
     if (isFocusedOnLName && DataTOAutoFill2 && DataTOAutoFill2.length > 0) {
       if (e.key === 'ArrowDown') {
@@ -680,7 +682,7 @@ const OrgDashboard = () => {
         if (data.data) {
           setuserrole2(data.data.id);
         } else {
-          toast.error(data.message, { autoClose: 3000 });
+          // toast.error(data.message, { autoClose: 3000 });
         }
       }
     } catch (error: any) {
@@ -1131,7 +1133,9 @@ const OrgDashboard = () => {
                                           >
                                             {/* {DataTOAutoFill2.map((e: any) => ( */}
                                             {DataTOAutoFill2.filter(
-                                              (e: any) => e.lastname != null,
+                                              (e: any) =>
+                                                e.lastname != null &&
+                                                e.lastname != '',
                                             ).map((e: any, index) => (
                                               <li
                                                 key={e}
