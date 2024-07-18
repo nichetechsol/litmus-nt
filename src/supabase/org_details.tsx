@@ -665,7 +665,22 @@ async function updateOrganization(data: {
     };
   }
 }
+async function orgNameCheck(name: any) {
+  try {
+    const { data: orgCheckData, error: orgCheckError } = await supabase
+      .from('org_details')
+      .select('id')
+      .eq('name', name);
 
+    if (orgCheckData && orgCheckData.length > 0) {
+      return { errorCode: 1, message: 'Organization already exists' };
+    } else {
+      return { errorCode: 0, message: 'Organization does not exist' };
+    }
+  } catch (error) {
+    return { errorCode: 1, message: 'Failed to check organization name' };
+  }
+}
 async function viewOrganization(org_id: any): Promise<Result<any>> {
   try {
     // Fetch organization details and type in parallel
@@ -1080,6 +1095,7 @@ export {
   getUserRole,
   organizationSearch,
   organizationSidebarList,
+  orgNameCheck,
   reqOrgDeleteMail,
   requestOrgDeletion,
   updateOrganization,
