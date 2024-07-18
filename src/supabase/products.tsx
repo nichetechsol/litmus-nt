@@ -604,16 +604,57 @@ const listofallFiles = async (data: any) => {
     if (errorEntitlement) {
       throw new Error('Error fetching entitlements package');
     }
+    const resolveEntitlementValue = (entitlements_values: any) => {
+      let entitlementValueResolved: any;
 
+      if (
+        entitlements_values.value_text !== null &&
+        entitlements_values.value_text !== undefined
+      ) {
+        entitlementValueResolved = entitlements_values.value_text;
+        entitlementValueResolved =
+          entitlementValueResolved.charAt(0).toUpperCase() +
+          entitlementValueResolved.slice(1);
+      } else if (
+        entitlements_values.value_number !== null &&
+        entitlements_values.value_number !== undefined
+      ) {
+        entitlementValueResolved = entitlements_values.value_number;
+      } else if (
+        entitlements_values.value_bool !== null &&
+        entitlements_values.value_bool !== undefined
+      ) {
+        entitlementValueResolved = entitlements_values.value_bool;
+      } else {
+        // If no value is present, skip this entitlement
+        return null;
+      }
+
+      return entitlementValueResolved;
+    };
     // Extracting the array of objects with entitlement_name_id and entitlement_value
-    const entitlementsArray = entitlements_package.map((item: any) => ({
-      entitlement_name_id: item.entitlement_name_id,
-      entitlement_value: item.entitlements_values.value_text,
-    }));
+    // const entitlementsArray = entitlements_package.map((item: any) => ({
+    //   entitlement_name_id: item.entitlement_name_id,
+    //   entitlement_value: item.entitlements_values.value_text,
 
+    // }));
+    // Extracting the array of objects with entitlement_name_id and entitlement_value
+    const entitlementsArray = entitlements_package.map((item: any) => {
+      const entitlement_value = resolveEntitlementValue(
+        item.entitlements_values,
+      );
+
+      return {
+        entitlement_name_id: item.entitlement_name_id,
+        entitlement_value: entitlement_value,
+      };
+    }); // Filter out null values
     const fileTypes: string[] = [];
 
     for (const entitlement of entitlementsArray) {
+      if (entitlement.entitlement_value === true) {
+        entitlement.entitlement_value = 'TRUE';
+      }
       const { data: filePermissions, error: errorFilePermission } =
         await supabase
           .from('filedownload_permissions')
