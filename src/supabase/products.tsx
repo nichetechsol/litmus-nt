@@ -17,7 +17,7 @@ async function listLitmusProducts(site_id: any, org_id: any, org_type_id: any) {
   const { data: entitlements_package, error: errorEntitlement } = await supabase
     .from('entitlements_package')
     .select('*')
-    .eq('site_id', site_id);
+    .eq('org_id', org_id);
 
   // Check if there was an error in fetching entitlements package
   if (errorEntitlement) {
@@ -450,11 +450,7 @@ async function allfiles(org_id: any) {
     data: currentFilesList, // Return the list of current files
   };
 }
-const downloadProduct = async (
-  folder: string,
-  subfolder: any,
-  fileName: any,
-) => {
+const downloadProduct = async (folder: any, subfolder: any, fileName: any) => {
   const path: any = folder + '/' + subfolder + '/' + fileName;
   const { data, error } = await supabase.storage
     .from('Litmus_Products')

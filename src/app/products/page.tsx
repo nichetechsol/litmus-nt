@@ -44,7 +44,6 @@ const Page = () => {
   const [org_type_id, setOrg_type_id] = useState<any>('');
   const [folderTrue, setFolderTrue] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState<any>('');
-  const [filteredFiles, setFilteredFiles] = useState<any>('');
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
       const tokens = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
@@ -118,7 +117,7 @@ const Page = () => {
   const handleDownload = async (fileName: string, subfolder: string) => {
     setLoading(true);
     const result = await downloadProduct(
-      selectedFolder?.folder ?? '',
+      currentSelectedFolder?.name,
       subfolder,
       fileName,
     );
@@ -148,7 +147,7 @@ const Page = () => {
     };
     const response = await logActivity(data);
     if (response) {
-      // fetchData8()
+      //
     }
   };
 
@@ -281,9 +280,9 @@ const Page = () => {
                             <>
                               <li
                                 style={{ cursor: 'pointer' }}
-                                key={folder.folder}
+                                key={folder}
                                 className={`list-group-item ${
-                                  selectedFolder === folder
+                                  currentSelectedFolder === folder
                                     ? 'checkforactive'
                                     : ''
                                 }`}
