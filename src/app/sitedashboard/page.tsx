@@ -1200,105 +1200,7 @@ const Page = () => {
                       // }}
                     >
                       <div className='flex justify-between items-center  gap-2'>
-                        <div className='flex items-center'>
-                          {/* <div className='avatar avatar-xl avatar-rounded '>
-                            {' '}
-                            <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
-                              <InitialsComponent
-                                name={
-                                  SingleSite?.site ? SingleSite?.site?.name : ''
-                                }
-                              />
-                            </span>
-                          </div> */}
-                          {/* <div className='relative group'>
-                            <h1 className='mb-1 font-semibold p-new text-[1rem] text-site-name'>
-                              {SingleSite?.site ? SingleSite?.site?.name : ''}
-                            </h1>
-                            <div className='absolute hidden group-hover:block bg-gray-400 text-black text-xs rounded p-2 z-10 bottom-full mb-2 w-max max-w-xs break-words'>
-                              {SingleSite?.site ? SingleSite?.site?.name : ''}
-                            </div>
-                          </div> */}
-                          {/* <div className='hs-tooltip ti-main-tooltip '>
-                                        <h1
-                                          className='h1-new hs-tooltip-toggle w-100'
-                                          style={{
-                                            fontSize: '1.1rem',
-                                            fontWeight: 'bold',
-                                            marginBottom: '0.5rem',
-                                          }}
-                                        >
-                                          <Link
-                                            aria-label='anchor'
-                                            href='#!'
-                                          ></Link>
-                                          {SingleSite?.site
-                                            ? SingleSite?.site?.name
-                                            : ''}
-                                          {SingleSite?.site?.name.length >
-                                            18 && (
-                                            <span
-                                              className='hs-tooltip-content  ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm '
-                                              role='tooltip'
-                                            >
-                                              {SingleSite?.site
-                                                ? SingleSite?.site?.name
-                                                : ''}
-                                            </span>
-                                          )}
-                                        </h1>
-                                      </div> */}
-                        </div>
-
-                        {/* <div className='hs-dropdown ti-dropdown'>
-                          <Link
-                            aria-label='anchor'
-                            href='#!'
-                            className='flex items-center justify-center w-[1.75rem] h-[1.75rem]  !text-[0.8rem] !py-1 !px-2 rounded-sm bg-light border-light shadow-none !font-medium'
-                            aria-expanded='false'
-                            onClick={(e) => {
-                              e.preventDefault(); // Prevent default navigation action
-                              e.stopPropagation(); // Prevent click from bubbling up
-                            }}
-                          >
-                            <i className='ri-more-2-line text-[0.8rem]'></i>
-                          </Link>
-                          <ul className='hs-dropdown-menu ti-dropdown-menu hidden'>
-                            <li>
-                              <button
-                                className='ti-dropdown-item w-full text-start !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
-                                // href='#!'
-                                style={{ cursor: 'pointer' }}
-                                aria-label='anchor'
-                                data-bs-target='#formmodal'
-                                data-bs-toggle='modal'
-                                data-bs-whatever='@fat'
-                                data-hs-overlay='#todo-compose'
-                                onClick={(e) => {
-                                  e.stopPropagation(); // Prevent card click
-                                  // setModalOpen(true);
-                                  handeledit(SingleSite);
-                                }}
-                              >
-                                Edit
-                              </button>
-                            </li>
-                            <li>
-                              <button
-                                className='ti-dropdown-item w-full text-start !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
-                                // href='#!'
-                                style={{ cursor: 'pointer' }}
-                                aria-label='anchor'
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handelDelete(SingleSite);
-                                }}
-                              >
-                                Delete Request
-                              </button>
-                            </li>
-                          </ul>
-                        </div> */}
+                        <div className='flex items-center'></div>
                       </div>
                       {}
                       <div className=''>
@@ -1308,17 +1210,6 @@ const Page = () => {
                               <i className='bx bx-map align-middle me-2 text-muted'></i>
                               <b>Address : </b>
                               <p className='ms-1 over-text text-muted fw-normal d-inline-block'>
-                                {/* {SingleSite?.site && (
-                                  <>
-                                    {SingleSite?.site?.address1}
-                                    {SingleSite?.site?.address2
-                                      ? `, ${SingleSite?.site?.address2}`
-                                      : ''}
-                                    {`, ${SingleSite?.site?.city}`}
-                                    {`, ${SingleSite?.state}`}
-                                    {`, ${SingleSite?.country}`}
-                                  </>
-                                )} */}
                                 {siteCountData &&
                                   `${siteCountData?.data?.sites_details
                                     ?.address1}${
@@ -1371,42 +1262,6 @@ const Page = () => {
                               </span>
                             </li>
                           </ul>
-                          {/* {SingleSite?.user_role_id === 1 ||
-                                      SingleSite?.user_role_id === 2 ? (
-                                        <div className='flex justify-center mt-3'>
-                                          <div
-                                            style={{ cursor: 'pointer' }}
-                                            aria-label='anchor'
-                                            data-bs-target='#formmodal'
-                                            data-bs-toggle='modal'
-                                            data-bs-whatever='@fat'
-                                            data-hs-overlay='#todo-compose'
-                                            onClick={(e) => {
-                                              e.stopPropagation(); // Prevent card click
-                                              // setModalOpen(true);
-                                              handeledit(SingleSite);
-                                            }}
-                                            className='ti-btn ti-btn-primary-full ti-btn-wave !gap-0  bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
-                                          >
-                                            <i className='ri-edit-line me-1'></i>{' '}
-                                            Edit
-                                          </div>
-                                          <div
-                                            style={{ cursor: 'pointer' }}
-                                            aria-label='anchor'
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              handelDelete(SingleSite);
-                                            }}
-                                            className='ti-btn ti-btn-danger-full ti-btn-wave !gap-0 !ms-2 bg-danger/10 text-white hover:bg-white hover:text-danger hover:border-danger'
-                                          >
-                                            <i className='ri-delete-bin-line me-1'></i>{' '}
-                                            Delete
-                                          </div>
-                                        </div>
-                                      ) : (
-                                        ''
-                                      )} */}
                         </div>
                       </div>
                     </div>
@@ -1505,7 +1360,7 @@ const Page = () => {
                                               <li
                                                 style={{ cursor: 'pointer' }}
                                                 key={e}
-                                                onClick={() =>
+                                                onMouseDown={() =>
                                                   handelautofill(e)
                                                 }
                                               >
@@ -1553,7 +1408,7 @@ const Page = () => {
                                             {DataTOAutoFill1.map((e: any) => (
                                               <li
                                                 key={e}
-                                                onClick={() =>
+                                                onMouseDown={() =>
                                                   handelautofill(e)
                                                 }
                                               >
@@ -1600,7 +1455,7 @@ const Page = () => {
                                             {DataTOAutoFill2.map((e: any) => (
                                               <li
                                                 key={e}
-                                                onClick={() =>
+                                                onMouseDown={() =>
                                                   handelautofill(e)
                                                 }
                                               >

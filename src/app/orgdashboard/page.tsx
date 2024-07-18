@@ -922,7 +922,7 @@ const OrgDashboard = () => {
                                               <li
                                                 style={{ cursor: 'pointer' }}
                                                 key={e}
-                                                onClick={() =>
+                                                onMouseDown={() =>
                                                   handelautofill(e)
                                                 }
                                               >
@@ -974,9 +974,12 @@ const OrgDashboard = () => {
                                             ).map((e: any) => (
                                               <li
                                                 key={e}
-                                                onClick={() =>
+                                                onMouseDown={() =>
                                                   handelautofill(e)
                                                 }
+                                                // onClick={() =>
+                                                //   handelautofill(e)
+                                                // }
                                               >
                                                 {e.firstname}({e.email})
                                               </li>
@@ -1027,7 +1030,7 @@ const OrgDashboard = () => {
                                             ).map((e: any) => (
                                               <li
                                                 key={e}
-                                                onClick={() =>
+                                                onMouseDown={() =>
                                                   handelautofill(e)
                                                 }
                                               >
