@@ -258,6 +258,10 @@ const Page = () => {
     };
     fetchData();
   };
+  const handleRequestMail = () => {
+    //
+  };
+
   return (
     <>
       {loading && <Loader />}
@@ -410,29 +414,33 @@ const Page = () => {
                                   </p> */}
                                   </div>
                                   <div className='font-semibold text-[0.9375rem] '>
-                                    {
-                                      file.disabled ? (
-                                        <a
-                                          onClick={() =>
-                                            handleDownload(
-                                              file.FileName,
-                                              file.subfolder,
-                                            )
-                                          }
-                                          // href={files.downloadLink}
-                                          className='text-[1rem] !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'
-                                          style={{ cursor: 'pointer' }}
-                                        >
-                                          <i className='ri-download-line text-[.8rem] text-white'></i>
-                                        </a>
-                                      ) : null
-                                      // <button
-                                      //   disabled
-                                      //   className='text-[1rem] !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-gray-300'
-                                      // >
-                                      //   <i className='ri-download-line text-[.8rem] text-white'></i>
-                                      // </button>
-                                    }
+                                    {file.disabled ? (
+                                      <a
+                                        onClick={() =>
+                                          handleDownload(
+                                            file.FileName,
+                                            file.subfolder,
+                                          )
+                                        }
+                                        // href={files.downloadLink}
+                                        className='text-[1rem] !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'
+                                        style={{ cursor: 'pointer' }}
+                                      >
+                                        <i className='ri-download-line text-[.8rem] text-white'></i>
+                                      </a>
+                                    ) : (
+                                      <a
+                                        onClick={() => handleRequestMail()}
+                                        // href={files.downloadLink}
+                                        className='text-[1rem] !w-[7.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'
+                                        style={{ cursor: 'pointer' }}
+                                      >
+                                        {/* <i className='ri-mail-line text-[.8rem] text-white'></i> */}
+                                        <p className='text-white text-[.8rem]'>
+                                          Request Access
+                                        </p>
+                                      </a>
+                                    )}
                                   </div>
                                 </div>
                               </li>

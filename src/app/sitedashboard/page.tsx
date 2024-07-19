@@ -24,7 +24,7 @@ import { getActivitiesBySiteID, logActivity } from '@/supabase/activity';
 import { showReqLicenceButton } from '@/supabase/licence';
 import { getUserRole } from '@/supabase/org_details';
 import { searchUsers } from '@/supabase/org_user';
-import { downloadProduct, listLitmusProducts } from '@/supabase/products';
+import { downloadProduct, fetchProductData } from '@/supabase/products';
 import { refreshToken } from '@/supabase/session';
 import {
   addUserToSites,
@@ -51,13 +51,14 @@ interface licenseData {
   licence_type_name: string;
   site_id: number;
 }
+interface ProductsFileDetails {
+  FileName: string;
+  downloadLink: string;
+  disabled: boolean;
+  subfolder: string;
+}
 interface Products {
-  data: {
-    FileName: string;
-    downloadLink: string;
-    extensionIncluded: string;
-    subfolder: string;
-  };
+  data: ProductsFileDetails[];
   errorCode: number;
   folder: string;
 }
@@ -340,16 +341,36 @@ const Page = () => {
     fetchUserData();
   }, [site_id, activePage, search]);
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       if (site_id) {
+  //         setLoading(true);
+  //         const result1: any = await listLitmusProducts(
+  //           site_id,
+  //           org_id,
+  //           org_type_id,
+  //         );
+  //         if (result1) {
+  //           setProducts(result1.data);
+  //           setProductSiteCount(result1.data.length);
+  //           setLoading(false);
+  //         }
+  //       }
+  //     } catch (error: any) {
+  //       setLoading(false);
+  //       //
+  //     }
+  //   };
+  //   fetchData();
+  // }, [site_id]);
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (site_id) {
           setLoading(true);
-          const result1: any = await listLitmusProducts(
-            site_id,
-            org_id,
-            org_type_id,
-          );
+          const data = { org_id, org_type_id };
+          const result1: any = await fetchProductData(data);
           if (result1) {
             setProducts(result1.data);
             setProductSiteCount(result1.data.length);
@@ -362,7 +383,7 @@ const Page = () => {
       }
     };
     fetchData();
-  }, [site_id]);
+  }, [org_id, org_type_id]);
   // for auto fill in user form
 
   const handelautofill = (e: any) => {
@@ -1117,22 +1138,22 @@ const Page = () => {
                                   <div className='flex-grow ic-product-p'>
                                     <p
                                       className={`font-semibold mb-[1.4px]  text-[0.813rem] ${
-                                        product.data.extensionIncluded === 'Y'
+                                        product.data[0].disabled
                                           ? ''
                                           : 'text-gray-500'
                                       }`}
                                     >
-                                      {product.data.FileName}
+                                      {product.data[0].FileName}
                                     </p>
                                   </div>
-                                  {product.data.extensionIncluded === 'Y' && (
+                                  {product.data[0].disabled && (
                                     <div className='font-semibold text-[0.9375rem] '>
                                       <a
                                         onClick={() => {
                                           handleDownload(
-                                            product.data.FileName,
+                                            product.data[0].FileName,
                                             product.folder,
-                                            product.data.subfolder,
+                                            product.data[0].subfolder,
                                             'P',
                                           );
                                         }}
@@ -1175,7 +1196,11 @@ const Page = () => {
                                     </p>
                                   </div>
                                   <div className='font-semibold text-[0.9375rem] '>
-                                    {entitlement.entitlementValue}
+                                    {entitlement.entitlementValue === true
+                                      ? 'true'
+                                      : entitlement.entitlementValue === false
+                                      ? 'false'
+                                      : entitlement.entitlementValue}
                                   </div>
                                 </div>
                               </li>
@@ -1312,7 +1337,7 @@ const Page = () => {
                             </li>
                             <li className='list-group-item fw-semibold'>
                               <i className='bx bx-briefcase align-middle me-2 text-muted'></i>
-                              <b>counrty :</b>
+                              <b>Counrty :</b>
                               <span className='ms-1 text-muted fw-normal d-inline-block'>
                                 {/* {SingleSite?.ownerNames?.join(', ')} */}
                                 {/* {SingleSite?.ownerNames?.length
@@ -1332,7 +1357,7 @@ const Page = () => {
                             </li>
                             <li className='list-group-item fw-semibold'>
                               <i className='bx bx-user align-middle me-2 text-muted'></i>
-                              <b>city :</b>
+                              <b>City :</b>
                               <span className='ms-1 text-muted fw-normal d-inline-block'>
                                 {/* {SingleSite?.type_name} */}
                                 {siteCountData &&
@@ -1571,7 +1596,9 @@ const Page = () => {
                                             ref={lastNameListRef}
                                           >
                                             {DataTOAutoFill2.filter(
-                                              (e: any) => e.lastname != null,
+                                              (e: any) =>
+                                                e.lastname != null &&
+                                                e.lastname != '',
                                             ).map((e: any, index) => (
                                               <li
                                                 key={e}

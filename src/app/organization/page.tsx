@@ -586,9 +586,15 @@ const Page = () => {
                 if (result.errorCode != 0) {
                   toast.error(result.message, { autoClose: 3000 });
                   setDomains([...domains, id.domainname]);
+                  setDomainIdsToBeRemoved((prev) =>
+                    prev.filter((domain) => domain.domainid !== id.domainid),
+                  );
                   throw new Error(result.message);
                 } else {
                   toast.success(result.message, { autoClose: 3000 });
+                  setDomainIdsToBeRemoved((prev) =>
+                    prev.filter((domain) => domain.domainid !== id.domainid),
+                  );
                 }
               });
 
@@ -596,19 +602,7 @@ const Page = () => {
             } catch (error) {
               return;
             }
-            // domainIdsToBeRemoved.map(async (id) => {
-            //   const data = {
-            //     org_id: orgidForupdatetion,
-            //     domain_id: id.domainid,
-            //     user_id: user_id,
-            //     name: organizationName,
-            //     userName: email,
-            //   };
-            //   const result = await deleteDomains(data);
-            //   if (result.errorCode != 0) {
-            //     toast.error(result.message, { autoClose: 3000 });
-            //   }
-            // });
+            setDomainIdsToBeRemoved([]);
           }
           const selectedTypeId =
             typeDropdown?.find((type) => type.name === selectedType)?.id ??
@@ -865,7 +859,7 @@ const Page = () => {
   function createCustomContent(orgName: any) {
     return `
     <div>
-      <p>Please type "<b>DELETE</b>" or "<b>${orgName}</b>" to confirm deletion</p>
+      <p>Please type <b>DELETE</b> or <b>${orgName}</b> to confirm deletion</p>
       <input type="text" class="swal-content__input" id="delete-input" placeholder="Type here">
     </div>
   `;
@@ -873,7 +867,7 @@ const Page = () => {
   function createCustomContent2(orgName: any) {
     return `
     <div>
-      <p>Please type "<b>DELETE</b>" or "<b>${orgName}</b>" to confirm deletion</p>
+      <p>Please type <b>DELETE</b> or <b>${orgName}</b> to confirm deletion</p>
     </div>
   `;
   }

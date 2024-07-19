@@ -733,7 +733,7 @@ const Page: React.FC = () => {
   function createCustomContent(name: any) {
     return `
     <div>
-      <p>Please type "<b>DELETE</b>" or "<b>${name}</b>" to confirm deletion</p>
+      <p>Please type <b>DELETE</b> or <b>${name}</b> to confirm deletion</p>
       <input type="text" class="swal-content__input" id="delete-input" placeholder="Type here">
     </div>
   `;
@@ -741,7 +741,7 @@ const Page: React.FC = () => {
   function createCustomContent2(name: any) {
     return `
     <div>
-      <p>Please type "<b>DELETE</b>" or "<b>${name}</b>" to confirm deletion</p>
+      <p>Please type <b>DELETE</b> or <b>${name}</b> to confirm deletion</p>
     </div>
   `;
   }

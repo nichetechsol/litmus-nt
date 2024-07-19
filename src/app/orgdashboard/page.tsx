@@ -48,7 +48,7 @@ interface OrgUser {
 interface Entitlement {
   id: number;
   entitlementName: string;
-  entitlementValue: number;
+  entitlementValue: number | string | boolean;
   created_at: string;
   entitlement_name_id: number;
   entitlement_value_id: number;
@@ -829,7 +829,11 @@ const OrgDashboard = () => {
                                     </p>
                                   </div>
                                   <div className='font-semibold text-[0.9375rem] '>
-                                    {entitlement.entitlementValue}
+                                    {entitlement.entitlementValue === true
+                                      ? 'true'
+                                      : entitlement.entitlementValue === false
+                                      ? 'false'
+                                      : entitlement.entitlementValue}
                                   </div>
                                 </div>
                               </li>
