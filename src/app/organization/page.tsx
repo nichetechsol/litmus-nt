@@ -26,6 +26,7 @@ import {
   fetchOrganizationTypes,
   getUserRole,
   organizationSidebarList,
+  orgNameCheck,
   reqOrgDeleteMail,
   requestOrgDeletion,
   updateOrganization,
@@ -428,21 +429,41 @@ const Page = () => {
   };
   const [orgidForupdatetion, setorgidForupdatetion] = useState();
   const [addbuttonclass, setaddbuttonclass] = useState<boolean>(false);
+  // useEffect(() => {
+  //   const validate = async () => {
+  //     try {
+  //       await validationSchema.validate(
+  //         { organizationName, domains, selectedType, message, organizationNameError },
+  //         { abortEarly: false },
+  //       );
+  //       setaddbuttonclass(true);
+  //     } catch (err) {
+  //       setaddbuttonclass(false);
+  //     }
+  //   };
+
+  //   validate();
+  // }, [organizationName, domains, selectedType, message]);
+
   useEffect(() => {
     const validate = async () => {
-      try {
-        await validationSchema.validate(
-          { organizationName, domains, selectedType, message },
-          { abortEarly: false },
-        );
-        setaddbuttonclass(true);
-      } catch (err) {
+      if (organizationNameError == '') {
+        try {
+          await validationSchema.validate(
+            { organizationName, domains, selectedType, message },
+            { abortEarly: false },
+          );
+          setaddbuttonclass(true);
+        } catch (err) {
+          setaddbuttonclass(false);
+        }
+      } else {
         setaddbuttonclass(false);
       }
     };
 
     validate();
-  }, [organizationName, domains, selectedType, message]);
+  }, [organizationName, domains, selectedType, message, organizationNameError]);
 
   const [domainIdsToBeRemoved, setDomainIdsToBeRemoved] = useState<
     { domainname: string; domainid: number }[]
@@ -1022,6 +1043,30 @@ const Page = () => {
       setLoading(false);
     }
   };
+
+  const checkInputValue = async (value: any) => {
+    try {
+      const response = await orgNameCheck(value);
+
+      if (response) {
+        if (response.errorCode == 1) {
+          setOrganizationNameError(response.message);
+        }
+      }
+    } catch (error) {
+      if (error instanceof Yup.ValidationError) {
+        setDomainError(error.message);
+      }
+      // console.error('Error checking input value:', error);
+      // setError('Error checking input value. Please try again later.');
+    }
+  };
+  const handelblurrr = () => {
+    if (organizationName) {
+      checkInputValue(organizationName);
+    }
+  };
+
   return (
     <>
       {loading && <Loader />}
@@ -1106,8 +1151,7 @@ const Page = () => {
                                     <input
                                       type='text'
                                       className={`form-control w-full ${
-                                        organizationNameError1 ||
-                                        organizationNameError != ''
+                                        organizationNameError1
                                           ? 'input-error'
                                           : ''
                                       }`}
@@ -1117,6 +1161,7 @@ const Page = () => {
                                       onKeyDown={handleKeyPress}
                                       value={organizationName}
                                       maxLength={256}
+                                      onBlur={handelblurrr}
                                     />
                                     {organizationNameError && (
                                       <div className='text-danger'>
