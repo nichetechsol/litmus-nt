@@ -829,10 +829,9 @@ const OrgDashboard = () => {
                                     </p>
                                   </div>
                                   <div className='font-semibold text-[0.9375rem] '>
-                                    {entitlement.entitlementValue === true
-                                      ? 'true'
-                                      : entitlement.entitlementValue === false
-                                      ? 'false'
+                                    {typeof entitlement.entitlementValue ===
+                                    'boolean'
+                                      ? entitlement.entitlementValue.toString()
                                       : entitlement.entitlementValue}
                                   </div>
                                 </div>

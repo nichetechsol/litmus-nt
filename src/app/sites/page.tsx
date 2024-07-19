@@ -1202,7 +1202,7 @@ const Page: React.FC = () => {
                               >
                                 {changeFlage === true
                                   ? 'Add Site'
-                                  : 'Edit Site'}
+                                  : 'Save Changes'}
                               </button>
                             </div>
                           </div>

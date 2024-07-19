@@ -6,7 +6,10 @@
 
 import { redirect, useRouter } from 'next/navigation';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
 import swal from 'sweetalert';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 import { decryptData } from '@/helper/Encryption_Decryption';
 import { logActivity } from '@/supabase/activity';
@@ -18,7 +21,6 @@ import {
 } from '@/supabase/products';
 import { refreshToken } from '@/supabase/session';
 import Loader from '@/utils/Loader/Loader';
-
 interface folderDetailsData {
   name: string;
   product_type: string;
@@ -259,7 +261,7 @@ const Page = () => {
     fetchData();
   };
   const handleRequestMail = () => {
-    //
+    toast.warning('Work In Progress..', { autoClose: 3000 });
   };
 
   return (
@@ -267,6 +269,7 @@ const Page = () => {
       {loading && <Loader />}
       {tokenVerify && (
         <>
+          <ToastContainer />
           <div className='my-5'>
             <div className='grid grid-cols-12 gap-6'>
               <div className='xl:col-span-12 col-span-12'>
