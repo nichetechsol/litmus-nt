@@ -184,7 +184,7 @@ async function reqLicense(data: any) {
     };
   }
 }
-async function reqLicenseforLitmus(data: any) {
+async function reqProductsforLitmus(data: any) {
   const userName: any = data.userName;
   const orgName: any = data.name;
   const token: any = data.token;
@@ -206,7 +206,7 @@ async function reqLicenseforLitmus(data: any) {
 
     return {
       errorCode: 0,
-      message: 'License request sent successfully.',
+      message: 'products request sent successfully.',
       data: null,
     };
   } catch (error) {
@@ -340,6 +340,6 @@ export {
   getLicenceData,
   getSKUList,
   reqLicense,
-  reqLicenseforLitmus,
+  reqProductsforLitmus,
   showReqLicenceButton,
 };

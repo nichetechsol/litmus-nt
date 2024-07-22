@@ -13,6 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { decryptData } from '@/helper/Encryption_Decryption';
 import { logActivity } from '@/supabase/activity';
+import { reqProductsforLitmus } from '@/supabase/licence';
 import {
   downloadProduct,
   listofallFiles,
@@ -40,12 +41,16 @@ const Page = () => {
   const navigate = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [tokenVerify, setTokenVerify] = useState(false);
+  const [orgName, setorgName] = useState<any>('');
   const [user_id, setuser_id] = useState<any>('');
   const [org_id, setorg_id] = useState<any>('');
   const [site_id, setsite_id] = useState<any>('');
   const [org_type_id, setOrg_type_id] = useState<any>('');
   const [folderTrue, setFolderTrue] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState<any>('');
+  const [onlyToken, setOnlyToken] = useState('');
+  const [userEmail, setUseremail] = useState<any>('');
+
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
       const tokens = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
@@ -54,6 +59,8 @@ const Page = () => {
         redirect('/');
       } else {
         setTokenVerify(true);
+        const token = JSON.parse(tokens);
+        setOnlyToken(token.access_token);
       }
     }
   }, []);
@@ -63,11 +70,14 @@ const Page = () => {
     const encryptedOrgId = localStorage.getItem('org_id');
     const encryptedSiteId = localStorage.getItem('site_id');
     const encrytedOrgTypeId = localStorage.getItem('org_type_id');
+    const decryptedOrgName = decryptData(localStorage.getItem('org_name'));
+    const decrypteduserEmail = decryptData(localStorage.getItem('user_email'));
 
     const decryptedUserId = decryptData(encryptedUserId);
     const decryptedOrgId = decryptData(encryptedOrgId);
     const decryptedSiteId = decryptData(encryptedSiteId);
     const decrytedOrgTypeId = decryptData(encrytedOrgTypeId);
+
     if (decryptedOrgId) {
       setorg_id(decryptedOrgId);
       if (!decryptedSiteId) {
@@ -87,7 +97,10 @@ const Page = () => {
         // redirect('/organization');
       });
     }
-
+    if (decryptedOrgName) {
+      setorgName(decryptedOrgName);
+      setUseremail(decrypteduserEmail);
+    }
     if (decryptedSiteId) {
       setsite_id(decryptedSiteId);
     }
@@ -170,6 +183,7 @@ const Page = () => {
         setLoading(true);
         if (org_id) {
           const data: any = await listofProducts(org_id);
+
           if (data) {
             setFolder1(data.data);
             setCurrentTrue(true);
@@ -260,8 +274,26 @@ const Page = () => {
     };
     fetchData();
   };
-  const handleRequestMail = () => {
-    toast.warning('Work In Progress..', { autoClose: 3000 });
+
+  const handleRequestMail = async () => {
+    // toast.warning('Work In Progress..', { autoClose: 3000 });
+    const data = {
+      userName: userEmail,
+      name: orgName,
+      token: onlyToken,
+    };
+    setLoading(true);
+    try {
+      const response: any = await reqProductsforLitmus(data);
+      if (response) {
+        setLoading(false);
+        toast.success(response.message, { autoClose: 3000 });
+      } else if (response.errorCode === 0) {
+        toast.error(response.message, { autoClose: 3000 });
+      }
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, { autoClose: 3000 });
+    }
   };
 
   return (
@@ -432,17 +464,24 @@ const Page = () => {
                                         <i className='ri-download-line text-[.8rem] text-white'></i>
                                       </a>
                                     ) : (
-                                      <a
-                                        onClick={() => handleRequestMail()}
-                                        // href={files.downloadLink}
-                                        className='text-[1rem] !w-[7.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'
-                                        style={{ cursor: 'pointer' }}
-                                      >
-                                        {/* <i className='ri-mail-line text-[.8rem] text-white'></i> */}
-                                        <p className='text-white text-[.8rem]'>
-                                          Request Access
-                                        </p>
-                                      </a>
+                                      <>
+                                        {bucketName &&
+                                        bucketName === 'Litmus_Products' ? (
+                                          <a
+                                            onClick={() => handleRequestMail()}
+                                            // href={files.downloadLink}
+                                            className='text-[1rem] !w-[7.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'
+                                            style={{ cursor: 'pointer' }}
+                                          >
+                                            {/* <i className='ri-mail-line text-[.8rem] text-white'></i> */}
+                                            <p className='text-white text-[.8rem]'>
+                                              Request Access
+                                            </p>
+                                          </a>
+                                        ) : (
+                                          'false'
+                                        )}
+                                      </>
                                     )}
                                   </div>
                                 </div>

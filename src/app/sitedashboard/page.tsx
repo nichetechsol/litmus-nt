@@ -51,14 +51,11 @@ interface licenseData {
   licence_type_name: string;
   site_id: number;
 }
-interface ProductsFileDetails {
+interface Products {
   FileName: string;
   downloadLink: string;
   disabled: boolean;
   subfolder: string;
-}
-interface Products {
-  data: ProductsFileDetails[];
   errorCode: number;
   folder: string;
 }
@@ -324,7 +321,7 @@ const Page = () => {
       } else {
         //
       }
-      const result: any = await showReqLicenceButton({ orgID: site_id });
+      const result: any = await showReqLicenceButton(org_id);
 
       if ((data.data.id === 1 || data.data.id === 2) && result) {
         setshowReqLicBtn(true);
@@ -335,7 +332,7 @@ const Page = () => {
   };
   useEffect(() => {
     roleChange();
-  }, [site_id, user_id]);
+  }, [org_id, user_id]);
 
   useEffect(() => {
     fetchUserData();
@@ -818,6 +815,7 @@ const Page = () => {
       fetchData8();
     }
   };
+
   return (
     <>
       {loading && <Loader />}
@@ -1138,22 +1136,20 @@ const Page = () => {
                                   <div className='flex-grow ic-product-p'>
                                     <p
                                       className={`font-semibold mb-[1.4px]  text-[0.813rem] ${
-                                        product.data[0].disabled
-                                          ? ''
-                                          : 'text-gray-500'
+                                        product.disabled ? '' : 'text-gray-500'
                                       }`}
                                     >
-                                      {product.data[0].FileName}
+                                      {product.FileName}
                                     </p>
                                   </div>
-                                  {product.data[0].disabled && (
+                                  {product.disabled && (
                                     <div className='font-semibold text-[0.9375rem] '>
                                       <a
                                         onClick={() => {
                                           handleDownload(
-                                            product.data[0].FileName,
+                                            product.FileName,
                                             product.folder,
-                                            product.data[0].subfolder,
+                                            product.subfolder,
                                             'P',
                                           );
                                         }}
