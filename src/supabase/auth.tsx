@@ -93,7 +93,8 @@ async function Login(email: string, password: string): Promise<LoginResult> {
       return { errorCode: 1, message: 'Invalid data' };
     }
     const userId = userData[0].id;
-
+    const userEmail = userData[0].email;
+    await handleDomainUserAssignment(userId, userEmail);
     // Check the number of organizations where the user has role_id = 1
     const { data: orgUsersData, error: orgUsersError } = await supabase
       .from('org_users')
@@ -132,4 +133,65 @@ async function Login(email: string, password: string): Promise<LoginResult> {
     return { errorCode: -1, message: (error as Error).message }; // Return a general error code
   }
 }
+async function handleDomainUserAssignment(
+  userId: string,
+  email: string,
+): Promise<void> {
+  // Extract domain from email
+  const domain = email.split('@')[1];
+
+  // Get domainId
+  const { data: domainData, error: domainError } = await supabase
+    .from('domains')
+    .select('id')
+    .eq('name', domain)
+    .limit(1)
+    .single();
+
+  if (domainError || !domainData) {
+    return;
+  }
+
+  const domainId = domainData.id;
+
+  // Get organization IDs associated with the domain
+  const { data: orgDomainsData, error: orgDomainsError } = await supabase
+    .from('org_domains')
+    .select('org_id')
+    .eq('domain_id', domainId);
+
+  if (orgDomainsError || !orgDomainsData || orgDomainsData.length === 0) {
+    return;
+  }
+
+  // Insert into org_users if necessary
+  for (const orgDomain of orgDomainsData) {
+    const orgId = orgDomain.org_id;
+
+    if (!orgId) {
+      return;
+    } else {
+      const { data: orgUserData, error: checkOrgUserError } = await supabase
+        .from('org_users')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('org_id', orgId);
+
+      if (checkOrgUserError) {
+        return;
+      }
+
+      if (!orgUserData || orgUserData.length === 0) {
+        const { error: insertOrgUserError } = await supabase
+          .from('org_users')
+          .insert([{ user_id: userId, role_id: 3, org_id: orgId }]);
+
+        if (insertOrgUserError) {
+          return;
+        }
+      }
+    }
+  }
+}
+
 export { Login };
