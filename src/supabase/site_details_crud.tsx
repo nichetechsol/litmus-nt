@@ -793,11 +793,11 @@ async function requestSiteDeletion(data: any): Promise<Result<any>> {
     // Send email
     await sendEmailFunction(to, subject, headingData, contentData, data.token);
     const emailData: any = await fetchEmailData('Site_Delete_Request_User');
-    const toUser = data.email;
+    const toUser = emailData.data.To;
     const subjectUser = emailData.data.email_subject;
     const headingUser = emailData.data.email_heading;
     const contentUser = emailData.data.email_content;
-    const toData = toUser.replace('{{Target User EMail}}', toUser);
+    const toData = toUser.replace('{{Target User EMail}}', userName);
     const headingUserData = headingUser.replace('{{Site Name}}', siteName);
     const contentUserData = contentUser
       .replace('{{Site Name}}', siteName)
