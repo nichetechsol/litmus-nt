@@ -10,7 +10,7 @@ interface GetSKUParams {
 }
 
 interface GetLicenceDataParams {
-  siteID: number;
+  orgID: number;
 }
 
 interface EntitlementName {
@@ -124,51 +124,6 @@ const getSKUList = async ({ orgId }: GetSKUParams): Promise<any> => {
   }
 };
 
-// async function reqLicense (data:any):Promise<any>{
-//   const userName: string = data.userName;
-//   const orgName: string = data.org_name;
-//   try{
-//     const emailResult = await fetchEmailData('License_Request');
-//     if (emailResult.errorCode !== 0) {
-//       return {
-//         errorCode: 1,
-//         message: 'Error fetching email configuration.',
-//         data: null,
-//       };
-//     }
-//     const emailData = emailResult.data;
-
-//     const to: string = emailData.To;
-//     const subject: string = emailData.email_subject;
-//     const heading: string = emailData.email_heading;
-//     const contentTemplate: string = emailData.email_content;
-
-//     const headingData = heading
-//     .replace('{{User Name}}', userName)
-//     .replace('{{Org Name}}', orgName);
-//     const contentData = contentTemplate
-//     .replace('{{User Name}}', userName)
-//     .replace('{{Org Name}}', orgName);
-
-//     // Send email
-//     await sendEmailFunction(to, subject, headingData, contentData, data.token);
-
-//     return {
-//       errorCode: 0,
-//       message: 'Organization deletion request sent successfully.',
-//       data: null,
-//     };
-
-//   } catch (error) {
-//     // Handle unexpected errors
-//     return {
-//       errorCode: 1,
-//       message: 'Unexpected error',
-//       data: null,
-//     };
-//   }
-// }
-
 async function reqLicense(data: any) {
   const userName: any = data.userName;
   const orgName: any = data.name;
@@ -229,6 +184,39 @@ async function reqLicense(data: any) {
     };
   }
 }
+async function reqLicenseforLitmus(data: any) {
+  const userName: any = data.userName;
+  const orgName: any = data.name;
+  const token: any = data.token;
+
+  try {
+    // Fetch email data for License_Request
+    const email_data: any = await fetchEmailData('Request_for_Trial');
+    const to = email_data.data.To; //here To is email_config table's To
+    const subject = email_data.data.email_subject;
+    const heading = email_data.data.email_heading;
+    const content = email_data.data.email_content;
+
+    const headingData = heading.replace('{{Target User Name}}', userName);
+    const contentData = content
+      .replace('{{Target User Name}}', userName)
+      .replace('{{Org Name}}', orgName);
+
+    await sendEmailFunction(to, subject, headingData, contentData, data.token);
+
+    return {
+      errorCode: 0,
+      message: 'License request sent successfully.',
+      data: null,
+    };
+  } catch (error) {
+    return {
+      errorCode: 1,
+      message: 'Unexpected error',
+      data: null,
+    };
+  }
+}
 
 const addLicence = async ({
   user_id,
@@ -273,9 +261,9 @@ const addLicence = async ({
 };
 
 const getLicenceData = async ({
-  siteID,
+  orgID,
 }: GetLicenceDataParams): Promise<any> => {
-  if (siteID === undefined) {
+  if (orgID === undefined) {
     return 'Invalid parameters';
   }
 
@@ -290,7 +278,7 @@ const getLicenceData = async ({
         created_by!inner(email,firstname,lastname)
       `,
       )
-      .eq('site_id', siteID);
+      .eq('org_id', orgID);
     // .returns<EntitlementPackage[]>();
 
     if (licencesError) {
@@ -307,9 +295,9 @@ const getLicenceData = async ({
   }
 };
 const showReqLicenceButton = async ({
-  siteID,
+  orgID,
 }: GetLicenceDataParams): Promise<boolean> => {
-  if (!siteID) {
+  if (!orgID) {
     return false;
   }
 
@@ -328,7 +316,7 @@ const showReqLicenceButton = async ({
           'License Catalog',
           'License Plan',
         ])
-        .eq('site_id', siteID)) as {
+        .eq('org_id', orgID)) as {
         data: EntitlementPackage[] | null;
         error: any;
       };
@@ -352,5 +340,6 @@ export {
   getLicenceData,
   getSKUList,
   reqLicense,
+  reqLicenseforLitmus,
   showReqLicenceButton,
 };
