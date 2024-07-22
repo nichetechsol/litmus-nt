@@ -72,15 +72,12 @@ const Page = () => {
 
   const [user_id, setuser_id] = useState<any>('');
   const [org_id, setorg_id] = useState<any>('');
-  const [site_id, setsite_id] = useState<any>('');
   useEffect(() => {
     const encryptedUserId = localStorage.getItem('user_id');
     const encryptedOrgId = localStorage.getItem('org_id');
-    const encryptedSiteId = localStorage.getItem('site_id');
 
     const decryptedUserId = decryptData(encryptedUserId);
     const decryptedOrgId = decryptData(encryptedOrgId);
-    const decryptedSiteId = decryptData(encryptedSiteId);
 
     // if (decryptedOrgId) {
     //   setorg_id(decryptedOrgId);
@@ -104,9 +101,6 @@ const Page = () => {
       setorg_id(decryptedOrgId);
     }
 
-    if (decryptedSiteId) {
-      setsite_id(decryptedSiteId);
-    }
     if (decryptedUserId) {
       setuser_id(decryptedUserId);
     }
@@ -162,7 +156,6 @@ const Page = () => {
     setLoading(false);
     const data = {
       org_id: org_id,
-      site_id: site_id,
       user_id: user_id,
       activity_type: 'download_file',
       details: { filename: fileName },
