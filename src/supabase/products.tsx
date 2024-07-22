@@ -1,6 +1,7 @@
 /* eslint-disable simple-import-sort/exports */
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import supabase from '@/supabase/db';
 interface FolderResult {
   folder: string;
@@ -612,9 +613,6 @@ const listofallFiles = async (data: any) => {
         entitlements_values.value_text !== undefined
       ) {
         entitlementValueResolved = entitlements_values.value_text;
-        entitlementValueResolved =
-          entitlementValueResolved.charAt(0).toUpperCase() +
-          entitlementValueResolved.slice(1);
       } else if (
         entitlements_values.value_number !== null &&
         entitlements_values.value_number !== undefined
@@ -650,7 +648,7 @@ const listofallFiles = async (data: any) => {
       };
     }); // Filter out null values
     const fileTypes: string[] = [];
-
+    let permissionVersion: any = false;
     for (const entitlement of entitlementsArray) {
       if (entitlement.entitlement_value === true) {
         entitlement.entitlement_value = 'TRUE';
@@ -661,18 +659,19 @@ const listofallFiles = async (data: any) => {
       const { data: filePermissions, error: errorFilePermission } =
         await supabase
           .from('filedownload_permissions')
-          .select('*')
+          .select('*, version')
           .eq('entitlement_name_id', entitlement.entitlement_name_id)
           .eq('entitlement_value', entitlement.entitlement_value)
           .eq('org_type_id', org_type_id)
-          .eq('version', version)
           .eq('product', product);
-
       if (errorFilePermission) {
         throw new Error('Error checking file permissions');
       }
-
       if (filePermissions && filePermissions.length > 0) {
+        // Check if any permission has the current version
+        permissionVersion = filePermissions.some(
+          (permission: any) => permission.version === 'current',
+        );
         const extensions = filePermissions.map((permission: any) =>
           permission.file_type.trim().toLowerCase(),
         );
@@ -698,9 +697,26 @@ const listofallFiles = async (data: any) => {
 
     const filesList = folderData.map((fileEntry: any) => {
       const fileName: string = fileEntry.name;
-      const extensionIncluded = fileTypes.some((extension) =>
-        fileName.includes(extension),
-      );
+      let extensionIncluded: any = false;
+      if (permissionVersion === true) {
+        if (version === 'current') {
+          extensionIncluded = fileTypes.some((extension) =>
+            fileName.includes(extension),
+          );
+        }
+      }
+      if (permissionVersion === false) {
+        if (version === 'current') {
+          extensionIncluded = fileTypes.some((extension) =>
+            fileName.includes(extension),
+          );
+        }
+        if (version === 'all') {
+          extensionIncluded = fileTypes.some((extension) =>
+            fileName.includes(extension),
+          );
+        }
+      }
 
       // Placeholder for downloadLink as we don't create signed URLs here
 
