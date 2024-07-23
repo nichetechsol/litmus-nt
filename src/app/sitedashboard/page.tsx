@@ -980,7 +980,7 @@ const Page = () => {
                                   <span className='font-semibold me-2 text-[.875rem]'>
                                     Owner:
                                   </span>
-                                  <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
+                                  <p className='text-[#8c9097] word-break-all dark:text-white/50 text-[.875rem]'>
                                     {' '}
                                     {site_owner_name ? site_owner_name : '--'}
                                   </p>
@@ -1318,7 +1318,7 @@ const Page = () => {
                           <ul className='list-group list-group-flush'>
                             <li className='flex list-group-item fw-semibold'>
                               <i className='bx bx-map align-middle me-2 text-muted'></i>
-                              <b>Address : </b>
+                              <b className='info-name'>Address:</b>
                               <p className='ms-1 over-text text-muted fw-normal d-inline-block'>
                                 {siteCountData &&
                                   `${siteCountData?.data?.sites_details

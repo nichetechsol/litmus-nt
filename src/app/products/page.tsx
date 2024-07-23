@@ -466,7 +466,9 @@ const Page = () => {
                                     ) : (
                                       <>
                                         {bucketName &&
-                                        bucketName === 'Litmus_Products' ? (
+                                        bucketName == 'Litmus_Products' &&
+                                        currentSelectedFolder?.product_type ==
+                                          'litmus_edge' ? (
                                           <a
                                             onClick={() => handleRequestMail()}
                                             // href={files.downloadLink}
@@ -478,9 +480,7 @@ const Page = () => {
                                               Request Access
                                             </p>
                                           </a>
-                                        ) : (
-                                          'false'
-                                        )}
+                                        ) : null}
                                       </>
                                     )}
                                   </div>

@@ -20334,3 +20334,9 @@ body.no-scroll-no {
 .highlighted {
   background-color: #d3d3d3; /* Change this to your preferred highlight color */
 }
+.info-name {
+  white-space: no-wrap;
+}
+.word-break-all {
+  word-break: break-all;
+}
