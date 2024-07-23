@@ -324,6 +324,18 @@ async function addOrganization(data: {
   type_name: any;
 }): Promise<Result<any>> {
   try {
+    const { data: generalSettingsData, error } = await supabase
+      .from('general_settings')
+      .select('*')
+      .eq('setting_name', 'org_retention');
+
+    if (error) {
+      return { errorCode: 1, message: `Error fetching setting`, data: null };
+    }
+    let retValue = 0;
+    if (generalSettingsData && generalSettingsData.length > 0) {
+      retValue = generalSettingsData[0].value_number;
+    }
     // Insert organization details
     const { data: insertData, error: insertError } = await supabase
       .from('org_details')
@@ -333,7 +345,7 @@ async function addOrganization(data: {
           description: data.description,
           type_id: data.type_id,
           status: data.status,
-          retention_setting: 1,
+          retention_setting: retValue,
         },
       ])
       .select();
