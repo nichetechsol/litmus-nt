@@ -55,38 +55,41 @@ async function searchUsers(search: any): Promise<Result<User[]>> {
     let userQuery = supabase.from('users').select('*'); // Limit to 10 results for suggestions
 
     // Add search criteria if provided
-    if (search) {
+    if (search != '') {
       const searchLower = `%${search.toLowerCase()}%`;
       userQuery = userQuery.or(
         `firstname.ilike.${searchLower},lastname.ilike.${searchLower},email.ilike.${searchLower}`,
       );
-    }
+      const { data: users, error: userError } = await userQuery;
 
-    // Execute the query
-    const { data: users, error: userError } = await userQuery;
-
-    // Handle potential errors from fetching user details
-    if (userError) {
+      // Handle potential errors from fetching user details
+      if (userError) {
+        return {
+          errorCode: 1,
+          message: 'Failed to retrieve users.',
+          data: null,
+        };
+      }
+      // Handle case where no users are found
+      if (!users || users.length === 0) {
+        return {
+          errorCode: 1,
+          message: 'User not found',
+          data: null,
+        };
+      }
       return {
-        errorCode: 1,
-        message: 'Failed to retrieve users.',
-        data: null,
+        errorCode: 0,
+        message: 'Success',
+        data: users,
       };
     }
-    // Handle case where no users are found
-    if (!users || users.length === 0) {
-      return {
-        errorCode: 1,
-        message: 'User not found',
-        data: null,
-      };
-    }
-
     return {
-      errorCode: 0,
-      message: 'Success',
-      data: users,
+      errorCode: 1,
+      message: 'User not found',
+      data: null,
     };
+    // Execute the query
   } catch (err) {
     // Handle any other errors (e.g., network issues)
     return {

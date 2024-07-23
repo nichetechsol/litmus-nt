@@ -327,7 +327,7 @@ const OrgDashboard = () => {
     setEmail(newEmail);
     try {
       const result1: any = await searchUsers(newEmail);
-      if (result1.data) {
+      if (result1) {
         setDataTOAutoFill(result1.data);
 
         // setLoading(false);
@@ -352,7 +352,7 @@ const OrgDashboard = () => {
     setFirstName(newFirstName);
     try {
       const result1: any = await searchUsers(newFirstName);
-      if (result1.data) {
+      if (result1) {
         setDataTOAutoFill1(result1.data);
 
         // setLoading(false);
@@ -377,7 +377,7 @@ const OrgDashboard = () => {
     setLastName(newLastName);
     try {
       const result1: any = await searchUsers(newLastName);
-      if (result1.data) {
+      if (result1) {
         setDataTOAutoFill2(result1.data);
 
         // setLoading(false);
