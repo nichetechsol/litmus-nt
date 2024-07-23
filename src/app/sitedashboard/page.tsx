@@ -321,7 +321,7 @@ const Page = () => {
       } else {
         //
       }
-      const result: any = await showReqLicenceButton(org_id);
+      const result: any = await showReqLicenceButton({ orgID: org_id });
 
       if ((data.data.id === 1 || data.data.id === 2) && result) {
         setshowReqLicBtn(true);

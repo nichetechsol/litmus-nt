@@ -43,6 +43,7 @@ import {
   addSites,
   addSitesConfirm,
   requestSiteDeletion,
+  siteNameCheck,
   updateSite,
 } from '@/supabase/site_details_crud';
 import { fetchSiteType } from '@/supabase/site_type';
@@ -891,6 +892,57 @@ const Page: React.FC = () => {
     // Initial call to show the modal
     showDeleteModal();
   };
+
+  // for sitename already exsist
+  const checkInputValue = async (value: any) => {
+    try {
+      const response = await siteNameCheck(value);
+
+      if (response) {
+        if (response.errorCode == 1) {
+          setAddSiteNameError(response.message);
+        }
+      }
+    } catch (error) {
+      if (error instanceof Yup.ValidationError) {
+        setAddSiteNameError(error.message);
+      }
+      // console.error('Error checking input value:', error);
+      // setError('Error checking input value. Please try again later.');
+    }
+  };
+  const handelblurrr = () => {
+    if (AddSiteName) {
+      checkInputValue(AddSiteName);
+    }
+  };
+  //
+  const [focusedIndex, setFocusedIndex] = useState<number>(-1);
+  const handelkeyyy = (e: any) => {
+    if (sidebarSite) {
+      if (e.key === 'ArrowDown') {
+        setFocusedIndex((prevIndex) =>
+          prevIndex < sidebarSite.length - 1 ? prevIndex + 1 : prevIndex,
+        );
+      } else if (e.key === 'ArrowUp') {
+        setFocusedIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : 0));
+      } else if (e.key === 'Enter' && focusedIndex >= 0) {
+        const site: any = sidebarSite[focusedIndex];
+        if (site.id !== -1) {
+          handleSiteClick(site);
+        }
+      }
+    }
+  };
+  const handleSiteClick = (site: { id: number; name: string }) => {
+    setLoading(true);
+    const encryptedSiteId = encryptData(site.id.toString());
+    const encryptedSiteName = encryptData(site.name);
+    localStorage.setItem('site_id', encryptedSiteId);
+    localStorage.setItem('site_name', encryptedSiteName);
+    navigate.push('/sitedashboard');
+    setLoading(false);
+  };
   return (
     <>
       <>
@@ -962,6 +1014,7 @@ const Page: React.FC = () => {
                                     onChange={handelAddSiteName}
                                     value={AddSiteName}
                                     maxLength={256}
+                                    onBlur={handelblurrr}
                                   />
                                   {AddSiteNameError && (
                                     <div className='text-danger'>
@@ -1219,6 +1272,7 @@ const Page: React.FC = () => {
                           className='form-control w-full !rounded-md !bg-light border-0 !rounded-e-none'
                           placeholder='Search Site Here'
                           aria-describedby='button-addon2'
+                          onKeyDown={handelkeyyy}
                         />
                         <button
                           type='button'
@@ -1235,11 +1289,13 @@ const Page: React.FC = () => {
                       <ul className='list-none task-main-nav mb-0'>
                         {sidebarSite && (
                           <div>
-                            {sidebarSite.map((site) => (
+                            {sidebarSite.map((site, index) => (
                               <li
                                 // style={{ cursor: 'pointer' }}
                                 style={{
                                   cursor: site.id == -1 ? '' : 'pointer',
+                                  backgroundColor:
+                                    focusedIndex === index ? '#e0e0e0' : '',
                                 }}
                                 key={site?.id}
                                 onClick={() => {

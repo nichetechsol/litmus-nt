@@ -1049,7 +1049,7 @@ const Page = () => {
       }
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
-        setDomainError(error.message);
+        setOrganizationNameError(error.message);
       }
       // console.error('Error checking input value:', error);
       // setError('Error checking input value. Please try again later.');
@@ -1060,7 +1060,36 @@ const Page = () => {
       checkInputValue(organizationName);
     }
   };
-
+  // for search arrow
+  const [focusedIndex, setFocusedIndex] = useState<number>(-1);
+  const handelkeyyy = (e: any) => {
+    if (sidebarOrgs?.data) {
+      if (e.key === 'ArrowDown') {
+        setFocusedIndex((prevIndex) =>
+          prevIndex < sidebarOrgs.data.length - 1 ? prevIndex + 1 : prevIndex,
+        );
+      } else if (e.key === 'ArrowUp') {
+        setFocusedIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : 0));
+      } else if (e.key === 'Enter' && focusedIndex >= 0) {
+        const org: any = sidebarOrgs.data[focusedIndex];
+        if (org.id !== -1) {
+          handleOrgClick(org);
+        }
+      }
+    }
+  };
+  const handleOrgClick = (org: { id: number; name: string }) => {
+    setLoading(true);
+    const encryptedOrgId = encryptData(org.id.toString());
+    const encryptedOrgName = encryptData(org.name);
+    localStorage.removeItem('site_id');
+    localStorage.removeItem('site_name');
+    localStorage.removeItem('site_owner_name');
+    localStorage.setItem('org_id', encryptedOrgId);
+    localStorage.setItem('org_name', encryptedOrgName);
+    navigate.push('/orgdashboard');
+    setLoading(false);
+  };
   return (
     <>
       {loading && <Loader />}
@@ -1390,6 +1419,7 @@ const Page = () => {
                         className='form-control w-full !rounded-md !bg-light border-0 !rounded-e-none'
                         placeholder='Search Organization'
                         aria-describedby='button-addon2'
+                        onKeyDown={handelkeyyy}
                       />
                       <button
                         type='button'
@@ -1410,10 +1440,12 @@ const Page = () => {
                       {sidebarOrgs && (
                         <div>
                           {sidebarOrgs &&
-                            sidebarOrgs.data.map((org) => (
+                            sidebarOrgs.data.map((org, index) => (
                               <li
                                 style={{
-                                  cursor: org.id == -1 ? '' : 'pointer',
+                                  cursor: org.id === -1 ? '' : 'pointer',
+                                  backgroundColor:
+                                    focusedIndex === index ? '#e0e0e0' : '',
                                 }}
                                 key={org.id as number}
                                 onClick={() => {
