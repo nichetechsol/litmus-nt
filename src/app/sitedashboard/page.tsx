@@ -325,6 +325,8 @@ const Page = () => {
 
       if ((data.data.id === 1 || data.data.id === 2) && result) {
         setshowReqLicBtn(true);
+      } else {
+        setshowReqLicBtn(false);
       }
     } catch (error: any) {
       //

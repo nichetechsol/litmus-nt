@@ -31,7 +31,26 @@ const DomainSchema = Yup.string()
       return domains.every((domain) => domainRegex.test(domain));
     },
   );
-
+const DomainSchema2 = Yup.string()
+  .max(255, 'The domain should not exceed 255 characters.')
+  // .matches(
+  //   // /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+$/,
+  //   // /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+,)*[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+$/,
+  //   // /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+,)*[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+$/,
+  //   /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+)*$/,
+  //   'Invalid domain format. Please enter a valid domain.',
+  // );
+  .test(
+    'is-valid-domain',
+    'Invalid domain format. Please enter a valid domain.',
+    (value) => {
+      if (!value) return true; // If the value is empty, don't perform validation
+      const domains = value.split(',').map((domain) => domain.trim());
+      const domainRegex =
+        /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,250}[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+)*$/;
+      return domains.every((domain) => domainRegex.test(domain));
+    },
+  );
 const TypeDropdownSchema = Yup.string().required(
   'Please select a type from the dropdown menu.',
 );
@@ -164,6 +183,7 @@ const SiteStateDropdownSchema = Yup.string()
   );
 export {
   DomainSchema,
+  DomainSchema2,
   emailSchema,
   emailSchemaSign,
   MessageSchema,

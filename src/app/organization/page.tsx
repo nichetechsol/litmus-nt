@@ -14,6 +14,7 @@ import { decryptData, encryptData } from '@/helper/Encryption_Decryption';
 import InitialsComponent from '@/helper/NameHelper';
 import {
   DomainSchema,
+  DomainSchema2,
   MessageSchema,
   OrganizationNameSchema,
   TypeDropdownSchema,
@@ -323,13 +324,24 @@ const Page = () => {
     const newDomain = e.target.value.trimStart();
     // setDomain(newDomain);
     setDomainInput(newDomain);
-    DomainSchema.validate(newDomain)
-      .then(() => {
-        setDomainError('');
-      })
-      .catch((err: Yup.ValidationError) => {
-        setDomainError(err.message);
-      });
+    if (domains.length > 0) {
+      DomainSchema2.validate(newDomain)
+        .then(() => {
+          setDomainError('');
+        })
+        .catch((err: Yup.ValidationError) => {
+          setDomainError(err.message);
+        });
+      return;
+    } else {
+      DomainSchema.validate(newDomain)
+        .then(() => {
+          setDomainError('');
+        })
+        .catch((err: Yup.ValidationError) => {
+          setDomainError(err.message);
+        });
+    }
   };
   const handleTypeDropdownChange = (
     e: React.ChangeEvent<HTMLSelectElement>,
