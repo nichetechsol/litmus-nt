@@ -206,7 +206,7 @@ async function reqProductsforLitmus(data: any) {
 
     return {
       errorCode: 0,
-      message: 'products request sent successfully.',
+      message: 'Products request sent successfully.',
       data: null,
     };
   } catch (error) {

@@ -768,9 +768,9 @@ async function orgNameCheck(name: any) {
       .eq('name', name);
 
     if (orgCheckData && orgCheckData.length > 0) {
-      return { errorCode: 1, message: 'Organization already exists' };
+      return { errorCode: 1, message: 'Organization already exists.' };
     } else {
-      return { errorCode: 0, message: 'Organization does not exist' };
+      return { errorCode: 0, message: 'Organization does not exist.' };
     }
   } catch (error) {
     return { errorCode: 1, message: 'Failed to check organization name' };
