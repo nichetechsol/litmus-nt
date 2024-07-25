@@ -186,7 +186,48 @@ const Page: React.FC = () => {
   const [message, setMessage] = useState('');
   const [messageError, setMessageError] = useState('');
   const closeModalButtonRef = useRef<HTMLButtonElement>(null);
+  const [addbuttonclass, setaddbuttonclass] = useState<boolean>(false);
 
+  useEffect(() => {
+    const validate = async () => {
+      if (AddSiteNameError == '') {
+        try {
+          await validationSchema.validate(
+            {
+              AddSiteName,
+              SelectedValueDropdown,
+              Address1,
+              Address2,
+              SelectedValueCounrty,
+              SelectedValueState,
+              City,
+              Pincode,
+              message,
+            },
+            { abortEarly: false },
+          );
+          setaddbuttonclass(true);
+        } catch (err) {
+          setaddbuttonclass(false);
+        }
+      } else {
+        setaddbuttonclass(false);
+      }
+    };
+
+    validate();
+  }, [
+    AddSiteName,
+    SelectedValueDropdown,
+    Address1,
+    Address2,
+    SelectedValueCounrty,
+    SelectedValueState,
+    City,
+    Pincode,
+    message,
+    AddSiteNameError,
+  ]);
   const openModal = () => {
     document.body.classList.add('no-scroll1');
   };
@@ -1250,7 +1291,12 @@ const Page: React.FC = () => {
                               </button>
                               <button
                                 type='button'
-                                className='ti-btn bg-primary text-white !font-medium'
+                                disabled={!addbuttonclass}
+                                className={
+                                  addbuttonclass
+                                    ? 'ti-btn bg-primary text-white !font-medium'
+                                    : 'ti-btn bg-gray-500 text-white !font-medium'
+                                }
                                 onClick={handleSubmit}
                               >
                                 {changeFlage === true
