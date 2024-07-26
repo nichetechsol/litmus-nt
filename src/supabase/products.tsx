@@ -587,98 +587,77 @@ const listofProductsFolder = async (folder: any, bucket_name: any) => {
 };
 const listofallFiles = async (data: any) => {
   try {
-    const bucket_name = data.bucket_name;
-    const folder = data.folder;
-    const subfolder = data.subfolder;
-    const version = data.version;
-    const product = data.product;
-    const org_type_id = data.org_type_id;
-    const org_id = data.org_id;
+    const {
+      bucket_name,
+      folder,
+      subfolder,
+      version,
+      product,
+      org_type_id,
+      org_id,
+    } = data;
 
     // Fetch the entitlements package for the given org_id
     const { data: entitlements_package, error: errorEntitlement } =
       await supabase
         .from('entitlements_package')
-        .select(`*, entitlements_values(*)`)
+        .select('*, entitlements_values(*)')
         .eq('org_id', org_id);
 
-    if (errorEntitlement) {
+    if (errorEntitlement || !entitlements_package) {
       throw new Error('Error fetching entitlements package');
     }
-    const resolveEntitlementValue = (entitlements_values: any) => {
-      let entitlementValueResolved: any;
-
-      if (
-        entitlements_values.value_text !== null &&
-        entitlements_values.value_text !== undefined
-      ) {
-        entitlementValueResolved = entitlements_values.value_text;
-      } else if (
-        entitlements_values.value_number !== null &&
-        entitlements_values.value_number !== undefined
-      ) {
-        entitlementValueResolved = entitlements_values.value_number;
-      } else if (
-        entitlements_values.value_bool !== null &&
-        entitlements_values.value_bool !== undefined
-      ) {
-        entitlementValueResolved = entitlements_values.value_bool;
-      } else {
-        // If no value is present, skip this entitlement
-        return null;
-      }
-
-      return entitlementValueResolved;
-    };
-    // Extracting the array of objects with entitlement_name_id and entitlement_value
-    // const entitlementsArray = entitlements_package.map((item: any) => ({
-    //   entitlement_name_id: item.entitlement_name_id,
-    //   entitlement_value: item.entitlements_values.value_text,
-
-    // }));
-    // Extracting the array of objects with entitlement_name_id and entitlement_value
-    const entitlementsArray = entitlements_package.map((item: any) => {
-      const entitlement_value = resolveEntitlementValue(
-        item.entitlements_values,
+    const resolveEntitlementValue = (values: any) => {
+      return (
+        values.value_text ?? values.value_number ?? values.value_bool ?? null
       );
+    };
+    // Resolve entitlement values and fetch file permissions in parallel
+    const entitlementsArray = entitlements_package.map((item: any) => ({
+      entitlement_name_id: item.entitlement_name_id,
+      entitlement_value: resolveEntitlementValue(item.entitlements_values),
+    }));
 
-      return {
-        entitlement_name_id: item.entitlement_name_id,
-        entitlement_value: entitlement_value,
-      };
-    }); // Filter out null values
-    const fileTypes: string[] = [];
-    let permissionVersion: any = false;
-    for (const entitlement of entitlementsArray) {
-      if (entitlement.entitlement_value === true) {
-        entitlement.entitlement_value = 'TRUE';
-      }
-      if (entitlement.entitlement_value === false) {
-        entitlement.entitlement_value = 'FALSE';
-      }
-      const { data: filePermissions, error: errorFilePermission } =
-        await supabase
+    const filePermissionsPromises = entitlementsArray.map(
+      (entitlement: any) => {
+        let { entitlement_value } = entitlement;
+        if (entitlement_value === true) entitlement_value = 'TRUE';
+        if (entitlement_value === false) entitlement_value = 'FALSE';
+
+        return supabase
           .from('filedownload_permissions')
           .select('*, version')
           .eq('entitlement_name_id', entitlement.entitlement_name_id)
-          .eq('entitlement_value', entitlement.entitlement_value)
+          .eq('entitlement_value', entitlement_value)
           .eq('org_type_id', org_type_id)
           .eq('product', product);
-      // if (errorFilePermission) {
-      //   throw new Error('Error checking file permissions');
-      // }
-      if (filePermissions && filePermissions.length > 0) {
-        // Check if any permission has the current version
-        permissionVersion = filePermissions.some(
-          (permission: any) => permission.version === 'current',
-        );
-        const extensions = filePermissions.map((permission: any) =>
-          permission.file_type.trim().toLowerCase(),
-        );
-        fileTypes.push(...extensions);
-      }
-    }
+      },
+    );
 
+    // Run all file permissions queries in parallel
+    const filePermissionsResults = await Promise.all(filePermissionsPromises);
+
+    const fileTypes: any = new Set();
+    let permissionVersion: boolean | null = null;
+
+    filePermissionsResults.forEach(
+      ({ data: filePermissions, error: errorFilePermission }) => {
+        if (errorFilePermission) {
+          throw new Error('Error checking file permissions');
+        }
+
+        if (filePermissions?.length) {
+          permissionVersion = filePermissions.some(
+            (permission) => permission.version === 'current',
+          );
+          filePermissions.forEach((permission: any) =>
+            fileTypes.add(permission.file_type.trim().toLowerCase()),
+          );
+        }
+      },
+    );
+
+    // Retrieve folder contents
     const { data: folderData, error: folderError } = await supabase.storage
       .from(bucket_name)
       .list(`${folder}/${subfolder}`);
@@ -687,7 +666,7 @@ const listofallFiles = async (data: any) => {
       throw new Error('Error retrieving folder contents');
     }
 
-    if (!folderData || folderData.length === 0) {
+    if (!folderData?.length) {
       return {
         errorCode: 0,
         message: 'No Data Available for this product',
@@ -695,35 +674,22 @@ const listofallFiles = async (data: any) => {
       };
     }
 
+    // Process files and filter based on permissions
     const filesList = folderData.map((fileEntry: any) => {
       const fileName: string = fileEntry.name;
-      let extensionIncluded: any = false;
-      if (permissionVersion === true) {
-        if (version === 'current') {
-          extensionIncluded = fileTypes.some((extension) =>
-            fileName.includes(extension),
-          );
-        }
-      }
-      if (permissionVersion === false) {
-        if (version === 'current') {
-          extensionIncluded = fileTypes.some((extension) =>
-            fileName.includes(extension),
-          );
-        }
-        if (version === 'all') {
-          extensionIncluded = fileTypes.some((extension) =>
-            fileName.includes(extension),
-          );
-        }
-      }
+      const extensionIncluded = [...fileTypes].some((extension) =>
+        fileName.includes(extension),
+      );
 
-      // Placeholder for downloadLink as we don't create signed URLs here
+      const disabled =
+        permissionVersion !== null &&
+        ((version === 'current' && extensionIncluded) ||
+          (version === 'all' && extensionIncluded));
 
       return {
         FileName: fileName,
         status: version,
-        disabled: extensionIncluded,
+        disabled,
         subfolder,
       };
     });
@@ -741,6 +707,7 @@ const listofallFiles = async (data: any) => {
     };
   }
 };
+
 // const fetchProductData = async (data: any) => {
 //   try {
 //     const org_id = data.org_id;
@@ -942,13 +909,19 @@ const fetchProductData = async (data: any) => {
   const org_type_id = data.org_type_id;
 
   try {
-    // Step 1: Fetch the product list based on the entitlements or default settings
-    const { data: entitlements_package, error: errorEntitlement } =
-      await supabase
-        .from('entitlements_package')
-        .select(`*, entitlements_values(value_text)`)
-        .eq('org_id', org_id)
-        .eq('entitlement_name_id', 21);
+    // Step 1: Fetch entitlements and general settings in a single batch request
+    const [{ data: entitlements_package }, { data: general_settings }] =
+      await Promise.all([
+        supabase
+          .from('entitlements_package')
+          .select(`*, entitlements_values(value_text)`)
+          .eq('org_id', org_id)
+          .eq('entitlement_name_id', 21),
+        supabase
+          .from('general_settings')
+          .select('*')
+          .eq('setting_name', 'default_license_catalog'),
+      ]);
 
     let productListTable = 'Litmus_Products'; // Default product list table
 
@@ -967,36 +940,29 @@ const fetchProductData = async (data: any) => {
           productListTable = 'Belden_Products';
           break;
       }
-    } else {
-      const { data: general_settings, error: errorGeneralSettings } =
-        await supabase
-          .from('general_settings')
-          .select('*')
-          .eq('setting_name', 'default_license_catalog');
+    } else if (general_settings && general_settings.length > 0) {
+      const defaultValue = general_settings[0].value_text;
 
-      if (general_settings && general_settings.length > 0) {
-        const defaultValue = general_settings[0].value_text;
-
-        switch (defaultValue) {
-          case 'litmus':
-            productListTable = 'Litmus_Products';
-            break;
-          case 'google':
-            productListTable = 'Google_Products';
-            break;
-          case 'belden':
-            productListTable = 'Belden_Products';
-            break;
-        }
+      switch (defaultValue) {
+        case 'litmus':
+          productListTable = 'Litmus_Products';
+          break;
+        case 'google':
+          productListTable = 'Google_Products';
+          break;
+        case 'belden':
+          productListTable = 'Belden_Products';
+          break;
       }
     }
 
+    // Step 2: Fetch products list
     const { data: products, error: productError } = await supabase.storage
       .from(productListTable)
       .list();
-    if (productError) {
-      throw new Error(`Error fetching ${productListTable}`);
-    }
+
+    if (productError) throw productError;
+
     if (!products || products.length === 0) {
       return {
         errorCode: 0,
@@ -1005,147 +971,118 @@ const fetchProductData = async (data: any) => {
       };
     }
 
-    // Step 2: Fetch the folders and their contents for each product
-    const allFiles = [];
-    for (const product of products) {
+    // Step 3: Fetch entitlements package and process entitlements
+    const { data: entitlements, error: errorEntitlementPackage } =
+      await supabase
+        .from('entitlements_package')
+        .select(`*, entitlements_values(*)`)
+        .eq('org_id', org_id);
+
+    if (errorEntitlementPackage) throw errorEntitlementPackage;
+
+    const resolveEntitlementValue = (entitlements_values: any) => {
+      if (
+        entitlements_values.value_text !== null &&
+        entitlements_values.value_text !== undefined
+      ) {
+        return entitlements_values.value_text;
+      } else if (
+        entitlements_values.value_number !== null &&
+        entitlements_values.value_number !== undefined
+      ) {
+        return entitlements_values.value_number;
+      } else if (
+        entitlements_values.value_bool !== null &&
+        entitlements_values.value_bool !== undefined
+      ) {
+        return entitlements_values.value_bool;
+      }
+      return null;
+    };
+
+    const entitlementsArray = entitlements.map((item: any) => {
+      return {
+        entitlement_name_id: item.entitlement_name_id,
+        entitlement_value: resolveEntitlementValue(item.entitlements_values),
+      };
+    });
+
+    // Step 4: Process products and fetch folder contents in parallel
+    const allFilesPromises = products.map(async (product) => {
       const productFolder = product.name;
       const { data: folderData, error: folderError } = await supabase.storage
         .from(productListTable)
         .list(productFolder);
 
-      if (folderError) {
-        throw new Error('Error retrieving folder contents');
-      }
-      if (!folderData || folderData.length === 0) {
-        continue;
-      }
+      if (folderError) throw folderError;
+      if (!folderData || folderData.length === 0) return null;
 
-      // Fetch the _Current folder contents
       const currentFolder = folderData.find((folder: any) =>
         folder.name.endsWith('_Current'),
       );
-      if (!currentFolder) {
-        continue;
-      }
+      if (!currentFolder) return null;
 
       const { data: currentFiles, error: currentFilesError } =
         await supabase.storage
           .from(productListTable)
           .list(`${productFolder}/${currentFolder.name}`);
-      if (currentFilesError) {
-        throw new Error('Error retrieving current folder contents');
-      }
-      if (!currentFiles || currentFiles.length === 0) {
-        continue;
-      }
 
-      // Step 3: Check entitlements for file permissions
-      const { data: entitlements_package, error: errorEntitlement } =
-        await supabase
-          .from('entitlements_package')
-          .select(`*, entitlements_values(*)`)
-          .eq('org_id', org_id);
+      if (currentFilesError) throw currentFilesError;
+      if (!currentFiles || currentFiles.length === 0) return null;
 
-      if (errorEntitlement) {
-        throw new Error('Error fetching entitlements package');
-      }
+      // Step 5: Check entitlements for file permissions in parallel
+      const filePermissionsPromises = entitlementsArray.map(
+        async (entitlement) => {
+          const { data: filePermissions, error: errorFilePermission } =
+            await supabase
+              .from('filedownload_permissions')
+              .select('*, version')
+              .eq('entitlement_name_id', entitlement.entitlement_name_id)
+              .eq(
+                'entitlement_value',
+                entitlement.entitlement_value === true
+                  ? 'TRUE'
+                  : entitlement.entitlement_value === false
+                  ? 'FALSE'
+                  : entitlement.entitlement_value,
+              )
+              .eq('org_type_id', org_type_id)
+              .eq('product', product.name.toLowerCase());
 
-      const resolveEntitlementValue = (entitlements_values: any) => {
-        let entitlementValueResolved: any;
+          if (errorFilePermission) throw errorFilePermission;
+          return filePermissions;
+        },
+      );
 
-        if (
-          entitlements_values.value_text !== null &&
-          entitlements_values.value_text !== undefined
-        ) {
-          entitlementValueResolved = entitlements_values.value_text;
-        } else if (
-          entitlements_values.value_number !== null &&
-          entitlements_values.value_number !== undefined
-        ) {
-          entitlementValueResolved = entitlements_values.value_number;
-        } else if (
-          entitlements_values.value_bool !== null &&
-          entitlements_values.value_bool !== undefined
-        ) {
-          entitlementValueResolved = entitlements_values.value_bool;
-        } else {
-          // If no value is present, skip this entitlement
-          return null;
-        }
+      const filePermissionsResults = await Promise.all(filePermissionsPromises);
+      const filePermissions = filePermissionsResults.flat().filter(Boolean);
 
-        return entitlementValueResolved;
-      };
-      const entitlementsArray = entitlements_package.map((item: any) => {
-        const entitlement_value = resolveEntitlementValue(
-          item.entitlements_values,
-        );
-        return {
-          entitlement_name_id: item.entitlement_name_id,
-          entitlement_value: entitlement_value,
-        };
-      });
+      const permissionVersion = filePermissions.some(
+        (permission: any) => permission.version === 'current',
+      );
+      const fileTypes = filePermissions.map((permission: any) =>
+        permission.file_type.trim().toLowerCase(),
+      );
 
-      const fileTypes: string[] = [];
-      let permissionVersion: any = false;
-      const dataName = product.name.toLowerCase();
-
-      for (const entitlement of entitlementsArray) {
-        if (entitlement.entitlement_value === true) {
-          entitlement.entitlement_value = 'TRUE';
-        }
-        if (entitlement.entitlement_value === false) {
-          entitlement.entitlement_value = 'FALSE';
-        }
-        const { data: filePermissions, error: errorFilePermission } =
-          await supabase
-            .from('filedownload_permissions')
-            .select('*, version')
-            .eq('entitlement_name_id', entitlement.entitlement_name_id)
-            .eq('entitlement_value', entitlement.entitlement_value)
-            .eq('org_type_id', org_type_id)
-            .eq('product', dataName);
-        if (errorFilePermission) {
-          throw new Error('Error checking file permissions');
-        }
-        if (filePermissions && filePermissions.length > 0) {
-          // Check if any permission has the current version
-          permissionVersion = filePermissions.some(
-            (permission: any) => permission.version === 'current',
-          );
-          const extensions = filePermissions.map((permission: any) =>
-            permission.file_type.trim().toLowerCase(),
-          );
-          fileTypes.push(...extensions);
-        }
-      }
-      // Step 4: Get the 0th position file and apply file permissions
       if (currentFiles.length > 0) {
-        const fileEntry = currentFiles[0]; // Only the 0th position file
+        const fileEntry = currentFiles[0];
         const fileName: string = fileEntry.name;
-        let extensionIncluded: any = false;
-        if (permissionVersion === true) {
-          extensionIncluded = fileTypes.some((extension) =>
-            fileName.includes(extension),
-          );
-        }
-        if (permissionVersion === false) {
-          extensionIncluded = fileTypes.some((extension) =>
-            fileName.includes(extension),
-          );
-        }
+        const extensionIncluded = fileTypes.some((extension) =>
+          fileName.includes(extension),
+        );
 
-        const fileInfo = {
+        return {
           FileName: fileName,
           status: 'current',
           disabled: extensionIncluded,
           folder: productFolder,
           subfolder: currentFolder.name,
         };
-
-        // Add to the final list
-        allFiles.push(fileInfo);
       }
-    }
+      return null;
+    });
+
+    const allFiles = (await Promise.all(allFilesPromises)).filter(Boolean);
 
     return {
       errorCode: 0,
@@ -1156,7 +1093,7 @@ const fetchProductData = async (data: any) => {
   } catch (error) {
     return {
       errorCode: 1,
-      message: `Unexpected error occurred: ${error}`,
+      message: `Unexpected error occurred`,
       data: null,
     };
   }
