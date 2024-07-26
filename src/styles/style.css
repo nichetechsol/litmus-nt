@@ -556,7 +556,7 @@ html {
 @media (max-width: 991.98px) {
   .app-header .horizontal-logo .header-logo img {
     @apply h-8 leading-8;
-    width: 100%;
+    width: 100% !important;
   }
 }
 .main-index footer {
@@ -2422,6 +2422,9 @@ html {
   .box-header .search-ti {
     width: 130px;
     @apply h-[1.9rem];
+  }
+  .top-margin-1 {
+    margin-top: 10px;
   }
   [data-nav-layout='horizontal']
     .landing-body
@@ -20364,6 +20367,7 @@ body.no-scroll-no {
 .form-select {
   font-size: 14px !important;
 }
-li.page-item.disabled a {
-  cursor: default;
-}
+/* .task-main-nav{
+height: 250px;
+overflow-y: auto;
+} */

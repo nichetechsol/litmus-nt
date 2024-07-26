@@ -922,13 +922,13 @@ const OrgDashboard = () => {
                 </div>
 
                 <div className='xxl:col-span-12 xl:col-span-12 col-span-12'>
-                  <div className='box custom-card'>
+                  <div className='box custom-card '>
                     <div className='box-header justify-between'>
                       <div className='box-title'>User Management</div>
                       <div className='flex  gap-2'>
                         <div>
                           <input
-                            className='ti-form-control form-control-sm search-ti'
+                            className='ti-form-control form-control-sm search-ti  top-margin-1'
                             type='text'
                             placeholder='Search here'
                             aria-label='.form-control-sm example'
@@ -942,7 +942,7 @@ const OrgDashboard = () => {
                           {' '}
                           {userrole2 === 1 || userrole2 === 2 ? (
                             <button
-                              className='btn btn-primary btn-wave mb-3'
+                              className='btn btn-primary btn-wave mb-3  top-margin-1'
                               data-bs-target='#formmodal'
                               data-bs-toggle='modal'
                               data-bs-whatever='@fat'
@@ -951,7 +951,7 @@ const OrgDashboard = () => {
                               ref={closeModalButtonRef}
                             >
                               <div
-                                className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
+                                className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0 top-margin-1'
                                 data-hs-overlay='#todo-compose'
                               >
                                 <i className='ri-add-circle-line !text-[1rem]'></i>

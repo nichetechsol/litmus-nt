@@ -1477,7 +1477,7 @@ const Page = () => {
                     </div>
                   </div>
                   <div className='p-4 task-navigation border-b border-dashed dark:border-defaultborder/10'>
-                    <ul className='list-none task-main-nav mb-0'>
+                    <ul className='list-none task-main-nav mb-0 '>
                       {/* <li className="!px-0 !pt-0">
                                         <span className="text-[.6875rem] text-[#8c9097] dark:text-white/50 opacity-[0.7] font-semibold"> Organization</span>
                                     </li> */}
@@ -1522,9 +1522,7 @@ const Page = () => {
                                   {/* <span className="me-2 leading-none">
                                             <i className="ri-task-line align-middle text-[.875rem]"></i>
                                         </span> */}
-                                  <span className='flex-grow p-new'>
-                                    {org?.name}
-                                  </span>
+                                  <a className='flex-grow p-new'>{org?.name}</a>
                                   {/* <span className="badge bg-success/10 text-success rounded-full">167</span> */}
                                 </div>
                               </li>
