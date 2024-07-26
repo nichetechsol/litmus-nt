@@ -174,7 +174,7 @@ const OrgDashboard = () => {
   };
   useEffect(() => {
     CountData();
-  }, [org_id]);
+  }, [org_id, orgUserData]);
   const fetchData7 = async () => {
     try {
       // setLoading(true);
@@ -198,7 +198,7 @@ const OrgDashboard = () => {
   };
   useEffect(() => {
     fetchData7();
-  }, [org_id]);
+  }, [org_id, orgUserData]);
 
   const fetchData2 = async () => {
     try {
@@ -1174,6 +1174,7 @@ const OrgDashboard = () => {
                                         <span className='text-danger'>*</span>
                                       </label>
                                       <select
+                                        style={{ cursor: 'pointer' }}
                                         className={`form-select ${
                                           role === '' ? 'deselect-main' : ''
                                         }`}

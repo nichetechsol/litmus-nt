@@ -766,6 +766,7 @@ const Page: React.FC = () => {
     setLoading(false);
   };
   const Addsite = () => {
+    seteditsiteid(undefined);
     openModal();
     handleCall();
     handelclosemodel();
@@ -843,6 +844,12 @@ const Page: React.FC = () => {
           element: 'div',
           attributes: {
             innerHTML: createCustomContent(SingleSite?.site.name),
+            oninput: (e: Event) => {
+              const target = e.target as HTMLInputElement;
+              let value = target.value;
+              value = value.trimStart();
+              target.value = value;
+            },
           },
         },
         icon: 'warning',
@@ -937,7 +944,7 @@ const Page: React.FC = () => {
   // for sitename already exsist
   const checkInputValue = async (value: any) => {
     try {
-      const response = await siteNameCheck(value);
+      const response = await siteNameCheck(value, editsiteid);
 
       if (response) {
         if (response.errorCode == 1) {
@@ -1055,7 +1062,7 @@ const Page: React.FC = () => {
                                     onChange={handelAddSiteName}
                                     value={AddSiteName}
                                     maxLength={256}
-                                    onBlur={handelblurrr}
+                                    onKeyUp={handelblurrr}
                                   />
                                   {AddSiteNameError && (
                                     <div className='text-danger'>

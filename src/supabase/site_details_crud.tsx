@@ -825,25 +825,47 @@ async function requestSiteDeletion(data: any): Promise<Result<any>> {
     };
   }
 }
-async function siteNameCheck(name: any) {
+async function siteNameCheck(name: any, site_id: any) {
   try {
-    const { data: siteCheckData, error: siteCheckError } = await supabase
-      .from('sites_detail')
-      .select('id')
-      .eq('name', name);
+    if (site_id != undefined) {
+      const { data: siteCheckData, error: siteCheckError } = await supabase
+        .from('sites_detail')
+        .select('id')
+        .eq('name', name)
+        .neq('id', site_id);
 
-    // if (siteCheckError) {
-    //   return { errorCode: 1, message: 'Failed to check site name', data: null };
-    // }
+      // if (siteCheckError) {
+      //   return { errorCode: 1, message: 'Failed to check site name', data: null };
+      // }
 
-    if (siteCheckData && siteCheckData.length > 0) {
-      return {
-        errorCode: 1,
-        message: 'Site already exists',
-        data: siteCheckData,
-      };
+      if (siteCheckData && siteCheckData.length > 0) {
+        return {
+          errorCode: 1,
+          message: 'Site already exists.',
+          data: siteCheckData,
+        };
+      } else {
+        return { errorCode: 0, message: 'Site does not exist', data: null };
+      }
     } else {
-      return { errorCode: 0, message: 'Site does not exist', data: null };
+      const { data: siteCheckData, error: siteCheckError } = await supabase
+        .from('sites_detail')
+        .select('id')
+        .eq('name', name);
+
+      // if (siteCheckError) {
+      //   return { errorCode: 1, message: 'Failed to check site name', data: null };
+      // }
+
+      if (siteCheckData && siteCheckData.length > 0) {
+        return {
+          errorCode: 1,
+          message: 'Site already exists.',
+          data: siteCheckData,
+        };
+      } else {
+        return { errorCode: 0, message: 'Site does not exist', data: null };
+      }
     }
   } catch (error) {
     return {

@@ -248,7 +248,7 @@ const Page = () => {
   };
   useEffect(() => {
     countData();
-  }, [org_id, site_id]);
+  }, [org_id, site_id, orgUserData]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -280,7 +280,7 @@ const Page = () => {
   };
   useEffect(() => {
     fetchData8();
-  }, [site_id]);
+  }, [site_id, orgUserData]);
   // useEffect(() => {
   //   const fetchData = async () => {
   //     try {
@@ -1628,6 +1628,7 @@ const Page = () => {
                                         <span className='text-danger'>*</span>
                                       </label>
                                       <select
+                                        style={{ cursor: 'pointer' }}
                                         className={`form-select ${
                                           role === '' ? 'deselect-main' : ''
                                         }`}

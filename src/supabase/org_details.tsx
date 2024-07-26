@@ -760,17 +760,29 @@ async function updateOrganization(data: {
     };
   }
 }
-async function orgNameCheck(name: any) {
+async function orgNameCheck(name: any, org_id: any) {
   try {
-    const { data: orgCheckData, error: orgCheckError } = await supabase
-      .from('org_details')
-      .select('id')
-      .eq('name', name);
-
-    if (orgCheckData && orgCheckData.length > 0) {
-      return { errorCode: 1, message: 'Organization already exists.' };
+    if (org_id != null) {
+      const { data: orgCheckData, error: orgCheckError } = await supabase
+        .from('org_details')
+        .select('id')
+        .eq('name', name)
+        .neq('id', org_id);
+      if (orgCheckData && orgCheckData.length > 0) {
+        return { errorCode: 1, message: 'Organization already exists.' };
+      } else {
+        return { errorCode: 0, message: 'Organization does not exists.' };
+      }
     } else {
-      return { errorCode: 0, message: 'Organization does not exist.' };
+      const { data: orgCheckData, error: orgCheckError } = await supabase
+        .from('org_details')
+        .select('id')
+        .eq('name', name);
+      if (orgCheckData && orgCheckData.length > 0) {
+        return { errorCode: 1, message: 'Organization already exists.' };
+      } else {
+        return { errorCode: 0, message: 'Organization does not exists.' };
+      }
     }
   } catch (error) {
     return { errorCode: 1, message: 'Failed to check organization name' };

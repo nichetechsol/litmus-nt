@@ -241,6 +241,10 @@ const Page = () => {
         const data: any = await fetchOrganizationAndSiteDetails(user_id);
 
         if (data.errorCode === 0) {
+          if (data.data.length > 0) {
+            setorg_exists('true');
+            localStorage.setItem('org_exists', 'true');
+          }
           setOrgsWithSites(data.data);
         } else {
           toast.error(data.message, { autoClose: 3000 });
@@ -320,8 +324,15 @@ const Page = () => {
         setOrganizationNameError1(true);
       });
   };
+  const [domainPlusbtnVisible, setDomainPlusbtnVisible] =
+    useState<boolean>(false);
   const handleDomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDomain = e.target.value.trimStart();
+    if (newDomain != '') {
+      setDomainPlusbtnVisible(true);
+    } else {
+      setDomainPlusbtnVisible(false);
+    }
     // setDomain(newDomain);
     setDomainInput(newDomain);
     if (domains.length > 0) {
@@ -852,6 +863,7 @@ const Page = () => {
     // setOrganizationName(org.org_name);
   };
   const addorg = () => {
+    setorgidForupdatetion(undefined);
     setOrganizationNameError1(true);
     openModal();
     setDomainInput('');
@@ -914,6 +926,12 @@ const Page = () => {
           element: 'div',
           attributes: {
             innerHTML: createCustomContent(org.org_name),
+            oninput: (e: Event) => {
+              const target = e.target as HTMLInputElement;
+              let value = target.value;
+              value = value.trimStart();
+              target.value = value;
+            },
           },
         },
         // content: {
@@ -1052,7 +1070,7 @@ const Page = () => {
 
   const checkInputValue = async (value: any) => {
     try {
-      const response = await orgNameCheck(value);
+      const response = await orgNameCheck(value, orgidForupdatetion);
 
       if (response) {
         if (response.errorCode == 1) {
@@ -1196,7 +1214,8 @@ const Page = () => {
                                       onKeyDown={handleKeyPress}
                                       value={organizationName}
                                       maxLength={256}
-                                      onBlur={handelblurrr}
+                                      onKeyUp={handelblurrr}
+                                      // onBlur={handelblurrr}
                                     />
                                     {organizationNameError && (
                                       <div className='text-danger'>
@@ -1236,9 +1255,16 @@ const Page = () => {
                                         value={domainInput}
                                         maxLength={255}
                                       />
+
                                       <button
                                         type='button'
-                                        className='ti-btn bg-primary text-white ml-2 mb-0 plus-btn-org'
+                                        // className='ti-btn bg-primary text-white ml-2 mb-0 plus-btn-org'
+                                        disabled={!domainPlusbtnVisible}
+                                        className={`${
+                                          domainPlusbtnVisible
+                                            ? 'ti-btn bg-primary text-white ml-2 mb-0 plus-btn-org'
+                                            : 'ti-btn bg-gray-500 text-white ml-2 mb-0 plus-btn-org'
+                                        }`}
                                         onClick={handleDomainPlus}
                                       >
                                         +
@@ -1315,6 +1341,7 @@ const Page = () => {
                                       <span className='text-danger'>*</span>
                                     </label>
                                     <select
+                                      style={{ cursor: 'pointer' }}
                                       className={`form-select ${
                                         selectedType === ''
                                           ? 'deselect-main input-error'
@@ -1330,6 +1357,7 @@ const Page = () => {
                                       {typeDropdown &&
                                         typeDropdown.map((type) => (
                                           <option
+                                            style={{ cursor: 'pointer' }}
                                             key={type.id}
                                             value={type.name}
                                           >
