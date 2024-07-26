@@ -137,59 +137,51 @@ async function handleDomainUserAssignment(
   userId: string,
   email: string,
 ): Promise<void> {
-  // Extract domain from email
   const domain = email.split('@')[1];
 
-  // Get domainId
-  const { data: domainData, error: domainError } = await supabase
+  // Get domain ID and associated organizations in one query
+  const { data: domainOrgData, error: domainOrgError } = await supabase
     .from('domains')
-    .select('id')
+    .select('id, org_domains(org_id)')
     .eq('name', domain)
-    .limit(1)
     .single();
 
-  if (domainError || !domainData) {
+  if (domainOrgError || !domainOrgData) {
     return;
   }
 
-  const domainId = domainData.id;
+  const domainId = domainOrgData.id;
+  const orgDomains = domainOrgData.org_domains || [];
 
-  // Get organization IDs associated with the domain
-  const { data: orgDomainsData, error: orgDomainsError } = await supabase
-    .from('org_domains')
+  // Check existing org_users in one query
+  const existingOrgUserCheck = await supabase
+    .from('org_users')
     .select('org_id')
-    .eq('domain_id', domainId);
+    .eq('user_id', userId)
+    .in(
+      'org_id',
+      orgDomains.map((org) => org.org_id),
+    );
 
-  if (orgDomainsError || !orgDomainsData || orgDomainsData.length === 0) {
+  if (existingOrgUserCheck.error) {
     return;
   }
 
-  // Insert into org_users if necessary
-  for (const orgDomain of orgDomainsData) {
-    const orgId = orgDomain.org_id;
+  const existingOrgIds = new Set(
+    existingOrgUserCheck.data.map((org) => org.org_id),
+  );
+  const newOrgUsers = orgDomains
+    .map((org) => org.org_id)
+    .filter((orgId) => !existingOrgIds.has(orgId))
+    .map((orgId) => ({ user_id: userId, role_id: 3, org_id: orgId }));
 
-    if (!orgId) {
+  if (newOrgUsers.length > 0) {
+    const { error: insertOrgUserError } = await supabase
+      .from('org_users')
+      .insert(newOrgUsers);
+
+    if (insertOrgUserError) {
       return;
-    } else {
-      const { data: orgUserData, error: checkOrgUserError } = await supabase
-        .from('org_users')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('org_id', orgId);
-
-      if (checkOrgUserError) {
-        return;
-      }
-
-      if (!orgUserData || orgUserData.length === 0) {
-        const { error: insertOrgUserError } = await supabase
-          .from('org_users')
-          .insert([{ user_id: userId, role_id: 3, org_id: orgId }]);
-
-        if (insertOrgUserError) {
-          return;
-        }
-      }
     }
   }
 }

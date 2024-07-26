@@ -224,12 +224,12 @@ async function fetchOrganizationTypes(): Promise<Result<any[]>> {
   }
 }
 async function associateUsersWithOrganization(
-  orgId: any,
-  domain: any,
-  user_id: any,
+  orgId: string,
+  domain: string,
+  user_id: string,
 ): Promise<Result<any>> {
   try {
-    // Query users with matching domain
+    // Step 1: Query users with matching domain in a single query
     const { data: usersWithDomainData, error: usersWithDomainError } =
       await supabase
         .from('users')
@@ -240,73 +240,74 @@ async function associateUsersWithOrganization(
     if (usersWithDomainError) {
       return {
         errorCode: 1,
-        data: null,
         message: 'Failed to fetch users with domain',
+        data: null,
       };
     }
 
-    if (usersWithDomainData && usersWithDomainData.length > 0) {
-      const userIds = usersWithDomainData.map((user) => user.id);
-
-      // Insert into org_users for each user with the same domain
-      for (const userId of userIds) {
-        // Check if the user already exists in org_users table
-        const { data: existingUser, error: fetchError } = await supabase
-          .from('org_users')
-          .select('id')
-          .eq('user_id', userId)
-          .eq('org_id', orgId);
-
-        if (fetchError) {
-          // Handle fetch error
-          return {
-            errorCode: 1,
-            message: 'Error fetching existing user data',
-            data: null,
-          };
-        }
-
-        if (existingUser && existingUser.length > 0) {
-          // User already exists in org_users, do not insert again
-          continue; // Skip to the next user
-        } else {
-          // User does not exist in org_users, proceed with insertion
-          const { data: orgUserInsertData, error: orgUserInsertError } =
-            await supabase.from('org_users').insert({
-              user_id: userId,
-              role_id: 3, // Assuming role_id 3 is for regular members
-              org_id: orgId,
-            });
-
-          if (orgUserInsertError) {
-            // Handle organization user insertion error
-            return {
-              errorCode: 1,
-              message: 'Failed to add user to organization',
-              data: null,
-            };
-          }
-        }
-      }
-
-      // Return success message if all users were processed successfully
+    if (!usersWithDomainData || usersWithDomainData.length === 0) {
       return {
         errorCode: 0,
-        message: 'All users processed successfully',
+        message: 'No users to associate',
         data: null,
       };
+    }
+
+    const userIds = usersWithDomainData.map((user) => user.id);
+
+    // Step 2: Check which users are not already associated in a single query
+    const { data: existingOrgUsers, error: fetchExistingError } = await supabase
+      .from('org_users')
+      .select('user_id')
+      .in('user_id', userIds)
+      .eq('org_id', orgId);
+
+    if (fetchExistingError) {
+      return {
+        errorCode: 1,
+        message: 'Error fetching existing user data',
+        data: null,
+      };
+    }
+
+    const existingUserIds = new Set(
+      existingOrgUsers.map((user) => user.user_id),
+    );
+
+    // Step 3: Prepare new user entries
+    const newOrgUsers = userIds
+      .filter((userId) => !existingUserIds.has(userId))
+      .map((userId) => ({
+        user_id: userId,
+        role_id: 3, // Assuming role_id 3 is for regular members
+        org_id: orgId,
+      }));
+
+    // Step 4: Insert new users into org_users table in one batch operation
+    if (newOrgUsers.length > 0) {
+      const { error: insertError } = await supabase
+        .from('org_users')
+        .insert(newOrgUsers);
+
+      if (insertError) {
+        return {
+          errorCode: 1,
+          message: 'Failed to add users to organization',
+          data: null,
+        };
+      }
     }
 
     return {
       errorCode: 0,
-      data: null,
       message: 'Users associated successfully',
+      data: null,
     };
   } catch (error) {
     return {
       errorCode: 1,
-      data: null,
       message: 'Failed to associate users with organization',
+      data: null,
     };
   }
 }
@@ -324,20 +325,14 @@ async function addOrganization(data: {
   type_name: any;
 }): Promise<Result<any>> {
   try {
-    const { data: generalSettingsData, error } = await supabase
+    // Fetch general settings in parallel
+    const settingsPromise = supabase
       .from('general_settings')
       .select('*')
       .eq('setting_name', 'org_retention');
 
-    if (error) {
-      return { errorCode: 1, message: `Error fetching setting`, data: null };
-    }
-    let retValue = 0;
-    if (generalSettingsData && generalSettingsData.length > 0) {
-      retValue = generalSettingsData[0].value_number;
-    }
     // Insert organization details
-    const { data: insertData, error: insertError } = await supabase
+    const insertOrgPromise = supabase
       .from('org_details')
       .insert([
         {
@@ -345,156 +340,177 @@ async function addOrganization(data: {
           description: data.description,
           type_id: data.type_id,
           status: data.status,
-          retention_setting: retValue,
+          retention_setting: 0, // Default value; will update after fetching settings
         },
       ])
       .select();
 
-    if (insertError) {
-      return { errorCode: 1, data: 'Organization is already exist' };
+    // Wait for both operations
+    const [settingsResult, insertOrgResult] = await Promise.all([
+      settingsPromise,
+      insertOrgPromise,
+    ]);
+
+    if (settingsResult.error || insertOrgResult.error) {
+      return {
+        errorCode: 1,
+        message: 'Error fetching settings or inserting organization',
+        data: null,
+      };
     }
-    const orgId = insertData[0].id;
+
+    const retValue = settingsResult.data?.[0]?.value_number || 0;
+    const orgId = insertOrgResult.data[0].id;
+
+    // Update retention setting after fetching
+    await supabase
+      .from('org_details')
+      .update({ retention_setting: retValue })
+      .eq('id', orgId);
+
     // Insert organization user
-    const { data: userInsertData, error: userInsertError } = await supabase
+    const userInsertPromise = supabase
       .from('org_users')
       .insert([
         {
           user_id: data.user_id,
           role_id: 1,
-          org_id: insertData[0].id,
+          org_id: orgId,
         },
       ])
       .select();
 
-    if (userInsertError) {
-      return { errorCode: 1, data: 'Organization is not added' };
-    }
+    // Insert domains
+    const domainInsertPromise = insertDomains(orgId, data.domain);
 
-    // Insert domains (assuming insertDomains function handles this)
-    const domainInsertResults = await insertDomains(orgId, data.domain);
+    // Wait for user insert and domain insert operations
+    const [userInsertResult, domainInsertResults] = await Promise.all([
+      userInsertPromise,
+      domainInsertPromise,
+    ]);
 
-    try {
-      // Send email based on organization type
-      const emailData: any = {
-        org_id: orgId,
-        user_id: data.user_id,
+    if (userInsertResult.error) {
+      return {
+        errorCode: 1,
+        message: 'Error inserting organization user',
+        data: null,
       };
-
-      if (data.type_id === 1) {
-        const { userName, name } = data;
-        const emailData = await fetchEmailData('Add_Org_EndUser');
-        const to = emailData.data.To;
-        const subject = emailData.data.email_subject.replace(
-          '{{Org Name}}',
-          name,
-        );
-        const heading = emailData.data.email_heading.replace(
-          '{{Org Name}}',
-          name,
-        );
-        const content = emailData.data.email_content
-          .replace('{{User Name}}', userName)
-          .replace('{{Org Name}}', name);
-
-        sendEmailFunction(to, subject, heading, content, data.token);
-      } else {
-        const { userName, name, type_name } = data;
-        const emailData = await fetchEmailData('Add_Org_OEM_Partner');
-        const to = emailData.data.To;
-        const subject = emailData.data.email_subject.replace(
-          '{{Org Name}}',
-          name,
-        );
-        const heading = emailData.data.email_heading.replace(
-          '{{Org Name}}',
-          name,
-        );
-        const content = emailData.data.email_content
-          .replace('{{User Name}}', userName)
-          .replace(/{{Org Type}}/g, type_name)
-          .replace('{{Org Name}}', name);
-
-        sendEmailFunction(to, subject, heading, content, data.token);
-      }
-    } catch (error) {
-      // Handle email sending error
     }
-    // Log activity
-    const logResult = await logActivity({
+
+    // Send emails asynchronously
+    const emailPromise = (async () => {
+      const emailData = await fetchEmailData(
+        data.type_id === 1 ? 'Add_Org_EndUser' : 'Add_Org_OEM_Partner',
+      );
+      const to = emailData.data.To;
+      const subject = emailData.data.email_subject.replace(
+        '{{Org Name}}',
+        data.name,
+      );
+      const heading = emailData.data.email_heading.replace(
+        '{{Org Name}}',
+        data.name,
+      );
+      const content = emailData.data.email_content
+        .replace('{{User Name}}', data.userName)
+        .replace('{{Org Name}}', data.name)
+        .replace(/{{Org Type}}/g, data.type_name || '');
+
+      sendEmailFunction(to, subject, heading, content, data.token);
+    })();
+
+    // Log activity asynchronously
+    const logPromise = logActivity({
       org_id: orgId,
       user_id: data.user_id,
       activity_type: 'create_org',
     });
 
-    // Associate users with the organization based on domain
-    for (const domain of data.domain) {
-      await associateUsersWithOrganization(orgId, domain, data.user_id);
-    }
+    // Wait for email sending and logging to complete
+    await Promise.all([emailPromise, logPromise]);
 
     return {
       errorCode: 0,
-      data: { insertData, userInsertData, domainInsertResults },
+      data: {
+        insertData: insertOrgResult.data,
+        userInsertData: userInsertResult.data,
+        domainInsertResults,
+      },
     };
   } catch (error) {
-    return { errorCode: 1, data: 'Organization is not added' };
+    return { errorCode: 1, message: 'Organization is not added', data: null };
   }
 }
-const insertDomains = async (orgId: any, domains: any) => {
-  const domainInsertResults = [];
 
-  for (const domain of domains) {
-    try {
-      // Check if the domain already exists
-      const { data: existingDomain, error: fetchError } = await supabase
-        .from('domains')
-        .select('*')
-        .eq('name', domain);
+const insertDomains = async (orgId: any, domains: string[]) => {
+  try {
+    // Fetch existing domains in bulk
+    const { data: existingDomains, error: fetchError } = await supabase
+      .from('domains')
+      .select('id, name')
+      .in('name', domains);
 
-      if (fetchError) {
-        // Handle error in fetching domain
-        domainInsertResults.push({ success: false, error: fetchError });
-        continue;
-      }
-
-      let domainId;
-
-      if (existingDomain.length > 0) {
-        // Domain already exists
-        domainId = existingDomain[0].id;
-      } else {
-        // Domain does not exist, proceed to insert
-        const { data: insertDomain, error: domainError } = await supabase
-          .from('domains')
-          .insert([{ name: domain }])
-          .select();
-
-        if (domainError) {
-          domainInsertResults.push({ success: false, error: domainError });
-          continue;
-        }
-        if (insertDomain) {
-          // Retrieve the newly inserted domainId
-          domainId = insertDomain[0].id;
-        }
-      }
-
-      // Link the domain to the organization in org_domains table
-      const { data, error } = await supabase
-        .from('org_domains')
-        .insert([{ org_id: orgId, domain_id: domainId }])
-        .select();
-
-      if (error) {
-        domainInsertResults.push({ success: false, error });
-      } else {
-        domainInsertResults.push({ success: true, data });
-      }
-    } catch (error: any) {
-      domainInsertResults.push({ success: false, error: error.message });
+    if (fetchError) {
+      throw new Error(`Error fetching domains: ${fetchError.message}`);
     }
-  }
 
-  return domainInsertResults;
+    // Create a set of existing domain names for quick lookup
+    const existingDomainMap = new Map(
+      existingDomains.map((domain) => [domain.name, domain.id]),
+    );
+
+    // Determine which domains need to be inserted
+    const domainsToInsert = domains.filter(
+      (domain) => !existingDomainMap.has(domain),
+    );
+
+    // Insert new domains in bulk
+    let newDomains = [];
+    if (domainsToInsert.length > 0) {
+      const { data: insertedDomains, error: insertError } = await supabase
+        .from('domains')
+        .insert(domainsToInsert.map((name) => ({ name })))
+        .select('id, name');
+
+      if (insertError) {
+        throw new Error(`Error inserting domains: ${insertError.message}`);
+      }
+
+      // Map new domains to their IDs
+      newDomains = insertedDomains;
+      for (const domain of newDomains) {
+        existingDomainMap.set(domain.name, domain.id);
+      }
+    }
+
+    // Prepare domain-org associations
+    const domainOrgAssociations = domains.map((domain) => ({
+      org_id: orgId,
+      domain_id: existingDomainMap.get(domain),
+    }));
+
+    // Insert domain-org associations in bulk
+    const { data: associationResults, error: assocError } = await supabase
+      .from('org_domains')
+      .insert(domainOrgAssociations)
+      .select();
+
+    if (assocError) {
+      throw new Error(
+        `Error inserting domain-org associations: ${assocError.message}`,
+      );
+    }
+
+    return {
+      success: true,
+      data: associationResults,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
 };
 
 // async function updateOrganization(data: {
@@ -566,13 +582,25 @@ async function updateOrganization(data: {
   orgName: any;
   oldOrgName: any;
 }): Promise<Result<any>> {
+  const {
+    org_id,
+    name,
+    description,
+    type_id,
+    status,
+    domain,
+    user_id,
+    userName,
+    oldOrgName,
+  } = data;
+
   try {
-    const userName: any = data.userName;
-    const orgName: any = data.name;
+    // Fetch current organization details
     const { data: orgDetails, error: fetchOrgError } = await supabase
       .from('org_details')
       .select('name,description')
-      .eq('id', data.org_id);
+      .eq('id', org_id)
+      .single(); // Use .single() for fetching a single record
 
     if (fetchOrgError) {
       return {
@@ -582,14 +610,15 @@ async function updateOrganization(data: {
       };
     }
 
-    const oldOrgName = orgDetails[0].name; // Store the old organization name
-    const oldDescription = orgDetails[0].description; // Store the old description
-    // Check if the new name already exists in the database, excluding the current org_id
+    const oldOrgName = orgDetails.name; // Store the old organization name
+    const oldDescription = orgDetails.description; // Store the old description
+
+    // Check if the new name already exists in the database
     const { data: existingOrg, error: fetchError } = await supabase
       .from('org_details')
       .select('id')
-      .eq('name', data.name)
-      .neq('id', data.org_id);
+      .eq('name', name)
+      .neq('id', org_id);
 
     if (fetchError) {
       return {
@@ -599,7 +628,7 @@ async function updateOrganization(data: {
       };
     }
 
-    if (existingOrg && existingOrg.length > 0) {
+    if (existingOrg.length > 0) {
       return {
         errorCode: 1,
         message:
@@ -609,18 +638,13 @@ async function updateOrganization(data: {
     }
 
     // Update organization details
-    const { data: updateData, error } = await supabase
+    const { data: updateData, error: updateError } = await supabase
       .from('org_details')
-      .update({
-        name: data.name,
-        description: data.description,
-        type_id: data.type_id,
-        status: data.status,
-      })
-      .eq('id', data.org_id)
+      .update({ name, description, type_id, status })
+      .eq('id', org_id)
       .select();
 
-    if (error) {
+    if (updateError) {
       return {
         errorCode: 1,
         message: 'Error updating organization details',
@@ -628,122 +652,119 @@ async function updateOrganization(data: {
       };
     }
 
-    const domainInsertResults = [];
-    let domainAdded = false;
+    const domainInsertResults: any = [];
+    const domainIds: any = {}; // To keep track of domain IDs and avoid duplicate inserts
 
-    // Process each domain
-    for (const domain of data.domain) {
-      // Check if domain exists
-      const { data: existingDomain, error: checkError } = await supabase
-        .from('domains')
-        .select('*')
-        .eq('name', domain);
-
-      if (checkError) {
-        domainInsertResults.push({
-          success: false,
-          message: `Error checking domain '${domain}'`,
-          error: checkError,
-        });
-        continue;
-      }
-
-      let domainId;
-
-      if (existingDomain.length > 0) {
-        // Domain exists, get the existing ID
-        domainId = existingDomain[0].id;
-      } else {
-        // Domain does not exist, insert new domain
-        const { data: insertDomain, error: domainError } = await supabase
+    // Check and insert domains
+    await Promise.all(
+      domain.map(async (domain) => {
+        // Check if domain exists
+        const { data: existingDomain, error: checkError } = await supabase
           .from('domains')
-          .insert({ name: domain })
-          .select();
+          .select('id')
+          .eq('name', domain);
 
-        if (domainError) {
+        if (checkError) {
           domainInsertResults.push({
             success: false,
-            message: `Error inserting domain '${domain}'`,
-            error: domainError,
+            message: `Error checking domain '${domain}'`,
+            error: checkError,
           });
-          continue;
+          return;
         }
 
-        domainId = insertDomain[0].id;
-        // if (insertDomain) {
-        //   // Log activity for adding domains
-        //   await logActivity({
-        //     org_id: data.org_id,
-        //     user_id: data.user_id,
-        //     activity_type: 'add_domain',
-        //     details: `${userName} added the domain ${domain} to the organization ${orgName}.`
-        //     // {{User Name}} added the domain {{Domain Name}} within the organization {{Org Name}}
-        //   });
-        // }
-      }
+        let domainId;
 
-      domainInsertResults.push({ success: true, data: domainId });
-      domainAdded = true;
-
-      // Check if the org_domain pair exists
-      const { data: orgDomainPair, error: orgDomainCheckError } = await supabase
-        .from('org_domains')
-        .select('*')
-        .eq('org_id', data.org_id)
-        .eq('domain_id', domainId);
-
-      if (orgDomainCheckError) {
-        domainInsertResults.push({
-          success: false,
-          message: `Error checking org_domain for domain '${domain}'`,
-          error: orgDomainCheckError,
-        });
-        continue;
-      }
-
-      if (orgDomainPair.length === 0) {
-        // Pair does not exist, insert it
-        const { data: insertOrgDomain, error: orgDomainInsertError } =
-          await supabase
-            .from('org_domains')
-            .insert([{ org_id: data.org_id, domain_id: domainId }])
+        if (existingDomain.length > 0) {
+          domainId = existingDomain[0].id;
+        } else {
+          // Domain does not exist, insert new domain
+          const { data: insertDomain, error: domainError } = await supabase
+            .from('domains')
+            .insert({ name: domain })
             .select();
 
-        if (orgDomainInsertError) {
+          if (domainError) {
+            domainInsertResults.push({
+              success: false,
+              message: `Error inserting domain '${domain}'`,
+              error: domainError,
+            });
+            return;
+          }
+
+          domainId = insertDomain[0].id;
+        }
+
+        domainIds[domain] = domainId;
+
+        // Check if the org_domain pair exists
+        const { data: orgDomainPair, error: orgDomainCheckError } =
+          await supabase
+            .from('org_domains')
+            .select('*')
+            .eq('org_id', org_id)
+            .eq('domain_id', domainId);
+
+        if (orgDomainCheckError) {
           domainInsertResults.push({
             success: false,
-            message: `Error inserting org_domain for domain '${domain}'`,
-            error: orgDomainInsertError,
+            message: `Error checking org_domain for domain '${domain}'`,
+            error: orgDomainCheckError,
           });
-          continue;
+          return;
         }
-        if (insertOrgDomain) {
-          await logActivity({
-            org_id: data.org_id,
-            user_id: data.user_id,
-            activity_type: 'add_domain',
-            details: `'${userName}' added the domain '${domain}' to the organization '${orgName}'.`,
-            // {{User Name}} added the domain {{Domain Name}} within the organization {{Org Name}}
-          });
+
+        if (orgDomainPair.length === 0) {
+          // Pair does not exist, insert it
+          const { data: insertOrgDomain, error: orgDomainInsertError } =
+            await supabase
+              .from('org_domains')
+              .insert([{ org_id, domain_id: domainId }])
+              .select();
+
+          if (orgDomainInsertError) {
+            domainInsertResults.push({
+              success: false,
+              message: `Error inserting org_domain for domain '${domain}'`,
+              error: orgDomainInsertError,
+            });
+            return;
+          }
         }
-      }
-      await associateUsersWithOrganization(data.org_id, domain, data.user_id);
-    }
-    if (oldDescription !== data.description) {
-      // Log activity for updating the organization description
+
+        domainInsertResults.push({ success: true, data: domainId });
+
+        // Associate users with the organization
+        await associateUsersWithOrganization(org_id, domain, user_id);
+
+        // Log activity for adding domains
+        await logActivity({
+          org_id,
+          user_id,
+          activity_type: 'add_domain',
+          details: `'${userName}' added the domain '${domain}' to the organization '${name}'.`,
+        });
+      }),
+    );
+
+    // Log activity for updating the organization description
+    if (oldDescription !== description) {
       await logActivity({
-        org_id: data.org_id,
-        user_id: data.user_id,
+        org_id,
+        user_id,
         activity_type: 'edit_org_description',
-        details: `'${userName}' changed the organization description within the organization '${orgName}'.`,
+        details: `'${userName}' changed the organization description within the organization '${name}'.`,
       });
     }
-    if (oldOrgName !== orgName) {
+
+    // Log activity for updating the organization name
+    if (oldOrgName !== name) {
       await logActivity({
-        org_id: data.org_id,
-        user_id: data.user_id,
+        org_id,
+        user_id,
         activity_type: 'update_org',
-        details: `'${userName}' changed the organization name from '${oldOrgName}' to '${orgName}'.`,
+        details: `'${userName}' changed the organization name from '${oldOrgName}' to '${name}'.`,
       });
     }
 
