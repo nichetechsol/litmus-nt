@@ -156,6 +156,7 @@ const OrgDashboard = () => {
     null,
   );
   const [activity_log, setActivity_log] = useState<activitylogs[] | null>(null);
+
   const CountData = async () => {
     try {
       // setLoading(true);
@@ -287,6 +288,21 @@ const OrgDashboard = () => {
   const [roleError, setRoleError] = useState('');
   // const [loading, setLoading] = useState<boolean>(false);
   const [roles, setRoles] = useState<roles[] | null>(null);
+  const [addbuttonclass, setaddbuttonclass] = useState<boolean>(false);
+
+  // for grey out btn
+  useEffect(() => {
+    const validate = async () => {
+      try {
+        await validationSchema.validate({ email, role }, { abortEarly: false });
+        setaddbuttonclass(true);
+      } catch (err) {
+        setaddbuttonclass(false);
+      }
+    };
+
+    validate();
+  }, [email, role]);
   useEffect(() => {
     const fetchRoles = async () => {
       try {
@@ -1003,10 +1019,7 @@ const OrgDashboard = () => {
                                       {isFocusedOnEmail &&
                                         DataTOAutoFill &&
                                         DataTOAutoFill.length > 0 && (
-                                          <ul
-                                            className='auto-fill-list'
-                                            ref={emailListRef}
-                                          >
+                                          <ul className='' ref={emailListRef}>
                                             {DataTOAutoFill.map(
                                               (e: any, index) => (
                                                 <li
@@ -1015,11 +1028,12 @@ const OrgDashboard = () => {
                                                   onMouseDown={() =>
                                                     handelautofill(e)
                                                   }
-                                                  className={
-                                                    index === highlightedIndex
-                                                      ? 'highlighted'
-                                                      : ''
-                                                  }
+                                                  className={` list-group-item
+                                                    ${
+                                                      index === highlightedIndex
+                                                        ? 'highlighted'
+                                                        : ''
+                                                    }`}
                                                 >
                                                   {e.email}
                                                 </li>
@@ -1064,7 +1078,7 @@ const OrgDashboard = () => {
                                         DataTOAutoFill1 &&
                                         DataTOAutoFill1.length > 0 && (
                                           <ul
-                                            className='auto-fill-list'
+                                            className=''
                                             ref={firstNameListRef}
                                           >
                                             {DataTOAutoFill1.filter(
@@ -1077,11 +1091,12 @@ const OrgDashboard = () => {
                                                 onMouseDown={() =>
                                                   handelautofill(e)
                                                 }
-                                                className={
-                                                  index === highlightedIndex
-                                                    ? 'highlighted'
-                                                    : ''
-                                                }
+                                                className={` list-group-item
+                                                 ${
+                                                   index === highlightedIndex
+                                                     ? 'highlighted'
+                                                     : ''
+                                                 }`}
 
                                                 // onClick={() =>
                                                 //   handelautofill(e)
@@ -1131,7 +1146,7 @@ const OrgDashboard = () => {
                                         DataTOAutoFill2 &&
                                         DataTOAutoFill2.length > 0 && (
                                           <ul
-                                            className='auto-fill-list'
+                                            className=''
                                             ref={lastNameListRef}
                                           >
                                             {/* {DataTOAutoFill2.map((e: any) => ( */}
@@ -1145,11 +1160,11 @@ const OrgDashboard = () => {
                                                 onMouseDown={() =>
                                                   handelautofill(e)
                                                 }
-                                                className={
+                                                className={` list-group-item${
                                                   index === highlightedIndex
                                                     ? 'highlighted'
                                                     : ''
-                                                }
+                                                }`}
                                               >
                                                 {e.lastname}({e.email})
                                               </li>
@@ -1215,8 +1230,14 @@ const OrgDashboard = () => {
                                   </button>
                                   <button
                                     type='button'
-                                    className='ti-btn bg-primary text-white !font-medium'
+                                    // className='ti-btn bg-primary text-white !font-medium'
                                     onClick={() => handleSubmit()}
+                                    disabled={!addbuttonclass}
+                                    className={
+                                      addbuttonclass
+                                        ? 'ti-btn bg-primary text-white !font-medium'
+                                        : 'ti-btn bg-gray-500 text-white !font-medium'
+                                    }
                                   >
                                     {changeFlage === true
                                       ? 'Add User'
