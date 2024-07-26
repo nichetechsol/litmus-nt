@@ -243,7 +243,12 @@ const Page = () => {
         if (data.errorCode === 0) {
           if (data.data.length > 0) {
             setorg_exists('true');
-            localStorage.setItem('org_exists', 'true');
+            const encryptedOrgExists = encryptData('true');
+            localStorage.setItem('org_exists', encryptedOrgExists);
+          } else {
+            setorg_exists('false');
+            const encryptedOrgExists = encryptData('false');
+            localStorage.setItem('org_exists', encryptedOrgExists);
           }
           setOrgsWithSites(data.data);
         } else {
