@@ -1245,7 +1245,7 @@ const Page = () => {
                                       <input
                                         type='text'
                                         // className='form-control w-full me-2'
-                                        className={`form-control w-full me-2 ${
+                                        className={`form-control-2   me-2 ${
                                           domainError === ''
                                             ? ''
                                             : 'input-error'
@@ -1590,7 +1590,7 @@ const Page = () => {
                           >
                             <div className='box-body contact-action'>
                               <div className='flex items-center '>
-                                <div className='avtariv flex flex-grow justify-between gap-2 items-center'>
+                                <div className='avtariv flex flex-grow gap-2 items-center'>
                                   {' '}
                                   <div className='avatar avatar-xl avatar-rounded me-1  '>
                                     <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>

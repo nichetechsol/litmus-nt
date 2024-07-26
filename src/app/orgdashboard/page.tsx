@@ -938,7 +938,7 @@ const OrgDashboard = () => {
                           />
                         </div>
                         {/* <div className='hs-dropdown ti-dropdown'> */}
-                        <div className=' grid border-b border-dashed dark:border-defaultborder/10'>
+                        <div className=' grid '>
                           {' '}
                           {userrole2 === 1 || userrole2 === 2 ? (
                             <button

@@ -1507,7 +1507,7 @@ const Page: React.FC = () => {
                                           />
                                         </span>
                                       </div>
-                                      <div className='relative group'>
+                                      <div className='relative group px-2'>
                                         <h1 className='mb-1 font-semibold p-new text-[1rem] text-site-name'>
                                           {SingleSite?.site
                                             ? SingleSite?.site?.name
@@ -1610,7 +1610,7 @@ const Page: React.FC = () => {
                                         <li className='flex list-group-item fw-semibold'>
                                           <i className='bx bx-map align-middle me-2 text-muted'></i>
                                           <b>Address </b>
-                                          <p className='ms-1 over-text text-muted fw-normal d-inline-block'>
+                                          <p className='ms-1 pnew-white-space over-text text-muted fw-normal d-inline-block'>
                                             {SingleSite?.site && (
                                               <>
                                                 {SingleSite?.site?.address1}
@@ -1627,7 +1627,7 @@ const Page: React.FC = () => {
                                         <li className='list-group-item fw-semibold'>
                                           <i className='bx bx-briefcase align-middle me-2 text-muted'></i>
                                           <b>Owner</b>
-                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                          <span className='ms-1 pnew-white-space text-muted fw-normal d-inline-block'>
                                             {/* {SingleSite?.ownerNames?.join(', ')} */}
                                             {SingleSite?.ownerNames?.length
                                               ? SingleSite.ownerNames.join(', ')
@@ -1637,14 +1637,14 @@ const Page: React.FC = () => {
                                         <li className='list-group-item fw-semibold'>
                                           <i className='bx bx-user align-middle me-2 text-muted'></i>
                                           <b>Number of users</b>
-                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                          <span className='ms-1  pnew-white-space text-muted fw-normal d-inline-block'>
                                             {SingleSite?.users?.length}
                                           </span>
                                         </li>
                                         <li className='list-group-item fw-semibold'>
                                           <i className='bx bx-user align-middle me-2 text-muted'></i>
                                           <b>Type</b>
-                                          <span className='ms-1 text-muted fw-normal d-inline-block'>
+                                          <span className='ms-1  pnew-white-space text-muted fw-normal d-inline-block'>
                                             {SingleSite?.type_name}
                                           </span>
                                         </li>

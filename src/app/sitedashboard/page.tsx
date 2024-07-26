@@ -1015,10 +1015,10 @@ const Page = () => {
                               </div>
                               <div className='xl:col-span-4 xxl:col-span-4 lg:col-span-4 md:col-span-12 col-span-4'>
                                 <div className='text-center owner-details p-6 w-full h-full flex justify-center'>
-                                  <span className='font-semibold text-[.875rem]'>
+                                  <span className='font-semibold text-[.875rem] me-2'>
                                     {siteCountData &&
                                     siteCountData.data.sites_details.created_at
-                                      ? 'Created: '
+                                      ? 'Created:   '
                                       : ''}
                                   </span>
 
@@ -1028,7 +1028,7 @@ const Page = () => {
                                       ? moment(
                                           siteCountData.data.sites_details
                                             .created_at,
-                                        ).format('MM/DD/YYYY HH:mm')
+                                        ).format(' MM/DD/YYYY HH:mm')
                                       : //  siteCountData.data.sites_details[0].created_at.split(
                                         //     'T',
                                         //   )[0]
@@ -1074,8 +1074,8 @@ const Page = () => {
                                       <i className='ri-profile-line text-[1rem]  text-white'></i>
                                     </span>
                                   </div>
-                                  <div className='flex-grow'>
-                                    <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                  <div className='flex-grow flex-license'>
+                                    <p className='pnew-white-space  font-semibold mb-[1.4px]  text-[0.813rem]'>
                                       {user.licence_number}
                                     </p>
                                     <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>

@@ -415,7 +415,7 @@ html {
     padding: 10px 20px;
   }
   .authentication {
-    min-height: 90vh !important;
+    min-height: 95vh !important;
   }
   .header-element.header-fullscreen {
     @apply hidden;
@@ -15507,6 +15507,7 @@ input.gridjs-input {
 
 .form-select {
   @apply block w-full py-[0.5rem] pe-[2.25rem] ps-[0.75rem] text-[1rem] font-normal leading-[1.9];
+  cursor: pointer;
 }
 
 .form-select {
@@ -15605,7 +15606,7 @@ input.gridjs-input {
 }
 
 .form-control {
-  @apply border-inputborder text-defaulttextcolor  dark:border-white/10  text-[0.875rem] font-normal leading-[1] rounded-none  py-2 px-[0.85rem] placeholder:text-defaulttextcolor dark:placeholder:text-defaulttextcolor/70;
+  @apply border-inputborder text-defaulttextcolor  dark:border-white/10  text-[0.8rem] font-normal leading-[1] rounded-none  py-2 px-[0.85rem] placeholder:text-defaulttextcolor dark:placeholder:text-defaulttextcolor/70;
   @apply dark:bg-bodybg;
   @apply placeholder:opacity-40 placeholder:font-medium placeholder:text-[0.8rem];
 }
@@ -20213,7 +20214,7 @@ h6 {
   padding: 0px !important;
   margin: 0px !important;
 } */
-
+/* 
 input[type='color'],
 input[type='date'],
 input[type='datetime'],
@@ -20231,7 +20232,7 @@ input[type='week'],
 select:focus,
 textarea {
   font-size: 16px;
-}
+} */
 
 body.modal-open {
   overflow-y: hidden;
@@ -20303,6 +20304,13 @@ body.no-scroll-no {
   word-break: break-all;
   white-space: break-spaces;
 }
+.swal-content__div b {
+  word-break: break-all;
+  white-space: break-spaces;
+}
+.flex-license {
+  @apply w-[8rem] px-[1rem];
+}
 
 .login-div input {
   background-color: #e8f0fe;
@@ -20339,4 +20347,20 @@ body.no-scroll-no {
 }
 .word-break-all {
   word-break: break-all;
+}
+.form-control-2 {
+  width: 100%;
+  border-radius: 0.35rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 0.85rem;
+  padding-right: 0.85rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: rgb(var(--default-text-color));
+}
+.form-control,
+.form-select {
+  font-size: 14px !important;
 }
