@@ -1463,7 +1463,9 @@ const Page = () => {
                                       </label>
                                       <input
                                         type='text'
-                                        className='form-control w-full'
+                                        className={`form-control w-full ${
+                                          email ? '' : 'input-error'
+                                        } ${emailError ? 'input-error' : ''} `}
                                         id='Email'
                                         disabled={!changeFlage}
                                         placeholder='Enter Email'
@@ -1521,7 +1523,10 @@ const Page = () => {
                                       </label>
                                       <input
                                         type='text'
-                                        className='form-control w-full'
+                                        className={`form-control w-full 
+                                          ${
+                                            firstNameError ? 'input-error' : ''
+                                          } `}
                                         id='task-name'
                                         disabled={!changeFlage}
                                         placeholder='Enter First Name'
@@ -1582,7 +1587,9 @@ const Page = () => {
                                       </label>
                                       <input
                                         type='text'
-                                        className='form-control w-full'
+                                        className={`form-control w-full ${
+                                          lastNameError ? 'input-error' : ''
+                                        }`}
                                         id='task-name'
                                         placeholder='Enter Last Name'
                                         disabled={!changeFlage}
@@ -1644,8 +1651,10 @@ const Page = () => {
                                       <select
                                         style={{ cursor: 'pointer' }}
                                         className={`form-select ${
-                                          role === '' ? 'deselect-main' : ''
-                                        }`}
+                                          role ? '' : 'input-error'
+                                        }
+                                        ${roleError ? 'input-error' : ''}
+                                        ${role === '' ? 'deselect-main' : ''}`}
                                         onChange={handleRoleChange}
                                         value={role}
                                       >

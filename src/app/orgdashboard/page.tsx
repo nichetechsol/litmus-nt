@@ -1000,7 +1000,9 @@ const OrgDashboard = () => {
                                       </label>
                                       <input
                                         type='text'
-                                        className='form-control w-full'
+                                        className={`form-control w-full ${
+                                          email ? '' : 'input-error'
+                                        } ${emailError ? 'input-error' : ''} `}
                                         id='Email'
                                         disabled={!changeFlage}
                                         placeholder='Enter Email'
@@ -1058,7 +1060,10 @@ const OrgDashboard = () => {
                                       </label>
                                       <input
                                         type='text'
-                                        className='form-control w-full'
+                                        className={`form-control w-full 
+                                          ${
+                                            firstNameError ? 'input-error' : ''
+                                          } `}
                                         id='task-name'
                                         disabled={!changeFlage}
                                         placeholder='Enter First Name'
@@ -1126,7 +1131,9 @@ const OrgDashboard = () => {
                                       </label>
                                       <input
                                         type='text'
-                                        className='form-control w-full'
+                                        className={`form-control w-full ${
+                                          lastNameError ? 'input-error' : ''
+                                        }`}
                                         id='Last Name'
                                         disabled={!changeFlage}
                                         placeholder='Enter Last Name'
@@ -1191,8 +1198,10 @@ const OrgDashboard = () => {
                                       <select
                                         style={{ cursor: 'pointer' }}
                                         className={`form-select ${
-                                          role === '' ? 'deselect-main' : ''
-                                        }`}
+                                          role ? '' : 'input-error'
+                                        }
+                                        ${roleError ? 'input-error' : ''}
+                                        ${role === '' ? 'deselect-main' : ''}`}
                                         onChange={handleRoleChange}
                                         value={role}
                                       >

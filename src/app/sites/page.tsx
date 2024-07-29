@@ -1056,7 +1056,11 @@ const Page: React.FC = () => {
                                   </label>
                                   <input
                                     type='text'
-                                    className='form-control '
+                                    className={`form-control ${
+                                      AddSiteName ? '' : 'input-error'
+                                    } ${
+                                      AddSiteNameError ? 'input-error' : ''
+                                    } `}
                                     id='task-name'
                                     placeholder='Enter Site Name'
                                     onChange={handelAddSiteName}
@@ -1078,7 +1082,11 @@ const Page: React.FC = () => {
                                     Type <span className='text-danger'>*</span>
                                   </label>
                                   <select
-                                    className={`form-select ${
+                                    className={`form-select  ${
+                                      SelectedValueDropdown ? '' : 'input-error'
+                                    } 
+                                      ${typeDropdownError ? 'input-error' : ''}
+                                    ${
                                       SelectedValueDropdown === ''
                                         ? 'deselect-main'
                                         : ''
@@ -1113,7 +1121,9 @@ const Page: React.FC = () => {
                                   </label>
                                   <input
                                     type='text'
-                                    className='form-control w-full'
+                                    className={`form-control w-full ${
+                                      Address1 ? '' : 'input-error'
+                                    } ${Address1Error ? 'input-error' : ''} `}
                                     id='task-name'
                                     placeholder='Enter Address 1'
                                     onChange={handelchangeAddress1}
@@ -1135,7 +1145,8 @@ const Page: React.FC = () => {
                                   </label>
                                   <input
                                     type='text'
-                                    className='form-control w-full'
+                                    className={`form-control w-full
+                                    } ${Address2Error ? 'input-error' : ''} `}
                                     id='task-name'
                                     placeholder='Enter Address 2'
                                     onChange={handelchangeAddress2}
@@ -1157,6 +1168,10 @@ const Page: React.FC = () => {
                                   </label>
                                   <select
                                     className={`form-select ${
+                                      SelectedValueCounrty ? '' : 'input-error'
+                                    } 
+                                    ${CountryListError ? 'input-error' : ''}
+                                    ${
                                       SelectedValueCounrty === ''
                                         ? 'deselect-main'
                                         : ''
@@ -1192,11 +1207,14 @@ const Page: React.FC = () => {
                                     State <span className='text-danger'>*</span>
                                   </label>
                                   <select
-                                    className={`form-select ${
-                                      SelectedValueState === ''
-                                        ? 'deselect-main'
-                                        : ''
-                                    }`}
+                                    className={`form-select 
+                                      ${SelectedValueState ? '' : 'input-error'}
+                                      ${stateListError ? 'input-error' : ''}
+                                      ${
+                                        SelectedValueState === ''
+                                          ? 'deselect-main'
+                                          : ''
+                                      }`}
                                     onChange={handelchangeState}
                                     value={SelectedValueState}
                                   >
@@ -1226,7 +1244,9 @@ const Page: React.FC = () => {
                                   </label>
                                   <input
                                     type='text'
-                                    className='form-control w-full'
+                                    className={`form-control w-full ${
+                                      City ? '' : 'input-error'
+                                    }  ${CityError ? 'input-error' : ''}`}
                                     id='task-name'
                                     placeholder='Enter City'
                                     onChange={handelAddSiteCity}
@@ -1249,7 +1269,9 @@ const Page: React.FC = () => {
                                   </label>
                                   <input
                                     type='text'
-                                    className='form-control w-full'
+                                    className={`form-control w-full ${
+                                      Pincode ? '' : 'input-error'
+                                    } ${PincodeError ? 'input-error' : ''}`}
                                     id='task-name'
                                     placeholder='Enter Zip Code'
                                     onChange={handelAddSitePincode}
@@ -1271,7 +1293,9 @@ const Page: React.FC = () => {
                                     Description
                                   </label>
                                   <textarea
-                                    className='form-control w-full'
+                                    className={`form-control w-full ${
+                                      messageError ? 'input-error' : ''
+                                    }`}
                                     style={{ resize: 'none' }}
                                     id='task-name'
                                     placeholder='Enter Description'
