@@ -346,61 +346,61 @@ async function modifyUserOfSites(
     }
 
     // Send email notifications based on role changes
-    let action = '';
-    if (UserData.role_id > 1) {
-      action = 'User_Role_Demoted';
-    } else {
-      action = 'User_Role_Promoted';
-    }
+    // let action = '';
+    // if (UserData.role_id > 1) {
+    //   action = 'User_Role_Demoted';
+    // } else {
+    //   action = 'User_Role_Promoted';
+    // }
 
-    if (action) {
-      const userName: any = UserData.userName;
-      const orgName: any = UserData.orgName;
-      const siteName: any = UserData.siteName;
-      // const role: any = modifyingUserRoleData[0].user_role;
-      // const role: any = targetUserRoleData[0].user_role;
-      // const role: any = UserData.user_role_id;
-      const role: any = UserData.role_id;
-      let roleName: any;
-      if (role == 1) {
-        roleName = 'Owner';
-      }
-      if (role == 2) {
-        roleName = 'Admin';
-      }
-      if (role == 3) {
-        roleName = 'Member';
-      }
+    // if (action) {
+    //   const userName: any = UserData.userName;
+    //   const orgName: any = UserData.orgName;
+    //   const siteName: any = UserData.siteName;
+    //   // const role: any = modifyingUserRoleData[0].user_role;
+    //   // const role: any = targetUserRoleData[0].user_role;
+    //   // const role: any = UserData.user_role_id;
+    //   const role: any = UserData.role_id;
+    //   let roleName: any;
+    //   if (role == 1) {
+    //     roleName = 'Owner';
+    //   }
+    //   if (role == 2) {
+    //     roleName = 'Admin';
+    //   }
+    //   if (role == 3) {
+    //     roleName = 'Member';
+    //   }
 
-      const email_data = await fetchEmailData(action);
-      if (email_data.errorCode === 0) {
-        const target_user = UserData.email;
-        const { data: emailConfig } = email_data;
-        const to = email_data.data.To;
-        const subject = emailConfig.email_subject;
-        const heading = emailConfig.email_heading;
-        const content = emailConfig.email_content;
-        const headingData = heading
-          .replace('{{Target User Name}}', target_user)
-          .replace('{{Site Name}}', siteName)
-          .replace('{{Org Name}}', orgName)
-          .replace('{{Role Name}}', roleName);
-        const contentData = content
-          .replace('{{Target User Name}}', target_user)
-          .replace('{{Site Name}}', siteName)
-          .replace('{{Org Name}}', orgName)
-          .replace('{{User Name}}', userName)
-          .replace('{{Role Name}}', roleName);
+    //   const email_data = await fetchEmailData(action);
+    //   if (email_data.errorCode === 0) {
+    //     const target_user = UserData.email;
+    //     const { data: emailConfig } = email_data;
+    //     const to = email_data.data.To;
+    //     const subject = emailConfig.email_subject;
+    //     const heading = emailConfig.email_heading;
+    //     const content = emailConfig.email_content;
+    //     const headingData = heading
+    //       .replace('{{Target User Name}}', target_user)
+    //       .replace('{{Site Name}}', siteName)
+    //       .replace('{{Org Name}}', orgName)
+    //       .replace('{{Role Name}}', roleName);
+    //     const contentData = content
+    //       .replace('{{Target User Name}}', target_user)
+    //       .replace('{{Site Name}}', siteName)
+    //       .replace('{{Org Name}}', orgName)
+    //       .replace('{{User Name}}', userName)
+    //       .replace('{{Role Name}}', roleName);
 
-        await sendEmailFunction(
-          to,
-          subject,
-          headingData,
-          contentData,
-          UserData.token,
-        );
-      }
-    }
+    //     await sendEmailFunction(
+    //       to,
+    //       subject,
+    //       headingData,
+    //       contentData,
+    //       UserData.token,
+    //     );
+    //   }
+    // }
     return {
       errorCode: 0,
       message: 'User role updated successfully',

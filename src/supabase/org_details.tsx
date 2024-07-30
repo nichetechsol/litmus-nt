@@ -569,6 +569,216 @@ const insertDomains = async (orgId: any, domains: string[]) => {
 //     return { errorCode: 1, data: null };
 //   }
 // }
+async function confirmDeletion(data: {
+  orgId: any;
+  domainName: any;
+  name: any;
+  status: any;
+  type_id: any;
+}): Promise<Result<any>> {
+  try {
+    // Fetch domain ID by domain name
+    const { data: domainData, error: domainError } = await supabase
+      .from('domains')
+      .select('id')
+      .eq('name', data.domainName)
+      .single();
+
+    if (domainError || !domainData) {
+      return {
+        errorCode: 1,
+        message: 'Error fetching domain ID or domain does not exist.',
+        data: null,
+      };
+    }
+
+    const domainId = domainData.id;
+
+    // Check if the domain is the only one associated with the organization
+    const { data: orgDomains, error: orgDomainsError } = await supabase
+      .from('org_domains')
+      .select('domain_id')
+      .eq('org_id', data.orgId);
+
+    if (orgDomainsError) {
+      return {
+        errorCode: 1,
+        message: 'Error fetching organization domains.',
+        data: null,
+      };
+    }
+
+    if (orgDomains.length === 1 && orgDomains[0].domain_id === domainId) {
+      return {
+        errorCode: 1,
+        message:
+          'Cannot delete the last domain associated with the organization.',
+        data: null,
+      };
+    }
+
+    // Fetch organization details
+    const { data: orgDetails, error: fetchOrgError } = await supabase
+      .from('org_details')
+      .select('name,description')
+      .eq('id', data.orgId)
+      .single();
+
+    if (fetchOrgError || !orgDetails) {
+      return {
+        errorCode: 1,
+        message: 'Error fetching current organization details',
+        data: null,
+      };
+    }
+
+    const oldOrgName = orgDetails.name; // Store the old organization name
+    const oldDescription = orgDetails.description; // Store the old description
+
+    // Check if the new name already exists in the database
+    const { data: existingOrg, error: fetchError } = await supabase
+      .from('org_details')
+      .select('id')
+      .eq('name', data.name)
+      .neq('id', data.orgId);
+
+    if (fetchError) {
+      return {
+        errorCode: 1,
+        message: 'Error checking uniqueness of Organization name',
+        data: null,
+      };
+    }
+
+    if (existingOrg.length > 0) {
+      return {
+        errorCode: 1,
+        message:
+          'Organization name is already taken. Please choose a different name.',
+        data: null,
+      };
+    }
+
+    // Update organization details
+    const { data: updateData, error: updateError } = await supabase
+      .from('org_details')
+      .update({
+        name: data.name,
+        description: oldDescription,
+        type_id: data.type_id,
+        status: data.status,
+      })
+      .eq('id', data.orgId)
+      .select();
+
+    if (updateError) {
+      return {
+        errorCode: 1,
+        message: 'Error updating organization details',
+        data: null,
+      };
+    }
+
+    const domainInsertResults: any[] = [];
+    const domainIds: Record<string, any> = {}; // To keep track of domain IDs and avoid duplicate inserts
+
+    // Check and insert domains
+    await Promise.all(
+      [data.domainName].map(async (domain: string) => {
+        // Check if domain exists
+        const { data: existingDomain, error: checkError } = await supabase
+          .from('domains')
+          .select('id')
+          .eq('name', domain);
+
+        if (checkError) {
+          domainInsertResults.push({
+            success: false,
+            message: `Error checking domain '${domain}'`,
+            error: checkError,
+          });
+          return;
+        }
+
+        let domainId;
+
+        if (existingDomain.length > 0) {
+          domainId = existingDomain[0].id;
+        } else {
+          // Domain does not exist, insert new domain
+          const { data: insertDomain, error: domainError } = await supabase
+            .from('domains')
+            .insert({ name: domain })
+            .select();
+
+          if (domainError) {
+            domainInsertResults.push({
+              success: false,
+              message: `Error inserting domain '${domain}'`,
+              error: domainError,
+            });
+            return;
+          }
+
+          domainId = insertDomain[0].id;
+        }
+
+        domainIds[domain] = domainId;
+
+        // Check if the org_domain pair exists
+        const { data: orgDomainPair, error: orgDomainCheckError } =
+          await supabase
+            .from('org_domains')
+            .select('*')
+            .eq('org_id', data.orgId)
+            .eq('domain_id', domainId);
+
+        if (orgDomainCheckError) {
+          domainInsertResults.push({
+            success: false,
+            message: `Error checking org_domain for domain '${domain}'`,
+            error: orgDomainCheckError,
+          });
+          return;
+        }
+
+        if (orgDomainPair.length === 0) {
+          // Pair does not exist, insert it
+          const { data: insertOrgDomain, error: orgDomainInsertError } =
+            await supabase
+              .from('org_domains')
+              .insert([{ org_id: data.orgId, domain_id: domainId }])
+              .select();
+
+          if (orgDomainInsertError) {
+            domainInsertResults.push({
+              success: false,
+              message: `Error inserting org_domain for domain '${domain}'`,
+              error: orgDomainInsertError,
+            });
+            return;
+          }
+        }
+
+        domainInsertResults.push({ success: true, data: domainId });
+        return;
+      }),
+    );
+
+    return {
+      errorCode: 0,
+      message: 'Organization updated successfully.',
+      data: null,
+    };
+  } catch (error) {
+    // console.error(error);
+    return {
+      errorCode: 1,
+      message: 'An unexpected error occurred.',
+      data: null,
+    };
+  }
+}
 async function updateOrganization(data: {
   name: string;
   description: string;
@@ -595,6 +805,26 @@ async function updateOrganization(data: {
   } = data;
 
   try {
+    if (!data.org_id || !data.domain || !data.user_id) {
+      return {
+        errorCode: 1,
+        message: 'Invalid input: missing required fields',
+        data: null,
+      };
+    }
+
+    const userEmailDomain = userName.split('@')[1];
+    const domainName = domain;
+
+    // Check if the domain being deleted is the same as the user's email domain
+    if (userEmailDomain === domainName) {
+      return {
+        errorCode: 2,
+        message:
+          'Notify user wants to delete the domain associated with email?',
+        data: data,
+      };
+    }
     // Fetch current organization details
     const { data: orgDetails, error: fetchOrgError } = await supabase
       .from('org_details')
@@ -1217,6 +1447,7 @@ async function getUserRole(): Promise<Result<UserRole[]>> {
 export {
   addOrganization,
   associateUsersWithOrganization,
+  confirmDeletion,
   deleteDomains,
   deleteOrganization,
   fetchOrganizationAndSiteDetails,
