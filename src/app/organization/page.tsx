@@ -717,6 +717,7 @@ const Page = () => {
           try {
             await DomainSchema.validate(domain);
             newDomains.push(domain);
+            setDomainPlusbtnVisible(false);
           } catch (error) {
             if (error instanceof Error) {
               errorMessage += `${error.message} for domain ${domain}. `;
@@ -967,13 +968,14 @@ const Page = () => {
         html: true,
       } as any).then((value) => {
         document.body.classList.remove('no-scroll');
-        setLoading(true);
+
         const inputElem = document.getElementById(
           'delete-input',
         ) as HTMLInputElement;
         const userInput = inputElem?.value;
 
         if (userInput === 'DELETE' || userInput == org.org_name) {
+          setLoading(true);
           // Clear any existing error message
           const email = decryptData(localStorage.getItem('user_email'));
           const data = {
