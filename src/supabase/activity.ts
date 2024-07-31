@@ -28,8 +28,10 @@ interface GetSiteActivitiesParams {
 const valid_activity_types: string[] = [
   'create_org',
   'create_site',
-  'add_user',
-  'remove_user',
+  'add_user_org',
+  'add_user_site',
+  'remove_user_org',
+  'remove_user_site',
   'add_licence',
   'download_file',
   'update_site',

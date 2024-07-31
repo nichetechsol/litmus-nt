@@ -244,7 +244,7 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
                   site_id: UserData.site_id,
                   target_user_id: users[0].id,
                   target_user_role: UserData.role_id,
-                  activity_type: 'add_user',
+                  activity_type: 'add_user_site',
                 });
                 // Add email function here to send an invitation to the user
                 return { errorCode: 0, data: 'User added successfully' };
@@ -442,7 +442,7 @@ async function removeUserFromSites(
         site_id: site_id,
         user_id: user_id, // You might want to pass the admin's user_id who is performing the removal
         target_user_id: target_user_id,
-        activity_type: 'remove_user',
+        activity_type: 'remove_user_site',
       });
 
       return { errorCode: 0, data: 'Site user deleted successfully' };

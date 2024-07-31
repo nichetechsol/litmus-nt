@@ -233,7 +233,7 @@ async function addUserToOrganization(
               user_id: UserData.user_id,
               target_user_id: users[0].id,
               target_user_role: UserData.role_id,
-              activity_type: 'add_user',
+              activity_type: 'add_user_org',
             });
 
             // Add email function here to send an invitation to the user
@@ -379,7 +379,7 @@ async function removeUserFromOrganization(
         org_id: org_id,
         user_id: user_id, // You might want to pass the admin's user_id who is performing the removal
         target_user_id: id,
-        activity_type: 'remove_user',
+        activity_type: 'remove_user_org',
       });
 
       return { errorCode: 0, data: 'User deleted succesfully' };
