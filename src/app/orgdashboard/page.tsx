@@ -1487,6 +1487,10 @@ const OrgDashboard = () => {
                                         activity?.activity_type ===
                                           'edit_site_description' ||
                                         activity?.activity_type ===
+                                          'add_user_site' ||
+                                        activity?.activity_type ===
+                                          'remove_user_site' ||
+                                        activity?.activity_type ===
                                           'add_user_org' ||
                                         activity?.activity_type ===
                                           'remove_user_org') && (
@@ -1514,6 +1518,70 @@ const OrgDashboard = () => {
                                                               ?.email
                                                       } created a new org. named '${activity
                                                         ?.org_id?.name}'`
+                                                    : activity?.activity_type ===
+                                                      'add_user_site'
+                                                    ? `${
+                                                        activity.user_id
+                                                          .firstname &&
+                                                        activity.user_id
+                                                          .lastname
+                                                          ? activity.user_id
+                                                              .firstname +
+                                                            ' ' +
+                                                            activity.user_id
+                                                              .lastname
+                                                          : activity.user_id
+                                                              .email
+                                                      } added a new user named '${
+                                                        activity?.target_user_id
+                                                          ?.firstname &&
+                                                        activity?.target_user_id
+                                                          ?.lastname
+                                                          ? activity
+                                                              ?.target_user_id
+                                                              ?.firstname +
+                                                            ' ' +
+                                                            activity
+                                                              ?.target_user_id
+                                                              ?.lastname
+                                                          : activity
+                                                              ?.target_user_id
+                                                              ?.email
+                                                      }' within the site '${
+                                                        activity.site_id.name
+                                                      }'`
+                                                    : activity?.activity_type ===
+                                                      'remove_user_site'
+                                                    ? `${
+                                                        activity.user_id
+                                                          .firstname &&
+                                                        activity.user_id
+                                                          .lastname
+                                                          ? activity.user_id
+                                                              .firstname +
+                                                            ' ' +
+                                                            activity.user_id
+                                                              .lastname
+                                                          : activity.user_id
+                                                              .email
+                                                      } removed a user named '${
+                                                        activity?.target_user_id
+                                                          ?.firstname &&
+                                                        activity?.target_user_id
+                                                          ?.lastname
+                                                          ? activity
+                                                              .target_user_id
+                                                              .firstname +
+                                                            ' ' +
+                                                            activity
+                                                              ?.target_user_id
+                                                              ?.lastname
+                                                          : activity
+                                                              ?.target_user_id
+                                                              ?.email
+                                                      }' within the site '${
+                                                        activity.site_id.name
+                                                      }'`
                                                     : activity?.activity_type ===
                                                       'create_site'
                                                     ? `${
