@@ -981,6 +981,10 @@ const Page: React.FC = () => {
         }
       }
     }
+    const listItem = document.getElementById(`site-item-${focusedIndex}`);
+    if (listItem) {
+      listItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   };
   const handleSiteClick = (site: { id: number; name: string }) => {
     setLoading(true);
@@ -1369,6 +1373,7 @@ const Page: React.FC = () => {
                             {sidebarSite.map((site, index) => (
                               <li
                                 // style={{ cursor: 'pointer' }}
+                                id={`site-item-${index}`}
                                 style={{
                                   cursor: site.id == -1 ? '' : 'pointer',
                                   backgroundColor:

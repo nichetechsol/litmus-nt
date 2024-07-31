@@ -41,6 +41,7 @@ export default function Activitylogs() {
   const [loading, setLoading] = useState<boolean>(false);
   const [CamePage, setCamePage] = useState<any>();
   const [activity_log, setActivity_log] = useState<activitylogs[] | null>(null);
+
   const [Siteactivity_log, setSiteActivity_log] = useState<
     activitylogs[] | null
   >(null);
@@ -173,8 +174,8 @@ export default function Activitylogs() {
                 ? activity_log.map(
                     (activity, index) =>
                       (activity?.activity_type === 'create_org' ||
-                        activity?.activity_type === 'add_user' ||
-                        activity?.activity_type === 'remove_user' ||
+                        activity?.activity_type === 'add_user_org' ||
+                        activity?.activity_type === 'remove_user_org' ||
                         activity?.activity_type === 'create_site' ||
                         activity?.activity_type === 'download_file' ||
                         activity?.activity_type === 'update_org' ||
@@ -200,7 +201,7 @@ export default function Activitylogs() {
                                           : activity?.user_id?.email
                                       } created a new org. named '${activity
                                         ?.org_id?.name}'`
-                                    : activity?.activity_type === 'add_user'
+                                    : activity?.activity_type === 'add_user_org'
                                     ? `${
                                         activity?.user_id?.firstname &&
                                         activity?.user_id?.lastname
@@ -218,7 +219,8 @@ export default function Activitylogs() {
                                           : activity?.target_user_id?.email
                                       }' within the organization ${activity
                                         ?.org_id.name}`
-                                    : activity?.activity_type === 'remove_user'
+                                    : activity?.activity_type ===
+                                      'remove_user_org'
                                     ? `${
                                         activity?.user_id?.firstname &&
                                         activity?.user_id?.lastname
@@ -328,8 +330,8 @@ export default function Activitylogs() {
                 Siteactivity_log.map(
                   (activity, index) =>
                     (activity?.activity_type === 'create_site' ||
-                      activity?.activity_type === 'add_user' ||
-                      activity?.activity_type === 'remove_user' ||
+                      activity?.activity_type === 'add_user_site' ||
+                      activity?.activity_type === 'remove_user_site' ||
                       activity?.activity_type === 'add_licence' ||
                       activity?.activity_type === 'download_file' ||
                       activity?.activity_type === 'edit_site_name' ||
@@ -357,7 +359,7 @@ export default function Activitylogs() {
                                     } within the organization '${
                                       activity.org_id.name
                                     }'`
-                                  : activity?.activity_type === 'add_user'
+                                  : activity?.activity_type === 'add_user_site'
                                   ? `${
                                       activity.user_id.firstname &&
                                       activity.user_id.lastname
@@ -375,7 +377,8 @@ export default function Activitylogs() {
                                     }' within the site '${
                                       activity.site_id.name
                                     }'`
-                                  : activity?.activity_type === 'remove_user'
+                                  : activity?.activity_type ===
+                                    'remove_user_site'
                                   ? `${
                                       activity.user_id.firstname &&
                                       activity.user_id.lastname

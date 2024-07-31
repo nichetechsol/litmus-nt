@@ -20394,3 +20394,6 @@ overflow-y: auto;
 .tool-custom {
   left: -40px;
 }
+li.page-item.disabled a {
+  cursor: default;
+}

@@ -1880,9 +1880,10 @@ const Page = () => {
                                   (activity, index) =>
                                     (activity?.activity_type ===
                                       'create_site' ||
-                                      activity?.activity_type === 'add_user' ||
                                       activity?.activity_type ===
-                                        'remove_user' ||
+                                        'add_user_site' ||
+                                      activity?.activity_type ===
+                                        'remove_user_site' ||
                                       activity?.activity_type ===
                                         'add_licence' ||
                                       activity?.activity_type ===
@@ -1921,7 +1922,7 @@ const Page = () => {
                                                       .name} within the organization '${activity
                                                       ?.org_id.name}'`
                                                   : activity?.activity_type ===
-                                                    'add_user'
+                                                    'add_user_site'
                                                   ? `${
                                                       activity?.user_id
                                                         ?.firstname &&
@@ -1951,7 +1952,7 @@ const Page = () => {
                                                     }' within the site '${activity
                                                       ?.site_id.name}'`
                                                   : activity?.activity_type ===
-                                                    'remove_user'
+                                                    'remove_user_site'
                                                   ? `${
                                                       activity?.user_id
                                                         ?.firstname &&

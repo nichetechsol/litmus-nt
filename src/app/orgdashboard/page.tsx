@@ -156,7 +156,6 @@ const OrgDashboard = () => {
     null,
   );
   const [activity_log, setActivity_log] = useState<activitylogs[] | null>(null);
-
   const CountData = async () => {
     try {
       // setLoading(true);
@@ -1488,9 +1487,9 @@ const OrgDashboard = () => {
                                         activity?.activity_type ===
                                           'edit_site_description' ||
                                         activity?.activity_type ===
-                                          'add_user' ||
+                                          'add_user_org' ||
                                         activity?.activity_type ===
-                                          'remove_user') && (
+                                          'remove_user_org') && (
                                         <tr
                                           className='border hover:bg-gray-100 dark:hover:bg-light dark:border-defaultborder/10 border-defaultborder !border-x-0'
                                           key={index}
@@ -1534,7 +1533,7 @@ const OrgDashboard = () => {
                                                         ?.name} within the organization '${activity
                                                         ?.org_id?.name}'`
                                                     : activity?.activity_type ===
-                                                      'add_user'
+                                                      'add_user_org'
                                                     ? `${
                                                         activity?.user_id
                                                           ?.firstname &&
@@ -1565,7 +1564,7 @@ const OrgDashboard = () => {
                                                       }' within the organization ${activity
                                                         ?.org_id?.name}`
                                                     : activity?.activity_type ===
-                                                      'remove_user'
+                                                      'remove_user_org'
                                                     ? `${
                                                         activity?.user_id
                                                           ?.firstname &&

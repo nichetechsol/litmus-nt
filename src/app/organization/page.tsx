@@ -1183,6 +1183,10 @@ const Page = () => {
         }
       }
     }
+    const listItem = document.getElementById(`org-item-${focusedIndex}`);
+    if (listItem) {
+      listItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   };
   const handleOrgClick = (org: { id: number; name: string }) => {
     setLoading(true);
@@ -1558,6 +1562,7 @@ const Page = () => {
                           {sidebarOrgs &&
                             sidebarOrgs.data.map((org, index) => (
                               <li
+                                id={`org-item-${index}`}
                                 style={{
                                   cursor: org.id === -1 ? '' : 'pointer',
                                   backgroundColor:
