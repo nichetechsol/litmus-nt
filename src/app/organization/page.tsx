@@ -620,7 +620,7 @@ const Page = () => {
                   );
                   throw new Error(result.message);
                 } else {
-                  toast.success(result.message, { autoClose: 3000 });
+                  // toast.success(result.message, { autoClose: 3000 });
                   setDomainIdsToBeRemoved((prev) =>
                     prev.filter((domain) => domain.domainid !== id.domainid),
                   );
