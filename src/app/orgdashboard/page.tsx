@@ -1000,6 +1000,7 @@ const OrgDashboard = () => {
                                       </label>
                                       <input
                                         type='text'
+                                        autoComplete='none'
                                         className={`form-control w-full ${
                                           email ? '' : 'input-error'
                                         } ${emailError ? 'input-error' : ''} `}
@@ -1016,7 +1017,6 @@ const OrgDashboard = () => {
                                         onKeyDown={handleKeyPress}
                                         maxLength={320}
                                         value={email}
-                                        autoComplete='off'
                                       />
                                       {isFocusedOnEmail &&
                                         DataTOAutoFill &&

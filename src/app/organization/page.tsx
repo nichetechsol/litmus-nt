@@ -22,6 +22,7 @@ import {
 import Seo from '@/shared/layout-components/seo/seo';
 import {
   addOrganization,
+  confirmDeletion,
   deleteDomains,
   fetchOrganizationAndSiteDetails,
   fetchOrganizationTypes,
@@ -765,47 +766,115 @@ const Page = () => {
   //     // }
   // };
 
+  // const removeDomain = async (index: number, domain: any) => {
+  //   const id: any =
+  //     allDomain && allDomain.find((i: any) => i.domainname == domain);
+
+  //   const newdom = domains.filter((i, idx) => idx != index);
+
+  //   if (changeFlage === false && id?.domainid && newdom.length >= 1) {
+  //     // const data = {
+  //     //   org_id: orgidForupdatetion,
+  //     //   domain_id: id.domainid,
+  //     //   user_id: user_id,
+  //     //   name: organizationName,
+  //     //   userName: email,
+  //     // };
+  //     setDomainIdsToBeRemoved([...domainIdsToBeRemoved, id]);
+  //     // const result = await deleteDomains(data);
+  //     // if (result.errorCode === 0) {
+
+  //     setDomains(newdom);
+  //     if (newdom.length == 0) {
+  //       setLoading(false);
+  //       setDomainError('Domain is required. Please enter a domain.');
+  //       // setDomains(newdom);
+  //     } else {
+  //       setLoading(false);
+  //       setDomainError('');
+  //     }
+  //     // } else {
+  //     //   setLoading(false);
+  //     //   toast.error(result.message, { autoClose: 3000 });
+  //     // }
+  //   } else {
+  //     if (newdom.length == 0) {
+  //       setLoading(false);
+  //       setDomainError("Atleast one domain is required.You can't delete it.");
+  //       // toast.error('Atleast one domain must be entered.', { autoClose: 3000 });
+  //       setDomains(newdom);
+  //     } else {
+  //       setLoading(false);
+  //       setDomainError('');
+  //       setDomains(newdom);
+  //     }
+  //   }
+  // };
+
   const removeDomain = async (index: number, domain: any) => {
     const id: any =
       allDomain && allDomain.find((i: any) => i.domainname == domain);
-
     const newdom = domains.filter((i, idx) => idx != index);
 
     if (changeFlage === false && id?.domainid && newdom.length >= 1) {
-      // const data = {
-      //   org_id: orgidForupdatetion,
-      //   domain_id: id.domainid,
-      //   user_id: user_id,
-      //   name: organizationName,
-      //   userName: email,
-      // };
-      setDomainIdsToBeRemoved([...domainIdsToBeRemoved, id]);
-      // const result = await deleteDomains(data);
-      // if (result.errorCode === 0) {
+      const data = {
+        user_id: user_id,
+        domainName: domain,
+      };
+      const result = await confirmDeletion(data);
 
+      if (result.errorCode === 0) {
+        swal({
+          title: 'Are you sure?',
+          text: 'You are about to remove the domain which is the same as your own email domain. This might prevent your colleagues to automatically join this Organization. Do you want to delete this domain?',
+          icon: 'warning',
+          buttons: {
+            cancel: {
+              text: 'Cancel',
+              value: false,
+              visible: true,
+              className: '',
+              closeModal: true,
+            },
+            confirm: {
+              text: 'Delete',
+              value: true,
+              visible: true,
+              className: '',
+              closeModal: true,
+            },
+          },
+        }).then(async (willProceed) => {
+          if (willProceed) {
+            setDomainIdsToBeRemoved([...domainIdsToBeRemoved, id]);
+            setDomains(newdom);
+            if (newdom.length == 0) {
+              setLoading(false);
+              setDomainError('Domain is required. Please enter a domain.');
+            } else {
+              setLoading(false);
+              setDomainError('');
+            }
+          }
+        });
+      } else {
+        setDomains(newdom);
+        if (newdom.length == 0) {
+          setLoading(false);
+          setDomainError('Domain is required. Please enter a domain.');
+        } else {
+          setLoading(false);
+          setDomainError('');
+        }
+      }
+    } else {
       setDomains(newdom);
       if (newdom.length == 0) {
         setLoading(false);
-        setDomainError('Domain is required. Please enter a domain.');
-        // setDomains(newdom);
+        setDomainError("At least one domain is required. You can't delete it.");
       } else {
         setLoading(false);
         setDomainError('');
-      }
-      // } else {
-      //   setLoading(false);
-      //   toast.error(result.message, { autoClose: 3000 });
-      // }
-    } else {
-      if (newdom.length == 0) {
-        setLoading(false);
-        setDomainError("Atleast one domain is required.You can't delete it.");
-        // toast.error('Atleast one domain must be entered.', { autoClose: 3000 });
-        setDomains(newdom);
-      } else {
-        setLoading(false);
-        setDomainError('');
-        setDomains(newdom);
       }
     }
   };
