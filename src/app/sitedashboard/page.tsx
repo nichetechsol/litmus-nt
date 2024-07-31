@@ -991,7 +991,7 @@ const Page = () => {
                         <div className='box text-default shadow border dark:border-defaulttextcolor/10'>
                           <div className='box-body !p-0'>
                             <div className='sm:grid grid-cols-12'>
-                              <div className='xl:col-span-4 xxl:col-span-4 lg:col-span-4 md:col-span-12 col-span-4 about-company-stats-border'>
+                              <div className='xl:col-span-4 xxl:col-span-4 lg:col-span-4 md:col-span-12 col-span-12 about-company-stats-border'>
                                 <div className='text-center owner-details p-6 w-full h-full flex justify-center'>
                                   <span className='font-semibold me-2 text-[.875rem]'>
                                     Owner:
@@ -1002,7 +1002,7 @@ const Page = () => {
                                   </p>
                                 </div>
                               </div>
-                              <div className='xl:col-span-4 xxl:col-span-4 lg:col-span-4 md:col-span-12 col-span-4 about-company-stats-border'>
+                              <div className='xl:col-span-4 xxl:col-span-4 lg:col-span-4 md:col-span-12 col-span-12 about-company-stats-border'>
                                 <div className='text-center owner-details p-6 w-full h-full flex justify-center'>
                                   <span className='font-semibold me-2 text-[.875rem]'>
                                     Organization Name:
@@ -1013,7 +1013,7 @@ const Page = () => {
                                   </p>
                                 </div>
                               </div>
-                              <div className='xl:col-span-4 xxl:col-span-4 lg:col-span-4 md:col-span-12 col-span-4'>
+                              <div className='xl:col-span-4 xxl:col-span-4 lg:col-span-4 md:col-span-12 col-span-12'>
                                 <div className='text-center owner-details p-6 w-full h-full flex justify-center'>
                                   <span className='font-semibold text-[.875rem] me-2'>
                                     {siteCountData &&
@@ -1395,7 +1395,7 @@ const Page = () => {
                 </div>
                 <div className='xxl:col-span-12 xl:col-span-12 col-span-12'>
                   <div className='box custom-card'>
-                    <div className='box-header justify-between'>
+                    <div className='box-header b-activity justify-between'>
                       <div className='box-title'>User Management</div>
                       <div className='flex  gap-2'>
                         <div>
@@ -1840,7 +1840,7 @@ const Page = () => {
                 {activity_log && activity_log.length > 0 && (
                   <div className='xxl:col-span-12 xl:col-span-12 col-span-12'>
                     <div className='box'>
-                      <div className='box-header flex justify-between'>
+                      <div className='box-header flex b-activity justify-between'>
                         <div className='box-title'>
                           Activity Logs
                           <span className='text-gray-600'>

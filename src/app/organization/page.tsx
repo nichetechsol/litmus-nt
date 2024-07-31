@@ -1609,12 +1609,12 @@ const Page = () => {
                                       <i className='ri-building-fill text-black'>dd</i>
                                     </h4> */}
                                   </div>
-                                  <div>
+                                  <div className='orgn-details'>
                                     <div className='relative group'>
                                       <h6 className='mb-1 font-semibold p-new  text-[1rem] text-site-name'>
                                         {org?.org_name}
                                       </h6>
-                                      <div className='absolute hidden group-hover:block bg-gray-400 text-black text-xs rounded p-2 z-10 bottom-full mb-2 w-max max-w-xs break-words'>
+                                      <div className='absolute hidden tool-custom group-hover:block bg-gray-400 text-black text-xs rounded p-2 z-10 bottom-full mb-2 w-max max-w-xs break-words'>
                                         {org?.org_name}
                                       </div>
                                     </div>

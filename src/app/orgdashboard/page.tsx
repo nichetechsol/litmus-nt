@@ -923,9 +923,9 @@ const OrgDashboard = () => {
 
                 <div className='xxl:col-span-12 xl:col-span-12 col-span-12'>
                   <div className='box custom-card '>
-                    <div className='box-header justify-between'>
+                    <div className='box-header b-activity flex-middle justify-between'>
                       <div className='box-title'>User Management</div>
-                      <div className='flex  gap-2'>
+                      <div className='flex b-activity  gap-2'>
                         <div>
                           <input
                             className='ti-form-control form-control-sm search-ti  top-margin-1'
@@ -951,7 +951,7 @@ const OrgDashboard = () => {
                               ref={closeModalButtonRef}
                             >
                               <div
-                                className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0 top-margin-1'
+                                className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn  ti-btn-w-sm bg-primary  text-white !font-medium w-full !mb-0 top-margin-1'
                                 data-hs-overlay='#todo-compose'
                               >
                                 <i className='ri-add-circle-line !text-[1rem]'></i>
@@ -1411,7 +1411,7 @@ const OrgDashboard = () => {
                 {activity_log && activity_log.length > 0 && (
                   <div className='xxl:col-span-12 xl:col-span-12 col-span-12'>
                     <div className='box overflow-hidden'>
-                      <div className='box-header flex justify-between'>
+                      <div className='box-header   b-activity flex justify-between'>
                         <div className='box-title'>
                           Activity Logs
                           <span className='text-gray-600'>
@@ -1446,7 +1446,7 @@ const OrgDashboard = () => {
                                 // window.location.href = '/activitylogs';
                                 navigate.push('/activitylogs');
                               }}
-                              className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
+                              className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn rght-btn ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
                             >
                               {/* <i className='ri-add-circle-line !text-[1rem]'></i> */}
                               View All

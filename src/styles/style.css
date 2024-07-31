@@ -405,7 +405,18 @@ html {
 
 /* End::Header theme-mode icon style */
 /* Start::Header fullscreen responsive */
+@media (max-width: 991.98px) {
+  .app-header .horizontal-logo .header-logo img {
+    @apply h-8 leading-8;
+    width: 100% !important;
+  }
+}
 @media (max-width: 767.98px) {
+  .app-header .horizontal-logo .header-logo img {
+    height: 2rem;
+    line-height: 2rem;
+    width: 2rem !important;
+  }
   .h-90 {
     height: 100% !important;
   }
@@ -553,12 +564,7 @@ html {
     @apply py-4;
   }
 }
-@media (max-width: 991.98px) {
-  .app-header .horizontal-logo .header-logo img {
-    @apply h-8 leading-8;
-    width: 100% !important;
-  }
-}
+
 .main-index footer {
   @apply ps-0;
 }
@@ -2423,9 +2429,9 @@ html {
     width: 130px;
     @apply h-[1.9rem];
   }
-  .top-margin-1 {
+  /* .top-margin-1 {
     margin-top: 10px;
-  }
+  } */
   [data-nav-layout='horizontal']
     .landing-body
     .landing-banner
@@ -4649,9 +4655,9 @@ label {
 [data-toggled='open'] .app-sidebar .main-sidebar-header {
   @apply hidden;
 }
-[data-toggled='open'] .app-sidebar #sidebar-scroll {
+/* [data-toggled='open'] .app-sidebar #sidebar-scroll {
   @apply mt-0;
-}
+} */
 
 [data-toggled='close'] .app-sidebar {
   @apply transition-all duration-300 -translate-x-full;
@@ -4660,9 +4666,9 @@ label {
 [data-toggled='close'] .app-sidebar .main-sidebar-header {
   @apply hidden;
 }
-[data-toggled='close'] .app-sidebar #sidebar-scroll {
+/* [data-toggled='close'] .app-sidebar #sidebar-scroll {
   @apply mt-0;
-}
+} */
 [data-toggled='close'][dir='ltr'] .app-sidebar {
   @apply -translate-x-full;
 }
@@ -4674,9 +4680,9 @@ label {
   .main-sidebar-header {
     @apply hidden;
   }
-  #sidebar-scroll {
+  /* #sidebar-scroll {
     @apply mt-0;
-  }
+  } */
 }
 /* End Responsive Styles */
 /* Responsive Styles Start */
@@ -4694,9 +4700,9 @@ label {
   .main-sidebar-header {
     @apply hidden;
   }
-  .main-sidebar {
+  /* .main-sidebar {
     @apply mt-0;
-  }
+  } */
   .app-sidebar {
     @apply top-0;
   }
@@ -13618,6 +13624,9 @@ button.gridjs-sort {
   }
 }
 @media (max-width: 767.98px) {
+  .b-activity {
+    justify-content: end !important;
+  }
   .fc .fc-toolbar {
     @apply block;
   }
@@ -15847,6 +15856,7 @@ select:focus {
 .form-control:disabled,
 .form-select:disabled {
   @apply bg-light text-defaulttextcolor;
+  cursor: default !important;
 }
 
 .form-control-plaintext {
@@ -20089,8 +20099,12 @@ h6 {
   @apply flex justify-between;
   flex-direction: column;
 }
+.authentication-signup {
+  min-height: inherit;
+}
 .over-text {
   overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .text-site-name {
@@ -20098,10 +20112,8 @@ h6 {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  word-break: break-all;
 }
 .p-new {
-  word-break: break-all;
   overflow-wrap: break-word;
 }
 .new-modal-open {
@@ -20357,7 +20369,6 @@ body.no-scroll-no {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   padding-left: 0.85rem;
-  padding-right: 0.85rem;
   font-size: 0.875rem;
   font-weight: 400;
   line-height: 1.6;
@@ -20371,3 +20382,15 @@ body.no-scroll-no {
 height: 250px;
 overflow-y: auto;
 } */
+@media (min-width: 700px) {
+  .flex-middle {
+    display: flex;
+  }
+}
+
+.orgn-details {
+  width: 80%;
+}
+.tool-custom {
+  left: -40px;
+}

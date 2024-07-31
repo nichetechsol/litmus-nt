@@ -15,7 +15,7 @@ const LoginForm = () => {
         <div className='bg-theme'>
           <div className='authentication authentication-basic signin-new'>
             <div className='container'>
-              <div className='flex justify-center   items-center h-90 text-defaultsize text-defaulttextcolor'>
+              <div className='flex justify-center   items-center text-defaultsize text-defaulttextcolor'>
                 <div className='login-div'>
                   <div className='xxl:col-span-4 xl:col-span-4 lg:col-span-4 md:col-span-6 sm:col-span-8 col-span-12'>
                     <div className='my-[2.5rem] flex justify-center'>
@@ -65,6 +65,10 @@ const LoginForm = () => {
                         <p className='h5 font-semibold mb-2 text-center'>
                           Add Details
                         </p>
+                        <p className=' font-semibold mb-2 text-center'>
+                          We Just Need a Little More Information to set up your
+                          account
+                        </p>
 
                         {/* <p className="mb-4 text-[#8c9097] dark:text-white/50 opacity-[0.7] font-normal text-center">Welcome back Jhon !</p> */}
                         <div className='grid grid-cols-12 gap-y-4'>
@@ -110,7 +114,8 @@ const LoginForm = () => {
                                 maxLength={16}
                                 className='form-control form-control-lg !rounded-s-md'
                                 id='signin-password'
-                                placeholder='Password'
+                                placeholder='Re-enter Password *
+'
                               />
                               <button
                                 aria-label='button'
@@ -136,7 +141,7 @@ const LoginForm = () => {
                               name='email'
                               className='form-control form-control-lg w-full !rounded-md'
                               id='email'
-                              placeholder='Email'
+                              placeholder='Given Name'
                             />
 
                             {/* <input type="text" name="email" className="form-control form-control-lg w-full !rounded-md" id="email" onChange={changeHandler} value={email}/> */}
@@ -154,7 +159,7 @@ const LoginForm = () => {
                               name='email'
                               className='form-control form-control-lg w-full !rounded-md'
                               id='email'
-                              placeholder='Email'
+                              placeholder='Surname'
                             />
                           </div>
 
@@ -179,6 +184,67 @@ const LoginForm = () => {
                               htmlFor='signin-email'
                               className='form-label text-default'
                             >
+                              I am Litmus
+                              <span className='text-danger'>&nbsp;*</span>
+                            </label>
+                            <div className='mb-2'>
+                              <div className='form-check'>
+                                <input
+                                  className='form-check-input'
+                                  type='radio'
+                                  name='flexRadioDefault'
+                                  id='flexRadioDefault1'
+                                />
+                                <label
+                                  className='form-check-label'
+                                  htmlFor='flexRadioDefault1'
+                                >
+                                  End User
+                                </label>
+                              </div>
+                            </div>
+
+                            <div className='mb-2'>
+                              <div className='form-check '>
+                                <input
+                                  className='form-check-input'
+                                  type='radio'
+                                  name='flexRadioDefault'
+                                  id='flexRadioDefault2'
+                                  defaultChecked
+                                />
+                                <label
+                                  className='form-check-label'
+                                  htmlFor='flexRadioDefault2'
+                                >
+                                  OEM
+                                </label>
+                              </div>
+                            </div>
+
+                            <div className='mb-2'>
+                              <div className='form-check '>
+                                <input
+                                  className='form-check-input'
+                                  type='radio'
+                                  name='flexRadioDefault'
+                                  id='flexRadioDefault3'
+                                  defaultChecked
+                                />
+                                <label
+                                  className='form-check-label'
+                                  htmlFor='flexRadioDefault3'
+                                >
+                                  Partner
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                          <div className='xl:col-span-12 col-span-12'>
+                            <label
+                              htmlFor='signin-email'
+                              className='form-label text-default'
+                            >
                               Organization Name
                               <span className='text-danger'>&nbsp;*</span>
                             </label>
@@ -187,7 +253,8 @@ const LoginForm = () => {
                               name='email'
                               className='form-control form-control-lg w-full !rounded-md'
                               id='email'
-                              placeholder='Email'
+                              placeholder='Organization Name
+'
                             />
                           </div>
                           <div className='xl:col-span-12 col-span-12'>
@@ -203,7 +270,7 @@ const LoginForm = () => {
                               name='email'
                               className='form-control form-control-lg w-full !rounded-md'
                               id='email'
-                              placeholder='Email'
+                              placeholder='Site Name'
                             />
                           </div>
 
@@ -219,7 +286,7 @@ const LoginForm = () => {
                               name='email'
                               className='form-control form-control-lg w-full !rounded-md'
                               id='email'
-                              placeholder='Email'
+                              placeholder='City'
                             />
                           </div>
 
@@ -236,7 +303,8 @@ const LoginForm = () => {
                               name='email'
                               className='form-control form-control-lg w-full !rounded-md'
                               id='email'
-                              placeholder='Email'
+                              placeholder='Postal Code
+'
                             />
                           </div>
 
@@ -253,7 +321,8 @@ const LoginForm = () => {
                               name='email'
                               className='form-control form-control-lg w-full !rounded-md'
                               id='email'
-                              placeholder='Email'
+                              placeholder='Country/Region
+'
                             />
                           </div>
 
@@ -270,13 +339,14 @@ const LoginForm = () => {
                               name='email'
                               className='form-control form-control-lg w-full !rounded-md'
                               id='email'
-                              placeholder='Email'
+                              placeholder='State/Province
+'
                             />
                           </div>
 
                           <div className='xl:col-span-12 col-span-12 grid mt-2'>
                             <button className='ti-btn ti-btn-primary !bg-primary !text-white !font-medium'>
-                              Sign In
+                              Sign Up
                             </button>
                             {/* <Link onClick={(e)=>{handleSubmit(e)}} href="#!" className="ti-btn ti-btn-primary !bg-primary !text-white !font-medium">Sign In</Link> */}
                           </div>
