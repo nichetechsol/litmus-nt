@@ -1090,29 +1090,29 @@ async function deleteDomains(data: any): Promise<Result<any>> {
     // }
 
     // Check if the domain is associated with any other organization
-    const { data: domainAssociations, error: checkOtherOrgsError } =
-      await supabase
-        .from('org_domains')
-        .select('org_id')
-        .eq('domain_id', data.domain_id)
-        .neq('org_id', data.org_id);
+    // const { data: domainAssociations, error: checkOtherOrgsError } =
+    //   await supabase
+    //     .from('org_domains')
+    //     .select('org_id')
+    //     .eq('domain_id', data.domain_id)
+    //     .neq('org_id', data.org_id);
 
-    if (checkOtherOrgsError) {
-      return {
-        errorCode: 1,
-        message: 'Error checking domain associations',
-        data: null,
-      };
-    }
+    // if (checkOtherOrgsError) {
+    //   return {
+    //     errorCode: 1,
+    //     message: 'Error checking domain associations',
+    //     data: null,
+    //   };
+    // }
 
     // If the domain is associated with other organizations, do not delete
-    if (domainAssociations && domainAssociations.length > 0) {
-      return {
-        errorCode: 1,
-        message: 'Cannot delete domain associated with other organizations',
-        data: null,
-      };
-    }
+    // if (domainAssociations && domainAssociations.length > 0) {
+    //   return {
+    //     errorCode: 1,
+    //     message: 'Cannot delete domain associated with other organizations',
+    //     data: null,
+    //   };
+    // }
 
     // Delete the domain from org_domains table for the specified organization
     const { error: deleteOrgDomainError } = await supabase
