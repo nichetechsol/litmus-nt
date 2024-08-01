@@ -20,6 +20,7 @@ import {
   TypeDropdownSchema,
 } from '@/helper/ValidationHelper';
 import Seo from '@/shared/layout-components/seo/seo';
+import { checkLicensePlan } from '@/supabase/auth';
 import {
   addOrganization,
   confirmDeletion,
@@ -128,13 +129,13 @@ const Page = () => {
     const encryptedUserId = localStorage.getItem('user_id');
     const encryptedUserRole = localStorage.getItem('user_role');
     const encryptedemail = localStorage.getItem('user_email');
-    const encryptedaddorg = localStorage.getItem('add_orgUser');
+    // const encryptedaddorg = localStorage.getItem('add_orgUser');
     const encryptedorgexist = localStorage.getItem('org_exists');
 
     const decryptedUserId = decryptData(encryptedUserId);
     const decryptedUserRole = decryptData(encryptedUserRole);
     const decryptemail = decryptData(encryptedemail);
-    const decryptaddorg = decryptData(encryptedaddorg);
+    // const decryptaddorg = decryptData(encryptedaddorg);
     const decryptorgexist = decryptData(encryptedorgexist);
 
     if (decryptedUserId) {
@@ -146,9 +147,9 @@ const Page = () => {
     if (decryptedUserRole) {
       setUserrole(decryptedUserRole);
     }
-    if (decryptaddorg) {
-      setadd_orgUser(decryptaddorg);
-    }
+    // if (decryptaddorg) {
+    //   setadd_orgUser(decryptaddorg);
+    // }
     if (decryptorgexist) {
       setorg_exists(decryptorgexist);
     }
@@ -424,7 +425,30 @@ const Page = () => {
 
     fetchData();
   }, []);
+  const AddOrgButton = async () => {
+    try {
+      setLoading(true);
+      if (user_id) {
+        const data = await checkLicensePlan(user_id);
 
+        if (data.errorCode === 0) {
+          if (data.add_orgUser === true) {
+            setadd_orgUser('true');
+          } else {
+            setadd_orgUser('false');
+          }
+        } else {
+          toast.error('Error fetching details...', { autoClose: 3000 });
+        }
+      }
+      setLoading(false);
+    } catch (error: any) {
+      toast.error('Error Fetching Type..', { autoClose: 3000 });
+    }
+  };
+  useEffect(() => {
+    AddOrgButton();
+  }, [user_id]);
   const validateForm = async () => {
     try {
       await validationSchema.validate(
@@ -574,6 +598,7 @@ const Page = () => {
             setMessageError('');
             fetchData();
             fetchData1();
+            AddOrgButton();
             setDomainError('');
             closeModal();
           } catch (error) {

@@ -189,27 +189,16 @@ async function handleDomainUserAssignment(
     }
   }
 }
-async function checkLicensePlan(
-  userId: number,
-): Promise<CheckLicensePlanResult> {
+async function checkLicensePlan(userId: any): Promise<CheckLicensePlanResult> {
   try {
-    // Fetch org_users and general_settings data in parallel
-    const [orgUsersResponse, settingsResponse] = await Promise.all([
-      supabase.from('org_users').select('*').eq('user_id', userId),
-
-      supabase
-        .from('general_settings')
-        .select('value_text')
-        .eq('setting_name', 'license_plan_allowed_to_create_organization')
-        .single(), // We expect only one setting row
-    ]);
-
-    const orgUsersData: any = orgUsersResponse.data;
-    const orgUsersError = orgUsersResponse.error;
-    const settingsData = settingsResponse.data;
-    const settingsError = settingsResponse.error;
-
-    // Error handling for org_users query
+    const { data: orgUsersData, error: orgUsersError } = await supabase
+      .from('org_users')
+      .select('*')
+      .eq('user_id', userId);
+    const { data: settingsData, error: settingsError } = await supabase
+      .from('general_settings')
+      .select('*')
+      .eq('setting_name', 'license_plan_allowed_to_create_organization');
     if (orgUsersError) {
       return {
         errorCode: 1,
@@ -218,53 +207,54 @@ async function checkLicensePlan(
       };
     }
 
-    // Error handling for settings query
-    if (settingsError || !settingsData) {
-      return {
-        errorCode: 1,
-        org_exists: false,
-        add_orgUser: false,
-      };
-    }
-
-    const allowedLicensePlans: string[] = settingsData.value_text;
     let add_orgUser = false;
     let org_exists = false;
-
-    // Check if user exists and has role_id 1
     if (orgUsersData.length > 0) {
       org_exists = true;
+      for (const orgUser of orgUsersData) {
+        if (orgUser.role_id === 1) {
+          // add_orgUser = true;
+          // Fetch data from `entitlements_package` table based on `org_id`
+          const { data: entitlementsData, error: entitlementsError } =
+            await supabase
+              .from('entitlements_package')
+              .select(`*,entitlement_value_id(value_text)`)
+              .eq('org_id', orgUser.org_id)
+              .eq('entitlement_name_id', 14);
 
-      const orgUser = orgUsersData.find((user: any) => user.role_id === 1);
-      if (orgUser) {
-        // Fetch entitlements data for this org_id
-        const { data: entitlementsData, error: entitlementsError } =
-          await supabase
-            .from('entitlements_package')
-            .select(`*,entitlement_value_id(value_text)`)
-            .eq('org_id', orgUser.org_id)
-            .eq('entitlement_name_id', 14);
+          // if (entitlementsError) {
+          //   return {
+          //     errorCode: 1,
+          //     org_exists: false,
+          //     add_orgUser: false,
+          //   };
+          // }
 
-        if (entitlementsError) {
-          return {
-            errorCode: 1,
-            org_exists: true,
-            add_orgUser: false,
-          };
-        }
+          // Check if any entitlement value exists
+          if (entitlementsData) {
+            let entitlement_value_text;
 
-        // Check if any entitlement value exists and if it is in the allowedLicensePlans
-        if (entitlementsData.length > 0) {
-          const entitlement_value_text =
-            entitlementsData[0].entitlement_value_id.value_text;
-          add_orgUser = allowedLicensePlans.includes(entitlement_value_text);
+            if (entitlementsData.length > 0) {
+              entitlement_value_text =
+                entitlementsData[0].entitlement_value_id.value_text;
+            }
+
+            if (settingsData) {
+              const allowedLicensePlans: any[] = settingsData[0].value_text;
+              const add_orgUser_true = allowedLicensePlans.includes(
+                entitlement_value_text,
+              );
+              if (add_orgUser_true === true) {
+                add_orgUser = true;
+              }
+            }
+          }
         }
       }
     } else {
       add_orgUser = true;
       org_exists = false;
     }
-
     return {
       errorCode: 0,
       org_exists: org_exists,
