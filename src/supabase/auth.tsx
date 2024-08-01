@@ -192,6 +192,7 @@ async function AsureAuth(provider: AuthProvider): Promise<void> {
       provider,
       options: {
         scopes: 'email',
+        redirectTo: 'https://xhfsouemrdscsfejrwmx.supabase.co/auth/v1/callback',
       },
     });
   } catch (error) {
