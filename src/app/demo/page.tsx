@@ -2,7 +2,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 
-import { fetchProductData } from '@/supabase/products';
+import { checkLicensePlan } from '@/supabase/auth';
 
 const OrgDashboard = () => {
   const [result, setResult] = useState(null);
@@ -21,12 +21,15 @@ const OrgDashboard = () => {
         //   lastname: 'Roka',
         // };
 
-        const data1: any = {
-          org_id: 175,
-          org_type_id: 1,
-        };
+        // const data1: any = {
+        //   // org_id: 175,
+        //   // org_type_id: 1,
+        //   user_id: 92,
 
-        const data: any = await fetchProductData(data1);
+        // };
+
+        // const data: any = await fetchProductData(data1);
+        const data: any = await checkLicensePlan(92);
 
         // const { data, error } = await supabase
         //   .from('site_users')
