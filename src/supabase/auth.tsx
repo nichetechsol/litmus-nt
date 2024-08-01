@@ -192,6 +192,7 @@ async function AsureAuth(provider: AuthProvider): Promise<void> {
       provider,
       options: {
         scopes: 'email',
+        redirectTo: `https://litmus-nt-git-azure-nichetechabhays-projects.vercel.app/auth/callback`,
       },
     });
   } catch (error) {
