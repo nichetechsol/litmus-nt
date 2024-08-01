@@ -8,9 +8,12 @@ async function sendEmailFunction(
 ) {
   const url =
     'https://emsjiuztcinhapaurcrl.supabase.co/functions/v1/send-email';
+  const emailArray = to
+    .split(',')
+    .map((email) => email.trim().replace(/"/g, ''));
 
   const body = {
-    to: to,
+    to: emailArray,
     subject: subject,
     heading: heading,
     content: content,
