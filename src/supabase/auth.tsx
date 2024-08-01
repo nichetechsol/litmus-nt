@@ -190,6 +190,10 @@ async function AsureAuth(provider: AuthProvider): Promise<void> {
   try {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
+      options: {
+        redirectTo:
+          'https://litmus-nt-git-azure-nichetechabhays-projects.vercel.app/auth/callback',
+      },
     });
   } catch (error) {
     const data = true;

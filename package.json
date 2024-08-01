@@ -20,7 +20,7 @@
   "dependencies": {
     "@headlessui/react": "^2.1.2",
     "@reduxjs/toolkit": "^2.2.5",
-    "@supabase/supabase-js": "^2.43.4",
+    "@supabase/supabase-js": "^2.45.0",
     "@types/moment": "^2.13.0",
     "@types/react": "^18.3.3",
     "@types/yup": "^0.32.0",
