@@ -18,7 +18,7 @@ import * as Yup from 'yup';
 
 import { emailSchemaSign, passwordSchema } from '@/helper/ValidationHelper';
 import Footer from '@/shared/layout-components/footer/footer';
-import { Login } from '@/supabase/auth';
+import { AsureAuth, Login } from '@/supabase/auth';
 import Loader from '@/utils/Loader/Loader';
 
 import { basePath } from '../../next.config';
@@ -38,6 +38,10 @@ const LoginForm = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useRouter();
   // const [tokenVerify, setTokenVerify] = useState(true);
+
+  const handleLogin = async () => {
+    await AsureAuth('azure');
+  };
   const ENCRYPTION_KEY = 'pass123';
   const encryptData = (data: string | number | null | undefined): string => {
     if (!data && data !== 0) {
@@ -417,6 +421,9 @@ const LoginForm = () => {
                               onClick={handleSubmit}
                             >
                               Sign In
+                            </button>
+                            <button onClick={handleLogin}>
+                              Login with Azure
                             </button>
                             {/* <Link onClick={(e)=>{handleSubmit(e)}} href="#!" className="ti-btn ti-btn-primary !bg-primary !text-white !font-medium">Sign In</Link> */}
                           </div>
