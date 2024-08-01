@@ -1349,7 +1349,10 @@ const Page: React.FC = () => {
                         <input
                           type='text'
                           value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
+                          onChange={(e) => {
+                            setSearchTerm(e.target.value);
+                            setFocusedIndex(-1);
+                          }}
                           className='form-control w-full !rounded-md !bg-light border-0 !rounded-e-none'
                           placeholder='Search Site Here'
                           aria-describedby='button-addon2'
