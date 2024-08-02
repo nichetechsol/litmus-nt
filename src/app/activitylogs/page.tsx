@@ -174,23 +174,29 @@ export default function Activitylogs() {
                 ? activity_log.map(
                     (activity, index) =>
                       (activity?.activity_type === 'create_org' ||
-                        activity?.activity_type === 'add_user_org' ||
-                        activity?.activity_type === 'remove_user_org' ||
                         activity?.activity_type === 'create_site' ||
                         activity?.activity_type === 'download_file' ||
                         activity?.activity_type === 'update_org' ||
                         activity?.activity_type === 'remove_domain' ||
                         activity?.activity_type === 'add_domain' ||
-                        activity?.activity_type === 'edit_org_description') && (
+                        activity?.activity_type === 'edit_org_description' ||
+                        activity?.activity_type === 'add_licence' ||
+                        activity?.activity_type === 'edit_site_name' ||
+                        activity?.activity_type === 'update_site' ||
+                        activity?.activity_type === 'edit_site_type' ||
+                        activity?.activity_type === 'edit_site_description' ||
+                        activity?.activity_type === 'add_user_site' ||
+                        activity?.activity_type === 'remove_user_site' ||
+                        activity?.activity_type === 'add_user_org' ||
+                        activity?.activity_type === 'remove_user_org') && (
                         <tr
-                          className='border  hover:bg-gray-100 dark:hover:bg-light dark:border-defaultborder/10 border-defaultborder !border-x-0'
+                          className='border hover:bg-gray-100 dark:hover:bg-light dark:border-defaultborder/10 border-defaultborder !border-x-0'
                           key={index}
                         >
                           <th scope='col'>
-                            <div className='flex items-center '>
-                              {/* <img src={idx.src} alt="" className="avatar avatar-md p-1 bg-light avatar-rounded me-2 !mb-0" /> */}
+                            <div className='flex items-center'>
                               <div>
-                                <p className='font-semibold mb-0 	 text-wrap'>
+                                <p className='font-semibold mb-0 text-wrap'>
                                   {activity?.activity_type === 'create_org'
                                     ? `${
                                         activity?.user_id?.firstname &&
@@ -200,6 +206,57 @@ export default function Activitylogs() {
                                             activity?.user_id?.lastname
                                           : activity?.user_id?.email
                                       } created a new org. named '${activity
+                                        ?.org_id?.name}'`
+                                    : activity?.activity_type ===
+                                      'add_user_site'
+                                    ? `${
+                                        activity.user_id.firstname &&
+                                        activity.user_id.lastname
+                                          ? activity.user_id.firstname +
+                                            ' ' +
+                                            activity.user_id.lastname
+                                          : activity.user_id.email
+                                      } added a new user named '${
+                                        activity?.target_user_id?.firstname &&
+                                        activity?.target_user_id?.lastname
+                                          ? activity?.target_user_id
+                                              ?.firstname +
+                                            ' ' +
+                                            activity?.target_user_id?.lastname
+                                          : activity?.target_user_id?.email
+                                      }' within the site '${
+                                        activity.site_id.name
+                                      }'`
+                                    : activity?.activity_type ===
+                                      'remove_user_site'
+                                    ? `${
+                                        activity.user_id.firstname &&
+                                        activity.user_id.lastname
+                                          ? activity.user_id.firstname +
+                                            ' ' +
+                                            activity.user_id.lastname
+                                          : activity.user_id.email
+                                      } removed a user named '${
+                                        activity?.target_user_id?.firstname &&
+                                        activity?.target_user_id?.lastname
+                                          ? activity.target_user_id.firstname +
+                                            ' ' +
+                                            activity?.target_user_id?.lastname
+                                          : activity?.target_user_id?.email
+                                      }' within the site '${
+                                        activity.site_id.name
+                                      }'`
+                                    : activity?.activity_type === 'create_site'
+                                    ? `${
+                                        activity?.user_id?.firstname &&
+                                        activity?.user_id?.lastname
+                                          ? activity?.user_id?.firstname +
+                                            ' ' +
+                                            activity?.user_id?.lastname
+                                          : activity?.user_id?.email
+                                      } created a new site named ${activity
+                                        ?.site_id
+                                        ?.name} within the organization '${activity
                                         ?.org_id?.name}'`
                                     : activity?.activity_type === 'add_user_org'
                                     ? `${
@@ -218,7 +275,7 @@ export default function Activitylogs() {
                                             activity?.target_user_id?.lastname
                                           : activity?.target_user_id?.email
                                       }' within the organization ${activity
-                                        ?.org_id.name}`
+                                        ?.org_id?.name}`
                                     : activity?.activity_type ===
                                       'remove_user_org'
                                     ? `${
@@ -230,14 +287,16 @@ export default function Activitylogs() {
                                           : activity?.user_id?.email
                                       } removed a user named '${
                                         activity?.target_user_id?.firstname &&
-                                        activity?.target_user_id.lastname
-                                          ? activity?.target_user_id.firstname +
+                                        activity?.target_user_id?.lastname
+                                          ? activity?.target_user_id
+                                              ?.firstname +
                                             ' ' +
                                             activity?.target_user_id?.lastname
                                           : activity?.target_user_id?.email
                                       }' within the organization ${activity
                                         ?.org_id?.name}`
-                                    : activity?.activity_type === 'create_site'
+                                    : activity?.activity_type ===
+                                      'download_file'
                                     ? `${
                                         activity?.user_id?.firstname &&
                                         activity?.user_id?.lastname
@@ -245,36 +304,7 @@ export default function Activitylogs() {
                                             ' ' +
                                             activity?.user_id?.lastname
                                           : activity?.user_id?.email
-                                      } created a new site named ${activity
-                                        ?.site_id
-                                        ?.name} within the organization '${activity
-                                        ?.org_id?.name}'`
-                                    : // : activity?.activity_type ===
-                                    //   'add_licence'
-                                    // ? `${
-                                    //     activity.user_id
-                                    //       .firstname &&
-                                    //     activity.user_id
-                                    //       .lastname
-                                    //       ? activity.user_id
-                                    //           .firstname +
-                                    //         ' ' +
-                                    //         activity.user_id
-                                    //           .lastname
-                                    //       : activity.user_id
-                                    //           .email
-                                    //   } added a new license within the organization ${
-                                    //     activity.org_id.name
-                                    //   }`
-                                    activity?.activity_type === 'download_file'
-                                    ? `${
-                                        activity?.user_id?.firstname &&
-                                        activity?.user_id?.lastname
-                                          ? activity?.user_id?.firstname +
-                                            ' ' +
-                                            activity?.user_id?.lastname
-                                          : activity?.user_id?.email
-                                      }  downloaded a file named '${activity
+                                      } downloaded a file named '${activity
                                         ?.details
                                         ?.filename}' within the site '${activity
                                         ?.org_id.name}'`
@@ -287,14 +317,32 @@ export default function Activitylogs() {
                                       activity?.activity_type ===
                                         'edit_org_description'
                                     ? `${activity.details}`
+                                    : activity?.activity_type === 'add_licence'
+                                    ? `${
+                                        activity.user_id?.firstname &&
+                                        activity.user_id?.lastname
+                                          ? activity.user_id?.firstname +
+                                            ' ' +
+                                            activity.user_id?.lastname
+                                          : activity.user_id?.email
+                                      } added a new license within the organization ${
+                                        activity.org_id.name
+                                      }`
+                                    : activity?.activity_type ===
+                                        'edit_site_name' ||
+                                      activity?.activity_type ===
+                                        'update_site' ||
+                                      activity?.activity_type ===
+                                        'edit_site_type' ||
+                                      activity?.activity_type ===
+                                        'edit_site_description'
+                                    ? `${activity?.details}`
                                     : ''}
                                 </p>
                               </div>
                             </div>
                           </th>
-
                           <td className='f-end'>
-                            {/* {activity.activity_date.split('T')[0]} */}
                             {activity
                               ? moment(activity.activity_date).format(
                                   'MM/DD/YYYY HH:mm',
@@ -305,15 +353,6 @@ export default function Activitylogs() {
                       ),
                   )
                 : null}
-              {/* {activity_log && activity_log.length == 0 && (
-                            <>
-                              <tr>
-                                <div className='col-md-12 w-100 mt-4'>
-                                  <p className='text-center'>No Log Found</p>{' '}
-                                </div>
-                              </tr>
-                            </>
-                          )} */}
             </tbody>
           </table>
         </div>
