@@ -1661,7 +1661,7 @@ const Page: React.FC = () => {
                                       <ul className='list-group list-group-flush'>
                                         <li className='flex list-group-item fw-semibold'>
                                           <i className='bx bx-map align-middle me-2 text-muted'></i>
-                                          <b>Address : </b>
+                                          <b>Address:</b>
                                           <p className='ms-1 pnew-white-space over-text text-muted fw-normal d-inline-block'>
                                             {SingleSite?.site && (
                                               <>
