@@ -736,7 +736,7 @@ async function updateOrganization(data: {
             org_id,
             user_id,
             activity_type: 'add_domain',
-            details: `'${userName}' added the domain '${domain}' to the organization '${name}'.`,
+            details: `'${userName}' added the domain '${domain}' within the organization '${name}'.`,
           });
         }
 
