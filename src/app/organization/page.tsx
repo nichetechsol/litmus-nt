@@ -482,21 +482,6 @@ const Page = () => {
   };
   const [orgidForupdatetion, setorgidForupdatetion] = useState();
   const [addbuttonclass, setaddbuttonclass] = useState<boolean>(false);
-  // useEffect(() => {
-  //   const validate = async () => {
-  //     try {
-  //       await validationSchema.validate(
-  //         { organizationName, domains, selectedType, message, organizationNameError },
-  //         { abortEarly: false },
-  //       );
-  //       setaddbuttonclass(true);
-  //     } catch (err) {
-  //       setaddbuttonclass(false);
-  //     }
-  //   };
-
-  //   validate();
-  // }, [organizationName, domains, selectedType, message]);
 
   useEffect(() => {
     const validate = async () => {
@@ -780,62 +765,6 @@ const Page = () => {
         setDomainError(err.message);
       });
   };
-  //   const removeDomain = (domain: string) => {
-  //     setDomains(domains.filter(d => d !== domain));
-  //     // const updatedDomains = domains.filter(d => d !== domain);
-  //     // setDomains(updatedDomains);
-  //     // if (updatedDomains.length == 0) {
-  //     //   setDomainError('Domain is required. Please enter a domain.');
-  //     // } else {
-  //     //   setDomainError('');
-  //     // }
-  // };
-
-  // const removeDomain = async (index: number, domain: any) => {
-  //   const id: any =
-  //     allDomain && allDomain.find((i: any) => i.domainname == domain);
-
-  //   const newdom = domains.filter((i, idx) => idx != index);
-
-  //   if (changeFlage === false && id?.domainid && newdom.length >= 1) {
-  //     // const data = {
-  //     //   org_id: orgidForupdatetion,
-  //     //   domain_id: id.domainid,
-  //     //   user_id: user_id,
-  //     //   name: organizationName,
-  //     //   userName: email,
-  //     // };
-  //     setDomainIdsToBeRemoved([...domainIdsToBeRemoved, id]);
-  //     // const result = await deleteDomains(data);
-  //     // if (result.errorCode === 0) {
-
-  //     setDomains(newdom);
-  //     if (newdom.length == 0) {
-  //       setLoading(false);
-  //       setDomainError('Domain is required. Please enter a domain.');
-  //       // setDomains(newdom);
-  //     } else {
-  //       setLoading(false);
-  //       setDomainError('');
-  //     }
-  //     // } else {
-  //     //   setLoading(false);
-  //     //   toast.error(result.message, { autoClose: 3000 });
-  //     // }
-  //   } else {
-  //     if (newdom.length == 0) {
-  //       setLoading(false);
-  //       setDomainError("Atleast one domain is required.You can't delete it.");
-  //       // toast.error('Atleast one domain must be entered.', { autoClose: 3000 });
-  //       setDomains(newdom);
-  //     } else {
-  //       setLoading(false);
-  //       setDomainError('');
-  //       setDomains(newdom);
-  //     }
-  //   }
-  // };
-
   const removeDomain = async (index: number, domain: any) => {
     const id: any =
       allDomain && allDomain.find((i: any) => i.domainname == domain);
@@ -908,7 +837,6 @@ const Page = () => {
   }, [domains]);
 
   ///// for edit ///
-
   const handeledit = async (org: any) => {
     openModal();
     setLoading(true);
@@ -979,7 +907,6 @@ const Page = () => {
     setChangeFlage(true);
     setModalOpen(true);
   };
-  // const orgName = 'YourOrganizationName';
   function createCustomContent(orgName: any) {
     return `
     <div>
@@ -1182,8 +1109,6 @@ const Page = () => {
       if (error instanceof Yup.ValidationError) {
         setOrganizationNameError(error.message);
       }
-      // console.error('Error checking input value:', error);
-      // setError('Error checking input value. Please try again later.');
     }
   };
   const handelblurrr = () => {
@@ -1395,14 +1320,12 @@ const Page = () => {
                                           >
                                             <div className='sm:flex-shrink-0 domain-name-div'>
                                               {domain}
-                                              {/* {domain} */}
                                             </div>
                                             <div className='ms-auto'>
                                               <div className='mx-1 my-1'>
                                                 <button
                                                   type='button'
                                                   className='inline-flex bg-teal-50 rounded-sm text-teal-500 focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-offset-teal-50 focus:ring-teal-600'
-                                                  // data-hs-remove-element='#dismiss-alert2'
                                                   onClick={() =>
                                                     removeDomain(index, domain)
                                                   }
@@ -1433,8 +1356,6 @@ const Page = () => {
                                             </div>
                                           </div>
                                         ))}
-                                      {/* <div className="alert alert-solid-primary alert-dismissible !ms-2 fade show flex" role="alert" id="dismiss-alert2"><div className="sm:flex-shrink-0"> A simple </div><div className="ms-auto"><div className="mx-1 my-1"><button type="button" className="inline-flex bg-teal-50 rounded-sm text-teal-500 focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-offset-teal-50 focus:ring-teal-600" data-hs-remove-element="#dismiss-alert2"><span className="sr-only">Dismiss</span><svg className="h-3 w-3" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M0.92524 0.687069C1.126 0.486219 1.39823 0.373377 1.68209 0.373377C1.96597 0.373377 2.2382 0.486219 2.43894 0.687069L8.10514 6.35813L13.7714 0.687069C13.8701 0.584748 13.9882 0.503105 14.1188 0.446962C14.2494 0.39082 14.3899 0.361248 14.5321 0.360026C14.6742 0.358783 14.8151 0.38589 14.9468 0.439762C15.0782 0.493633 15.1977 0.573197 15.2983 0.673783C15.3987 0.774389 15.4784 0.894026 15.5321 1.02568C15.5859 1.15736 15.6131 1.29845 15.6118 1.44071C15.6105 1.58297 15.5809 1.72357 15.5248 1.85428C15.4688 1.98499 15.3872 2.10324 15.2851 2.20206L9.61883 7.87312L15.2851 13.5441C15.4801 13.7462 15.588 14.0168 15.5854 14.2977C15.5831 14.5787 15.4705 14.8474 15.272 15.046C15.0735 15.2449 14.805 15.3574 14.5244 15.3599C14.2437 15.3623 13.9733 15.2543 13.7714 15.0591L8.10514 9.38812L2.43894 15.0591C2.23704 15.2543 1.96663 15.3623 1.68594 15.3599C1.40526 15.3574 1.13677 15.2449 0.938279 15.046C0.739807 14.8474 0.627232 14.5787 0.624791 14.2977C0.62235 14.0168 0.730236 13.7462 0.92524 13.5441L6.59144 7.87312L0.92524 2.20206C0.724562 2.00115 0.611816 1.72867 0.611816 1.44457C0.611816 1.16047 0.724562 0.887983 0.92524 0.687069Z" fill="currentColor"></path></svg></button></div></div></div>
-                                                             <div className="alert alert-solid-primary alert-dismissible !ms-2 fade show flex" role="alert" id="dismiss-alert2"><div className="sm:flex-shrink-0"> A simple </div><div className="ms-auto"><div className="mx-1 my-1"><button type="button" className="inline-flex bg-teal-50 rounded-sm text-teal-500 focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-offset-teal-50 focus:ring-teal-600" data-hs-remove-element="#dismiss-alert2"><span className="sr-only">Dismiss</span><svg className="h-3 w-3" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M0.92524 0.687069C1.126 0.486219 1.39823 0.373377 1.68209 0.373377C1.96597 0.373377 2.2382 0.486219 2.43894 0.687069L8.10514 6.35813L13.7714 0.687069C13.8701 0.584748 13.9882 0.503105 14.1188 0.446962C14.2494 0.39082 14.3899 0.361248 14.5321 0.360026C14.6742 0.358783 14.8151 0.38589 14.9468 0.439762C15.0782 0.493633 15.1977 0.573197 15.2983 0.673783C15.3987 0.774389 15.4784 0.894026 15.5321 1.02568C15.5859 1.15736 15.6131 1.29845 15.6118 1.44071C15.6105 1.58297 15.5809 1.72357 15.5248 1.85428C15.4688 1.98499 15.3872 2.10324 15.2851 2.20206L9.61883 7.87312L15.2851 13.5441C15.4801 13.7462 15.588 14.0168 15.5854 14.2977C15.5831 14.5787 15.4705 14.8474 15.272 15.046C15.0735 15.2449 14.805 15.3574 14.5244 15.3599C14.2437 15.3623 13.9733 15.2543 13.7714 15.0591L8.10514 9.38812L2.43894 15.0591C2.23704 15.2543 1.96663 15.3623 1.68594 15.3599C1.40526 15.3574 1.13677 15.2449 0.938279 15.046C0.739807 14.8474 0.627232 14.5787 0.624791 14.2977C0.62235 14.0168 0.730236 13.7462 0.92524 13.5441L6.59144 7.87312L0.92524 2.20206C0.724562 2.00115 0.611816 1.72867 0.611816 1.44457C0.611816 1.16047 0.724562 0.887983 0.92524 0.687069Z" fill="currentColor"></path></svg></button></div></div></div> */}
                                     </div>
                                   </div>
                                   <div className='xl:col-span-12 col-span-12 mb-2'>
@@ -1525,8 +1446,6 @@ const Page = () => {
                                     setTypeDropdownError('');
                                     setMessageError('');
                                     closeModal();
-                                    // fetchData();
-                                    // fetchData1();
                                   }}
                                 >
                                   Cancel
@@ -1534,7 +1453,6 @@ const Page = () => {
                                 <button
                                   type='button'
                                   disabled={!addbuttonclass}
-                                  // className='ti-btn bg-primary text-white !font-medium'
                                   className={
                                     addbuttonclass
                                       ? 'ti-btn bg-primary text-white !font-medium'
@@ -1581,10 +1499,6 @@ const Page = () => {
                   </div>
                   <div className='p-4 task-navigation border-b border-dashed dark:border-defaultborder/10'>
                     <ul className='list-none task-main-nav mb-0 '>
-                      {/* <li className="!px-0 !pt-0">
-                                        <span className="text-[.6875rem] text-[#8c9097] dark:text-white/50 opacity-[0.7] font-semibold"> Organization</span>
-                                    </li> */}
-
                       {sidebarOrgs && (
                         <div>
                           {sidebarOrgs &&
@@ -1623,11 +1537,7 @@ const Page = () => {
                                 }}
                               >
                                 <div className='flex items-center'>
-                                  {/* <span className="me-2 leading-none">
-                                            <i className="ri-task-line align-middle text-[.875rem]"></i>
-                                        </span> */}
                                   <a className='flex-grow p-new'>{org?.name}</a>
-                                  {/* <span className="badge bg-success/10 text-success rounded-full">167</span> */}
                                 </div>
                               </li>
                             ))}
@@ -1696,7 +1606,6 @@ const Page = () => {
                                   {' '}
                                   <div className='avatar avatar-xl avatar-rounded me-1  '>
                                     <span className='inline-flex items-center justify-center !w-[2.75rem] !h-[2.75rem] leading-[2.75rem] text-[0.85rem]  rounded-full text-success bg-success/10 font-semibold'>
-                                      {/* {SingleSite?.site?SingleSite?.site?.name[0].toUpperCase(): ""} */}
                                       {org.org_name ? (
                                         <InitialsComponent
                                           name={org.org_name}
@@ -1705,11 +1614,6 @@ const Page = () => {
                                         ''
                                       )}
                                     </span>
-                                    {/* <img src="../../../assets/images/faces/4.jpg" alt={org.org_name?org.org_name[0].toUpperCase(): ""} /> */}
-                                    {/* <h4>
-                                      {' '}
-                                      <i className='ri-building-fill text-black'>dd</i>
-                                    </h4> */}
                                   </div>
                                   <div className='orgn-details'>
                                     <div className='relative group'>
@@ -1720,18 +1624,6 @@ const Page = () => {
                                         {org?.org_name}
                                       </div>
                                     </div>
-                                    {/* <div className='hs-tooltip ti-main-tooltip '>
-                                      <h6 className=' hs-tooltip-toggle w-100 mb-1 font-semibold text-[1rem] text-site-name'>
-                                        {' '}
-                                        {org?.org_name}{' '}
-                                        <span
-                                          className='hs-tooltip-content  ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm '
-                                          role='tooltip'
-                                        >
-                                          {org?.org_name}
-                                        </span>
-                                      </h6>
-                                    </div> */}
                                     <p className='mb-1 text-[#8c9097] dark:text-white/50 contact-mail text-truncate'>
                                       {org?.sites_count} sites
                                     </p>
@@ -1780,17 +1672,6 @@ const Page = () => {
                                           ''
                                         )}
                                       </li>
-                                      <li>
-                                        {/* <button
-                                          className='ti-dd-btn  ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
-                                          onClick={(e) => {
-                                            e.stopPropagation(); // Prevent card click
-                                            // Your function to handle the delete action
-                                          }}
-                                        >
-                                          Delete
-                                        </button> */}
-                                      </li>
                                     </ul>
                                   </div>
                                 ) : (
@@ -1801,45 +1682,6 @@ const Page = () => {
                           </div>
                         </div>
                       ))}
-                    {/* <div className="xl:col-span-4 col-span-12 task-card">
-                                        <div className="box">
-                <div className="box-body contact-action">
-
-                    <div className="flex items-start ">
-                        <div className="flex flex-grow flex-wrap gap-2">
-                            <div className="avatar avatar-xl avatar-rounded me-3">
-                                <img src="../../../assets/images/faces/4.jpg" alt="" />
-                            </div>
-                            <div>
-                                <h6 className=" mb-1 font-semibold text-[1rem]"> Melissa Jane </h6>
-                                <p className="mb-1 text-[#8c9097] dark:text-white/50 contact-mail text-truncate">melissajane2134@gmail.com</p>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-            </div>
-
-            <div className="xl:col-span-4 col-span-12 task-card">
-                                        <div className="box">
-                <div className="box-body contact-action">
-
-                    <div className="flex items-start ">
-                        <div className="flex flex-grow flex-wrap gap-2">
-                            <div className="avatar avatar-xl avatar-rounded me-3">
-                                <img src="../../../assets/images/faces/4.jpg" alt="" />
-                            </div>
-                            <div>
-                                <h6 className=" mb-1 font-semibold text-[1rem]"> Melissa Jane </h6>
-                                <p className="mb-1 text-[#8c9097] dark:text-white/50 contact-mail text-truncate">melissajane2134@gmail.com</p>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-            </div> */}
                   </div>
                 </div>
               </div>
