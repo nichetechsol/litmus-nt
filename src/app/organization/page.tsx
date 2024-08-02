@@ -1132,6 +1132,11 @@ const Page = () => {
         if (org.id !== -1) {
           handleOrgClick(org);
         }
+      } else if (e.key === 'Tab') {
+        e.preventDefault();
+        setFocusedIndex((prevIndex) =>
+          prevIndex < sidebarOrgs.data.length - 1 ? prevIndex + 1 : 0,
+        );
       }
     }
     const listItem = document.getElementById(`org-item-${focusedIndex}`);
