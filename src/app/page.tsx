@@ -18,7 +18,8 @@ import * as Yup from 'yup';
 
 import { emailSchemaSign, passwordSchema } from '@/helper/ValidationHelper';
 import Footer from '@/shared/layout-components/footer/footer';
-import { AsureAuth, Login } from '@/supabase/auth';
+import { AsureAuth, GetUser, Login } from '@/supabase/auth';
+import { supabase } from '@/supabase/db';
 import Loader from '@/utils/Loader/Loader';
 
 import { basePath } from '../../next.config';
@@ -238,6 +239,38 @@ const LoginForm = () => {
       }
     }
   };
+
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (session) {
+          // User is logged in
+          redirect('/organization');
+        } else {
+          // User is logged out
+          redirect('/login');
+        }
+      },
+    );
+
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const user = await GetUser();
+
+      if (user) {
+        // User is already logged in, redirect to the desired page
+        redirect('/organization'); // or any other page you want to redirect to
+      }
+    };
+
+    checkUser();
+  }, []);
+
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');

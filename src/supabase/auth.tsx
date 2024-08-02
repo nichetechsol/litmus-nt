@@ -185,19 +185,45 @@ async function handleDomainUserAssignment(
     }
   }
 }
+const getURL = () => {
+  let url =
+    process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
+    process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
+    'http://localhost:3000/';
+  // Make sure to include `https://` when not localhost.
+  url = url.startsWith('http') ? url : `https://${url}`;
+  // Make sure to include a trailing `/`.
+  url = url.endsWith('/') ? url : `${url}/`;
+  return url;
+};
 export type AuthProvider = 'azure';
 async function AsureAuth(provider: AuthProvider): Promise<void> {
   try {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        scopes: 'email',
-        redirectTo:
-          'https://litmus-nt-git-azure-nichetechabhays-projects.vercel.app/auth/callback',
+        scopes: 'offline_access,email',
+        redirectTo: getURL(),
       },
     });
   } catch (error) {
     const data = true;
   }
 }
-export { AsureAuth, Login };
+async function GetUser() {
+  try {
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
+
+    if (error) {
+      throw error; // Propagate the error to the catch block
+    }
+
+    return session;
+  } catch (error) {
+    return null; // Return null or handle the error appropriately
+  }
+}
+export { AsureAuth, GetUser, Login };
