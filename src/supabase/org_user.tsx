@@ -389,6 +389,60 @@ async function removeUserFromOrganization(
     return { errorCode: -1, data: 'User not found' };
   }
 }
+async function inviteSendToUser(data: any) {
+  try {
+    // Fetch the email template data for 'Invite_Not_existing_User'
+    const emailResult = await fetchEmailData('Invite_Not_existing_User');
+
+    // Ensure emailResult and emailResult.data are valid
+    if (!emailResult || !emailResult.data) {
+      return { message: 'Failed to fetch email template data.', errorCode: 1 };
+    }
+
+    // Extract data from the fetched email template
+    const emailData = emailResult.data;
+    const toTemplate: string = emailData.To;
+    const subject: string = emailData.email_subject;
+    const headingTemplate: string = emailData.email_heading;
+    const contentTemplate: string = emailData.email_content;
+
+    // Define the sign-up link
+    const signUpLink =
+      '<a href="https://central-v2-external-naehe0iv7-litmusio.vercel.app/">Sign Up Here</a>';
+
+    // Replace placeholders with actual values
+    const toData = toTemplate.replace(
+      '{{Target User EMail}}',
+      data.targetUserEmail,
+    );
+    const headingData = headingTemplate
+      .replace('{{User Name}}', data.userName)
+      .replace('{{Org Name}}', data.orgName);
+    const contentData = contentTemplate
+      .replace('{{User Name}}', data.userName)
+      .replace('{{Org Name}}', data.orgName)
+      .replace('<to be added when available>', signUpLink);
+
+    // Send the email using the provided sendEmailFunction
+    const response = await sendEmailFunction(
+      toData,
+      subject,
+      headingData,
+      contentData,
+      data.token,
+    );
+
+    // Return success message with errorCode 0
+    if (response) {
+      return { message: 'Invitation email sent successfully.', errorCode: 0 };
+    } else {
+      return { message: 'Failed to send invitation email.', errorCode: 2 };
+    }
+  } catch (error) {
+    // Return error message and an errorCode
+    return { message: 'Error sending invitation email.', errorCode: 2 };
+  }
+}
 
 async function getOrgUserRole(
   user_id: any,
@@ -451,6 +505,7 @@ async function getOrgUserRole(
 export {
   addUserToOrganization,
   getOrgUserRole,
+  inviteSendToUser,
   modifyUserOfOrganization,
   removeUserFromOrganization,
   searchUsers,
