@@ -20397,3 +20397,7 @@ overflow-y: auto;
 li.page-item.disabled a {
   cursor: default;
 }
+.scrollable-container {
+  max-height: 300px; /* Adjust the height as needed */
+  overflow-y: auto;
+}

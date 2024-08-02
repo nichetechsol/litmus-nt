@@ -1119,7 +1119,7 @@ const Page = () => {
   };
   // for search arrow
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
-  const handelkeyyy = (e: any) => {
+  const handelkeyyy = (e: React.KeyboardEvent) => {
     if (sidebarOrgs?.data) {
       if (e.key === 'ArrowDown') {
         setFocusedIndex((prevIndex) =>
@@ -1138,12 +1138,27 @@ const Page = () => {
           prevIndex < sidebarOrgs.data.length - 1 ? prevIndex + 1 : 0,
         );
       }
-    }
-    const listItem = document.getElementById(`org-item-${focusedIndex}`);
-    if (listItem) {
-      listItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      // Get the focused list item
+      const listItem = document.getElementById(`org-item-${focusedIndex}`);
+      const container = document.querySelector('.scrollable-container');
+
+      if (listItem && container) {
+        const listItemRect = listItem.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        const buffer = 50; // Add some buffer space
+
+        // Check if the list item is out of view and adjust scroll position if necessary
+        if (listItemRect.top < containerRect.top + buffer) {
+          container.scrollTop -= containerRect.top + buffer - listItemRect.top;
+        } else if (listItemRect.bottom > containerRect.bottom - buffer) {
+          container.scrollTop +=
+            listItemRect.bottom - (containerRect.bottom - buffer);
+        }
+      }
     }
   };
+
   const handleOrgClick = (org: { id: number; name: string }) => {
     setLoading(true);
     const encryptedOrgId = encryptData(org.id.toString());
@@ -1506,7 +1521,7 @@ const Page = () => {
                   <div className='p-4 task-navigation border-b border-dashed dark:border-defaultborder/10'>
                     <ul className='list-none task-main-nav mb-0 '>
                       {sidebarOrgs && (
-                        <div>
+                        <div className='scrollable-container'>
                           {sidebarOrgs &&
                             sidebarOrgs.data.map((org, index) => (
                               <li
