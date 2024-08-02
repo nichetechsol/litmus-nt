@@ -248,7 +248,6 @@ const LoginForm = () => {
           redirect('/organization');
         } else {
           // User is logged out
-          redirect('/login');
         }
       },
     );
@@ -268,7 +267,9 @@ const LoginForm = () => {
       }
     };
 
-    checkUser();
+    setTimeout(() => {
+      checkUser();
+    }, 2000);
   }, []);
 
   useLayoutEffect(() => {

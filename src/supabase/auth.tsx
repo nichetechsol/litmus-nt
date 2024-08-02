@@ -202,7 +202,7 @@ async function AsureAuth(provider: AuthProvider): Promise<void> {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        scopes: 'offline_access,email',
+        scopes: 'email',
       },
     });
   } catch (error) {
