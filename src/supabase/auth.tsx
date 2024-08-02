@@ -191,15 +191,19 @@ async function handleDomainUserAssignment(
 }
 async function checkLicensePlan(userId: any): Promise<CheckLicensePlanResult> {
   try {
-    const { data: orgUsersData, error: orgUsersError } = await supabase
-      .from('org_users')
-      .select('*')
-      .eq('user_id', userId);
-    const { data: settingsData, error: settingsError } = await supabase
-      .from('general_settings')
-      .select('*')
-      .eq('setting_name', 'license_plan_allowed_to_create_organization');
-    if (orgUsersError) {
+    // Fetch org_users and general_settings data in parallel
+    const [orgUsersResponse, settingsResponse] = await Promise.all([
+      supabase.from('org_users').select('*').eq('user_id', userId),
+      supabase
+        .from('general_settings')
+        .select('*')
+        .eq('setting_name', 'license_plan_allowed_to_create_organization'),
+    ]);
+
+    const { data: orgUsersData, error: orgUsersError } = orgUsersResponse;
+    const { data: settingsData, error: settingsError } = settingsResponse;
+
+    if (orgUsersError || settingsError) {
       return {
         errorCode: 1,
         org_exists: false,
@@ -209,45 +213,40 @@ async function checkLicensePlan(userId: any): Promise<CheckLicensePlanResult> {
 
     let add_orgUser = false;
     let org_exists = false;
+
     if (orgUsersData.length > 0) {
       org_exists = true;
-      for (const orgUser of orgUsersData) {
-        if (orgUser.role_id === 1) {
-          // add_orgUser = true;
-          // Fetch data from `entitlements_package` table based on `org_id`
-          const { data: entitlementsData, error: entitlementsError } =
-            await supabase
-              .from('entitlements_package')
-              .select(`*,entitlement_value_id(value_text)`)
-              .eq('org_id', orgUser.org_id)
-              .eq('entitlement_name_id', 14);
 
-          // if (entitlementsError) {
-          //   return {
-          //     errorCode: 1,
-          //     org_exists: false,
-          //     add_orgUser: false,
-          //   };
-          // }
+      // Get all org IDs where user has role_id === 1
+      const orgIds = orgUsersData
+        .filter((orgUser) => orgUser.role_id === 1)
+        .map((orgUser) => orgUser.org_id);
 
-          // Check if any entitlement value exists
-          if (entitlementsData) {
-            let entitlement_value_text;
+      if (orgIds.length > 0) {
+        // Fetch entitlements for all these org IDs in a single query
+        const { data: entitlementsData, error: entitlementsError } =
+          await supabase
+            .from('entitlements_package')
+            .select('*,entitlement_value_id(value_text)')
+            .in('org_id', orgIds)
+            .eq('entitlement_name_id', 14);
 
-            if (entitlementsData.length > 0) {
-              entitlement_value_text =
-                entitlementsData[0].entitlement_value_id.value_text;
-            }
+        if (entitlementsError) {
+          return {
+            errorCode: 1,
+            org_exists: false,
+            add_orgUser: false,
+          };
+        }
 
-            if (settingsData) {
-              const allowedLicensePlans: any[] = settingsData[0].value_text;
-              const add_orgUser_true = allowedLicensePlans.includes(
-                entitlement_value_text,
-              );
-              if (add_orgUser_true === true) {
-                add_orgUser = true;
-              }
-            }
+        // Check if any entitlement matches the allowed license plans
+        const allowedLicensePlans: any[] = settingsData?.[0]?.value_text || [];
+        for (const entitlement of entitlementsData) {
+          const entitlement_value_text =
+            entitlement.entitlement_value_id?.value_text;
+          if (allowedLicensePlans.includes(entitlement_value_text)) {
+            add_orgUser = true;
+            break; // Exit the loop early if the condition is met
           }
         }
       }
@@ -255,6 +254,7 @@ async function checkLicensePlan(userId: any): Promise<CheckLicensePlanResult> {
       add_orgUser = true;
       org_exists = false;
     }
+
     return {
       errorCode: 0,
       org_exists: org_exists,
