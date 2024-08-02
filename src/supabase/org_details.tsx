@@ -731,20 +731,19 @@ async function updateOrganization(data: {
             });
             return;
           }
+          // Log activity for adding domains
+          await logActivity({
+            org_id,
+            user_id,
+            activity_type: 'add_domain',
+            details: `'${userName}' added the domain '${domain}' to the organization '${name}'.`,
+          });
         }
 
         domainInsertResults.push({ success: true, data: domainId });
 
         // Associate users with the organization
         await associateUsersWithOrganization(org_id, domain, user_id);
-
-        // Log activity for adding domains
-        await logActivity({
-          org_id,
-          user_id,
-          activity_type: 'add_domain',
-          details: `'${userName}' added the domain '${domain}' to the organization '${name}'.`,
-        });
       }),
     );
 
