@@ -812,6 +812,7 @@ const Page = () => {
           }
         });
       } else {
+        setDomainIdsToBeRemoved([...domainIdsToBeRemoved, id]);
         setDomains(newdom);
         if (newdom.length == 0) {
           setLoading(false);
