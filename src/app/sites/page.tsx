@@ -1661,7 +1661,7 @@ const Page: React.FC = () => {
                                       <ul className='list-group list-group-flush'>
                                         <li className='flex list-group-item fw-semibold'>
                                           <i className='bx bx-map align-middle me-2 text-muted'></i>
-                                          <b>Address </b>
+                                          <b>Address : </b>
                                           <p className='ms-1 pnew-white-space over-text text-muted fw-normal d-inline-block'>
                                             {SingleSite?.site && (
                                               <>
@@ -1678,7 +1678,7 @@ const Page: React.FC = () => {
                                         </li>
                                         <li className='list-group-item fw-semibold'>
                                           <i className='bx bx-briefcase align-middle me-2 text-muted'></i>
-                                          <b>Owner</b>
+                                          <b>Owner :</b>
                                           <span className='ms-1 pnew-white-space text-muted fw-normal d-inline-block'>
                                             {/* {SingleSite?.ownerNames?.join(', ')} */}
                                             {SingleSite?.ownerNames?.length
@@ -1688,14 +1688,14 @@ const Page: React.FC = () => {
                                         </li>
                                         <li className='list-group-item fw-semibold'>
                                           <i className='bx bx-user align-middle me-2 text-muted'></i>
-                                          <b>Number of users</b>
+                                          <b>Number of users :</b>
                                           <span className='ms-1  pnew-white-space text-muted fw-normal d-inline-block'>
                                             {SingleSite?.users?.length}
                                           </span>
                                         </li>
                                         <li className='list-group-item fw-semibold'>
                                           <i className='bx bx-user align-middle me-2 text-muted'></i>
-                                          <b>Type</b>
+                                          <b>Type :</b>
                                           <span className='ms-1  pnew-white-space text-muted fw-normal d-inline-block'>
                                             {SingleSite?.type_name}
                                           </span>
