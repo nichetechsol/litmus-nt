@@ -1104,7 +1104,7 @@ async function deleteDomains(data: any): Promise<Result<any>> {
     //   };
     // }
 
-    // If the domain is associated with other organizations, do not delete
+    // // If the domain is associated with other organizations, do not delete
     // if (domainAssociations && domainAssociations.length > 0) {
     //   return {
     //     errorCode: 1,
@@ -1440,9 +1440,89 @@ async function getUserRole(): Promise<Result<UserRole[]>> {
   }
 }
 
+async function checkBusinessDomain(domain_name: string): Promise<any> {
+  try {
+    const { data: known_public_domains, error } = await supabase
+      .from('known_public_domains')
+      .select('*')
+      .eq('domain_name', domain_name);
+
+    if (error) {
+      return {
+        errorCode: 1,
+        domain: false,
+        message: 'Error fetching domain',
+      };
+    }
+
+    if (known_public_domains && known_public_domains.length > 0) {
+      return {
+        errorCode: 0,
+        domain: true,
+        message: 'This domain exists',
+      };
+    } else {
+      return {
+        errorCode: 0,
+        domain: false,
+        message: 'This domain does not exist',
+      };
+    }
+  } catch (error) {
+    return {
+      errorCode: 2,
+      domain: false,
+      message: 'Unexpected error occurred',
+    };
+  }
+}
+async function checkDomainAssociations(data: {
+  domain_id: string;
+  org_id: string;
+}): Promise<any> {
+  try {
+    const { data: domainAssociations, error: checkOtherOrgsError } =
+      await supabase
+        .from('org_domains')
+        .select('org_id')
+        .eq('domain_id', data.domain_id)
+        .neq('org_id', data.org_id);
+
+    if (checkOtherOrgsError) {
+      return {
+        errorCode: 1,
+        message: 'Error checking domain associations',
+        data: null,
+      };
+    }
+
+    // If the domain is associated with other organizations, do not delete
+    if (domainAssociations && domainAssociations.length > 0) {
+      return {
+        errorCode: 1,
+        message: 'Cannot delete domain associated with other organizations',
+        data: null,
+      };
+    }
+
+    return {
+      errorCode: 0,
+      message: 'Domain can be deleted',
+      data: domainAssociations,
+    };
+  } catch (error) {
+    return {
+      errorCode: 2,
+      message: 'Unexpected error occurred',
+      data: null,
+    };
+  }
+}
 export {
   addOrganization,
   associateUsersWithOrganization,
+  checkBusinessDomain,
+  checkDomainAssociations,
   confirmDeletion,
   deleteDomains,
   deleteOrganization,
