@@ -100,9 +100,6 @@ const OrgDashboard = () => {
     }
   }, []);
   const [user_id, setuser_id] = useState<any>('');
-  // const [user_fname, setUser_fname] = useState("")
-  // const [user_lname, setUserlname] = useState("")
-  // const [user_role, setUserrole] = useState('');
   const [org_id, setorg_id] = useState<any>('');
   const [orgName, setorgName] = useState<any>('');
   const [userEmail, setUseremail] = useState<any>('');
@@ -156,6 +153,8 @@ const OrgDashboard = () => {
     null,
   );
   const [activity_log, setActivity_log] = useState<activitylogs[] | null>(null);
+
+  //Added by Srishti -  Count display on top
   const CountData = async () => {
     try {
       // setLoading(true);
@@ -175,6 +174,8 @@ const OrgDashboard = () => {
   useEffect(() => {
     CountData();
   }, [org_id, orgUserData]);
+
+  //Added by Srishti -  Activity Logs
   const fetchData7 = async () => {
     try {
       // setLoading(true);
@@ -200,6 +201,7 @@ const OrgDashboard = () => {
     fetchData7();
   }, [org_id, orgUserData]);
 
+  //Added by Srishti & Pagination by Prerna -  User management
   const fetchData2 = async () => {
     try {
       setLoading(true);
@@ -226,6 +228,8 @@ const OrgDashboard = () => {
   useEffect(() => {
     fetchData2();
   }, [search, org_id, activePage]);
+
+  //Added by Srishti & Pagination by Prerna - List of Entitlement
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -250,6 +254,8 @@ const OrgDashboard = () => {
 
     fetchData();
   }, [org_id, activePage2, perPage2]);
+
+  //Added by Srishti - Location of Sites
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -289,7 +295,7 @@ const OrgDashboard = () => {
   const [roles, setRoles] = useState<roles[] | null>(null);
   const [addbuttonclass, setaddbuttonclass] = useState<boolean>(false);
 
-  // for grey out btn
+  // Added by kunal - for grey out btn
   useEffect(() => {
     const validate = async () => {
       try {
@@ -302,6 +308,8 @@ const OrgDashboard = () => {
 
     validate();
   }, [email, role]);
+
+  // Added by Srishti - Getting role of the user currently Logged In
   useEffect(() => {
     const fetchRoles = async () => {
       try {
@@ -322,6 +330,7 @@ const OrgDashboard = () => {
 
     fetchRoles();
   }, []);
+
   const [isOpen, setIsOpen] = useState(false);
   const openModal = () => {
     setIsOpen(true);
@@ -332,6 +341,8 @@ const OrgDashboard = () => {
     setIsOpen(false);
     document.body.classList.remove('no-scroll1');
   };
+
+  //Added by Srishti & auto-fill done by Kunal - Add user form management and auto-populate feilds
   const [DataTOAutoFill, setDataTOAutoFill] = useState<string[]>([]);
   const [isFocusedOnEmail, setIsFocusedOnEmail] = useState(false);
   const handleEmailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -355,6 +366,7 @@ const OrgDashboard = () => {
       .then(() => setEmailError(''))
       .catch((err: Yup.ValidationError) => setEmailError(err.message));
   };
+
   const [DataTOAutoFill1, setDataTOAutoFill1] = useState<string[]>([]);
   const [isFocusedOnFName, setIsFocusedOnFName] = useState(false);
   const handleFirstNameChange = async (
@@ -380,6 +392,7 @@ const OrgDashboard = () => {
       .then(() => setFirstNameError(''))
       .catch((err: Yup.ValidationError) => setFirstNameError(err.message));
   };
+
   const [DataTOAutoFill2, setDataTOAutoFill2] = useState<string[]>([]);
   const [isFocusedOnLName, setIsFocusedOnLName] = useState(false);
   const handleLastNameChange = async (
@@ -415,6 +428,8 @@ const OrgDashboard = () => {
       .then(() => setRoleError(''))
       .catch((err: Yup.ValidationError) => setRoleError(err.message));
   };
+
+  //Added by Srishti & Kunal - set State for edit and add in add user form and clearning it
   const handleEdit = (user: any) => {
     openModal();
     setChangeFlage(false);
@@ -423,6 +438,14 @@ const OrgDashboard = () => {
     setFirstName(user.firstname ? user.firstname : '');
     setLastName(user.lastname ? user.lastname : '');
     setRole(user.role_id);
+  };
+  const handleAddUser = () => {
+    openModal();
+    setEmail('');
+    setFirstName('');
+    setLastName('');
+    setRole('');
+    setChangeFlage(true);
   };
   const handleFiledClear = () => {
     closeModal();
@@ -435,14 +458,7 @@ const OrgDashboard = () => {
     setDataTOAutoFill2([]);
   };
 
-  const handleAddUser = () => {
-    openModal();
-    setEmail('');
-    setFirstName('');
-    setLastName('');
-    setRole('');
-    setChangeFlage(true);
-  };
+  //Added by Srishti - Remove user from organization
   const handleDelete = (user: any) => {
     document.body.classList.add('no-scroll');
     swal({
@@ -494,6 +510,8 @@ const OrgDashboard = () => {
       }
     });
   };
+
+  //Added by Srishti - Apply Validation over add user/edit user form and SUpabase fn call of the same
   const validateForm = async () => {
     try {
       await validationSchema.validate(
@@ -744,7 +762,6 @@ const OrgDashboard = () => {
                           <div className='flex items-top justify-between'>
                             <div>
                               <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-primary'>
-                                {/* <i className='ti ti-users text-[1rem] text-white'></i> */}
                                 <i className='ri-wallet-2-line text-white'></i>
                               </span>
                             </div>
@@ -777,7 +794,6 @@ const OrgDashboard = () => {
                           <div className='flex items-top justify-between'>
                             <div>
                               <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-secondary'>
-                                {/* <i className='ti ti-wallet text-[1rem] text-white'></i> */}
                                 <i className='ri-group-line text-white'></i>
                               </span>
                             </div>
@@ -803,8 +819,6 @@ const OrgDashboard = () => {
                           <div className='flex items-top justify-between'>
                             <div>
                               <span className='!text-[0.8rem]  !w-[2.5rem] !h-[2.5rem] !leading-[2.5rem] !rounded-full inline-flex items-center justify-center bg-success'>
-                                {/* <i className='ti ti-wave-square text-[1rem] text-white'></i> */}
-                                {/* <i className='ri-pulse-line text-white'></i> */}
                                 <i className='ri-file-line text-white'></i>
                               </span>
                             </div>
@@ -890,8 +904,6 @@ const OrgDashboard = () => {
                       <div className='hs-dropdown ti-dropdown'></div>
                     </div>
                     <div className='box-body overflow-hidden'>
-                      {/* <div className='leads-source-chart flex items-center justify-center'> */}
-                      {/* <img src={imgMap} /> */}
                       <ul className='list-none crm-top-deals mb-0'>
                         {locationOfSites &&
                           locationOfSites.length > 0 &&
@@ -916,7 +928,6 @@ const OrgDashboard = () => {
                         )}
                       </ul>
                     </div>
-                    {/* </div> */}
                   </div>
                 </div>
 
@@ -936,7 +947,6 @@ const OrgDashboard = () => {
                             }}
                           />
                         </div>
-                        {/* <div className='hs-dropdown ti-dropdown'> */}
                         <div className=' grid '>
                           {' '}
                           {userrole2 === 1 || userrole2 === 2 ? (
@@ -962,7 +972,6 @@ const OrgDashboard = () => {
                           )}
                           <div
                             id='todo-compose'
-                            // className='hs-overlay hidden ti-modal'
                             className='hs-overlay hidden ti-modal  [--overlay-backdrop:static]'
                           >
                             <div className='hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out'>
@@ -1055,7 +1064,6 @@ const OrgDashboard = () => {
                                         className='ti-form-label'
                                       >
                                         First Name{' '}
-                                        {/* <span className='text-danger'>*</span> */}
                                       </label>
                                       <input
                                         type='text'
@@ -1101,17 +1109,10 @@ const OrgDashboard = () => {
                                                      ? 'highlighted'
                                                      : ''
                                                  }`}
-
-                                                // onClick={() =>
-                                                //   handelautofill(e)
-                                                // }
                                               >
                                                 {e.firstname}({e.email})
                                               </li>
                                             ))}
-                                            {/* {DataTOAutoFill1.map((e: any) => (
-                                        <li key={e} onClick={() => handelautofill(e)}>{e.firstname}</li>
-                                      ))} */}
                                           </ul>
                                         )}
                                       {firstNameError && (
@@ -1126,7 +1127,6 @@ const OrgDashboard = () => {
                                         className='ti-form-label'
                                       >
                                         Last Name{' '}
-                                        {/* <span className='text-danger'>*</span> */}
                                       </label>
                                       <input
                                         type='text'
@@ -1155,7 +1155,6 @@ const OrgDashboard = () => {
                                             className=''
                                             ref={lastNameListRef}
                                           >
-                                            {/* {DataTOAutoFill2.map((e: any) => ( */}
                                             {DataTOAutoFill2.filter(
                                               (e: any) =>
                                                 e.lastname != null &&
@@ -1175,8 +1174,6 @@ const OrgDashboard = () => {
                                                 {e.lastname}({e.email})
                                               </li>
                                             ))}
-                                            {/* <li key={e} onClick={() => handelautofill(e)}>{e.lastname}</li> 
-                                       ))} */}
                                           </ul>
                                         )}
                                       {lastNameError && (
@@ -1238,7 +1235,6 @@ const OrgDashboard = () => {
                                   </button>
                                   <button
                                     type='button'
-                                    // className='ti-btn bg-primary text-white !font-medium'
                                     onClick={() => handleSubmit()}
                                     disabled={!addbuttonclass}
                                     className={
@@ -1304,10 +1300,7 @@ const OrgDashboard = () => {
                                   >
                                     <td>
                                       <div className='flex items-center font-semibold'>
-                                        <span className='!me-2 inline-flex justify-center items-center'>
-                                          {/* <img src={idx.src} alt="img"
-                                    className="w-[1.75rem] h-[1.75rem] leading-[1.75rem] text-[0.65rem]  rounded-full" /> */}
-                                        </span>{' '}
+                                        <span className='!me-2 inline-flex justify-center items-center'></span>{' '}
                                         {`${
                                           user.firstname ? user.firstname : '-'
                                         } ${
@@ -1390,17 +1383,6 @@ const OrgDashboard = () => {
                                 </td>
                               </tr>
                             )}
-                            {/* <Pagination
-                              activePage={activePage}
-                              itemsCountPerPage={perPage}
-                              totalItemsCount={totalItemsCount}
-                              pageRangeDisplayed={5} // Adjust as needed
-                              onChange={(page: React.SetStateAction<number>) =>
-                                setActivePage(page)
-                              }
-                              itemClass='page-item'
-                              linkClass='page-link'
-                            /> */}
                           </tbody>
                         </table>
                       </div>
@@ -1418,20 +1400,6 @@ const OrgDashboard = () => {
                             (Last 7 days Activities)
                           </span>
                         </div>
-                        {/* <div className="hs-dropdown ti-dropdown">
-                              <Link href="#!" className="text-[0.75rem] px-2 font-normal text-[#8c9097] dark:text-white/50"
-                                  aria-expanded="false">
-                                  View All<i className="ri-arrow-down-s-line align-middle ms-1 inline-block"></i>
-                              </Link>
-                              <ul className="hs-dropdown-menu ti-dropdown-menu hidden" role="menu">
-                                  <li><Link className="ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block"
-                                      href="#!">Today</Link></li>
-                                  <li><Link className="ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block"
-                                      href="#!">This Week</Link></li>
-                                  <li><Link className="ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block"
-                                      href="#!">Last Week</Link></li>
-                              </ul>
-                          </div> */}
                         <div>
                           {activity_log && activity_log.length >= 9 ? (
                             <button
@@ -1442,12 +1410,10 @@ const OrgDashboard = () => {
                                   'ActivityLogs',
                                   encryptedActvitylog,
                                 );
-                                // window.location.href = '/activitylogs';
                                 navigate.push('/activitylogs');
                               }}
                               className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn rght-btn ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
                             >
-                              {/* <i className='ri-add-circle-line !text-[1rem]'></i> */}
                               View All
                             </button>
                           ) : (
