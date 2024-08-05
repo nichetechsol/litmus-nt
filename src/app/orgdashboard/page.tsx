@@ -573,46 +573,52 @@ const OrgDashboard = () => {
             if (button) {
               button.click();
             }
+          } else if (result.errorCode == 1) {
+            swal({
+              title: `${result.data}`,
+              text: 'Do you want to invite the user?',
+              icon: 'warning',
+              buttons: ['No', 'Yes'],
+            }).then(async (willSendInvite) => {
+              if (willSendInvite) {
+                setLoading(true);
+                //   const modalTrigger: any = document.querySelector(
+                //     "[data-hs-overlay='#todo-compose1']",
+                //   );
+                //   if (modalTrigger) {
+                //     modalTrigger.click();
+                // }
+                const data = {
+                  targetUserEmail: email.toLowerCase(),
+                  token: onlyToken,
+                  userName: userEmail,
+                  orgName: orgName,
+                };
+
+                await refreshToken();
+
+                const result = await inviteSendToUser(data);
+
+                if (result.errorCode === 0) {
+                  setLoading(false);
+                  toast.success(result.message, { autoClose: 3000 });
+                  fetchData2();
+                  CountData();
+                } else {
+                  toast.error(result.message, { autoClose: 3000 });
+                  setLoading(false);
+                }
+              }
+            });
+
+            const button = document.getElementById('close-modal-btn');
+            if (button) {
+              button.click();
+            }
           } else {
             toast.error(result.data, { autoClose: 3000 });
-            if (result.data == 'User is not in Central V2') {
-              swal({
-                title: 'Error',
-                text: `${result.data} Do you want to invite the user?`,
-                icon: 'error',
-                buttons: ['No', 'Yes'],
-              }).then(async (willSendInvite) => {
-                if (willSendInvite) {
-                  setLoading(true);
-                  //   const modalTrigger: any = document.querySelector(
-                  //     "[data-hs-overlay='#todo-compose1']",
-                  //   );
-                  //   if (modalTrigger) {
-                  //     modalTrigger.click();
-                  // }
-                  const data = {
-                    email: email.toLowerCase(),
-                    token: onlyToken,
-                    userName: userEmail,
-                    orgName: orgName,
-                  };
-
-                  await refreshToken();
-
-                  const result = await inviteSendToUser(data);
-
-                  if (result.errorCode === 0) {
-                    setLoading(false);
-                    toast.success(result.message, { autoClose: 3000 });
-                    fetchData2();
-                    CountData();
-                  } else {
-                    toast.error(result.message, { autoClose: 3000 });
-                    setLoading(false);
-                  }
-                }
-              });
-            }
+            fetchData2();
+            CountData();
             const button = document.getElementById('close-modal-btn');
             if (button) {
               button.click();

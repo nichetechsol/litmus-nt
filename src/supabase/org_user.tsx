@@ -137,7 +137,7 @@ async function addUserToOrganization(
 
           // Check for errors during the select operation
           if (selectError) {
-            return { errorCode: 1, data: 'User is not in Central V2' };
+            return { errorCode: -1, data: 'User is not in Central V2' };
           }
         }
       }
@@ -245,13 +245,13 @@ async function addUserToOrganization(
           }
         } else {
           // If user is already in the organization
-          return { errorCode: 1, data: 'User already in organization' };
+          return { errorCode: -1, data: 'User already in organization' };
         }
       }
     }
   } catch (error) {
     // Log any unexpected errors
-    return { errorCode: 1, data: 'User not added ' };
+    return { errorCode: -1, data: 'User not added ' };
   }
 }
 
