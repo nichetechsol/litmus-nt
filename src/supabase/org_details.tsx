@@ -1476,48 +1476,67 @@ async function checkBusinessDomain(domain_name: string): Promise<any> {
     };
   }
 }
-async function checkDomainAssociations(data: {
-  domain_id: string;
-  org_id: string;
-}): Promise<any> {
+
+async function checkDomainAssociations(domain_name: any): Promise<any> {
   try {
+    const { data: existingDomains, error: fetchError } = await supabase
+      .from('domains')
+      .select('id, name')
+      .eq('name', domain_name);
+
+    if (fetchError) {
+      return {
+        errorCode: 1,
+        message: 'Error fetching domain',
+        associated: false,
+      };
+    }
+
+    if (existingDomains.length === 0) {
+      return {
+        errorCode: 0,
+        message: 'Domain is not associated with any organization',
+        associated: false,
+      };
+    }
+
+    const domainId = existingDomains[0].id;
     const { data: domainAssociations, error: checkOtherOrgsError } =
       await supabase
         .from('org_domains')
         .select('org_id')
-        .eq('domain_id', data.domain_id)
-        .neq('org_id', data.org_id);
+        .eq('domain_id', domainId);
 
     if (checkOtherOrgsError) {
       return {
         errorCode: 1,
         message: 'Error checking domain associations',
-        data: null,
+        associated: false,
       };
     }
 
-    // If the domain is associated with other organizations, do not delete
-    if (domainAssociations && domainAssociations.length > 0) {
+    if (domainAssociations.length > 0) {
       return {
-        errorCode: 1,
-        message: 'Cannot delete domain associated with other organizations',
-        data: null,
+        errorCode: 0,
+        message: 'Domain is associated with other organizations',
+        associated: true,
       };
     }
 
     return {
       errorCode: 0,
       message: 'Domain can be deleted',
-      data: domainAssociations,
+      associated: false,
     };
   } catch (error) {
     return {
       errorCode: 2,
       message: 'Unexpected error occurred',
-      data: null,
+      associated: false,
     };
   }
 }
+
 export {
   addOrganization,
   associateUsersWithOrganization,
