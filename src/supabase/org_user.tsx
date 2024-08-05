@@ -110,7 +110,7 @@ async function addUserToOrganization(
     let selectError: any = null;
     if (UserData.user_role_id == 2) {
       if (UserData.role_id == 1) {
-        return { errorCode: 1, data: 'Admin cannot add the Owner' };
+        return { errorCode: -1, data: 'Admin cannot add the Owner' };
       }
     }
     // Check if the email is provided and not empty
@@ -137,7 +137,7 @@ async function addUserToOrganization(
 
           // Check for errors during the select operation
           if (selectError) {
-            return { errorCode: -1, data: 'User is not in Central V2' };
+            return { errorCode: 1, data: 'User is not in Central V2' };
           }
         }
       }
