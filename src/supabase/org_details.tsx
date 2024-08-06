@@ -380,7 +380,10 @@ async function addOrganization(data: {
         },
       ])
       .select();
-
+    //check domain is business domain or not
+    // Normalize domains to ensure all entries are domains
+    const isBusinessAccount = await checkDomains(data.domain);
+    await orgDefaultEntitlement(isBusinessAccount, orgId);
     // Insert domains
     const domainInsertPromise = insertDomains(orgId, data.domain);
 
@@ -1537,28 +1540,15 @@ async function checkDomainAssociations(domain_name: any): Promise<any> {
     };
   }
 }
-async function orgDefaultEntitlement(domainName: string, orgId: number) {
+async function orgDefaultEntitlement(isBusinessAccount: any, orgId: any) {
   try {
     // Step 1: Check if the domain is a known public domain
-    const { data: publicDomainData, error: publicDomainError } = await supabase
-      .from('known_public_domains')
-      .select('domain_name')
-      .eq('domain_name', domainName);
-
-    if (publicDomainError) {
-      return {
-        errorCode: 1,
-        isBusinessAccount: false,
-        data: publicDomainError.message,
-      };
+    let settingName: any;
+    if (isBusinessAccount === true) {
+      settingName = 'default_org_entitlements_business_users';
+    } else {
+      settingName = 'default_entitlements_nonebusiness_users';
     }
-
-    const isBusinessAccount = publicDomainData && publicDomainData.length === 0;
-
-    // Step 2: Fetch the appropriate JSON setting based on business account status
-    const settingName = isBusinessAccount
-      ? 'default_org_entitlements_business_users'
-      : 'default_org_entitlements_nonebusiness_users';
 
     const { data: settingsData, error: settingsError } = await supabase
       .from('general_settings')
@@ -1651,12 +1641,56 @@ async function orgDefaultEntitlement(domainName: string, orgId: number) {
     return { errorCode: 1, isBusinessAccount: false, data: err.message };
   }
 }
+async function checkDomains(domain: string[]): Promise<boolean> {
+  // Normalize domains
+  const normalizedDomains = domain.map((entry) => {
+    if (entry.includes('@')) {
+      return entry.split('@')[1];
+    }
+    return entry;
+  });
+
+  // Check if the domain array has only one domain
+  if (normalizedDomains.length === 1) {
+    const singleDomain = normalizedDomains[0];
+
+    const { data: publicDomain, error: publicDomainError } = await supabase
+      .from('known_public_domains')
+      .select('*')
+      .eq('domain_name', singleDomain);
+
+    if (publicDomainError || !publicDomain || publicDomain.length === 0) {
+      return true; // The single domain is not a known public domain
+    }
+
+    return false; // The single domain is a known public domain
+  } else {
+    // Check if any domain in the array is included in known public domains
+    const domainPromises = normalizedDomains.map(async (domain) => {
+      const { data: publicDomain, error: publicDomainError } = await supabase
+        .from('known_public_domains')
+        .select('*')
+        .eq('domain_name', domain)
+        .single();
+      if (publicDomainError || !publicDomain) {
+        return null;
+      }
+      return publicDomain;
+    });
+
+    const domainResults = await Promise.all(domainPromises);
+    const hasPublicDomain = domainResults.some((result) => result !== null);
+
+    return !hasPublicDomain; // Return false if any domain is a known public domain, otherwise true
+  }
+}
 
 export {
   addOrganization,
   associateUsersWithOrganization,
   checkBusinessDomain,
   checkDomainAssociations,
+  checkDomains,
   confirmDeletion,
   deleteDomains,
   deleteOrganization,
