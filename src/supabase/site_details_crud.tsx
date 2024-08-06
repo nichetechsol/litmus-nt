@@ -226,6 +226,7 @@ async function addSites(data: SiteData): Promise<Result<any>> {
           data: null,
         };
       } else {
+        await processEntitlements(data.org_id, siteDetails[0].id);
         const { data: userInsertData, error: userInsertError } = await supabase
           .from('site_users')
           .insert([
@@ -312,6 +313,8 @@ async function addSitesConfirm(data: any) {
         data: null,
       };
     } else {
+      await processEntitlements(data.org_id, siteDetails[0].id);
+
       const { data: userInsertData, error: userInsertError } = await supabase
         .from('site_users')
         .insert([
@@ -875,11 +878,176 @@ async function siteNameCheck(name: any, site_id: any) {
     };
   }
 }
+// Assume `supabase` is already initialized
+
+async function fetchDefaultEntitlements(): Promise<any> {
+  try {
+    const { data, error } = await supabase
+      .from('general_settings')
+      .select('*')
+      .eq('setting_name', 'default_site_entitlements');
+
+    if (error) {
+      console.error('Error fetching default entitlements:', error);
+      return null;
+    }
+
+    return data[0].value_json;
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return null;
+  }
+}
+
+async function findOrInsertEntitlementValue(
+  value: any,
+): Promise<number | null> {
+  const valueType = typeof value;
+  let entValueId;
+
+  // Determine the value column and check if the value exists
+  let valueColumn = '';
+  if (valueType === 'string') {
+    valueColumn = 'value_text';
+  } else if (valueType === 'number') {
+    valueColumn = 'value_number';
+  } else if (valueType === 'boolean') {
+    valueColumn = 'value_bool';
+  }
+
+  const { data: entValueData, error: entValueError } = await supabase
+    .from('entitlements_values')
+    .select('*')
+    .eq(valueColumn, value);
+
+  if (entValueError) {
+    console.error('Error fetching entitlement value:', entValueError);
+    return null;
+  }
+
+  if (entValueData?.length > 0) {
+    entValueId = entValueData[0].id;
+  } else {
+    const { data: insertData, error: insertError } = await supabase
+      .from('entitlements_values')
+      .insert({ [valueColumn]: value })
+      .select('*');
+
+    if (insertError) {
+      console.error(
+        `Error inserting entitlement value for value: ${value}`,
+        insertError,
+      );
+      return null;
+    }
+
+    entValueId = insertData[0].id;
+  }
+
+  return entValueId;
+}
+
+async function processEntitlements(org_id: any, site_id: any) {
+  const entitlementsData = await fetchDefaultEntitlements();
+
+  if (!entitlementsData) {
+    console.error('No entitlements data found');
+    return {
+      data: null,
+      message: 'No entitlements data found',
+      errorCode: 1,
+    };
+  }
+
+  const results = [];
+  const errors = [];
+
+  try {
+    for (const [key, value] of Object.entries(entitlementsData)) {
+      // Step 1: Find the key in the entitlements_name table
+      const { data: entNameData, error: entNameError } = await supabase
+        .from('entitlements_name')
+        .select('id')
+        .eq('name', key);
+
+      if (entNameError) {
+        console.error(
+          `Error fetching entitlement name for key: ${key}`,
+          entNameError,
+        );
+        errors.push({ key, error: entNameError });
+        continue;
+      }
+      let entNameId: any;
+      if (entNameData?.length === 0) {
+        const { data: newEntitlement, error: insertError } = await supabase
+          .from('entitlements_name')
+          .insert({ name: key })
+          .select('*');
+        if (newEntitlement != null) {
+          entNameId = newEntitlement[0].id;
+        }
+      }
+
+      entNameId = entNameData[0].id;
+
+      // Step 2: Find or insert the corresponding value in the entitlement_values table
+      const entValueId = await findOrInsertEntitlementValue(value);
+
+      if (!entValueId) {
+        console.error(
+          `Failed to find or insert entitlement value for key: ${key}`,
+        );
+        errors.push({
+          key,
+          error: 'Failed to find or insert entitlement value',
+        });
+        continue;
+      }
+
+      // Step 3: Insert into the entitlements_package table
+      const { error: insertError } = await supabase
+        .from('entitlements_package')
+        .insert({
+          entitlement_name_id: entNameId,
+          entitlement_value_id: entValueId,
+          org_id: org_id,
+          site_id: site_id,
+        });
+
+      if (insertError) {
+        console.error(
+          `Error inserting into entitlements_package for key: ${key}`,
+          insertError,
+        );
+        errors.push({ key, error: insertError });
+        continue;
+      }
+
+      results.push({ key, success: true });
+      console.log(`Successfully inserted entitlement for key: ${key}`);
+    }
+
+    return {
+      data: results,
+      message: 'Process completed with some errors',
+      errorCode: errors.length > 0 ? 1 : 0,
+    };
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return {
+      data: null,
+      message: 'Unexpected error occurred',
+      errorCode: 2,
+    };
+  }
+}
 
 export {
   addSites,
   addSitesConfirm,
   deleteSite,
+  processEntitlements,
   requestSiteDeletion,
   siteNameCheck,
   updateSite,

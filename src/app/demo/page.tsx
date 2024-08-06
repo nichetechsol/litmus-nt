@@ -1,67 +1,51 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-import { checkLicensePlan } from '@/supabase/auth';
+import { processEntitlements } from '@/supabase/site_details_crud';
 
 const OrgDashboard = () => {
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [result, setResult] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // const staticUserData = {
-        //   user_id: '1',
-        //   role_id: '2',
-        //   site_id: '1',
-        //   email: 'parthr@nichetech.com',
-        //   firstname: 'Parth',
-        //   lastname: 'Roka',
-        // };
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
 
-        // const data1: any = {
-        //   // org_id: 175,
-        //   // org_type_id: 1,
-        //   user_id: 92,
+    try {
+      const data: any = await processEntitlements(175, 171);
 
-        // };
-
-        // const data: any = await fetchProductData(data1);
-        const data: any = await checkLicensePlan(92);
-
-        // const { data, error } = await supabase
-        //   .from('site_users')
-        //   .update({ role_id: 3 })
-        //   .eq('id', 14)
-        //   .select();
-        if (data) {
-          const data1: any = data;
-          setResult(data1);
-        }
-      } catch (err: any) {
-        setError(err);
-      } finally {
-        setLoading(false);
+      if (data) {
+        setResult(data);
       }
-    };
-
-    fetchData();
-  }, []);
-
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
-  if (error) {
-    return <p>Error loading data: {error}</p>;
-  }
+    } catch (err: any) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div>
       <h1>Organization Dashboard</h1>
-      <pre>{JSON.stringify(result, null, 2)}</pre>
+      <button onClick={fetchData} disabled={loading}>
+        {loading ? 'Loading...' : 'Fetch Data'}
+      </button>
+      {error && <p>Error loading data: {error}</p>}
+      {result && (
+        <div>
+          <h2>Entitlement Data</h2>
+          {/* Adjust the structure based on the actual data shape */}
+          <ul>
+            {Object.keys(result).map((key) => (
+              <li key={key}>
+                <strong>{key}:</strong> {JSON.stringify(result[key], null, 2)}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
