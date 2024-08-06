@@ -4,6 +4,7 @@
 
 import { logActivity } from '@/supabase/activity';
 import fetchEmailData from '@/supabase/email_configuration';
+import { findOrInsertEntitlementValue } from '@/supabase/site_details_crud';
 
 import { supabase } from './db';
 import { sendEmailFunction } from './email';
@@ -1536,6 +1537,120 @@ async function checkDomainAssociations(domain_name: any): Promise<any> {
     };
   }
 }
+async function orgDefaultEntitlement(domainName: string, orgId: number) {
+  try {
+    // Step 1: Check if the domain is a known public domain
+    const { data: publicDomainData, error: publicDomainError } = await supabase
+      .from('known_public_domains')
+      .select('domain_name')
+      .eq('domain_name', domainName);
+
+    if (publicDomainError) {
+      return {
+        errorCode: 1,
+        isBusinessAccount: false,
+        data: publicDomainError.message,
+      };
+    }
+
+    const isBusinessAccount = publicDomainData && publicDomainData.length === 0;
+
+    // Step 2: Fetch the appropriate JSON setting based on business account status
+    const settingName = isBusinessAccount
+      ? 'default_org_entitlements_business_users'
+      : 'default_org_entitlements_nonebusiness_users';
+
+    const { data: settingsData, error: settingsError } = await supabase
+      .from('general_settings')
+      .select('setting_name, value_json')
+      .eq('setting_name', settingName)
+      .single();
+
+    if (settingsError) {
+      return {
+        errorCode: 1,
+        isBusinessAccount,
+        data: { error: settingsError.message },
+      };
+    }
+
+    if (!settingsData || !settingsData.value_json) {
+      return {
+        errorCode: 1,
+        isBusinessAccount,
+        data: { error: 'Settings data not found' },
+      };
+    }
+
+    const entitlementData = settingsData.value_json;
+
+    // Step 3: Collect entitlement names and values
+    const entitlementNames = Object.keys(entitlementData);
+    const entitlementValues = Object.values(entitlementData);
+
+    // Fetch all entitlement names
+    const { data: entitlementNameData, error: entitlementNameError } =
+      await supabase
+        .from('entitlements_name')
+        .select('id, name')
+        .in('name', entitlementNames); // Use IN query to batch fetch
+
+    if (entitlementNameError) {
+      return {
+        errorCode: 1,
+        isBusinessAccount,
+        data: { error: entitlementNameError.message },
+      };
+    }
+
+    const entitlementNameMap = new Map(
+      entitlementNameData.map((item) => [item.name, item.id]),
+    );
+
+    // Find or insert all entitlement values
+    const valueResults = await Promise.all(
+      entitlementValues.map((value) => findOrInsertEntitlementValue(value)),
+    );
+
+    if (valueResults.includes(null)) {
+      return {
+        errorCode: 1,
+        isBusinessAccount,
+        data: { error: 'Error processing entitlement values' },
+      };
+    }
+
+    // Create entries for `entitlements_package`
+    const entitlementsPackageEntries = entitlementNames.map((name, index) => ({
+      entitlement_value_id: valueResults[index],
+      entitlement_name_id: entitlementNameMap.get(name),
+      org_id: orgId,
+    }));
+
+    // Step 4: Insert into `entitlements_package`
+    if (entitlementsPackageEntries.length > 0) {
+      const { error: entitlementsPackageError } = await supabase
+        .from('entitlements_package')
+        .insert(entitlementsPackageEntries);
+
+      if (entitlementsPackageError) {
+        return {
+          errorCode: 1,
+          isBusinessAccount,
+          data: { error: entitlementsPackageError.message },
+        };
+      }
+    }
+
+    return {
+      errorCode: 0,
+      isBusinessAccount,
+      data: 'Entitlements processed successfully',
+    };
+  } catch (err: any) {
+    return { errorCode: 1, isBusinessAccount: false, data: err.message };
+  }
+}
 
 export {
   addOrganization,
@@ -1550,6 +1665,7 @@ export {
   getUserRole,
   organizationSearch,
   organizationSidebarList,
+  orgDefaultEntitlement,
   orgNameCheck,
   reqOrgDeleteMail,
   requestOrgDeletion,

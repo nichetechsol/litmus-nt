@@ -1047,6 +1047,7 @@ export {
   addSites,
   addSitesConfirm,
   deleteSite,
+  findOrInsertEntitlementValue,
   processEntitlements,
   requestSiteDeletion,
   siteNameCheck,
