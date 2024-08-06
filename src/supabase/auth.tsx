@@ -202,7 +202,7 @@ async function AsureAuth(provider: AuthProvider): Promise<void> {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        scopes: 'email',
+        scopes: 'email,profile,openid',
       },
     });
   } catch (error) {
@@ -215,6 +215,10 @@ async function GetUser() {
       data: { session },
       error,
     } = await supabase.auth.getSession();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (error) {
       throw error; // Propagate the error to the catch block

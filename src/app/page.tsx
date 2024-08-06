@@ -242,7 +242,7 @@ const LoginForm = () => {
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         if (session) {
           // User is logged in
           redirect('/organization');
