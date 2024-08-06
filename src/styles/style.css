@@ -408,7 +408,7 @@ html {
 @media (max-width: 991.98px) {
   .app-header .horizontal-logo .header-logo img {
     @apply h-8 leading-8;
-    width: 100% !important;
+    width: 2rem !important;
   }
 }
 @media (max-width: 767.98px) {
@@ -2426,7 +2426,7 @@ html {
     width: 10.5rem !important;
   }
   .box-header .search-ti {
-    width: 130px;
+    width: 110px;
     @apply h-[1.9rem];
   }
   /* .top-margin-1 {
@@ -2439,12 +2439,22 @@ html {
     @apply p-4;
   }
 }
+
 @media (max-width: 400px) {
   [data-nav-layout='horizontal'] .landing-body .landing-body .landing-banner {
     @apply h-[45rem];
   }
 }
 @media (max-width: 480px) {
+  .app-header .header-logo img {
+    height: 2rem;
+    line-height: 2rem;
+    width: 2rem !important;
+  }
+  .box-header .search-ti {
+    width: 110px;
+    height: 1.9rem;
+  }
   [data-nav-layout='horizontal'] .landing-body .landing-banner .section {
     @apply py-[2.375rem] px-0;
   }
@@ -20392,7 +20402,7 @@ overflow-y: auto;
   width: 80%;
 }
 .tool-custom {
-  left: -40px;
+  left: -90px;
 }
 li.page-item.disabled a {
   cursor: default;
@@ -20400,4 +20410,10 @@ li.page-item.disabled a {
 .scrollable-container {
   max-height: 300px; /* Adjust the height as needed */
   overflow-y: auto;
+}
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) /* applied to lg also */ {
+  .full-col {
+    width: 100%;
+    grid-column: 13;
+  }
 }

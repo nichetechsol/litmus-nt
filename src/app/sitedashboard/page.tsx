@@ -991,7 +991,7 @@ const Page = () => {
                         <div className='box text-default shadow border dark:border-defaulttextcolor/10'>
                           <div className='box-body !p-0'>
                             <div className='sm:grid grid-cols-12'>
-                              <div className='xl:col-span-4 xxl:col-span-4 lg:col-span-4 md:col-span-12 col-span-12 about-company-stats-border'>
+                              <div className='xl:col-span-4 full-col xxl:col-span-4 lg:col-span-4 md:col-span-12 col-span-12 about-company-stats-border'>
                                 <div className='text-center owner-details p-6 w-full h-full flex justify-center'>
                                   <span className='font-semibold me-2 text-[.875rem]'>
                                     Owner:
@@ -1002,7 +1002,7 @@ const Page = () => {
                                   </p>
                                 </div>
                               </div>
-                              <div className='xl:col-span-4 xxl:col-span-4 lg:col-span-4 md:col-span-12 col-span-12 about-company-stats-border'>
+                              <div className='xl:col-span-4 full-col xxl:col-span-4 lg:col-span-4 md:col-span-12 col-span-12 about-company-stats-border'>
                                 <div className='text-center owner-details p-6 w-full h-full flex justify-center'>
                                   <span className='font-semibold me-2 text-[.875rem]'>
                                     Organization Name:
@@ -1013,7 +1013,7 @@ const Page = () => {
                                   </p>
                                 </div>
                               </div>
-                              <div className='xl:col-span-4 xxl:col-span-4 lg:col-span-4 md:col-span-12 col-span-12'>
+                              <div className='xl:col-span-4 full-col xxl:col-span-4 lg:col-span-4 md:col-span-12 col-span-12'>
                                 <div className='text-center owner-details p-6 w-full h-full flex justify-center'>
                                   <span className='font-semibold text-[.875rem] me-2'>
                                     {siteCountData &&
