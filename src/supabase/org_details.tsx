@@ -1684,12 +1684,76 @@ async function checkDomains(domain: string[]): Promise<boolean> {
     return !hasPublicDomain; // Return false if any domain is a known public domain, otherwise true
   }
 }
+async function checkDomainAssociationsModify(
+  domain_name: any,
+  org_id: any,
+): Promise<any> {
+  try {
+    const { data: existingDomains, error: fetchError } = await supabase
+      .from('domains')
+      .select('id, name')
+      .eq('name', domain_name);
+
+    if (fetchError) {
+      return {
+        errorCode: 1,
+        message: 'Error fetching domain',
+        associated: false,
+      };
+    }
+
+    if (existingDomains.length === 0) {
+      return {
+        errorCode: 0,
+        message: 'Domain is not associated with any organization',
+        associated: false,
+      };
+    }
+
+    const domainId = existingDomains[0].id;
+    const { data: domainAssociations, error: checkOtherOrgsError } =
+      await supabase
+        .from('org_domains')
+        .select('org_id')
+        .eq('domain_id', domainId)
+        .neq('org_id', org_id);
+
+    if (checkOtherOrgsError) {
+      return {
+        errorCode: 1,
+        message: 'Error checking domain associations',
+        associated: false,
+      };
+    }
+
+    if (domainAssociations.length > 0) {
+      return {
+        errorCode: 0,
+        message: 'Domain is associated with other organizations',
+        associated: true,
+      };
+    }
+
+    return {
+      errorCode: 0,
+      message: 'Domain can be deleted',
+      associated: false,
+    };
+  } catch (error) {
+    return {
+      errorCode: 2,
+      message: 'Unexpected error occurred',
+      associated: false,
+    };
+  }
+}
 
 export {
   addOrganization,
   associateUsersWithOrganization,
   checkBusinessDomain,
   checkDomainAssociations,
+  checkDomainAssociationsModify,
   checkDomains,
   confirmDeletion,
   deleteDomains,

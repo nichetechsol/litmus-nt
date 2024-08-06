@@ -26,9 +26,12 @@ const DomainSchema = Yup.string()
     (value) => {
       if (!value) return true; // If the value is empty, don't perform validation
       const domains = value.split(',').map((domain) => domain.trim());
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       const domainRegex =
         /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,250}[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+)*$/;
-      return domains.every((domain) => domainRegex.test(domain));
+      return domains.every(
+        (domain) => domainRegex.test(domain) || emailRegex.test(domain),
+      );
     },
   );
 const DomainSchema2 = Yup.string()
@@ -46,9 +49,12 @@ const DomainSchema2 = Yup.string()
     (value) => {
       if (!value) return true; // If the value is empty, don't perform validation
       const domains = value.split(',').map((domain) => domain.trim());
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       const domainRegex =
         /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,250}[a-zA-Z0-9])?(\.[a-zA-Z]{2,})+)*$/;
-      return domains.every((domain) => domainRegex.test(domain));
+      return domains.every(
+        (domain) => domainRegex.test(domain) || emailRegex.test(domain),
+      );
     },
   );
 const TypeDropdownSchema = Yup.string().required(

@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
@@ -23,6 +24,8 @@ import Seo from '@/shared/layout-components/seo/seo';
 import { checkLicensePlan } from '@/supabase/auth';
 import {
   addOrganization,
+  checkBusinessDomain,
+  checkDomainAssociationsModify,
   confirmDeletion,
   deleteDomains,
   fetchOrganizationAndSiteDetails,
@@ -71,7 +74,7 @@ interface Typeor {
   name: string;
   created_at: string;
 }
-
+type OrgBusinessStatus = 'business' | 'none_business';
 const Page = () => {
   const [tokenVerify, setTokenVerify] = useState(false);
   const [onlyToken, setOnlyToken] = useState('');
@@ -93,7 +96,7 @@ const Page = () => {
   const [messageError, setMessageError] = useState('');
   const closeModalButtonRef = useRef<HTMLButtonElement>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [modalOpen, setModalOpen] = useState<boolean>(true);
   const [user_id, setuser_id] = useState<any>('');
   const [user_role, setUserrole] = useState<any>('');
   const [email, setEmail] = useState<any>('');
@@ -156,13 +159,24 @@ const Page = () => {
   }, []);
 
   //To re-open chipbox default domain open this comment and open all comments of setDomains([defaultDomain])
-  const getDefaultDomainFromEmail = () => {
+  const [org_Business, setOrg_Business] =
+    useState<OrgBusinessStatus>('business');
+  const getDefaultDomainFromEmail = async () => {
     const email1 = localStorage.getItem('user_email');
     const decryptemail = decryptData(email1);
 
     if (decryptemail) {
       const domain = decryptemail.split('@')[1];
-      return domain || '';
+      const result: any = await checkBusinessDomain(domain);
+      if (result.errorCode === 0) {
+        if (result.domain == true) {
+          setOrg_Business('none_business');
+          return decryptemail || '';
+        } else {
+          setOrg_Business('business');
+          return domain || '';
+        }
+      }
     }
     return '';
   };
@@ -716,8 +730,10 @@ const Page = () => {
         : domainInput.split(',').map((domain) => domain.trim());
       const newDomains = [];
       let errorMessage = '';
+      let errorMessage1 = '';
       const seenDomains = new Set();
-
+      const bussinessTrue = new Set();
+      let domainCheckedNotEmail = '';
       for (const domain of domainsArray) {
         if (domains.includes(domain)) {
           errorMessage += `Domain ${domain} already added. `;
@@ -727,21 +743,53 @@ const Page = () => {
           seenDomains.add(domain);
           try {
             await DomainSchema.validate(domain);
-            newDomains.push(domain);
+            if (domain.includes('@')) {
+              domainCheckedNotEmail = domain.split('@')[1];
+            } else {
+              domainCheckedNotEmail = domain;
+            }
+            const result: any = await checkBusinessDomain(
+              domainCheckedNotEmail,
+            );
+            if (result.errorCode === 0) {
+              if (result.domain === false) {
+                if (domain.includes('@')) {
+                  bussinessTrue.add(domain);
+                  errorMessage1 += `Don't need full Email for ${domainCheckedNotEmail}.`;
+                } else {
+                  newDomains.push(domain);
+                }
+              } else {
+                if (domain.includes('@')) {
+                  newDomains.push(domain);
+                } else {
+                  bussinessTrue.add(domain);
+                  errorMessage1 += `Required to add full Email for ${domain}.`;
+                }
+              }
+            }
+
             setDomainPlusbtnVisible(false);
           } catch (error) {
             if (error instanceof Error) {
               errorMessage += `${error.message} for domain ${domain}. `;
             } else {
-              errorMessage += `An unknown error occurred for domain ${domain}. `;
+              errorMessage += `An unknown error occurred for domain ${domain}.`;
             }
           }
         }
       }
       if (errorMessage === '') {
         setDomains([...domains, ...newDomains]);
-        setDomainInput('');
-        setDomainError('');
+        if (bussinessTrue.size > 0) {
+          const businessTrueArray = Array.from(bussinessTrue);
+          setDomainInput(businessTrueArray.join(','));
+          setDomainError(errorMessage1.trim());
+          setDomainPlusbtnVisible(true);
+        } else {
+          setDomainInput('');
+          setDomainError('');
+        }
       } else {
         setDomainError(errorMessage.trim());
       }
@@ -800,26 +848,98 @@ const Page = () => {
           },
         }).then(async (willProceed) => {
           if (willProceed) {
-            setDomainIdsToBeRemoved([...domainIdsToBeRemoved, id]);
-            setDomains(newdom);
-            if (newdom.length == 0) {
-              setLoading(false);
-              setDomainError('Domain is required. Please enter a domain.');
-            } else {
-              setLoading(false);
-              setDomainError('');
+            const result = await checkDomainAssociationsModify(
+              domain,
+              orgidForupdatetion,
+            );
+            if (result.errorCode === 0 && result.associated === true) {
+              swal({
+                title: 'Are you sure?',
+                text: 'You are about to remove the domain which is the associated by another organization. Do you want to delete this domain?',
+                icon: 'warning',
+                buttons: {
+                  cancel: {
+                    text: 'Cancel',
+                    value: false,
+                    visible: true,
+                    className: '',
+                    closeModal: true,
+                  },
+                  confirm: {
+                    text: 'Delete',
+                    value: true,
+                    visible: true,
+                    className: '',
+                    closeModal: true,
+                  },
+                },
+              }).then(async (willProceed) => {
+                if (willProceed) {
+                  setDomainIdsToBeRemoved([...domainIdsToBeRemoved, id]);
+                  setDomains(newdom);
+                  if (newdom.length == 0) {
+                    setLoading(false);
+                    setDomainError(
+                      'Domain is required. Please enter a domain.',
+                    );
+                  } else {
+                    setLoading(false);
+                    setDomainError('');
+                  }
+                }
+              });
             }
           }
         });
       } else {
-        setDomainIdsToBeRemoved([...domainIdsToBeRemoved, id]);
-        setDomains(newdom);
-        if (newdom.length == 0) {
-          setLoading(false);
-          setDomainError('Domain is required. Please enter a domain.');
+        const result = await checkDomainAssociationsModify(
+          domain,
+          orgidForupdatetion,
+        );
+        if (result.errorCode === 0 && result.associated === true) {
+          swal({
+            title: 'Are you sure?',
+            text: 'You are about to remove the domain which is the associated by another organization. Do you want to delete this domain?',
+            icon: 'warning',
+            buttons: {
+              cancel: {
+                text: 'Cancel',
+                value: false,
+                visible: true,
+                className: '',
+                closeModal: true,
+              },
+              confirm: {
+                text: 'Delete',
+                value: true,
+                visible: true,
+                className: '',
+                closeModal: true,
+              },
+            },
+          }).then(async (willProceed) => {
+            if (willProceed) {
+              setDomainIdsToBeRemoved([...domainIdsToBeRemoved, id]);
+              setDomains(newdom);
+              if (newdom.length == 0) {
+                setLoading(false);
+                setDomainError('Domain is required. Please enter a domain.');
+              } else {
+                setLoading(false);
+                setDomainError('');
+              }
+            }
+          });
         } else {
-          setLoading(false);
-          setDomainError('');
+          setDomainIdsToBeRemoved([...domainIdsToBeRemoved, id]);
+          setDomains(newdom);
+          if (newdom.length == 0) {
+            setLoading(false);
+            setDomainError('Domain is required. Please enter a domain.');
+          } else {
+            setLoading(false);
+            setDomainError('');
+          }
         }
       }
     } else {
@@ -901,7 +1021,13 @@ const Page = () => {
     const defaultDomain = getDefaultDomainFromEmail();
     if (defaultDomain) {
       setDomains([defaultDomain]);
+      if (org_Business === 'none_business') {
+        toast.warning('"None Business" are limited to one E-Mail address', {
+          autoClose: 3000,
+        });
+      }
     }
+
     setMessage('');
     fetchData();
     fetchData1();
@@ -1305,6 +1431,9 @@ const Page = () => {
                                         onKeyDown={handleKeyPress}
                                         value={domainInput}
                                         maxLength={255}
+                                        disabled={
+                                          org_Business === 'none_business'
+                                        }
                                       />
 
                                       <button
