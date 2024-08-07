@@ -1,16 +1,16 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable @next/next/no-img-element */
 'use client';
 import CryptoJS from 'crypto-js';
 import Link from 'next/link';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import React, {
   ChangeEvent,
   Fragment,
   KeyboardEvent,
   useEffect,
-  useLayoutEffect,
   useState,
 } from 'react';
 import swal from 'sweetalert';
@@ -245,7 +245,7 @@ const LoginForm = () => {
       async (event, session) => {
         if (session) {
           // User is logged in
-          redirect('/organization');
+          navigate.push('/home');
         } else {
           // User is logged out
         }
@@ -262,8 +262,14 @@ const LoginForm = () => {
       const user = await GetUser();
 
       if (user) {
+        const variabletaken = user.user.user_metadata.custom_claims;
+        const encryptedstoredEntraInfo = encryptData(variabletaken);
+        if (encryptedstoredEntraInfo) {
+          localStorage.setItem('entraInfo', encryptedstoredEntraInfo);
+        }
+
         // User is already logged in, redirect to the desired page
-        redirect('/organization'); // or any other page you want to redirect to
+        navigate.push('/demo'); // or any other page you want to redirect to
       }
     };
 
@@ -272,17 +278,17 @@ const LoginForm = () => {
     }, 2000);
   }, []);
 
-  useLayoutEffect(() => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
-      if (token) {
-        // setTokenVerify(true);
-        redirect('/organization');
-      } else {
-        // setTokenVerify(false);
-      }
-    }
-  }, []);
+  // useLayoutEffect(() => {
+  //   if (typeof window !== 'undefined') {
+  //     const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
+  //     if (token) {
+  //       // setTokenVerify(true);
+  //       redirect('/organization');
+  //     } else {
+  //       // setTokenVerify(false);
+  //     }
+  //   }
+  // }, []);
 
   // useEffect(() => {
   //   const storedEmail = localStorage.getItem('rememberedEmail');
