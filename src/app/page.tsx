@@ -18,7 +18,7 @@ import * as Yup from 'yup';
 
 import { emailSchemaSign, passwordSchema } from '@/helper/ValidationHelper';
 import Footer from '@/shared/layout-components/footer/footer';
-import { AsureAuth, GetUser, Login } from '@/supabase/auth';
+import { addUser, AsureAuth, GetUser, Login } from '@/supabase/auth';
 import { supabase } from '@/supabase/db';
 import Loader from '@/utils/Loader/Loader';
 
@@ -263,13 +263,16 @@ const LoginForm = () => {
 
       if (user) {
         const variabletaken = user.user.user_metadata.custom_claims;
+        const auth_id = user.user.id;
+        await addUser(variabletaken, auth_id);
+
         const encryptedstoredEntraInfo = encryptData(variabletaken);
         if (encryptedstoredEntraInfo) {
           localStorage.setItem('entraInfo', encryptedstoredEntraInfo);
         }
 
         // User is already logged in, redirect to the desired page
-        navigate.push('/demo'); // or any other page you want to redirect to
+        navigate.push('/home'); // or any other page you want to redirect to
       }
     };
 

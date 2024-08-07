@@ -229,4 +229,55 @@ async function GetUser() {
     return null; // Return null or handle the error appropriately
   }
 }
-export { AsureAuth, GetUser, Login };
+async function addUser(user_data: any, auth_id: any): Promise<any> {
+  try {
+    if (user_data != null) {
+      const organizations_name = user_data['Organization Name'];
+      const type = user_data['I am a Litmus'];
+      const name = user_data['First Name'] + ' ' + user_data['Last Name'];
+      const email = user_data['email'];
+
+      // Check if the email already exists
+      const { data: existingUser, error: existingUserError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', email)
+        .single();
+
+      if (existingUser) {
+        return {
+          errorCode: 1,
+          message: 'Email already exists',
+        };
+      }
+
+      if (existingUserError && existingUserError.code !== 'PGRST120') {
+        // Handle other potential errors from the query
+        throw existingUserError;
+      }
+
+      // Insert the new user if email doesn't exist
+      const { data: user, error: insertError } = await supabase
+        .from('users')
+        .insert([{ email: email, name: name, auth_id: auth_id }])
+        .select();
+
+      if (insertError) {
+        throw insertError;
+      }
+
+      return {
+        errorCode: 0,
+        message: 'User added successfully',
+        user: user,
+      };
+    }
+  } catch (error) {
+    return {
+      errorCode: 2,
+      message: 'An error occurred while adding the user',
+    };
+  }
+}
+
+export { addUser, AsureAuth, GetUser, Login };
