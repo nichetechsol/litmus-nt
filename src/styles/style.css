@@ -20415,9 +20415,28 @@ overflow-y: auto;
 li.page-item.disabled a {
   cursor: default;
 }
+.custom-scrollbar::-webkit-scrollbar {
+  @apply w-2 h-2 bg-gray-100 dark:bg-bodybg;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-gray-400;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar {
+  @apply bg-black/20;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-black/20;
+}
+
+.custom-scrollbar {
+  @apply overflow-y-auto; /* Ensure overflow is set for scrollbar to appear */
+}
 .scrollable-container {
-  max-height: 300px; /* Adjust the height as needed */
-  overflow-y: auto;
+  max-height: 400px; /* Adjust the height as needed */
+  overflow-y: scroll; /* Enable vertical scrolling */
 }
 @media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) /* applied to lg also */ {
   .full-col {

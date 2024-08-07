@@ -1118,25 +1118,29 @@ const OrgDashboard = () => {
                                         DataTOAutoFill &&
                                         DataTOAutoFill.length > 0 && (
                                           <ul className='' ref={emailListRef}>
-                                            {DataTOAutoFill.map(
-                                              (e: any, index) => (
-                                                <li
-                                                  style={{ cursor: 'pointer' }}
-                                                  key={e}
-                                                  onMouseDown={() =>
-                                                    handelautofill(e)
-                                                  }
-                                                  className={` list-group-item
+                                            <div className='scrollable-container custom-scrollbar overflow-y-auto'>
+                                              {DataTOAutoFill.map(
+                                                (e: any, index) => (
+                                                  <li
+                                                    style={{
+                                                      cursor: 'pointer',
+                                                    }}
+                                                    key={e}
+                                                    onMouseDown={() =>
+                                                      handelautofill(e)
+                                                    }
+                                                    className={` list-group-item
                                                     ${
                                                       index === highlightedIndex
                                                         ? 'highlighted'
                                                         : ''
                                                     }`}
-                                                >
-                                                  {e.email}
-                                                </li>
-                                              ),
-                                            )}
+                                                  >
+                                                    {e.email}
+                                                  </li>
+                                                ),
+                                              )}
+                                            </div>
                                           </ul>
                                         )}
                                       {emailError && (
@@ -1181,26 +1185,28 @@ const OrgDashboard = () => {
                                             className=''
                                             ref={firstNameListRef}
                                           >
-                                            {DataTOAutoFill1.filter(
-                                              (e: any) =>
-                                                e.firstname != null &&
-                                                e.firstname != '',
-                                            ).map((e: any, index) => (
-                                              <li
-                                                key={e}
-                                                onMouseDown={() =>
-                                                  handelautofill(e)
-                                                }
-                                                className={` list-group-item
+                                            <div className='scrollable-container custom-scrollbar overflow-y-auto'>
+                                              {DataTOAutoFill1.filter(
+                                                (e: any) =>
+                                                  e.firstname != null &&
+                                                  e.firstname != '',
+                                              ).map((e: any, index) => (
+                                                <li
+                                                  key={e}
+                                                  onMouseDown={() =>
+                                                    handelautofill(e)
+                                                  }
+                                                  className={` list-group-item
                                                  ${
                                                    index === highlightedIndex
                                                      ? 'highlighted'
                                                      : ''
                                                  }`}
-                                              >
-                                                {e.firstname}({e.email})
-                                              </li>
-                                            ))}
+                                                >
+                                                  {e.firstname}({e.email})
+                                                </li>
+                                              ))}
+                                            </div>
                                           </ul>
                                         )}
                                       {firstNameError && (
@@ -1243,25 +1249,27 @@ const OrgDashboard = () => {
                                             className=''
                                             ref={lastNameListRef}
                                           >
-                                            {DataTOAutoFill2.filter(
-                                              (e: any) =>
-                                                e.lastname != null &&
-                                                e.lastname != '',
-                                            ).map((e: any, index) => (
-                                              <li
-                                                key={e}
-                                                onMouseDown={() =>
-                                                  handelautofill(e)
-                                                }
-                                                className={` list-group-item${
-                                                  index === highlightedIndex
-                                                    ? 'highlighted'
-                                                    : ''
-                                                }`}
-                                              >
-                                                {e.lastname}({e.email})
-                                              </li>
-                                            ))}
+                                            <div className='scrollable-container custom-scrollbar overflow-y-auto'>
+                                              {DataTOAutoFill2.filter(
+                                                (e: any) =>
+                                                  e.lastname != null &&
+                                                  e.lastname != '',
+                                              ).map((e: any, index) => (
+                                                <li
+                                                  key={e}
+                                                  onMouseDown={() =>
+                                                    handelautofill(e)
+                                                  }
+                                                  className={` list-group-item${
+                                                    index === highlightedIndex
+                                                      ? 'highlighted'
+                                                      : ''
+                                                  }`}
+                                                >
+                                                  {e.lastname}({e.email})
+                                                </li>
+                                              ))}
+                                            </div>
                                           </ul>
                                         )}
                                       {lastNameError && (

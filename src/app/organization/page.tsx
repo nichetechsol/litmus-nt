@@ -1308,8 +1308,8 @@ const Page = () => {
             <div className='xl:col-span-3 col-span-12'>
               <div className='box'>
                 <div className='box-body !p-0'>
-                  {add_orgUser === 'true' && (
-                    <div className='p-4 grid border-b border-dashed dark:border-defaultborder/10'>
+                  <div className='p-4 grid border-b border-dashed dark:border-defaultborder/10'>
+                    {add_orgUser === 'true' && (
                       <Link
                         href=''
                         id='add-org-button'
@@ -1320,309 +1320,307 @@ const Page = () => {
                         <i className='ri-add-circle-line !text-[1rem]'></i>Add
                         Organization
                       </Link>
-                      {modalOpen && modalOpen ? (
-                        <div
-                          id='todo-compose'
-                          ref={modalRef}
-                          // className='hs-overlay hidden ti-modal open '
-                          className='hs-overlay hidden ti-modal [--overlay-backdrop:static]'
-                        >
-                          <div className='hs-overlay-open:mt-7  ti-modal-box mt-0 ease-out'>
-                            <div className='ti-modal-content'>
-                              <div className='ti-modal-header'>
-                                <h6
-                                  className='modal-title text-[1rem] font-semibold'
-                                  id='mail-ComposeLabel'
-                                >
-                                  {changeFlage === true
-                                    ? 'Add Organization'
-                                    : 'Edit Organization'}
-                                </h6>
-                                <button
-                                  type='button'
-                                  className='hs-dropdown-toggle !text-[1rem] !font-semibold !text-defaulttextcolor'
-                                  data-hs-overlay='#todo-compose'
-                                  ref={closeModalButtonRef}
-                                  onClick={() => {
-                                    setDomainInput('');
-                                    setOrganizationName('');
-                                    setSelectedType('');
-                                    closeModal();
-                                    const defaultDomain =
-                                      getDefaultDomainFromEmail();
-                                    if (defaultDomain) {
-                                      setDomains([defaultDomain]);
-                                    }
-                                    // setDomains([]);
-                                    setMessage('');
-                                    setOrganizationNameError('');
-                                    setDomainError('');
-                                    setTypeDropdownError('');
-                                    setMessageError('');
-                                    // fetchData();
-                                    // fetchData1();
-                                  }}
-                                >
-                                  <span className='sr-only'>Close</span>
-                                  <i className='ri-close-line'></i>
-                                </button>
-                              </div>
+                    )}
+                    {modalOpen && modalOpen ? (
+                      <div
+                        id='todo-compose'
+                        ref={modalRef}
+                        // className='hs-overlay hidden ti-modal open '
+                        className='hs-overlay hidden ti-modal [--overlay-backdrop:static]'
+                      >
+                        <div className='hs-overlay-open:mt-7  ti-modal-box mt-0 ease-out'>
+                          <div className='ti-modal-content'>
+                            <div className='ti-modal-header'>
+                              <h6
+                                className='modal-title text-[1rem] font-semibold'
+                                id='mail-ComposeLabel'
+                              >
+                                {changeFlage === true
+                                  ? 'Add Organization'
+                                  : 'Edit Organization'}
+                              </h6>
+                              <button
+                                type='button'
+                                className='hs-dropdown-toggle !text-[1rem] !font-semibold !text-defaulttextcolor'
+                                data-hs-overlay='#todo-compose'
+                                ref={closeModalButtonRef}
+                                onClick={() => {
+                                  setDomainInput('');
+                                  setOrganizationName('');
+                                  setSelectedType('');
+                                  closeModal();
+                                  const defaultDomain =
+                                    getDefaultDomainFromEmail();
+                                  if (defaultDomain) {
+                                    setDomains([defaultDomain]);
+                                  }
+                                  // setDomains([]);
+                                  setMessage('');
+                                  setOrganizationNameError('');
+                                  setDomainError('');
+                                  setTypeDropdownError('');
+                                  setMessageError('');
+                                  // fetchData();
+                                  // fetchData1();
+                                }}
+                              >
+                                <span className='sr-only'>Close</span>
+                                <i className='ri-close-line'></i>
+                              </button>
+                            </div>
 
-                              <div className='ti-modal-body !overflow-visible px-4'>
-                                <div className='grid grid-cols-12 gap-2'>
-                                  <div className='xl:col-span-12 col-span-12 mb-2'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      Organization Name{' '}
-                                      <span className='text-danger'>*</span>
-                                    </label>
+                            <div className='ti-modal-body !overflow-visible px-4'>
+                              <div className='grid grid-cols-12 gap-2'>
+                                <div className='xl:col-span-12 col-span-12 mb-2'>
+                                  <label
+                                    htmlFor='task-name'
+                                    className='ti-form-label'
+                                  >
+                                    Organization Name{' '}
+                                    <span className='text-danger'>*</span>
+                                  </label>
+                                  <input
+                                    type='text'
+                                    className={`form-control w-full ${
+                                      organizationNameError1
+                                        ? 'input-error'
+                                        : ''
+                                    }`}
+                                    id='task-name'
+                                    placeholder='Enter Organization Name'
+                                    onChange={handleorganizationNameChange}
+                                    onKeyDown={handleKeyPress}
+                                    value={organizationName}
+                                    maxLength={256}
+                                    onKeyUp={handelblurrr}
+                                    // onBlur={handelblurrr}
+                                  />
+                                  {organizationNameError && (
+                                    <div className='text-danger'>
+                                      {organizationNameError}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className='xl:col-span-12 col-span-12 mb-2'>
+                                  <label
+                                    htmlFor='task-name'
+                                    className='ti-form-label'
+                                  >
+                                    Domain/s{' '}
+                                    <span className='text-danger'>*</span>{' '}
+                                    <small className='form-text text-muted'>
+                                      (For multiple domains, press enter after
+                                      each domain, or separate them by comma to
+                                      add them all at once)
+                                    </small>
+                                  </label>
+                                  <div className='flex'>
                                     <input
                                       type='text'
-                                      className={`form-control w-full ${
-                                        organizationNameError1
-                                          ? 'input-error'
-                                          : ''
+                                      // className='form-control w-full me-2'
+                                      className={`form-control-2   me-2 ${
+                                        domainError === '' ? '' : 'input-error'
                                       }`}
                                       id='task-name'
-                                      placeholder='Enter Organization Name'
-                                      onChange={handleorganizationNameChange}
+                                      // placeholder={`For eg: ${
+                                      //   email.split('@')[1]
+                                      // }`}
+                                      placeholder='For eg: example.com'
+                                      onChange={handleDomainChange}
                                       onKeyDown={handleKeyPress}
-                                      value={organizationName}
-                                      maxLength={256}
-                                      onKeyUp={handelblurrr}
-                                      // onBlur={handelblurrr}
+                                      value={domainInput}
+                                      maxLength={255}
+                                      disabled={
+                                        org_Business === 'none_business'
+                                      }
                                     />
-                                    {organizationNameError && (
-                                      <div className='text-danger'>
-                                        {organizationNameError}
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className='xl:col-span-12 col-span-12 mb-2'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      Domain/s{' '}
-                                      <span className='text-danger'>*</span>{' '}
-                                      <small className='form-text text-muted'>
-                                        (For multiple domains, press enter after
-                                        each domain, or separate them by comma
-                                        to add them all at once)
-                                      </small>
-                                    </label>
-                                    <div className='flex'>
-                                      <input
-                                        type='text'
-                                        // className='form-control w-full me-2'
-                                        className={`form-control-2   me-2 ${
-                                          domainError === ''
-                                            ? ''
-                                            : 'input-error'
-                                        }`}
-                                        id='task-name'
-                                        // placeholder={`For eg: ${
-                                        //   email.split('@')[1]
-                                        // }`}
-                                        placeholder='For eg: example.com'
-                                        onChange={handleDomainChange}
-                                        onKeyDown={handleKeyPress}
-                                        value={domainInput}
-                                        maxLength={255}
-                                        disabled={
-                                          org_Business === 'none_business'
-                                        }
-                                      />
 
-                                      <button
-                                        type='button'
-                                        // className='ti-btn bg-primary text-white ml-2 mb-0 plus-btn-org'
-                                        disabled={!domainPlusbtnVisible}
-                                        className={`${
-                                          domainPlusbtnVisible
-                                            ? 'ti-btn bg-primary text-white ml-2 mb-0 plus-btn-org'
-                                            : 'ti-btn bg-gray-500 text-white ml-2 mb-0 plus-btn-org'
-                                        }`}
-                                        onClick={handleDomainPlus}
-                                      >
-                                        +
-                                      </button>
-                                    </div>
-                                    {domainError && (
-                                      <div className='text-danger'>
-                                        {domainError}
-                                      </div>
-                                    )}
+                                    <button
+                                      type='button'
+                                      // className='ti-btn bg-primary text-white ml-2 mb-0 plus-btn-org'
+                                      disabled={!domainPlusbtnVisible}
+                                      className={`${
+                                        domainPlusbtnVisible
+                                          ? 'ti-btn bg-primary text-white ml-2 mb-0 plus-btn-org'
+                                          : 'ti-btn bg-gray-500 text-white ml-2 mb-0 plus-btn-org'
+                                      }`}
+                                      onClick={handleDomainPlus}
+                                    >
+                                      +
+                                    </button>
                                   </div>
-                                  {/* <div className='flex justify-between mt-4'> */}
-                                  <div className='xl:col-span-12 col-span-12'>
-                                    <div className='grid grid-cols-12 gap-2'>
-                                      {domains &&
-                                        domains.map((domain: any, index) => (
-                                          // eslint-disable-next-line react/jsx-key
-                                          <div
-                                            key={index}
-                                            className='xl:col-span-6 col-span-6 alert alert-solid-primary alert-dismissible fade show flex'
-                                            role='alert'
-                                            id='dismiss-alert2'
-                                          >
-                                            <div className='sm:flex-shrink-0 domain-name-div'>
-                                              {domain}
-                                            </div>
-                                            <div className='ms-auto'>
-                                              <div className='mx-1 my-1'>
-                                                <button
-                                                  type='button'
-                                                  className='inline-flex bg-teal-50 rounded-sm text-teal-500 focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-offset-teal-50 focus:ring-teal-600'
-                                                  onClick={() =>
-                                                    removeDomain(index, domain)
-                                                  }
-                                                  //   onClick={()=>{
-                                                  //     domains.splice(index, 1);
-                                                  //   setDomains(domains);
-                                                  // }}
+                                  {domainError && (
+                                    <div className='text-danger'>
+                                      {domainError}
+                                    </div>
+                                  )}
+                                </div>
+                                {/* <div className='flex justify-between mt-4'> */}
+                                <div className='xl:col-span-12 col-span-12'>
+                                  <div className='grid grid-cols-12 gap-2'>
+                                    {domains &&
+                                      domains.map((domain: any, index) => (
+                                        // eslint-disable-next-line react/jsx-key
+                                        <div
+                                          key={index}
+                                          className='xl:col-span-6 col-span-6 alert alert-solid-primary alert-dismissible fade show flex'
+                                          role='alert'
+                                          id='dismiss-alert2'
+                                        >
+                                          <div className='sm:flex-shrink-0 domain-name-div'>
+                                            {domain}
+                                          </div>
+                                          <div className='ms-auto'>
+                                            <div className='mx-1 my-1'>
+                                              <button
+                                                type='button'
+                                                className='inline-flex bg-teal-50 rounded-sm text-teal-500 focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-offset-teal-50 focus:ring-teal-600'
+                                                onClick={() =>
+                                                  removeDomain(index, domain)
+                                                }
+                                                //   onClick={()=>{
+                                                //     domains.splice(index, 1);
+                                                //   setDomains(domains);
+                                                // }}
+                                              >
+                                                <span className='sr-only'>
+                                                  Dismiss
+                                                </span>
+                                                <svg
+                                                  className='h-3 w-3'
+                                                  width='16'
+                                                  height='16'
+                                                  viewBox='0 0 16 16'
+                                                  fill='none'
+                                                  xmlns='http://www.w3.org/2000/svg'
+                                                  aria-hidden='true'
                                                 >
-                                                  <span className='sr-only'>
-                                                    Dismiss
-                                                  </span>
-                                                  <svg
-                                                    className='h-3 w-3'
-                                                    width='16'
-                                                    height='16'
-                                                    viewBox='0 0 16 16'
-                                                    fill='none'
-                                                    xmlns='http://www.w3.org/2000/svg'
-                                                    aria-hidden='true'
-                                                  >
-                                                    <path
-                                                      d='M0.92524 0.687069C1.126 0.486219 1.39823 0.373377 1.68209 0.373377C1.96597 0.373377 2.2382 0.486219 2.43894 0.687069L8.10514 6.35813L13.7714 0.687069C13.8701 0.584748 13.9882 0.503105 14.1188 0.446962C14.2494 0.39082 14.3899 0.361248 14.5321 0.360026C14.6742 0.358783 14.8151 0.38589 14.9468 0.439762C15.0782 0.493633 15.1977 0.573197 15.2983 0.673783C15.3987 0.774389 15.4784 0.894026 15.5321 1.02568C15.5859 1.15736 15.6131 1.29845 15.6118 1.44071C15.6105 1.58297 15.5809 1.72357 15.5248 1.85428C15.4688 1.98499 15.3872 2.10324 15.2851 2.20206L9.61883 7.87312L15.2851 13.5441C15.4801 13.7462 15.588 14.0168 15.5854 14.2977C15.5831 14.5787 15.4705 14.8474 15.272 15.046C15.0735 15.2449 14.805 15.3574 14.5244 15.3599C14.2437 15.3623 13.9733 15.2543 13.7714 15.0591L8.10514 9.38812L2.43894 15.0591C2.23704 15.2543 1.96663 15.3623 1.68594 15.3599C1.40526 15.3574 1.13677 15.2449 0.938279 15.046C0.739807 14.8474 0.627232 14.5787 0.624791 14.2977C0.62235 14.0168 0.730236 13.7462 0.92524 13.5441L6.59144 7.87312L0.92524 2.20206C0.724562 2.00115 0.611816 1.72867 0.611816 1.44457C0.611816 1.16047 0.724562 0.887983 0.92524 0.687069Z'
-                                                      fill='currentColor'
-                                                    ></path>
-                                                  </svg>
-                                                </button>
-                                              </div>
+                                                  <path
+                                                    d='M0.92524 0.687069C1.126 0.486219 1.39823 0.373377 1.68209 0.373377C1.96597 0.373377 2.2382 0.486219 2.43894 0.687069L8.10514 6.35813L13.7714 0.687069C13.8701 0.584748 13.9882 0.503105 14.1188 0.446962C14.2494 0.39082 14.3899 0.361248 14.5321 0.360026C14.6742 0.358783 14.8151 0.38589 14.9468 0.439762C15.0782 0.493633 15.1977 0.573197 15.2983 0.673783C15.3987 0.774389 15.4784 0.894026 15.5321 1.02568C15.5859 1.15736 15.6131 1.29845 15.6118 1.44071C15.6105 1.58297 15.5809 1.72357 15.5248 1.85428C15.4688 1.98499 15.3872 2.10324 15.2851 2.20206L9.61883 7.87312L15.2851 13.5441C15.4801 13.7462 15.588 14.0168 15.5854 14.2977C15.5831 14.5787 15.4705 14.8474 15.272 15.046C15.0735 15.2449 14.805 15.3574 14.5244 15.3599C14.2437 15.3623 13.9733 15.2543 13.7714 15.0591L8.10514 9.38812L2.43894 15.0591C2.23704 15.2543 1.96663 15.3623 1.68594 15.3599C1.40526 15.3574 1.13677 15.2449 0.938279 15.046C0.739807 14.8474 0.627232 14.5787 0.624791 14.2977C0.62235 14.0168 0.730236 13.7462 0.92524 13.5441L6.59144 7.87312L0.92524 2.20206C0.724562 2.00115 0.611816 1.72867 0.611816 1.44457C0.611816 1.16047 0.724562 0.887983 0.92524 0.687069Z'
+                                                    fill='currentColor'
+                                                  ></path>
+                                                </svg>
+                                              </button>
                                             </div>
                                           </div>
-                                        ))}
-                                    </div>
-                                  </div>
-                                  <div className='xl:col-span-12 col-span-12 mb-2'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      Type{' '}
-                                      <span className='text-danger'>*</span>
-                                    </label>
-                                    <select
-                                      style={{ cursor: 'pointer' }}
-                                      className={`form-select ${
-                                        selectedType === ''
-                                          ? 'deselect-main input-error'
-                                          : ''
-                                      }`}
-                                      value={selectedType}
-                                      onChange={handleTypeDropdownChange}
-                                      disabled={!changeFlage}
-                                    >
-                                      <option value='' hidden>
-                                        Select Type
-                                      </option>
-                                      {typeDropdown &&
-                                        typeDropdown.map((type) => (
-                                          <option
-                                            style={{ cursor: 'pointer' }}
-                                            key={type.id}
-                                            value={type.name}
-                                          >
-                                            {type.name}
-                                          </option>
-                                        ))}
-                                    </select>
-
-                                    {typeDropdownError && (
-                                      <div className='text-danger'>
-                                        {typeDropdownError}
-                                      </div>
-                                    )}
-                                  </div>
-
-                                  <div className='xl:col-span-12 col-span-12 mb-2'>
-                                    <label
-                                      htmlFor='task-name'
-                                      className='ti-form-label'
-                                    >
-                                      Description
-                                    </label>
-                                    <textarea
-                                      className='form-control w-full'
-                                      id='task-name'
-                                      placeholder='Enter Description'
-                                      onChange={handleMessageChange}
-                                      onKeyDown={handleKeyPress}
-                                      value={message}
-                                      style={{ resize: 'none' }}
-                                      maxLength={1000}
-                                    />
-                                    {messageError && (
-                                      <div className='text-danger'>
-                                        {messageError}
-                                      </div>
-                                    )}
+                                        </div>
+                                      ))}
                                   </div>
                                 </div>
+                                <div className='xl:col-span-12 col-span-12 mb-2'>
+                                  <label
+                                    htmlFor='task-name'
+                                    className='ti-form-label'
+                                  >
+                                    Type <span className='text-danger'>*</span>
+                                  </label>
+                                  <select
+                                    style={{ cursor: 'pointer' }}
+                                    className={`form-select ${
+                                      selectedType === ''
+                                        ? 'deselect-main input-error'
+                                        : ''
+                                    }`}
+                                    value={selectedType}
+                                    onChange={handleTypeDropdownChange}
+                                    disabled={!changeFlage}
+                                  >
+                                    <option value='' hidden>
+                                      Select Type
+                                    </option>
+                                    {typeDropdown &&
+                                      typeDropdown.map((type) => (
+                                        <option
+                                          style={{ cursor: 'pointer' }}
+                                          key={type.id}
+                                          value={type.name}
+                                        >
+                                          {type.name}
+                                        </option>
+                                      ))}
+                                  </select>
+
+                                  {typeDropdownError && (
+                                    <div className='text-danger'>
+                                      {typeDropdownError}
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div className='xl:col-span-12 col-span-12 mb-2'>
+                                  <label
+                                    htmlFor='task-name'
+                                    className='ti-form-label'
+                                  >
+                                    Description
+                                  </label>
+                                  <textarea
+                                    className='form-control w-full'
+                                    id='task-name'
+                                    placeholder='Enter Description'
+                                    onChange={handleMessageChange}
+                                    onKeyDown={handleKeyPress}
+                                    value={message}
+                                    style={{ resize: 'none' }}
+                                    maxLength={1000}
+                                  />
+                                  {messageError && (
+                                    <div className='text-danger'>
+                                      {messageError}
+                                    </div>
+                                  )}
+                                </div>
                               </div>
-                              <div className='ti-modal-footer'>
-                                <button
-                                  type='button'
-                                  className='hs-dropdown-toggle ti-btn  ti-btn-light align-middle'
-                                  data-hs-overlay='#todo-compose'
-                                  ref={closeModalButtonRef}
-                                  onClick={() => {
-                                    setDomainInput('');
-                                    setOrganizationName('');
-                                    setSelectedType('');
-                                    const defaultDomain =
-                                      getDefaultDomainFromEmail();
-                                    if (defaultDomain) {
-                                      setDomains([defaultDomain]);
-                                    }
-                                    // setDomains([]);
-                                    setMessage('');
-                                    setOrganizationNameError('');
-                                    setDomainError('');
-                                    setTypeDropdownError('');
-                                    setMessageError('');
-                                    closeModal();
-                                  }}
-                                >
-                                  Cancel
-                                </button>
-                                <button
-                                  type='button'
-                                  disabled={!addbuttonclass}
-                                  className={
-                                    addbuttonclass
-                                      ? 'ti-btn bg-primary text-white !font-medium'
-                                      : 'ti-btn bg-gray-500 text-white !font-medium'
+                            </div>
+                            <div className='ti-modal-footer'>
+                              <button
+                                type='button'
+                                className='hs-dropdown-toggle ti-btn  ti-btn-light align-middle'
+                                data-hs-overlay='#todo-compose'
+                                ref={closeModalButtonRef}
+                                onClick={() => {
+                                  setDomainInput('');
+                                  setOrganizationName('');
+                                  setSelectedType('');
+                                  const defaultDomain =
+                                    getDefaultDomainFromEmail();
+                                  if (defaultDomain) {
+                                    setDomains([defaultDomain]);
                                   }
-                                  onClick={handleSubmit}
-                                >
-                                  {changeFlage === true
-                                    ? 'Add Organization'
-                                    : 'Save Changes'}
-                                </button>
-                              </div>
+                                  // setDomains([]);
+                                  setMessage('');
+                                  setOrganizationNameError('');
+                                  setDomainError('');
+                                  setTypeDropdownError('');
+                                  setMessageError('');
+                                  closeModal();
+                                }}
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                type='button'
+                                disabled={!addbuttonclass}
+                                className={
+                                  addbuttonclass
+                                    ? 'ti-btn bg-primary text-white !font-medium'
+                                    : 'ti-btn bg-gray-500 text-white !font-medium'
+                                }
+                                onClick={handleSubmit}
+                              >
+                                {changeFlage === true
+                                  ? 'Add Organization'
+                                  : 'Save Changes'}
+                              </button>
                             </div>
                           </div>
                         </div>
-                      ) : (
-                        <></>
-                      )}
-                    </div>
-                  )}
+                      </div>
+                    ) : (
+                      <></>
+                    )}
+                  </div>
+
                   <div className='p-4 border-b border-dashed dark:border-defaultborder/10'>
                     <div className='input-group' style={{ cursor: 'pointer' }}>
                       <input
@@ -1650,47 +1648,53 @@ const Page = () => {
                   <div className='p-4 task-navigation border-b border-dashed dark:border-defaultborder/10'>
                     <ul className='list-none task-main-nav mb-0 '>
                       {sidebarOrgs && (
-                        <div className='scrollable-container'>
-                          {sidebarOrgs &&
-                            sidebarOrgs.data.map((org, index) => (
-                              <li
-                                id={`org-item-${index}`}
-                                style={{
-                                  cursor: org.id === -1 ? '' : 'pointer',
-                                  backgroundColor:
-                                    focusedIndex === index ? '#e0e0e0' : '',
-                                }}
-                                key={org.id as number}
-                                onClick={() => {
-                                  if (org.id != -1) {
-                                    setLoading(true);
-                                    const encryptedOrgId = encryptData(
-                                      org.id as string,
-                                    );
-                                    const encryptedOrgName = encryptData(
-                                      org.name,
-                                    );
-                                    localStorage.removeItem('site_id');
-                                    localStorage.removeItem('site_name');
-                                    localStorage.removeItem('site_owner_name');
-                                    localStorage.setItem(
-                                      'org_id',
-                                      encryptedOrgId,
-                                    );
-                                    localStorage.setItem(
-                                      'org_name',
-                                      encryptedOrgName,
-                                    );
-                                    navigate.push('/orgdashboard');
-                                    setLoading(false);
-                                  }
-                                }}
-                              >
-                                <div className='flex items-center'>
-                                  <a className='flex-grow p-new'>{org?.name}</a>
-                                </div>
-                              </li>
-                            ))}
+                        <div className='scrollable-container custom-scrollbar overflow-y-auto'>
+                          <div>
+                            {sidebarOrgs &&
+                              sidebarOrgs.data.map((org, index) => (
+                                <li
+                                  id={`org-item-${index}`}
+                                  style={{
+                                    cursor: org.id === -1 ? '' : 'pointer',
+                                    backgroundColor:
+                                      focusedIndex === index ? '#e0e0e0' : '',
+                                  }}
+                                  key={org.id as number}
+                                  onClick={() => {
+                                    if (org.id != -1) {
+                                      setLoading(true);
+                                      const encryptedOrgId = encryptData(
+                                        org.id as string,
+                                      );
+                                      const encryptedOrgName = encryptData(
+                                        org.name,
+                                      );
+                                      localStorage.removeItem('site_id');
+                                      localStorage.removeItem('site_name');
+                                      localStorage.removeItem(
+                                        'site_owner_name',
+                                      );
+                                      localStorage.setItem(
+                                        'org_id',
+                                        encryptedOrgId,
+                                      );
+                                      localStorage.setItem(
+                                        'org_name',
+                                        encryptedOrgName,
+                                      );
+                                      navigate.push('/orgdashboard');
+                                      setLoading(false);
+                                    }
+                                  }}
+                                >
+                                  <div className='flex items-center'>
+                                    <a className='flex-grow p-new'>
+                                      {org?.name}
+                                    </a>
+                                  </div>
+                                </li>
+                              ))}
+                          </div>
                         </div>
                       )}
                     </ul>

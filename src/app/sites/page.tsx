@@ -1392,7 +1392,7 @@ const Page: React.FC = () => {
                     <div className='p-4 task-navigation border-b border-dashed dark:border-defaultborder/10'>
                       <ul className='list-none task-main-nav mb-0'>
                         {sidebarSite && (
-                          <div className='scrollable-container'>
+                          <div className='scrollable-container custom-scrollbar overflow-y-auto'>
                             {sidebarSite.map((site, index) => (
                               <li
                                 // style={{ cursor: 'pointer' }}
