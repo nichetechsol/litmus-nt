@@ -411,6 +411,14 @@ html {
     width: 2rem !important;
   }
 }
+@media (max-width: 768.98px) {
+  .cotainer-mobile {
+    padding: 0px;
+  }
+  .b-activity {
+    display: flex;
+  }
+}
 @media (max-width: 767.98px) {
   .app-header .horizontal-logo .header-logo img {
     height: 2rem;

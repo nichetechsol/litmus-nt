@@ -968,14 +968,14 @@ const Page = () => {
                       <div className='box-title'>About Site</div>
                     </div>
                     <div className='box-body'>
-                      <div className='ms-6'>
+                      <div className='ms-lg-6 '>
                         {siteCountData &&
-                        siteCountData.data.sites_details.about_site
+                          siteCountData.data.sites_details.about_site
                           ? ''
                           : // <h5 className='text-[1.25rem] text-defaulttextcolor dark:text-defaulttextcolor/70 font-medium'>
 
-                            // </h5>
-                            ''}
+                          // </h5>
+                          ''}
 
                         <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
                           {siteCountData
@@ -983,11 +983,11 @@ const Page = () => {
                             : null}
                           {siteCountData &&
                             siteCountData.data.sites_details.about_site ===
-                              '' &&
+                            '' &&
                             'No Description'}
                         </p>
                       </div>
-                      <div className='xl:col-span-12 col-span-12  mt-5 container !mx-auto !justify-center !items-center '>
+                      <div className='xl:col-span-12 col-span-12  mt-5 container cotainer-mobile !mx-auto !justify-center !items-center '>
                         <div className='box text-default shadow border dark:border-defaulttextcolor/10'>
                           <div className='box-body !p-0'>
                             <div className='sm:grid grid-cols-12'>
@@ -1017,7 +1017,7 @@ const Page = () => {
                                 <div className='text-center owner-details p-6 w-full h-full flex justify-center'>
                                   <span className='font-semibold text-[.875rem] me-2'>
                                     {siteCountData &&
-                                    siteCountData.data.sites_details.created_at
+                                      siteCountData.data.sites_details.created_at
                                       ? 'Created:   '
                                       : ''}
                                   </span>
@@ -1026,13 +1026,13 @@ const Page = () => {
                                     {' '}
                                     {siteCountData
                                       ? moment(
-                                          siteCountData.data.sites_details
-                                            .created_at,
-                                        ).format(' MM/DD/YYYY HH:mm')
+                                        siteCountData.data.sites_details
+                                          .created_at,
+                                      ).format(' MM/DD/YYYY HH:mm')
                                       : //  siteCountData.data.sites_details[0].created_at.split(
-                                        //     'T',
-                                        //   )[0]
-                                        ''}
+                                      //     'T',
+                                      //   )[0]
+                                      ''}
                                     {/* </span> */}
                                   </p>
                                 </div>
@@ -1067,49 +1067,49 @@ const Page = () => {
                       <ul className='list-none crm-top-deals mb-0'>
                         {licence && licence.length > 0
                           ? licence.map((user, index) => (
-                              <li className='mb-[0.9rem]' key={index}>
-                                <div className='flex items-start flex-wrap'>
-                                  <div className='me-2'>
-                                    <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
-                                      <i className='ri-profile-line text-[1rem]  text-white'></i>
-                                    </span>
-                                  </div>
-                                  <div className='flex-grow flex-license'>
-                                    <p className='pnew-white-space  font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                      {user.licence_number}
-                                    </p>
-                                    <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                      {/* {user.expiry.split('T')[0]} */}
-                                      {user
-                                        ? moment(user.expiry).format(
-                                            'MM/DD/YYYY HH:mm',
-                                          )
-                                        : ''}
-                                    </p>
-                                  </div>
-                                  <div className='font-semibold text-[0.9375rem] '>
-                                    <h1>
-                                      {' '}
-                                      {moment().isAfter(user.expiry) ? (
-                                        <span className='badge bg-danger text-white'>
-                                          Expired
-                                        </span>
-                                      ) : moment(user.expiry).isBefore(
-                                          moment().add(1, 'month'),
-                                        ) ? (
-                                        <span className='badge bg-warning text-white'>
-                                          Soon to Expire
-                                        </span>
-                                      ) : (
-                                        <span className='badge bg-primary text-white'>
-                                          Active
-                                        </span>
-                                      )}
-                                    </h1>
-                                  </div>
+                            <li className='mb-[0.9rem]' key={index}>
+                              <div className='flex items-start flex-wrap'>
+                                <div className='me-2'>
+                                  <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
+                                    <i className='ri-profile-line text-[1rem]  text-white'></i>
+                                  </span>
                                 </div>
-                              </li>
-                            ))
+                                <div className='flex-grow flex-license'>
+                                  <p className='pnew-white-space  font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                    {user.licence_number}
+                                  </p>
+                                  <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
+                                    {/* {user.expiry.split('T')[0]} */}
+                                    {user
+                                      ? moment(user.expiry).format(
+                                        'MM/DD/YYYY HH:mm',
+                                      )
+                                      : ''}
+                                  </p>
+                                </div>
+                                <div className='font-semibold text-[0.9375rem] '>
+                                  <h1>
+                                    {' '}
+                                    {moment().isAfter(user.expiry) ? (
+                                      <span className='badge bg-danger text-white'>
+                                        Expired
+                                      </span>
+                                    ) : moment(user.expiry).isBefore(
+                                      moment().add(1, 'month'),
+                                    ) ? (
+                                      <span className='badge bg-warning text-white'>
+                                        Soon to Expire
+                                      </span>
+                                    ) : (
+                                      <span className='badge bg-primary text-white'>
+                                        Active
+                                      </span>
+                                    )}
+                                  </h1>
+                                </div>
+                              </div>
+                            </li>
+                          ))
                           : null}
                         {licence && licence.length === 0 && (
                           <div className='col-md-12 w-100 mt-4'>
@@ -1141,45 +1141,44 @@ const Page = () => {
                       <ul className='list-none crm-top-deals mb-0'>
                         {products && products.length > 0
                           ? products.map((product, index) => (
-                              <li className='mb-[0.9rem]' key={index}>
-                                <h5 className='box-title'>{product.folder}</h5>
-                                <div className='flex items-center flex-wrap'>
-                                  <div className='me-2 ic-product'>
-                                    <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
-                                      <i className='ri-folder-line text-[1rem]  text-white'></i>
-                                    </span>
-                                  </div>
-                                  <div className='flex-grow ic-product-p'>
-                                    <p
-                                      className={`font-semibold mb-[1.4px]  text-[0.813rem] ${
-                                        product.disabled ? '' : 'text-gray-500'
-                                      }`}
-                                    >
-                                      {product.FileName}
-                                    </p>
-                                  </div>
-                                  {product.disabled && (
-                                    <div className='font-semibold text-[0.9375rem] '>
-                                      <a
-                                        onClick={() => {
-                                          handleDownload(
-                                            product.FileName,
-                                            product.folder,
-                                            product.subfolder,
-                                            'P',
-                                          );
-                                        }}
-                                        style={{ cursor: 'pointer' }}
-                                        // href={product.data.downloadLink}
-                                        className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
-                                      >
-                                        <i className='ri-download-line  text-[.8rem]  text-white'></i>
-                                      </a>
-                                    </div>
-                                  )}
+                            <li className='mb-[0.9rem]' key={index}>
+                              <h5 className='box-title'>{product.folder}</h5>
+                              <div className='flex items-center flex-wrap'>
+                                <div className='me-2 ic-product'>
+                                  <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
+                                    <i className='ri-folder-line text-[1rem]  text-white'></i>
+                                  </span>
                                 </div>
-                              </li>
-                            ))
+                                <div className='flex-grow ic-product-p'>
+                                  <p
+                                    className={`font-semibold mb-[1.4px]  text-[0.813rem] ${product.disabled ? '' : 'text-gray-500'
+                                      }`}
+                                  >
+                                    {product.FileName}
+                                  </p>
+                                </div>
+                                {product.disabled && (
+                                  <div className='font-semibold text-[0.9375rem] '>
+                                    <a
+                                      onClick={() => {
+                                        handleDownload(
+                                          product.FileName,
+                                          product.folder,
+                                          product.subfolder,
+                                          'P',
+                                        );
+                                      }}
+                                      style={{ cursor: 'pointer' }}
+                                      // href={product.data.downloadLink}
+                                      className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
+                                    >
+                                      <i className='ri-download-line  text-[.8rem]  text-white'></i>
+                                    </a>
+                                  </div>
+                                )}
+                              </div>
+                            </li>
+                          ))
                           : null}
                         {(products && products.length === 0) ||
                           (products === null && (
@@ -1200,22 +1199,22 @@ const Page = () => {
                       <ul className='list-none crm-top-deals mb-0'>
                         {entitlementListData && entitlementListData.length > 0
                           ? entitlementListData.map((entitlement: any) => (
-                              <li className='mb-[0.9rem]' key={entitlement.id}>
-                                <div className='flex items-start flex-wrap'>
-                                  <div className='flex-grow'>
-                                    <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                      {entitlement.entitlementName}
-                                    </p>
-                                  </div>
-                                  <div className='font-semibold text-[0.9375rem] '>
-                                    {typeof entitlement.entitlementValue ===
-                                    'boolean'
-                                      ? entitlement.entitlementValue.toString()
-                                      : entitlement.entitlementValue}
-                                  </div>
+                            <li className='mb-[0.9rem]' key={entitlement.id}>
+                              <div className='flex items-start flex-wrap'>
+                                <div className='flex-grow'>
+                                  <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                    {entitlement.entitlementName}
+                                  </p>
                                 </div>
-                              </li>
-                            ))
+                                <div className='font-semibold text-[0.9375rem] '>
+                                  {typeof entitlement.entitlementValue ===
+                                    'boolean'
+                                    ? entitlement.entitlementValue.toString()
+                                    : entitlement.entitlementValue}
+                                </div>
+                              </div>
+                            </li>
+                          ))
                           : null}
                         {entitlementListData &&
                           entitlementListData.length > 0 && (
@@ -1228,11 +1227,10 @@ const Page = () => {
                                 setActivePage2(page)
                               }
                               itemClass='page-item pagination-custom'
-                              linkClass={` ${
-                                totalItemsCount2 && totalItemsCount2 > 10
-                                  ? 'page-link'
-                                  : 'page-link chnage'
-                              }`}
+                              linkClass={` ${totalItemsCount2 && totalItemsCount2 > 10
+                                ? 'page-link'
+                                : 'page-link chnage'
+                                }`}
                             />
                           )}
                         {entitlementListData &&
@@ -1307,28 +1305,28 @@ const Page = () => {
                     {/* </div> */}
                     <div
                       className='box-body'
-                      // style={{ cursor: 'pointer' }}
-                      // onClick={() => {
-                      //   const encryptedsiteid = encryptData(SingleSite.site.id);
-                      //   const encryptedsitename = encryptData(
-                      //     SingleSite.site.name,
-                      //   );
-                      //   const encryptedsiteOwnerName = encryptData(
-                      //     SingleSite.ownerNames,
-                      //   );
-                      //   localStorage.setItem('site_id', encryptedsiteid);
-                      //   localStorage.setItem('site_name', encryptedsitename);
-                      //   localStorage.setItem(
-                      //     'site_owner_name',
-                      //     encryptedsiteOwnerName,
-                      //   );
-                      //   navigate.push('/sitedashboard');
-                      // }}
+                    // style={{ cursor: 'pointer' }}
+                    // onClick={() => {
+                    //   const encryptedsiteid = encryptData(SingleSite.site.id);
+                    //   const encryptedsitename = encryptData(
+                    //     SingleSite.site.name,
+                    //   );
+                    //   const encryptedsiteOwnerName = encryptData(
+                    //     SingleSite.ownerNames,
+                    //   );
+                    //   localStorage.setItem('site_id', encryptedsiteid);
+                    //   localStorage.setItem('site_name', encryptedsitename);
+                    //   localStorage.setItem(
+                    //     'site_owner_name',
+                    //     encryptedsiteOwnerName,
+                    //   );
+                    //   navigate.push('/sitedashboard');
+                    // }}
                     >
                       <div className='flex justify-between items-center  gap-2'>
                         <div className='flex items-center'></div>
                       </div>
-                      {}
+                      { }
                       <div className=''>
                         <div>
                           <ul className='list-group list-group-flush'>
@@ -1338,8 +1336,7 @@ const Page = () => {
                               <p className='ms-1 over-text text-muted fw-normal d-inline-block'>
                                 {siteCountData &&
                                   `${siteCountData?.data?.sites_details
-                                    ?.address1}${
-                                    siteCountData?.data?.sites_details?.address2
+                                    ?.address1}${siteCountData?.data?.sites_details?.address2
                                       ? `, ${siteCountData?.data?.sites_details?.address2}`
                                       : ''
                                   }`}
@@ -1463,9 +1460,8 @@ const Page = () => {
                                       </label>
                                       <input
                                         type='text'
-                                        className={`form-control w-full ${
-                                          email ? '' : 'input-error'
-                                        } ${emailError ? 'input-error' : ''} `}
+                                        className={`form-control w-full ${email ? '' : 'input-error'
+                                          } ${emailError ? 'input-error' : ''} `}
                                         id='Email'
                                         disabled={!changeFlage}
                                         placeholder='Enter Email'
@@ -1494,11 +1490,10 @@ const Page = () => {
                                                     handelautofill(e)
                                                   }
                                                   className={` list-group-item
-                                                  ${
-                                                    index === highlightedIndex
+                                                  ${index === highlightedIndex
                                                       ? 'highlighted'
                                                       : ''
-                                                  }`}
+                                                    }`}
                                                 >
                                                   {e.email}
                                                 </li>
@@ -1524,8 +1519,7 @@ const Page = () => {
                                       <input
                                         type='text'
                                         className={`form-control w-full 
-                                          ${
-                                            firstNameError ? 'input-error' : ''
+                                          ${firstNameError ? 'input-error' : ''
                                           } `}
                                         id='task-name'
                                         disabled={!changeFlage}
@@ -1560,10 +1554,9 @@ const Page = () => {
                                                   handelautofill(e)
                                                 }
                                                 className={` list-group-item
-                                                  ${
-                                                    index === highlightedIndex
-                                                      ? 'highlighted'
-                                                      : ''
+                                                  ${index === highlightedIndex
+                                                    ? 'highlighted'
+                                                    : ''
                                                   }`}
                                               >
                                                 {e.firstname}({e.email})
@@ -1587,9 +1580,8 @@ const Page = () => {
                                       </label>
                                       <input
                                         type='text'
-                                        className={`form-control w-full ${
-                                          lastNameError ? 'input-error' : ''
-                                        }`}
+                                        className={`form-control w-full ${lastNameError ? 'input-error' : ''
+                                          }`}
                                         id='task-name'
                                         placeholder='Enter Last Name'
                                         disabled={!changeFlage}
@@ -1623,11 +1615,10 @@ const Page = () => {
                                                   handelautofill(e)
                                                 }
                                                 className={` list-group-item
-                                                 ${
-                                                   index === highlightedIndex
-                                                     ? 'highlighted'
-                                                     : ''
-                                                 }`}
+                                                 ${index === highlightedIndex
+                                                    ? 'highlighted'
+                                                    : ''
+                                                  }`}
                                               >
                                                 {e.lastname}({e.email})
                                               </li>
@@ -1650,9 +1641,8 @@ const Page = () => {
                                       </label>
                                       <select
                                         style={{ cursor: 'pointer' }}
-                                        className={`form-select ${
-                                          role ? '' : 'input-error'
-                                        }
+                                        className={`form-select ${role ? '' : 'input-error'
+                                          }
                                         ${roleError ? 'input-error' : ''}
                                         ${role === '' ? 'deselect-main' : ''}`}
                                         onChange={handleRoleChange}
@@ -1748,58 +1738,56 @@ const Page = () => {
                           <tbody>
                             {orgUserData && orgUserData.length > 0
                               ? orgUserData.map((user, index) => (
-                                  <tr
-                                    className='border border-inherit border-solid hover:bg-gray-100 dark:border-defaultborder/10 dark:hover:bg-light'
-                                    key={index}
-                                  >
-                                    <td>
-                                      <div className='flex items-center font-semibold'>
-                                        {`${
-                                          user.firstname ? user.firstname : '-'
-                                        } ${
-                                          user.lastname ? user.lastname : '-'
+                                <tr
+                                  className='border border-inherit border-solid hover:bg-gray-100 dark:border-defaultborder/10 dark:hover:bg-light'
+                                  key={index}
+                                >
+                                  <td>
+                                    <div className='flex items-center font-semibold'>
+                                      {`${user.firstname ? user.firstname : '-'
+                                        } ${user.lastname ? user.lastname : '-'
                                         }`}{' '}
+                                    </div>
+                                  </td>
+
+                                  <td>{user.email}</td>
+                                  <td>
+                                    <span
+                                    // className={`inline-flex text-${user.color} !py-[0.15rem] !px-[0.45rem] rounded-sm !font-semibold !text-[0.75em] bg-${user.color}/10`}
+                                    >
+                                      {user.role_name}
+                                    </span>
+                                  </td>
+                                  {userrole3 == '1' || userrole3 == '2' ? (
+                                    <td>
+                                      <div className='flex flex-row items-center !gap-2 text-[0.9375rem]'>
+                                        <Link
+                                          aria-label='anchor'
+                                          href=''
+                                          style={{ cursor: 'pointer' }}
+                                          data-hs-overlay='#todo-compose-user'
+                                          onClick={() => {
+                                            handleEdit(user);
+                                          }}
+                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
+                                        >
+                                          <i className='ri-edit-line'></i>
+                                        </Link>
+                                        <div
+                                          style={{ cursor: 'pointer' }}
+                                          aria-label='anchor'
+                                          onClick={() => {
+                                            handleDelete(user);
+                                          }}
+                                          className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
+                                        >
+                                          <i className='ri-delete-bin-line'></i>
+                                        </div>
                                       </div>
                                     </td>
-
-                                    <td>{user.email}</td>
-                                    <td>
-                                      <span
-                                      // className={`inline-flex text-${user.color} !py-[0.15rem] !px-[0.45rem] rounded-sm !font-semibold !text-[0.75em] bg-${user.color}/10`}
-                                      >
-                                        {user.role_name}
-                                      </span>
-                                    </td>
-                                    {userrole3 == '1' || userrole3 == '2' ? (
-                                      <td>
-                                        <div className='flex flex-row items-center !gap-2 text-[0.9375rem]'>
-                                          <Link
-                                            aria-label='anchor'
-                                            href=''
-                                            style={{ cursor: 'pointer' }}
-                                            data-hs-overlay='#todo-compose-user'
-                                            onClick={() => {
-                                              handleEdit(user);
-                                            }}
-                                            className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
-                                          >
-                                            <i className='ri-edit-line'></i>
-                                          </Link>
-                                          <div
-                                            style={{ cursor: 'pointer' }}
-                                            aria-label='anchor'
-                                            onClick={() => {
-                                              handleDelete(user);
-                                            }}
-                                            className='ti-btn ti-btn-icon ti-btn-wave !gap-0 !m-0 !h-[1.75rem] !w-[1.75rem] text-[0.8rem] bg-danger/10 text-danger hover:bg-danger hover:text-white hover:border-danger'
-                                          >
-                                            <i className='ri-delete-bin-line'></i>
-                                          </div>
-                                        </div>
-                                      </td>
-                                    ) : null}
-                                  </tr>
-                                ))
+                                  ) : null}
+                                </tr>
+                              ))
                               : null}
                             {orgUserData && orgUserData.length > 0 && (
                               <tr>
@@ -1813,11 +1801,10 @@ const Page = () => {
                                       page: React.SetStateAction<number>,
                                     ) => setActivePage(page)}
                                     itemClass='page-item'
-                                    linkClass={` ${
-                                      totalItemsCount && totalItemsCount > 10
-                                        ? 'page-link'
-                                        : 'page-link chnage'
-                                    }`}
+                                    linkClass={` ${totalItemsCount && totalItemsCount > 10
+                                      ? 'page-link'
+                                      : 'page-link chnage'
+                                      }`}
                                   />
                                 </td>
                               </tr>
@@ -1881,21 +1868,21 @@ const Page = () => {
                                     (activity?.activity_type ===
                                       'create_site' ||
                                       activity?.activity_type ===
-                                        'add_user_site' ||
+                                      'add_user_site' ||
                                       activity?.activity_type ===
-                                        'remove_user_site' ||
+                                      'remove_user_site' ||
                                       activity?.activity_type ===
-                                        'add_licence' ||
+                                      'add_licence' ||
                                       activity?.activity_type ===
-                                        'download_file' ||
+                                      'download_file' ||
                                       activity?.activity_type ===
-                                        'edit_site_name' ||
+                                      'edit_site_name' ||
                                       activity?.activity_type ===
-                                        'update_site' ||
+                                      'update_site' ||
                                       activity?.activity_type ===
-                                        'edit_site_type' ||
+                                      'edit_site_type' ||
                                       activity?.activity_type ===
-                                        'edit_site_description') && (
+                                      'edit_site_description') && (
                                       <tr
                                         className='border hover:bg-gray-100 dark:hover:bg-light dark:border-defaultborder/10 border-defaultborder !border-x-0'
                                         key={index}
@@ -1905,125 +1892,118 @@ const Page = () => {
                                             <div>
                                               <p className='font-semibold mb-0 p-new text-wrap'>
                                                 {activity?.activity_type ===
-                                                'create_site'
-                                                  ? `${
-                                                      activity?.user_id
-                                                        ?.firstname &&
-                                                      activity?.user_id.lastname
-                                                        ? activity?.user_id
-                                                            ?.firstname +
-                                                          ' ' +
-                                                          activity?.user_id
-                                                            ?.lastname
-                                                        : activity?.user_id
-                                                            ?.email
-                                                    } created a new site named ${activity
-                                                      ?.site_id
-                                                      .name} within the organization '${activity
+                                                  'create_site'
+                                                  ? `${activity?.user_id
+                                                    ?.firstname &&
+                                                    activity?.user_id.lastname
+                                                    ? activity?.user_id
+                                                      ?.firstname +
+                                                    ' ' +
+                                                    activity?.user_id
+                                                      ?.lastname
+                                                    : activity?.user_id
+                                                      ?.email
+                                                  } created a new site named ${activity
+                                                    ?.site_id
+                                                    .name} within the organization '${activity
                                                       ?.org_id.name}'`
                                                   : activity?.activity_type ===
                                                     'add_user_site'
-                                                  ? `${
-                                                      activity?.user_id
-                                                        ?.firstname &&
+                                                    ? `${activity?.user_id
+                                                      ?.firstname &&
                                                       activity?.user_id.lastname
-                                                        ? activity?.user_id
-                                                            ?.firstname +
-                                                          ' ' +
-                                                          activity?.user_id
-                                                            ?.lastname
-                                                        : activity?.user_id
-                                                            ?.email
-                                                    } added a new user named '${
-                                                      activity?.target_user_id
-                                                        ?.firstname &&
+                                                      ? activity?.user_id
+                                                        ?.firstname +
+                                                      ' ' +
+                                                      activity?.user_id
+                                                        ?.lastname
+                                                      : activity?.user_id
+                                                        ?.email
+                                                    } added a new user named '${activity?.target_user_id
+                                                      ?.firstname &&
                                                       activity?.target_user_id
                                                         ?.lastname
-                                                        ? activity
-                                                            ?.target_user_id
-                                                            ?.firstname +
-                                                          ' ' +
-                                                          activity
-                                                            ?.target_user_id
-                                                            ?.lastname
-                                                        : activity
-                                                            ?.target_user_id
-                                                            ?.email
-                                                    }' within the site '${activity
-                                                      ?.site_id.name}'`
-                                                  : activity?.activity_type ===
-                                                    'remove_user_site'
-                                                  ? `${
-                                                      activity?.user_id
-                                                        ?.firstname &&
-                                                      activity?.user_id.lastname
-                                                        ? activity?.user_id
-                                                            ?.firstname +
-                                                          ' ' +
-                                                          activity?.user_id
-                                                            ?.lastname
-                                                        : activity?.user_id
-                                                            ?.email
-                                                    } removed a user named '${
-                                                      activity?.target_user_id
-                                                        ?.firstname &&
-                                                      activity?.target_user_id
+                                                      ? activity
+                                                        ?.target_user_id
+                                                        ?.firstname +
+                                                      ' ' +
+                                                      activity
+                                                        ?.target_user_id
                                                         ?.lastname
-                                                        ? activity
-                                                            ?.target_user_id
-                                                            ?.firstname +
-                                                          ' ' +
-                                                          activity
-                                                            ?.target_user_id
-                                                            ?.lastname
-                                                        : activity
-                                                            ?.target_user_id
-                                                            ?.email
+                                                      : activity
+                                                        ?.target_user_id
+                                                        ?.email
                                                     }' within the site '${activity
                                                       ?.site_id.name}'`
-                                                  : activity?.activity_type ===
-                                                    'add_licence'
-                                                  ? `${
-                                                      activity?.user_id
+                                                    : activity?.activity_type ===
+                                                      'remove_user_site'
+                                                      ? `${activity?.user_id
                                                         ?.firstname &&
-                                                      activity?.user_id.lastname
+                                                        activity?.user_id.lastname
                                                         ? activity?.user_id
+                                                          ?.firstname +
+                                                        ' ' +
+                                                        activity?.user_id
+                                                          ?.lastname
+                                                        : activity?.user_id
+                                                          ?.email
+                                                      } removed a user named '${activity?.target_user_id
+                                                        ?.firstname &&
+                                                        activity?.target_user_id
+                                                          ?.lastname
+                                                        ? activity
+                                                          ?.target_user_id
+                                                          ?.firstname +
+                                                        ' ' +
+                                                        activity
+                                                          ?.target_user_id
+                                                          ?.lastname
+                                                        : activity
+                                                          ?.target_user_id
+                                                          ?.email
+                                                      }' within the site '${activity
+                                                        ?.site_id.name}'`
+                                                      : activity?.activity_type ===
+                                                        'add_licence'
+                                                        ? `${activity?.user_id
+                                                          ?.firstname &&
+                                                          activity?.user_id.lastname
+                                                          ? activity?.user_id
                                                             ?.firstname +
                                                           ' ' +
                                                           activity?.user_id
                                                             ?.lastname
-                                                        : activity?.user_id
+                                                          : activity?.user_id
                                                             .email
-                                                    } added a new license within the organization ${activity
-                                                      ?.org_id.name}`
-                                                  : activity?.activity_type ===
-                                                    'download_file'
-                                                  ? `${
-                                                      activity?.user_id
-                                                        ?.firstname &&
-                                                      activity?.user_id
-                                                        ?.lastname
-                                                        ? activity.user_id
-                                                            ?.firstname +
-                                                          ' ' +
-                                                          activity?.user_id
-                                                            ?.lastname
-                                                        : activity?.user_id
-                                                            ?.email
-                                                    }  downloaded a file named '${activity
-                                                      .details
-                                                      ?.filename}' within the site '${activity
-                                                      ?.site_id.name}'`
-                                                  : activity?.activity_type ===
-                                                      'edit_site_name' ||
-                                                    activity?.activity_type ===
-                                                      'update_site' ||
-                                                    activity?.activity_type ===
-                                                      'edit_site_type' ||
-                                                    activity?.activity_type ===
-                                                      'edit_site_description'
-                                                  ? `${activity?.details}`
-                                                  : ''}
+                                                        } added a new license within the organization ${activity
+                                                          ?.org_id.name}`
+                                                        : activity?.activity_type ===
+                                                          'download_file'
+                                                          ? `${activity?.user_id
+                                                            ?.firstname &&
+                                                            activity?.user_id
+                                                              ?.lastname
+                                                            ? activity.user_id
+                                                              ?.firstname +
+                                                            ' ' +
+                                                            activity?.user_id
+                                                              ?.lastname
+                                                            : activity?.user_id
+                                                              ?.email
+                                                          }  downloaded a file named '${activity
+                                                            .details
+                                                            ?.filename}' within the site '${activity
+                                                              ?.site_id.name}'`
+                                                          : activity?.activity_type ===
+                                                            'edit_site_name' ||
+                                                            activity?.activity_type ===
+                                                            'update_site' ||
+                                                            activity?.activity_type ===
+                                                            'edit_site_type' ||
+                                                            activity?.activity_type ===
+                                                            'edit_site_description'
+                                                            ? `${activity?.details}`
+                                                            : ''}
                                               </p>
                                             </div>
                                           </div>
@@ -2032,8 +2012,8 @@ const Page = () => {
                                         <td className='f-end'>
                                           {activity
                                             ? moment(
-                                                activity.activity_date,
-                                              ).format('MM/DD/YYYY HH:mm')
+                                              activity.activity_date,
+                                            ).format('MM/DD/YYYY HH:mm')
                                             : ''}
                                           {/* {activity.activity_date.split('T')[0]} */}
                                         </td>
