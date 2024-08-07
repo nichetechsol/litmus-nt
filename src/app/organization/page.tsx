@@ -25,6 +25,7 @@ import { checkLicensePlan } from '@/supabase/auth';
 import {
   addOrganization,
   checkBusinessDomain,
+  checkDomainAssociations,
   checkDomainAssociationsModify,
   confirmDeletion,
   deleteDomains,
@@ -731,8 +732,10 @@ const Page = () => {
       const newDomains = [];
       let errorMessage = '';
       let errorMessage1 = '';
+      let errorMessage2 = '';
       const seenDomains = new Set();
       const bussinessTrue = new Set();
+      const bussinessTrueEmail = new Set();
       let domainCheckedNotEmail = '';
       for (const domain of domainsArray) {
         if (domains.includes(domain)) {
@@ -754,14 +757,158 @@ const Page = () => {
             if (result.errorCode === 0) {
               if (result.domain === false) {
                 if (domain.includes('@')) {
-                  bussinessTrue.add(domain);
-                  errorMessage1 += `Don't need full Email for ${domainCheckedNotEmail}.`;
+                  const domainOnly = domain.split('@')[1];
+                  const keepEmail = await swal({
+                    title: 'Email Detected',
+                    text: `Do you want to keep the email address (${domain}) or only the domain (${domainOnly})?`,
+                    icon: 'warning',
+                    buttons: {
+                      cancel: {
+                        text: 'Only Domain',
+                        value: false,
+                        visible: true,
+                        className: '',
+                        closeModal: true,
+                      },
+                      confirm: {
+                        text: 'Keep Email',
+                        value: true,
+                        visible: true,
+                        className: '',
+                        closeModal: true,
+                      },
+                    },
+                  });
+                  if (keepEmail) {
+                    const result = await checkDomainAssociations(domainOnly);
+                    if (result.errorCode === 0 && result.associated === true) {
+                      const willProceed = await swal({
+                        title: `Do you want to add ${domainOnly} as domain?`,
+                        text: 'You are about to add the domain which is the associated by another organization. ',
+                        icon: 'warning',
+                        buttons: {
+                          cancel: {
+                            text: 'Cancel',
+                            value: false,
+                            visible: true,
+                            className: '',
+                            closeModal: true,
+                          },
+                          confirm: {
+                            text: 'Add',
+                            value: true,
+                            visible: true,
+                            className: '',
+                            closeModal: true,
+                          },
+                        },
+                      });
+                      if (willProceed) {
+                        newDomains.push(domain);
+                      }
+                    } else if (result.associated === false) {
+                      newDomains.push(domain);
+                    }
+                  } else {
+                    const result = await checkDomainAssociations(domainOnly);
+                    if (result.errorCode === 0 && result.associated === true) {
+                      const willProceed = await swal({
+                        title: `Do you want to add ${domainOnly} as domain?`,
+                        text: 'You are about to add the domain which is the associated by another organization. ',
+                        icon: 'warning',
+                        buttons: {
+                          cancel: {
+                            text: 'Cancel',
+                            value: false,
+                            visible: true,
+                            className: '',
+                            closeModal: true,
+                          },
+                          confirm: {
+                            text: 'Add',
+                            value: true,
+                            visible: true,
+                            className: '',
+                            closeModal: true,
+                          },
+                        },
+                      });
+
+                      if (willProceed) {
+                        newDomains.push(domainOnly);
+                      }
+                    } else if (result.associated === false) {
+                      newDomains.push(domainOnly);
+                    }
+                  }
+                  errorMessage2 += `Domain is enough for ${domainCheckedNotEmail}.`;
+
+                  // bussinessTrueEmail.add(domain);
                 } else {
-                  newDomains.push(domain);
+                  const result = await checkDomainAssociations(domain);
+                  if (result.errorCode === 0 && result.associated === true) {
+                    const willProceed = await swal({
+                      title: `Do you want to add ${domain} as domain?`,
+                      text: 'You are about to add the domain which is the associated by another organization. ',
+                      icon: 'warning',
+                      buttons: {
+                        cancel: {
+                          text: 'Cancel',
+                          value: false,
+                          visible: true,
+                          className: '',
+                          closeModal: true,
+                        },
+                        confirm: {
+                          text: 'Add',
+                          value: true,
+                          visible: true,
+                          className: '',
+                          closeModal: true,
+                        },
+                      },
+                    });
+                    if (willProceed) {
+                      newDomains.push(domain);
+                    }
+                  } else if (result.associated === false) {
+                    newDomains.push(domain);
+                  }
+                  // newDomains.push(domain);
                 }
               } else {
                 if (domain.includes('@')) {
-                  newDomains.push(domain);
+                  const domainOnly = domain.split('@')[1];
+                  const result = await checkDomainAssociations(domainOnly);
+                  if (result.errorCode === 0 && result.associated === true) {
+                    const willProceed = await swal({
+                      title: `Do you want to add ${domainOnly} as domain?`,
+                      text: 'You are about to add the domain which is the associated by another organization. ',
+                      icon: 'warning',
+                      buttons: {
+                        cancel: {
+                          text: 'Cancel',
+                          value: false,
+                          visible: true,
+                          className: '',
+                          closeModal: true,
+                        },
+                        confirm: {
+                          text: 'Add',
+                          value: true,
+                          visible: true,
+                          className: '',
+                          closeModal: true,
+                        },
+                      },
+                    });
+                    if (willProceed) {
+                      newDomains.push(domain);
+                    }
+                  } else if (result.associated === false) {
+                    newDomains.push(domain);
+                  }
+                  // newDomains.push(domain);
                 } else {
                   bussinessTrue.add(domain);
                   errorMessage1 += `Required to add full Email for ${domain}.`;
