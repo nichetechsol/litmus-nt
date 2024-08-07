@@ -80,7 +80,7 @@ const Page = () => {
   const [tokenVerify, setTokenVerify] = useState(false);
   const [onlyToken, setOnlyToken] = useState('');
   const navigate = useRouter();
-  const [changeFlage, setChangeFlage] = useState<boolean>(false);
+  const [changeFlage, setChangeFlage] = useState<boolean>(true);
 
   const [organizationName, setOrganizationName] = useState('');
   const [organizationNameError, setOrganizationNameError] = useState('');

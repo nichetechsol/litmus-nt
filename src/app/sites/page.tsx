@@ -484,6 +484,7 @@ const Page: React.FC = () => {
   const handelchangeCountry = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const Newcountryselected = parseInt(e.target.value);
     SetSelectedValueCounrty(Newcountryselected);
+    setSelectedValueState('');
     SiteCountryDropdownSchema.validate(Newcountryselected)
       .then(() => {
         setCountryListError(''); // Clear error on successful validation
