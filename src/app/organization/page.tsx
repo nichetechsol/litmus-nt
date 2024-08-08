@@ -376,6 +376,7 @@ const Page = () => {
         });
       return;
     } else {
+      setOrg_Business('business');
       DomainSchema.validate(newDomain)
         .then(() => {
           setDomainError('');
@@ -734,7 +735,6 @@ const Page = () => {
             setMessageError('');
             fetchData();
             fetchData1();
-            setDomainError('');
           } catch (error) {
             setLoading(false);
             toast.error('Error Editing Organization', { autoClose: 3000 });
@@ -1052,6 +1052,7 @@ const Page = () => {
                   setDomains(newdom);
                   if (newdom.length == 0) {
                     setLoading(false);
+                    setOrg_Business('business');
                     setDomainError(
                       'Domain is required. Please enter a domain.',
                     );
@@ -1096,6 +1097,7 @@ const Page = () => {
               setDomains(newdom);
               if (newdom.length == 0) {
                 setLoading(false);
+                setOrg_Business('business');
                 setDomainError('Domain is required. Please enter a domain.');
               } else {
                 setLoading(false);
@@ -1108,6 +1110,7 @@ const Page = () => {
           setDomains(newdom);
           if (newdom.length == 0) {
             setLoading(false);
+            setOrg_Business('business');
             setDomainError('Domain is required. Please enter a domain.');
           } else {
             setLoading(false);
@@ -1119,6 +1122,7 @@ const Page = () => {
       setDomains(newdom);
       if (newdom.length == 0) {
         setLoading(false);
+        setOrg_Business('business');
         setDomainError("At least one domain is required. You can't delete it.");
       } else {
         setLoading(false);
