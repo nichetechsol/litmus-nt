@@ -175,6 +175,7 @@ const Page = () => {
           return decryptemail || '';
         } else {
           setOrg_Business('business');
+
           return domain || '';
         }
       }
@@ -182,11 +183,19 @@ const Page = () => {
     return '';
   };
   useEffect(() => {
-    // Set the default domain on component mount
-    const defaultDomain = getDefaultDomainFromEmail();
-    if (defaultDomain) {
-      setDomains([defaultDomain]);
-    }
+    const fetchDefaultDomain = async () => {
+      try {
+        // Set the default domain on component mount
+        const defaultDomain = await getDefaultDomainFromEmail();
+        if (defaultDomain) {
+          setDomains([defaultDomain]);
+        }
+      } catch (error) {
+        //// console.error('Error fetching the default domain:', error);
+      }
+    };
+
+    fetchDefaultDomain();
   }, []);
 
   useEffect(() => {
@@ -508,6 +517,7 @@ const Page = () => {
           );
           setaddbuttonclass(true);
         } catch (err) {
+          // console.log(err)
           setaddbuttonclass(false);
         }
       } else {
@@ -587,10 +597,18 @@ const Page = () => {
             setDomainInput('');
             setOrganizationName('');
             setSelectedType('');
-            const defaultDomain = getDefaultDomainFromEmail();
-            if (defaultDomain) {
-              setDomains([defaultDomain]);
-            }
+            const fetchDefaultDomain = async () => {
+              try {
+                const defaultDomain = await getDefaultDomainFromEmail();
+                if (defaultDomain) {
+                  setDomains([defaultDomain]);
+                }
+              } catch (error) {
+                //// console.error('Error fetching the default domain:', error);
+              }
+            };
+
+            fetchDefaultDomain();
             setMessage('');
             setOrganizationNameError('');
             setDomainError('');
@@ -697,10 +715,18 @@ const Page = () => {
             setDomainInput('');
             setOrganizationName('');
             setSelectedType('');
-            const defaultDomain = getDefaultDomainFromEmail();
-            if (defaultDomain) {
-              setDomains([defaultDomain]);
-            }
+            const fetchDefaultDomain = async () => {
+              try {
+                const defaultDomain = await getDefaultDomainFromEmail();
+                if (defaultDomain) {
+                  setDomains([defaultDomain]);
+                }
+              } catch (error) {
+                //// console.error('Error fetching the default domain:', error);
+              }
+            };
+
+            fetchDefaultDomain();
             setMessage('');
             setOrganizationNameError('');
             setDomainError('');
@@ -1120,10 +1146,18 @@ const Page = () => {
       setDomainInput('');
       setOrganizationName('');
       setSelectedType('');
-      const defaultDomain = getDefaultDomainFromEmail();
-      if (defaultDomain) {
-        setDomains([defaultDomain]);
-      }
+      const fetchDefaultDomain = async () => {
+        try {
+          const defaultDomain = await getDefaultDomainFromEmail();
+          if (defaultDomain) {
+            setDomains([defaultDomain]);
+          }
+        } catch (error) {
+          //   console.error('Error fetching the default domain:', error);
+        }
+      };
+
+      fetchDefaultDomain();
       setMessage('');
       setOrganizationNameError('');
       setDomainError('');
@@ -1165,15 +1199,23 @@ const Page = () => {
     setDomainInput('');
     setOrganizationName('');
     setSelectedType('');
-    const defaultDomain = getDefaultDomainFromEmail();
-    if (defaultDomain) {
-      setDomains([defaultDomain]);
-      if (org_Business === 'none_business') {
-        toast.warning('"None Business" are limited to one E-Mail address', {
-          autoClose: 3000,
-        });
+    const fetchDefaultDomain = async () => {
+      try {
+        const defaultDomain = await getDefaultDomainFromEmail();
+        if (defaultDomain) {
+          setDomains([defaultDomain]);
+          if (org_Business === 'none_business') {
+            toast.warning('"None Business" are limited to one E-Mail address', {
+              autoClose: 3000,
+            });
+          }
+        }
+      } catch (error) {
+        //   console.error('Error fetching the default domain:', error);
       }
-    }
+    };
+
+    fetchDefaultDomain();
 
     setMessage('');
     fetchData();
@@ -1496,11 +1538,19 @@ const Page = () => {
                                   setOrganizationName('');
                                   setSelectedType('');
                                   closeModal();
-                                  const defaultDomain =
-                                    getDefaultDomainFromEmail();
-                                  if (defaultDomain) {
-                                    setDomains([defaultDomain]);
-                                  }
+                                  const fetchDefaultDomain = async () => {
+                                    try {
+                                      const defaultDomain =
+                                        await getDefaultDomainFromEmail();
+                                      if (defaultDomain) {
+                                        setDomains([defaultDomain]);
+                                      }
+                                    } catch (error) {
+                                      //   console.error('Error fetching the default domain:', error);
+                                    }
+                                  };
+
+                                  fetchDefaultDomain();
                                   // setDomains([]);
                                   setMessage('');
                                   setOrganizationNameError('');
@@ -1729,11 +1779,19 @@ const Page = () => {
                                   setDomainInput('');
                                   setOrganizationName('');
                                   setSelectedType('');
-                                  const defaultDomain =
-                                    getDefaultDomainFromEmail();
-                                  if (defaultDomain) {
-                                    setDomains([defaultDomain]);
-                                  }
+                                  const fetchDefaultDomain = async () => {
+                                    try {
+                                      const defaultDomain =
+                                        await getDefaultDomainFromEmail();
+                                      if (defaultDomain) {
+                                        setDomains([defaultDomain]);
+                                      }
+                                    } catch (error) {
+                                      //   console.error('Error fetching the default domain:', error);
+                                    }
+                                  };
+
+                                  fetchDefaultDomain();
                                   // setDomains([]);
                                   setMessage('');
                                   setOrganizationNameError('');
