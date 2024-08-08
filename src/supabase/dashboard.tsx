@@ -100,7 +100,7 @@ async function orgDashboardCounts(
       }
 
       // Check if current number of sites exceeds entitlement limit
-      if (currentSites.length >= (entitlementValue.value_number ?? 0)) {
+      if (currentSites.length > (entitlementValue.value_number ?? 0)) {
         entitlementExceed = 'Y';
       } else {
         entitlementExceed = 'N';
