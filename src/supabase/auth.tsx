@@ -1,5 +1,7 @@
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { checkBusinessDomain } from '@/supabase/org_details';
+
 import { supabase } from './db';
 
 // Define the types for the function parameters and return values
@@ -141,7 +143,15 @@ async function handleDomainUserAssignment(
   userId: string,
   email: string,
 ): Promise<void> {
-  const domain = email.split('@')[1];
+  let domain = email.split('@')[1];
+  const result = await checkBusinessDomain(domain);
+
+  const domainExists = result.domain;
+  if (domainExists === true) {
+    domain = email;
+  } else {
+    domain = email.split('@')[1];
+  }
 
   // Get domain ID and associated organizations in one query
   const { data: domainOrgData, error: domainOrgError } = await supabase

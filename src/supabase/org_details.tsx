@@ -26,6 +26,7 @@ interface Result<T> {
   errorCode: number;
   message?: any;
   data: T | null;
+  business_account?: boolean;
 }
 
 interface OrganizationWithSiteCount {
@@ -814,6 +815,21 @@ async function orgNameCheck(name: any, org_id: any) {
 }
 async function viewOrganization(org_id: any): Promise<Result<any>> {
   try {
+    let business_account = false;
+    const { data: entitlements_package, error: entitlements_packageError } =
+      await supabase
+        .from('entitlements_package')
+        .select(`*, entitlements_values(value_bool)`)
+        // Filters
+        .eq('org_id', org_id)
+        .eq('entitlement_name_id', 33); // Using single() to get the first matching row
+    if (entitlements_package) {
+      if (entitlements_package[0].entitlements_values.value_bool == true) {
+        business_account = true;
+      } else {
+        business_account = false;
+      }
+    }
     // Fetch organization details and type in parallel
     const [orgDetailsResult, orgDomainIdsResult] = await Promise.all([
       supabase
@@ -895,7 +911,11 @@ async function viewOrganization(org_id: any): Promise<Result<any>> {
       })),
     };
 
-    return { errorCode: 0, data: orgWithDomains };
+    return {
+      errorCode: 0,
+      data: orgWithDomains,
+      business_account: business_account,
+    };
   } catch (error) {
     return { errorCode: 1, data: null, message: 'Error fetching Details' };
   }
