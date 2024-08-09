@@ -1709,7 +1709,7 @@ async function checkDomains(domain: string[]): Promise<boolean> {
     const domainResults = await Promise.all(domainPromises);
     const hasPublicDomain = domainResults.some((result) => result !== null);
 
-    return !hasPublicDomain; // Return false if any domain is a known public domain, otherwise true
+    return hasPublicDomain; // Return true if any domain is a known public domain, otherwise false
   }
 }
 async function checkDomainAssociationsModify(
