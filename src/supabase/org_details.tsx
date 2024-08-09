@@ -823,7 +823,15 @@ async function viewOrganization(org_id: any): Promise<Result<any>> {
         // Filters
         .eq('org_id', org_id)
         .eq('entitlement_name_id', 33); // Using single() to get the first matching row
-    if (entitlements_package) {
+    if (entitlements_packageError) {
+      // throw new Error('Failed to fetch organization details.');
+      return {
+        errorCode: 1,
+        data: null,
+        message: 'Failed to fetch organization details',
+      };
+    }
+    if (entitlements_package.length > 0) {
       if (entitlements_package[0].entitlements_values.value_bool == true) {
         business_account = true;
       } else {
@@ -894,7 +902,7 @@ async function viewOrganization(org_id: any): Promise<Result<any>> {
     const { data: domains, error: domainsError } = domainsResult;
 
     if (orgTypeError || !orgType || domainsError || !domains) {
-      return { errorCode: 1, data: null, message: 'Error fetching Details' };
+      return { errorCode: 1, data: null, message: 'Error fetching Details.' };
     }
 
     // Construct the OrgDetail object
