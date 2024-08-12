@@ -11,6 +11,9 @@
   align-items: center;
   z-index: 9999999;
 }
+.high-zindex-loader {
+  z-index: 9999999;
+}
 
 .loader {
   border: 8px solid #a1a1a1;

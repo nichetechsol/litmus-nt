@@ -124,6 +124,25 @@ const OrgDashboard = () => {
         navigate.push('/organization');
         // redirect('/organization');
       });
+      setTimeout(() => {
+        // Ensure loader is behind the SweetAlert
+        const swalContainer: any = document.querySelector('.swal-overlay');
+        if (swalContainer) {
+          swalContainer.style.zIndex = '10000000';
+        }
+
+        // Ensure modal is on top of overlay
+        const swalModal: any = document.querySelector('.swal-modal');
+        if (swalModal) {
+          swalModal.style.zIndex = '10000001';
+        }
+
+        // Ensure loader is behind
+        const loaderOverlay: any = document.querySelector('.loader-overlay');
+        if (loaderOverlay) {
+          loaderOverlay.style.zIndex = '9999998'; // Lower than SweetAlert
+        }
+      }, 0);
     }
   }, []);
 
@@ -1350,133 +1369,6 @@ const OrgDashboard = () => {
                         </div>
                       </div>
                     </div>
-
-                    {/* this is another model */}
-                    {/* <div>
-                      <div
-                        id='todo-compose1'
-                        // className='hs-overlay hidden ti-modal'
-                        className='hs-overlay hidden ti-modal  [--overlay-backdrop:static]'
-                      >
-                        <div className='hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out'>
-                          <div className='ti-modal-content'>
-                            <div className='ti-modal-header'>
-                              <h6
-                                className='modal-title text-[1rem] font-semibold'
-                                id='mail-ComposeLabel1'
-                              >
-                                Invite User
-                              </h6>
-                              <button
-                                type='button'
-                                className='hs-dropdown-toggle !text-[1rem] !font-semibold !text-defaulttextcolor'
-                                onClick={() => handleFiledClear()}
-                                data-hs-overlay='#todo-compose1'
-                                ref={closeModalButtonRef}
-                              >
-                                <span className='sr-only'>Close</span>
-                                <i className='ri-close-line'></i>
-                              </button>
-                            </div>
-                            <div className='ti-modal-body !overflow-visible px-4'>
-                              <div className='grid grid-cols-12 gap-2'>
-                                <div className='xl:col-span-12 col-span-12'>
-                                  <label
-                                    htmlFor='Email'
-                                    className='ti-form-label'
-                                  >
-                                    Email <span className='text-danger'>*</span>
-                                  </label>
-                                  <input
-                                    type='text'
-                                    autoComplete='none'
-                                    className={`form-control w-full ${
-                                      email ? '' : 'input-error'
-                                    } ${emailError ? 'input-error' : ''} `}
-                                    id='Email'
-                                    disabled={!changeFlage}
-                                    placeholder='Enter Email'
-                                    onChange={handleEmailChange}
-                                    onFocus={() => setIsFocusedOnEmail(true)}
-                                    onBlur={() => setIsFocusedOnEmail(false)}
-                                    // onKeyDown={handleKeyPress}
-                                    maxLength={320}
-                                    value={email}
-                                  />
-                                  {emailError && (
-                                    <div className='text-danger'>
-                                      {emailError}
-                                    </div>
-                                  )}{' '}
-                                </div>
-                                <div className='xl:col-span-12 col-span-12'>
-                                  <label
-                                    htmlFor='task-name'
-                                    className='ti-form-label'
-                                  >
-                                    Role <span className='text-danger'>*</span>
-                                  </label>
-                                  <select
-                                    style={{ cursor: 'pointer' }}
-                                    className={`form-select ${
-                                      role ? '' : 'input-error'
-                                    }
-                                        ${roleError ? 'input-error' : ''}
-                                        ${role === '' ? 'deselect-main' : ''}`}
-                                    onChange={handleRoleChange}
-                                    value={role}
-                                  >
-                                    <option value='' hidden>
-                                      Select a Role
-                                    </option>
-                                    {roles &&
-                                      roles.map((role) => (
-                                        <option key={role.id} value={role.id}>
-                                          {role.name}
-                                        </option>
-                                      ))}
-                                  </select>
-                                  {roleError && (
-                                    <div className='text-danger'>
-                                      {roleError}
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                            <div className='ti-modal-footer'>
-                              <button
-                                type='button'
-                                id='close-modal-btn'
-                                className='hs-dropdown-toggle ti-btn  ti-btn-light align-middle'
-                                data-hs-overlay='#todo-compose1'
-                                ref={closeModalButtonRef}
-                                onClick={() => handleFiledClear()}
-                              >
-                                Cancel
-                              </button>
-                              <button
-                                type='button'
-                                // className='ti-btn bg-primary text-white !font-medium'
-                                onClick={() => handelInvitation()}
-                                // disabled={!addbuttonclass2}
-                                // className={
-                                //   addbuttonclass2
-                                //     ? 'ti-btn bg-primary text-white !font-medium'
-                                //     : 'ti-btn bg-gray-500 text-white !font-medium'
-                                // }
-
-                                className='ti-btn bg-primary text-white !font-medium'
-                              >
-                                Send Invitation
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div> */}
-
-                    {/* end of the model */}
 
                     <div className='box-body'>
                       <div className='overflow-x-auto'>

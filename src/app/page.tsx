@@ -117,50 +117,7 @@ const LoginForm = () => {
       return false;
     }
   };
-  // const handleSubmit = async () => {
-  //   if (rememberMe) {
-  //     localStorage.setItem('rememberedEmail', email);
-  //     localStorage.setItem('rememberedPassword', password);
-  //   } else {
-  //     localStorage.removeItem('rememberedEmail');
-  //     localStorage.removeItem('rememberedPassword');
-  //   }
-  //   const isValid = await validateForm();
-  //   if (isValid) {
-  //     if (rememberMe) {
-  //       localStorage.setItem('rememberMe', 'true');
-  //     } else {
-  //       localStorage.removeItem('rememberMe');
-  //     }
-  //     setLoading(true);
-  //     const result: any = await Login(email, password);
-  //     if (result?.errorCode === 0) {
-  //       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //       const user_id: any = result.user[0]?.id;
-  //       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //       const user_role: any = result.user[0]?.user_role;
-  //       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //       const user_firstname: any = result.user[0]?.firstname;
-  //       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //       const user_lastname: any = result.user[0]?.lastname;
-  //       localStorage.setItem('user_id', user_id);
-  //       localStorage.setItem(
-  //         'user_fname',
-  //         user_firstname ? user_firstname : '',
-  //       );
-  //       localStorage.setItem('user_lname', user_lastname ? user_lastname : '');
-  //       localStorage.setItem('user_role', user_role);
-  //       navigate.push('/organization');
-  //       setLoading(false);
-  //     } else {
-  //       swal({
-  //         icon: 'error',
-  //         text: result.message,
-  //       });
-  //       setLoading(false);
-  //     }
-  //   }
-  // };
+
   const handleSubmit = async () => {
     if (rememberMe) {
       const encryptedEmail = encryptData(email);

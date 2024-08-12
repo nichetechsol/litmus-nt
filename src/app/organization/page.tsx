@@ -31,7 +31,6 @@ import {
   deleteDomains,
   fetchOrganizationAndSiteDetails,
   fetchOrganizationTypes,
-  getUserRole,
   organizationSidebarList,
   orgNameCheck,
   reqOrgDeleteMail,
@@ -99,22 +98,31 @@ const Page = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [modalOpen, setModalOpen] = useState<boolean>(true);
   const [user_id, setuser_id] = useState<any>('');
-  const [user_role, setUserrole] = useState<any>('');
   const [email, setEmail] = useState<any>('');
   const [add_orgUser, setadd_orgUser] = useState<any>('');
   const [org_exists, setorg_exists] = useState<any>('');
   const [allDomain, setAllDomain] = useState<any>('');
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [searchTerm, setSearchTerm] = useState<any>();
-
   const [orgsWithSites, setOrgsWithSites] = useState<
     OrganizationWithSiteCount[] | null
   >(null);
-
+  const [orgidForupdatetion, setorgidForupdatetion] = useState();
+  const [business_account, setBusiness_account] = useState<boolean>(true);
+  const [addbuttonclass, setaddbuttonclass] = useState<boolean>(false);
+  const [org_Business, setOrg_Business] =
+    useState<OrgBusinessStatus>('business');
   const [sidebarOrgs, setSidebarOrgs] = useState<SidebarOrgs | null>({
     data: [],
   });
+  const [isOpen, setIsOpen] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const [domainPlusbtnVisible, setDomainPlusbtnVisible] =
+    useState<boolean>(false);
+  const [domainIdsToBeRemoved, setDomainIdsToBeRemoved] = useState<
+    { domainname: string; domainid: number }[]
+  >([]);
+
+  const [focusedIndex, setFocusedIndex] = useState<number>(-1);
 
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
@@ -129,39 +137,8 @@ const Page = () => {
       }
     }
   }, []);
-  useEffect(() => {
-    const encryptedUserId = localStorage.getItem('user_id');
-    const encryptedUserRole = localStorage.getItem('user_role');
-    const encryptedemail = localStorage.getItem('user_email');
-    // const encryptedaddorg = localStorage.getItem('add_orgUser');
-    const encryptedorgexist = localStorage.getItem('org_exists');
-
-    const decryptedUserId = decryptData(encryptedUserId);
-    const decryptedUserRole = decryptData(encryptedUserRole);
-    const decryptemail = decryptData(encryptedemail);
-    // const decryptaddorg = decryptData(encryptedaddorg);
-    const decryptorgexist = decryptData(encryptedorgexist);
-
-    if (decryptedUserId) {
-      setuser_id(decryptedUserId);
-    }
-    if (decryptemail) {
-      setEmail(decryptemail);
-    }
-    if (decryptedUserRole) {
-      setUserrole(decryptedUserRole);
-    }
-    // if (decryptaddorg) {
-    //   setadd_orgUser(decryptaddorg);
-    // }
-    if (decryptorgexist) {
-      setorg_exists(decryptorgexist);
-    }
-  }, []);
 
   //To re-open chipbox default domain open this comment and open all comments of setDomains([defaultDomain])
-  const [org_Business, setOrg_Business] =
-    useState<OrgBusinessStatus>('business');
   const getDefaultDomainFromEmail = async () => {
     const email1 = localStorage.getItem('user_email');
     const decryptemail = decryptData(email1);
@@ -182,56 +159,59 @@ const Page = () => {
     }
     return '';
   };
-  useEffect(() => {
-    const fetchDefaultDomain = async () => {
-      try {
-        // Set the default domain on component mount
-        const defaultDomain = await getDefaultDomainFromEmail();
-        if (defaultDomain) {
-          setDomains([defaultDomain]);
-        }
-      } catch (error) {
-        //// console.error('Error fetching the default domain:', error);
-      }
-    };
+  const fetchOrgTypes = async () => {
+    try {
+      const data = await fetchOrganizationTypes();
 
+      if (data.data) {
+        setTypeDropdown(data.data);
+      } else {
+        toast.error(data.message, { autoClose: 3000 });
+      }
+    } catch (error: any) {
+      toast.error('Error Fetching Type..', { autoClose: 3000 });
+    }
+  };
+  const fetchDefaultDomain = async () => {
+    try {
+      const defaultDomain = await getDefaultDomainFromEmail();
+      if (defaultDomain) {
+        setDomains([defaultDomain]);
+      }
+    } catch (error) {
+      //
+    }
+  };
+  useEffect(() => {
+    const encryptedUserId = localStorage.getItem('user_id');
+    const encryptedemail = localStorage.getItem('user_email');
+    const encryptedorgexist = localStorage.getItem('org_exists');
+
+    const decryptedUserId = decryptData(encryptedUserId);
+    const decryptemail = decryptData(encryptedemail);
+    const decryptorgexist = decryptData(encryptedorgexist);
+
+    if (decryptedUserId) {
+      setuser_id(decryptedUserId);
+    }
+    if (decryptemail) {
+      setEmail(decryptemail);
+    }
+    if (decryptorgexist) {
+      setorg_exists(decryptorgexist);
+    }
     fetchDefaultDomain();
+    fetchOrgTypes();
   }, []);
-
-  useEffect(() => {
-    const fetchData2 = async () => {
-      try {
-        setLoading(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const data: any = await getUserRole();
-
-        if (data.data && data.data.length > 0) {
-          for (let i = 0; i < data.data.length; i++) {
-            if (data.data[i].id == user_role) {
-              setLoading(false);
-            }
-          }
-        } else {
-          toast.error(data.message, { autoClose: 3000 });
-        }
-      } catch (error: any) {
-        toast.error(error, { autoClose: 3000 });
-      }
-    };
-
-    fetchData2();
-  }, [user_role]);
-  const [isOpen, setIsOpen] = useState(false);
   const openModal = () => {
     setIsOpen(true);
     document.body.classList.add('no-scroll1');
   };
-
   const closeModal = () => {
     setIsOpen(false);
     document.body.classList.remove('no-scroll1');
   };
-  const modalRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (org_exists === 'false') {
       modalRef.current?.classList.remove('hidden');
@@ -262,7 +242,6 @@ const Page = () => {
   }, [isOpen]);
   const fetchData = async () => {
     try {
-      setLoading(true);
       if (user_id) {
         const data: any = await fetchOrganizationAndSiteDetails(user_id);
 
@@ -281,15 +260,39 @@ const Page = () => {
           toast.error(data.message, { autoClose: 3000 });
         }
       }
-      setLoading(false);
     } catch (error: any) {
       toast.error('Error Fetching Data!', { autoClose: 3000 });
     }
   };
+  const AddOrgButton = async () => {
+    try {
+      if (user_id) {
+        setLoading(true);
+        const data = await checkLicensePlan(user_id);
 
+        if (data.errorCode === 0) {
+          if (data.add_orgUser === true) {
+            setadd_orgUser('true');
+          } else {
+            setadd_orgUser('false');
+          }
+
+          setLoading(false);
+        } else {
+          toast.error('Error fetching details...', { autoClose: 3000 });
+
+          setLoading(false);
+        }
+      }
+    } catch (error: any) {
+      toast.error('Error Fetching Type..', { autoClose: 3000 });
+
+      setLoading(false);
+    }
+  };
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    AddOrgButton();
   }, [user_id]);
 
   const fetchData1 = async () => {
@@ -355,8 +358,7 @@ const Page = () => {
         setOrganizationNameError1(true);
       });
   };
-  const [domainPlusbtnVisible, setDomainPlusbtnVisible] =
-    useState<boolean>(false);
+
   const handleDomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDomain = e.target.value.trimStart();
     if (newDomain != '') {
@@ -413,67 +415,7 @@ const Page = () => {
         setMessageError(err.message);
       });
   };
-  // const addDomain = async (domain: string) => {
-  //   if (domains.includes(domain)) {
-  //     setDomainError('Domain already added');
-  //   } else {
-  //     try {
-  //       await DomainSchema.validate(domain);
-  //       setDomains([...domains, domain]);
-  //       setDomainInput('');
-  //       setDomainError('');
-  //     } catch (error) {
-  //       if (error instanceof Error) {
-  //         setDomainError(error.message);
-  //       } else {
-  //         // Handle the case where the error might not be an instance of Error
-  //         setDomainError('An unknown error occurred');
-  //       }
-  //     }
-  //   }
-  // };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await fetchOrganizationTypes();
-
-        if (data.data) {
-          setTypeDropdown(data.data);
-        } else {
-          toast.error(data.message, { autoClose: 3000 });
-        }
-      } catch (error: any) {
-        toast.error('Error Fetching Type..', { autoClose: 3000 });
-      }
-    };
-
-    fetchData();
-  }, []);
-  const AddOrgButton = async () => {
-    try {
-      setLoading(true);
-      if (user_id) {
-        const data = await checkLicensePlan(user_id);
-
-        if (data.errorCode === 0) {
-          if (data.add_orgUser === true) {
-            setadd_orgUser('true');
-          } else {
-            setadd_orgUser('false');
-          }
-        } else {
-          toast.error('Error fetching details...', { autoClose: 3000 });
-        }
-      }
-      setLoading(false);
-    } catch (error: any) {
-      toast.error('Error Fetching Type..', { autoClose: 3000 });
-    }
-  };
-  useEffect(() => {
-    AddOrgButton();
-  }, [user_id]);
   const validateForm = async () => {
     try {
       await validationSchema.validate(
@@ -505,9 +447,6 @@ const Page = () => {
       return false;
     }
   };
-  const [orgidForupdatetion, setorgidForupdatetion] = useState();
-  const [business_account, setBusiness_account] = useState<boolean>(true);
-  const [addbuttonclass, setaddbuttonclass] = useState<boolean>(false);
 
   useEffect(() => {
     const validate = async () => {
@@ -530,9 +469,6 @@ const Page = () => {
     validate();
   }, [organizationName, domains, selectedType, message, organizationNameError]);
 
-  const [domainIdsToBeRemoved, setDomainIdsToBeRemoved] = useState<
-    { domainname: string; domainid: number }[]
-  >([]);
   const handleSubmit = async () => {
     if (changeFlage == true) {
       if (domainInput.trim() !== '') {
@@ -556,7 +492,6 @@ const Page = () => {
 
           const data: any = {
             user_id: user_id,
-            user_role: user_role,
             name: organizationName,
             description: message,
             type_id: selectedTypeId,
@@ -595,32 +530,10 @@ const Page = () => {
             if (closeModalButtonRef.current) {
               closeModalButtonRef.current.click();
             }
-
-            setDomainInput('');
-            setOrganizationName('');
-            setSelectedType('');
-            const fetchDefaultDomain = async () => {
-              try {
-                const defaultDomain = await getDefaultDomainFromEmail();
-                if (defaultDomain) {
-                  setDomains([defaultDomain]);
-                }
-              } catch (error) {
-                //// console.error('Error fetching the default domain:', error);
-              }
-            };
-
-            fetchDefaultDomain();
-            setMessage('');
-            setOrganizationNameError('');
-            setDomainError('');
-            setTypeDropdownError('');
-            setMessageError('');
+            clearFields();
             fetchData();
             fetchData1();
             AddOrgButton();
-            setDomainError('');
-            closeModal();
           } catch (error) {
             setLoading(false);
             closeModal();
@@ -714,26 +627,7 @@ const Page = () => {
               closeModalButtonRef.current.click();
             }
 
-            setDomainInput('');
-            setOrganizationName('');
-            setSelectedType('');
-            const fetchDefaultDomain = async () => {
-              try {
-                const defaultDomain = await getDefaultDomainFromEmail();
-                if (defaultDomain) {
-                  setDomains([defaultDomain]);
-                }
-              } catch (error) {
-                //// console.error('Error fetching the default domain:', error);
-              }
-            };
-
-            fetchDefaultDomain();
-            setMessage('');
-            setOrganizationNameError('');
-            setDomainError('');
-            setTypeDropdownError('');
-            setMessageError('');
+            clearFields();
             fetchData();
             fetchData1();
           } catch (error) {
@@ -744,7 +638,37 @@ const Page = () => {
       }
     }
   };
-
+  const DomainAssociation = async (domainOnly: any, domain: any) => {
+    const result = await checkDomainAssociations(domainOnly);
+    if (result.errorCode === 0 && result.associated === true) {
+      const willProceed = await swal({
+        title: `Do you want to add ${domainOnly} as domain?`,
+        text: 'You are about to add the domain which is the associated by another organization. ',
+        icon: 'warning',
+        buttons: {
+          cancel: {
+            text: 'Cancel',
+            value: false,
+            visible: true,
+            className: '',
+            closeModal: true,
+          },
+          confirm: {
+            text: 'Add',
+            value: true,
+            visible: true,
+            className: '',
+            closeModal: true,
+          },
+        },
+      });
+      if (willProceed) {
+        return domain;
+      }
+    } else if (result.associated === false) {
+      return domain;
+    }
+  };
   const addDomain = async () => {
     if (
       (domainError === '' || domainError === 'Please press the Enter key.') &&
@@ -807,135 +731,31 @@ const Page = () => {
                     },
                   });
                   if (keepEmail) {
-                    const result = await checkDomainAssociations(domainOnly);
-                    if (result.errorCode === 0 && result.associated === true) {
-                      const willProceed = await swal({
-                        title: `Do you want to add ${domainOnly} as domain?`,
-                        text: 'You are about to add the domain which is the associated by another organization. ',
-                        icon: 'warning',
-                        buttons: {
-                          cancel: {
-                            text: 'Cancel',
-                            value: false,
-                            visible: true,
-                            className: '',
-                            closeModal: true,
-                          },
-                          confirm: {
-                            text: 'Add',
-                            value: true,
-                            visible: true,
-                            className: '',
-                            closeModal: true,
-                          },
-                        },
-                      });
-                      if (willProceed) {
-                        newDomains.push(domain);
-                      }
-                    } else if (result.associated === false) {
-                      newDomains.push(domain);
-                    }
+                    const domainasso = await DomainAssociation(
+                      domainOnly,
+                      domain,
+                    );
+                    newDomains.push(domainasso);
                   } else {
-                    const result = await checkDomainAssociations(domainOnly);
-                    if (result.errorCode === 0 && result.associated === true) {
-                      const willProceed = await swal({
-                        title: `Do you want to add ${domainOnly} as domain?`,
-                        text: 'You are about to add the domain which is the associated by another organization. ',
-                        icon: 'warning',
-                        buttons: {
-                          cancel: {
-                            text: 'Cancel',
-                            value: false,
-                            visible: true,
-                            className: '',
-                            closeModal: true,
-                          },
-                          confirm: {
-                            text: 'Add',
-                            value: true,
-                            visible: true,
-                            className: '',
-                            closeModal: true,
-                          },
-                        },
-                      });
-
-                      if (willProceed) {
-                        newDomains.push(domainOnly);
-                      }
-                    } else if (result.associated === false) {
-                      newDomains.push(domainOnly);
-                    }
+                    const domainasso = await DomainAssociation(
+                      domainOnly,
+                      domainOnly,
+                    );
+                    newDomains.push(domainasso);
                   }
                   errorMessage2 += `Domain is enough for ${domainCheckedNotEmail}.`;
-
-                  // bussinessTrueEmail.add(domain);
                 } else {
-                  const result = await checkDomainAssociations(domain);
-                  if (result.errorCode === 0 && result.associated === true) {
-                    const willProceed = await swal({
-                      title: `Do you want to add ${domain} as domain?`,
-                      text: 'You are about to add the domain which is the associated by another organization. ',
-                      icon: 'warning',
-                      buttons: {
-                        cancel: {
-                          text: 'Cancel',
-                          value: false,
-                          visible: true,
-                          className: '',
-                          closeModal: true,
-                        },
-                        confirm: {
-                          text: 'Add',
-                          value: true,
-                          visible: true,
-                          className: '',
-                          closeModal: true,
-                        },
-                      },
-                    });
-                    if (willProceed) {
-                      newDomains.push(domain);
-                    }
-                  } else if (result.associated === false) {
-                    newDomains.push(domain);
-                  }
-                  // newDomains.push(domain);
+                  const domainasso = await DomainAssociation(domain, domain);
+                  newDomains.push(domainasso);
                 }
               } else {
                 if (domain.includes('@')) {
                   const domainOnly = domain.split('@')[1];
-                  const result = await checkDomainAssociations(domainOnly);
-                  if (result.errorCode === 0 && result.associated === true) {
-                    const willProceed = await swal({
-                      title: `Do you want to add ${domainOnly} as domain?`,
-                      text: 'You are about to add the domain which is the associated by another organization. ',
-                      icon: 'warning',
-                      buttons: {
-                        cancel: {
-                          text: 'Cancel',
-                          value: false,
-                          visible: true,
-                          className: '',
-                          closeModal: true,
-                        },
-                        confirm: {
-                          text: 'Add',
-                          value: true,
-                          visible: true,
-                          className: '',
-                          closeModal: true,
-                        },
-                      },
-                    });
-                    if (willProceed) {
-                      newDomains.push(domain);
-                    }
-                  } else if (result.associated === false) {
-                    newDomains.push(domain);
-                  }
-                  // newDomains.push(domain);
+                  const domainasso = await DomainAssociation(
+                    domainOnly,
+                    domain,
+                  );
+                  newDomains.push(domainasso);
                 } else {
                   bussinessTrue.add(domain);
                   errorMessage1 += `Required to add full Email for ${domain}.`;
@@ -1134,7 +954,18 @@ const Page = () => {
   useEffect(() => {
     /* */
   }, [domains]);
-
+  const clearFields = () => {
+    setDomainInput('');
+    setOrganizationName('');
+    setSelectedType('');
+    setMessage('');
+    setOrganizationNameError('');
+    setTypeDropdownError('');
+    setMessageError('');
+    setDomainError('');
+    closeModal();
+    fetchDefaultDomain();
+  };
   ///// for edit ///
   const handeledit = async (org: any) => {
     openModal();
@@ -1147,31 +978,9 @@ const Page = () => {
       if (closeModalButtonRef.current) {
         closeModalButtonRef.current.click();
       }
-
-      setDomainInput('');
-      setOrganizationName('');
-      setSelectedType('');
-      const fetchDefaultDomain = async () => {
-        try {
-          const defaultDomain = await getDefaultDomainFromEmail();
-          if (defaultDomain) {
-            setDomains([defaultDomain]);
-          }
-        } catch (error) {
-          //   console.error('Error fetching the default domain:', error);
-        }
-      };
-
-      fetchDefaultDomain();
-      setMessage('');
-      setOrganizationNameError('');
-      setDomainError('');
-      setTypeDropdownError('');
-      setMessageError('');
+      clearFields();
       fetchData();
       fetchData1();
-      setDomainError('');
-      closeModal();
       return;
     }
     setorgidForupdatetion(org.org_id);
@@ -1204,7 +1013,7 @@ const Page = () => {
     setDomainInput('');
     setOrganizationName('');
     setSelectedType('');
-    const fetchDefaultDomain = async () => {
+    const fetchDefaultDomain2 = async () => {
       try {
         const defaultDomain = await getDefaultDomainFromEmail();
         if (defaultDomain) {
@@ -1219,9 +1028,7 @@ const Page = () => {
         //   console.error('Error fetching the default domain:', error);
       }
     };
-
-    fetchDefaultDomain();
-
+    fetchDefaultDomain2();
     setMessage('');
     fetchData();
     fetchData1();
@@ -1243,7 +1050,6 @@ const Page = () => {
     </div>
   `;
   }
-
   ////HANDLE DELETE FOR ORG
   const handleDelete = async (org: any) => {
     const showError = () => {
@@ -1268,8 +1074,6 @@ const Page = () => {
       swal({
         title: 'Are you sure?',
 
-        // text: `Please type "DELETE" or "${org.org_name}" to confirm deletion`,
-        // html: `Please type <b>DELETE</b> or <b>${org.org_name}</b> to confirm deletion`,
         content: {
           element: 'div',
           attributes: {
@@ -1282,14 +1086,6 @@ const Page = () => {
             },
           },
         },
-        // content: {
-        //   element: 'input',
-        //   attributes: {
-        //     placeholder: 'Type here',
-        //     type: 'text',
-        //     id: 'delete-input',
-        //   },
-        // },
 
         icon: 'warning',
         buttons: {
@@ -1368,9 +1164,6 @@ const Page = () => {
           setLoading(false);
         } else {
           setLoading(false);
-          // showError(
-          //   `You need to type <b>DELETE</b> or <b>${org.org_name}</b> to confirm`,
-          // );
           showError();
           setTimeout(() => {
             showDeleteModal();
@@ -1416,7 +1209,6 @@ const Page = () => {
       setLoading(false);
     }
   };
-
   const checkInputValue = async (value: any) => {
     try {
       const response = await orgNameCheck(value, orgidForupdatetion);
@@ -1438,7 +1230,6 @@ const Page = () => {
     }
   };
   // for search arrow
-  const [focusedIndex, setFocusedIndex] = useState<number>(-1);
   const handelkeyyy = (e: React.KeyboardEvent) => {
     if (sidebarOrgs?.data) {
       if (e.key === 'ArrowDown') {
@@ -1478,7 +1269,6 @@ const Page = () => {
       }
     }
   };
-
   const handleOrgClick = (org: { id: number; name: string }) => {
     setLoading(true);
     const encryptedOrgId = encryptData(org.id.toString());
@@ -1519,7 +1309,6 @@ const Page = () => {
                       <div
                         id='todo-compose'
                         ref={modalRef}
-                        // className='hs-overlay hidden ti-modal open '
                         className='hs-overlay hidden ti-modal [--overlay-backdrop:static]'
                       >
                         <div className='hs-overlay-open:mt-7  ti-modal-box mt-0 ease-out'>
@@ -1539,31 +1328,7 @@ const Page = () => {
                                 data-hs-overlay='#todo-compose'
                                 ref={closeModalButtonRef}
                                 onClick={() => {
-                                  setDomainInput('');
-                                  setOrganizationName('');
-                                  setSelectedType('');
-                                  closeModal();
-                                  const fetchDefaultDomain = async () => {
-                                    try {
-                                      const defaultDomain =
-                                        await getDefaultDomainFromEmail();
-                                      if (defaultDomain) {
-                                        setDomains([defaultDomain]);
-                                      }
-                                    } catch (error) {
-                                      //   console.error('Error fetching the default domain:', error);
-                                    }
-                                  };
-
-                                  fetchDefaultDomain();
-                                  // setDomains([]);
-                                  setMessage('');
-                                  setOrganizationNameError('');
-                                  setDomainError('');
-                                  setTypeDropdownError('');
-                                  setMessageError('');
-                                  // fetchData();
-                                  // fetchData1();
+                                  clearFields();
                                 }}
                               >
                                 <span className='sr-only'>Close</span>
@@ -1595,7 +1360,6 @@ const Page = () => {
                                     value={organizationName}
                                     maxLength={256}
                                     onKeyUp={handelblurrr}
-                                    // onBlur={handelblurrr}
                                   />
                                   {organizationNameError && (
                                     <div className='text-danger'>
@@ -1619,14 +1383,10 @@ const Page = () => {
                                   <div className='flex'>
                                     <input
                                       type='text'
-                                      // className='form-control w-full me-2'
                                       className={`form-control-2   me-2 ${
                                         domainError === '' ? '' : 'input-error'
                                       }`}
                                       id='task-name'
-                                      // placeholder={`For eg: ${
-                                      //   email.split('@')[1]
-                                      // }`}
                                       placeholder='For eg: example.com'
                                       onChange={handleDomainChange}
                                       onKeyDown={handleKeyPress}
@@ -1636,10 +1396,8 @@ const Page = () => {
                                         org_Business === 'none_business'
                                       }
                                     />
-
                                     <button
                                       type='button'
-                                      // className='ti-btn bg-primary text-white ml-2 mb-0 plus-btn-org'
                                       disabled={!domainPlusbtnVisible}
                                       className={`${
                                         domainPlusbtnVisible
@@ -1657,12 +1415,10 @@ const Page = () => {
                                     </div>
                                   )}
                                 </div>
-                                {/* <div className='flex justify-between mt-4'> */}
                                 <div className='xl:col-span-12 col-span-12'>
                                   <div className='grid grid-cols-12 gap-2'>
                                     {domains &&
                                       domains.map((domain: any, index) => (
-                                        // eslint-disable-next-line react/jsx-key
                                         <div
                                           key={index}
                                           className='xl:col-span-6 col-span-6 alert alert-solid-primary alert-dismissible fade show flex'
@@ -1684,10 +1440,6 @@ const Page = () => {
                                                   onClick={() =>
                                                     removeDomain(index, domain)
                                                   }
-                                                  //   onClick={()=>{
-                                                  //     domains.splice(index, 1);
-                                                  //   setDomains(domains);
-                                                  // }}
                                                 >
                                                   <span className='sr-only'>
                                                     Dismiss
@@ -1746,14 +1498,12 @@ const Page = () => {
                                         </option>
                                       ))}
                                   </select>
-
                                   {typeDropdownError && (
                                     <div className='text-danger'>
                                       {typeDropdownError}
                                     </div>
                                   )}
                                 </div>
-
                                 <div className='xl:col-span-12 col-span-12 mb-2'>
                                   <label
                                     htmlFor='task-name'
@@ -1786,29 +1536,7 @@ const Page = () => {
                                 data-hs-overlay='#todo-compose'
                                 ref={closeModalButtonRef}
                                 onClick={() => {
-                                  setDomainInput('');
-                                  setOrganizationName('');
-                                  setSelectedType('');
-                                  const fetchDefaultDomain = async () => {
-                                    try {
-                                      const defaultDomain =
-                                        await getDefaultDomainFromEmail();
-                                      if (defaultDomain) {
-                                        setDomains([defaultDomain]);
-                                      }
-                                    } catch (error) {
-                                      //   console.error('Error fetching the default domain:', error);
-                                    }
-                                  };
-
-                                  fetchDefaultDomain();
-                                  // setDomains([]);
-                                  setMessage('');
-                                  setOrganizationNameError('');
-                                  setDomainError('');
-                                  setTypeDropdownError('');
-                                  setMessageError('');
-                                  closeModal();
+                                  clearFields();
                                 }}
                               >
                                 Cancel
@@ -1835,7 +1563,6 @@ const Page = () => {
                       <></>
                     )}
                   </div>
-
                   <div className='p-4 border-b border-dashed dark:border-defaultborder/10'>
                     <div className='input-group' style={{ cursor: 'pointer' }}>
                       <input
@@ -2063,3 +1790,4 @@ const Page = () => {
 };
 
 export default Page;
+//2066

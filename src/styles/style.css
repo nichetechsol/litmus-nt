@@ -20444,3 +20444,13 @@ li.page-item.disabled a {
     grid-column: 13;
   }
 }
+.custom-swal {
+  z-index: 10000000 !important; /* Higher than the loader's z-index */
+}
+.custom-swal-overlay {
+  z-index: 10000000 !important; /* Ensure it's above the loader */
+}
+
+.custom-swal-overlay .swal-modal {
+  z-index: 10000001 !important; /* Ensure modal is on top of overlay */
+}
