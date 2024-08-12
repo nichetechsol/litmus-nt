@@ -601,12 +601,7 @@ const OrgDashboard = () => {
             }).then(async (willSendInvite) => {
               if (willSendInvite) {
                 setLoading(true);
-                //   const modalTrigger: any = document.querySelector(
-                //     "[data-hs-overlay='#todo-compose1']",
-                //   );
-                //   if (modalTrigger) {
-                //     modalTrigger.click();
-                // }
+
                 const data = {
                   targetUserEmail: email.toLowerCase(),
                   token: onlyToken,
@@ -803,48 +798,6 @@ const OrgDashboard = () => {
     }
   };
 
-  // // for inivatation
-  // const handelInvitation = async () => {
-  //   setLoading(true);
-  //   const isValid = await validateForm();
-  //   if (isValid) {
-  //     try {
-  //       // Prepare the data for the invitation
-  //       const data = {
-  //         email: email.toLowerCase(),
-  //         token: onlyToken,
-  //         userName: userEmail,
-  //         orgName: orgName,
-  //       };
-
-  //       await refreshToken();
-
-  //       const result = await inviteSendToUser(data);
-
-  //       if (result.errorCode === 0) {
-  //         toast.success(result.message, { autoClose: 3000 });
-  //         fetchData2();
-  //         CountData();
-  //       } else {
-  //         toast.error(result.message, { autoClose: 3000 });
-  //       }
-
-  //       // Close the modal
-  //       if (closeModalButtonRef.current) {
-  //         closeModalButtonRef.current.click();
-  //       }
-  //       closeModal();
-  //       roleChange();
-  //       setLoading(false);
-  //     } catch (error) {
-  //       closeModal();
-  //       setLoading(false);
-  //     }
-  //   } else {
-  //     closeModal();
-  //     setLoading(false);
-  //   }
-  // };
   return (
     <>
       {loading && <Loader />}

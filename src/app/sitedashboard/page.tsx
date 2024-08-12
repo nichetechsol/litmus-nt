@@ -146,7 +146,6 @@ const Page = () => {
   const [activePage2, setActivePage2] = useState(1);
   const [perPage2] = useState(10);
   const [products, setProducts] = useState<Products[] | null>(null);
-  // const [solutions, setSolution] = useState<Products[] | null>(null);
   const [activity_log, setActivity_log] = useState<activitylogs[] | null>(null);
   const [onlyToken, setOnlyToken] = useState('');
   const [addbuttonclass, setaddbuttonclass] = useState<boolean>(false);
@@ -243,9 +242,10 @@ const Page = () => {
           } else {
             //
           }
+          setLoading(false);
         }
       } catch (error: any) {
-        //
+        setLoading(false);
       }
     };
     fetchData();
@@ -295,22 +295,6 @@ const Page = () => {
   useEffect(() => {
     fetchData8();
   }, [site_id, orgUserData]);
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       // setLoading(true);
-  //       const data: any = await listSolutions();
-  //       if (data) {
-  //         setSolution(data.data);
-  //       }
-  //       // setLoading(false);
-  //     } catch (error: any) {
-  //       // setLoading(false);
-  //       //
-  //     }
-  //   };
-  //   fetchData();
-  // }, []);
 
   const fetchUserData = async () => {
     try {
@@ -354,41 +338,18 @@ const Page = () => {
     fetchUserData();
   }, [site_id, activePage, search]);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       if (site_id) {
-  //         setLoading(true);
-  //         const result1: any = await listLitmusProducts(
-  //           site_id,
-  //           org_id,
-  //           org_type_id,
-  //         );
-  //         if (result1) {
-  //           setProducts(result1.data);
-  //           setProductSiteCount(result1.data.length);
-  //           setLoading(false);
-  //         }
-  //       }
-  //     } catch (error: any) {
-  //       setLoading(false);
-  //       //
-  //     }
-  //   };
-  //   fetchData();
-  // }, [site_id]);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (site_id) {
+        if (org_id && org_type_id) {
           setLoading(true);
           const data = { org_id, org_type_id };
           const result1: any = await fetchProductData(data);
           if (result1) {
             setProducts(result1.data);
             setProductSiteCount(result1.data.length);
-            setLoading(false);
           }
+          setLoading(false);
         }
       } catch (error: any) {
         setLoading(false);
@@ -801,6 +762,7 @@ const Page = () => {
     } else if (flage === 'S') {
       result = await generateSignedUrl(folder, subfolder, fileName);
     }
+    //Added by Soumiya
     if (result) {
       // Convert the response to a blob
       const blob = new Blob([result], { type: result.type });
@@ -920,9 +882,6 @@ const Page = () => {
                                     Number of Products
                                   </p>
                                   <h4 className='font-semibold text-[1.5rem] !mb-2 '>
-                                    {/* {siteCountData
-                                      ? siteCountData.data.productCount
-                                      : 0} */}
                                     {productSiteCount ? productSiteCount : 0}
                                   </h4>
                                 </div>
@@ -972,10 +931,7 @@ const Page = () => {
                         {siteCountData &&
                         siteCountData.data.sites_details.about_site
                           ? ''
-                          : // <h5 className='text-[1.25rem] text-defaulttextcolor dark:text-defaulttextcolor/70 font-medium'>
-
-                            // </h5>
-                            ''}
+                          : ''}
 
                         <p className='text-[#8c9097] dark:text-white/50 text-[.875rem]'>
                           {siteCountData
@@ -1029,11 +985,7 @@ const Page = () => {
                                           siteCountData.data.sites_details
                                             .created_at,
                                         ).format(' MM/DD/YYYY HH:mm')
-                                      : //  siteCountData.data.sites_details[0].created_at.split(
-                                        //     'T',
-                                        //   )[0]
-                                        ''}
-                                    {/* </span> */}
+                                      : ''}
                                   </p>
                                 </div>
                               </div>
@@ -1170,7 +1122,6 @@ const Page = () => {
                                           );
                                         }}
                                         style={{ cursor: 'pointer' }}
-                                        // href={product.data.downloadLink}
                                         className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
                                       >
                                         <i className='ri-download-line  text-[.8rem]  text-white'></i>
@@ -1252,79 +1203,7 @@ const Page = () => {
                     <div className='box-header flex justify-between'>
                       <div className='box-title'>Billing Address</div>
                     </div>
-                    {/* <div className='box-body'> */}
-                    {/* <ul className='list-none crm-top-deals mb-0'>
-                        {solutions && solutions.length > 0
-                          ? solutions
-                              .filter(
-                                (solution) => solution.data.FileName !== '',
-                              )
-                              .map((solution, index) => (
-                                <li className='mb-[0.9rem]' key={index}>
-                                  <h5 className='box-title items-start'>
-                                    {solution.folder}
-                                  </h5>
-                                  <div className='flex items-center'>
-                                    <div className='me-2 ic-product'>
-                                      <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
-                                        <i className='ri-folder-line text-[1rem]  text-white'></i>
-                                      </span>
-                                    </div>
-                                    <div className='flex-grow ic-product-p'>
-                                      <p className='font-semibold mb-[1.4px]  text-[0.813rem]'>
-                                        {solution.data.FileName}
-                                      </p>
-                                    </div>
-                                    <div className='font-semibold text-[0.9375rem]  cursor-pointer'>
-                                      <a
-                                        onClick={() => {
-                                          handleDownload(
-                                            solution.data.FileName,
-                                            solution.folder.split('/')[0],
-                                            solution.folder.includes('/')
-                                              ? solution.folder.split('/')[-1]
-                                              : '',
-                                            'S',
-                                          );
-                                        }}
-                                        // href={solution.data.downloadLink}
-                                        className='text-[1rem]  !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem]  inline-flex items-center justify-center bg-primary'
-                                      >
-                                        <i className='ri-download-line  text-[.8rem]  text-white'></i>
-                                      </a>
-                                    </div>
-                                  </div>
-                                </li>
-                              ))
-                          : null}
-                        {solutions && solutions.length === 0 && (
-                          <div className='col-md-12 w-100 mt-4'>
-                            <p className='text-center'>No Solution Found</p>{' '}
-                          </div>
-                        )}
-                      </ul> */}
-
-                    {/* </div> */}
-                    <div
-                      className='box-body'
-                      // style={{ cursor: 'pointer' }}
-                      // onClick={() => {
-                      //   const encryptedsiteid = encryptData(SingleSite.site.id);
-                      //   const encryptedsitename = encryptData(
-                      //     SingleSite.site.name,
-                      //   );
-                      //   const encryptedsiteOwnerName = encryptData(
-                      //     SingleSite.ownerNames,
-                      //   );
-                      //   localStorage.setItem('site_id', encryptedsiteid);
-                      //   localStorage.setItem('site_name', encryptedsitename);
-                      //   localStorage.setItem(
-                      //     'site_owner_name',
-                      //     encryptedsiteOwnerName,
-                      //   );
-                      //   navigate.push('/sitedashboard');
-                      // }}
-                    >
+                    <div className='box-body'>
                       <div className='flex justify-between items-center  gap-2'>
                         <div className='flex items-center'></div>
                       </div>
@@ -1343,17 +1222,12 @@ const Page = () => {
                                       ? `, ${siteCountData?.data?.sites_details?.address2}`
                                       : ''
                                   }`}
-                                {/* {siteCountData?.data?.sites_details} */}
                               </p>
                             </li>
                             <li className='list-group-item fw-semibold'>
                               <i className='bx bx-briefcase align-middle me-2 text-muted'></i>
                               <b>Country :</b>
                               <span className='ms-1 text-muted fw-normal d-inline-block'>
-                                {/* {SingleSite?.ownerNames?.join(', ')} */}
-                                {/* {SingleSite?.ownerNames?.length
-                                  ? SingleSite.ownerNames.join(', ')
-                                  : '--'} */}
                                 {siteCountData &&
                                   siteCountData?.data?.sites_details?.country}
                               </span>
@@ -1362,7 +1236,6 @@ const Page = () => {
                               <i className='bx bx-user align-middle me-2 text-muted'></i>
                               <b>State :</b>
                               <span className='ms-1 text-muted fw-normal d-inline-block'>
-                                {/* {SingleSite?.users?.length} */}
                                 {siteCountData?.data?.sites_details?.state}
                               </span>
                             </li>
@@ -1370,7 +1243,6 @@ const Page = () => {
                               <i className='bx bx-user align-middle me-2 text-muted'></i>
                               <b>City :</b>
                               <span className='ms-1 text-muted fw-normal d-inline-block'>
-                                {/* {SingleSite?.type_name} */}
                                 {siteCountData &&
                                   siteCountData?.data?.sites_details.city}
                               </span>
@@ -1379,10 +1251,6 @@ const Page = () => {
                               <i className='bx bx-briefcase align-middle me-2 text-muted'></i>
                               <b>Zip Code :</b>
                               <span className='ms-1 text-muted fw-normal d-inline-block'>
-                                {/* {SingleSite?.ownerNames?.join(', ')} */}
-                                {/* {SingleSite?.ownerNames?.length
-                                  ? SingleSite.ownerNames.join(', ')
-                                  : '--'} */}
                                 {siteCountData &&
                                   siteCountData?.data?.sites_details?.pin_code}
                               </span>
@@ -1523,7 +1391,6 @@ const Page = () => {
                                         className='ti-form-label'
                                       >
                                         First Name{' '}
-                                        {/* <span className='text-danger'>*</span> */}
                                       </label>
                                       <input
                                         type='text'
@@ -1589,7 +1456,6 @@ const Page = () => {
                                         className='ti-form-label'
                                       >
                                         Last Name{' '}
-                                        {/* <span className='text-danger'>*</span> */}
                                       </label>
                                       <input
                                         type='text'
@@ -1699,7 +1565,6 @@ const Page = () => {
                                   </button>
                                   <button
                                     type='button'
-                                    // className='ti-btn bg-primary text-white !font-medium'
                                     onClick={() => handleSubmit()}
                                     disabled={!addbuttonclass}
                                     className={
@@ -1772,11 +1637,7 @@ const Page = () => {
 
                                     <td>{user.email}</td>
                                     <td>
-                                      <span
-                                      // className={`inline-flex text-${user.color} !py-[0.15rem] !px-[0.45rem] rounded-sm !font-semibold !text-[0.75em] bg-${user.color}/10`}
-                                      >
-                                        {user.role_name}
-                                      </span>
+                                      <span>{user.role_name}</span>
                                     </td>
                                     {userrole3 == '1' || userrole3 == '2' ? (
                                       <td>
@@ -1866,12 +1727,10 @@ const Page = () => {
                                   'ActivityLogs',
                                   encryptedActvitylog,
                                 );
-                                // window.location.href = '/activitylogs';
                                 navigate.push('/activitylogs');
                               }}
                               className='hs-dropdown-toggle py-2 ti-btn-sm  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
                             >
-                              {/* <i className='ri-add-circle-line !text-[1rem]'></i> */}
                               View All
                             </button>
                           ) : (
@@ -2073,3 +1932,4 @@ const Page = () => {
 };
 
 export default Page;
+//2076

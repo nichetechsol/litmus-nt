@@ -301,21 +301,7 @@ const Page: React.FC = () => {
       clearTimeout(handler);
     };
   }, [searchTerm]);
-  // for search//
-  const handleSearch = async () => {
-    if (searchTerm === '') {
-      // setResults();
-    } else {
-      const result = await fetchSiteType();
-      if (result.errorCode === 0 && result.data && result.data.length > 0) {
-        // setresults(result);
-        //   setError(null);
-      } else {
-        //   setError("Error fetching data");
-        // setResults(null);
-      }
-    }
-  };
+
   /// for submit
   const handelclosemodel = () => {
     closeModal();
@@ -1384,7 +1370,6 @@ const Page: React.FC = () => {
                           aria-label='button'
                           className='ti-btn ti-btn-light !rounded-s-none !mb-0'
                           id='button-addon2'
-                          onClick={handleSearch}
                         >
                           <i className='ri-search-line text-[#8c9097] dark:text-white/50'></i>
                         </button>

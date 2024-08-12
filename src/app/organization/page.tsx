@@ -482,6 +482,8 @@ const Page = () => {
             setDomainError(error.message);
           }
         }
+      } else if (organizationNameError != '') {
+        //
       } else {
         const isValid = await validateForm();
 
@@ -527,6 +529,7 @@ const Page = () => {
                 });
               }
             }
+
             if (closeModalButtonRef.current) {
               closeModalButtonRef.current.click();
             }
@@ -537,6 +540,10 @@ const Page = () => {
           } catch (error) {
             setLoading(false);
             closeModal();
+            if (closeModalButtonRef.current) {
+              closeModalButtonRef.current.click();
+            }
+            clearFields();
             toast.error('Error Adding Organization', { autoClose: 3000 });
           }
         }
@@ -631,6 +638,11 @@ const Page = () => {
             fetchData();
             fetchData1();
           } catch (error) {
+            if (closeModalButtonRef.current) {
+              closeModalButtonRef.current.click();
+            }
+
+            clearFields();
             setLoading(false);
             toast.error('Error Editing Organization', { autoClose: 3000 });
           }
@@ -1611,6 +1623,9 @@ const Page = () => {
                                       const encryptedOrgName = encryptData(
                                         org.name,
                                       );
+                                      const encryptOrgTypeId = encryptData(
+                                        org.type_id,
+                                      );
                                       localStorage.removeItem('site_id');
                                       localStorage.removeItem('site_name');
                                       localStorage.removeItem(
@@ -1623,6 +1638,10 @@ const Page = () => {
                                       localStorage.setItem(
                                         'org_name',
                                         encryptedOrgName,
+                                      );
+                                      localStorage.setItem(
+                                        'org_type_id',
+                                        encryptOrgTypeId,
                                       );
                                       navigate.push('/orgdashboard');
                                       setLoading(false);
