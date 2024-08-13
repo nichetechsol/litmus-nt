@@ -1678,40 +1678,34 @@ async function checkDomains(domain: string[]): Promise<boolean> {
     return entry;
   });
 
-  // Check if the domain array has only one domain
-  if (normalizedDomains.length === 1) {
-    const singleDomain = normalizedDomains[0];
+  // Fetch the known public domains from the table for all normalized domains
+  const { data: publicDomains, error: publicDomainsError } = await supabase
+    .from('known_public_domains')
+    .select('domain_name')
+    .in('domain_name', normalizedDomains);
 
-    const { data: publicDomain, error: publicDomainError } = await supabase
-      .from('known_public_domains')
-      .select('*')
-      .eq('domain_name', singleDomain);
-
-    if (publicDomainError || !publicDomain || publicDomain.length === 0) {
-      return true; // The single domain is not a known public domain
-    }
-
-    return false; // The single domain is a known public domain
-  } else {
-    // Check if any domain in the array is included in known public domains
-    const domainPromises = normalizedDomains.map(async (domain) => {
-      const { data: publicDomain, error: publicDomainError } = await supabase
-        .from('known_public_domains')
-        .select('*')
-        .eq('domain_name', domain)
-        .single();
-      if (publicDomainError || !publicDomain) {
-        return null;
-      }
-      return publicDomain;
-    });
-
-    const domainResults = await Promise.all(domainPromises);
-    const hasPublicDomain = domainResults.some((result) => result !== null);
-
-    return hasPublicDomain; // Return true if any domain is a known public domain, otherwise false
+  if (publicDomainsError) {
+    throw new Error('Error fetching public domains');
   }
+
+  // If publicDomains is an empty array or doesn't cover all normalized domains
+  if (!publicDomains || publicDomains.length === 0) {
+    return true; // None of the domains are in the known_public_domains table
+  }
+
+  // Create a Set of the known public domain names
+  const knownDomainsSet = new Set(
+    publicDomains.map((domain) => domain.domain_name),
+  );
+
+  // Check if any domain is not included in the known public domains
+  const anyDomainNotPublic = normalizedDomains.some(
+    (domain) => !knownDomainsSet.has(domain),
+  );
+
+  return anyDomainNotPublic; // Return true if any domain is not public, otherwise false
 }
+
 async function checkDomainAssociationsModify(
   domain_name: any,
   org_id: any,
