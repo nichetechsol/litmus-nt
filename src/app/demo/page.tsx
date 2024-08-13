@@ -2,7 +2,7 @@
 'use client';
 import React, { useState } from 'react';
 
-import { processEntitlements } from '@/supabase/site_details_crud';
+import { fetchProductData } from '@/supabase/products';
 
 const OrgDashboard = () => {
   const [result, setResult] = useState<any>(null);
@@ -14,7 +14,11 @@ const OrgDashboard = () => {
     setError(null);
 
     try {
-      const data: any = await processEntitlements(175, 171);
+      const data1 = {
+        org_id: 175,
+        org_type_id: 1,
+      };
+      const data: any = await fetchProductData(data1);
 
       if (data) {
         setResult(data);

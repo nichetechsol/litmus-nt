@@ -1116,12 +1116,56 @@ const fetchProductData = async (data: any) => {
           fileName.includes(extension),
         );
 
+        let can_be_requested = false;
+        let required_entitlements = null;
+
+        // If extension is not included, fetch permissions based on the product
+        if (extensionIncluded === false) {
+          const { data: filePermissions, error } = await supabase
+            .from('filedownload_permissions')
+            .select('file_type, can_be_requested, required_entitlements')
+            .eq('product', product.name.toLowerCase());
+
+          if (error) {
+            throw new Error('Error fetching file permissions');
+          }
+
+          const fileTypes1: any[] = [];
+
+          if (filePermissions?.length) {
+            filePermissions.forEach((permission: any) => {
+              fileTypes1.push({
+                file_type: permission.file_type.trim().toLowerCase(),
+                can_be_requested: permission.can_be_requested,
+                required_entitlements: permission.required_entitlements,
+              });
+            });
+          }
+
+          const matchingPermissions = filePermissions.filter((permission) =>
+            fileName.includes(permission.file_type),
+          );
+
+          // Determine if any matching permission has can_be_requested as true
+          can_be_requested = matchingPermissions.some(
+            (permission) => permission.can_be_requested === true,
+          );
+
+          // Get the required_entitlements from the first matching permission (if any)
+          if (matchingPermissions.length > 0) {
+            required_entitlements =
+              matchingPermissions[0].required_entitlements;
+          }
+        }
+
         return {
           FileName: fileName,
           status: 'current',
           disabled: extensionIncluded,
           folder: productFolder,
           subfolder: currentFolder.name,
+          required_entitlements,
+          can_be_requested,
         };
       }
       return null;
