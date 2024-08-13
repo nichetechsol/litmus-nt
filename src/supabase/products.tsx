@@ -675,24 +675,69 @@ const listofallFiles = async (data: any) => {
     }
 
     // Process files and filter based on permissions
-    const filesList = folderData.map((fileEntry: any) => {
-      const fileName: string = fileEntry.name;
-      const extensionIncluded = [...fileTypes].some((extension) =>
-        fileName.includes(extension),
-      );
+    const filesList = await Promise.all(
+      folderData.map(async (fileEntry: any) => {
+        const fileName: string = fileEntry.name;
+        const extensionIncluded = [...fileTypes].some((extension) =>
+          fileName.includes(extension),
+        );
+        let can_be_requested = false;
+        let required_entitlements = null;
 
-      const disabled =
-        permissionVersion !== null &&
-        ((version === 'current' && extensionIncluded) ||
-          (version === 'all' && extensionIncluded));
+        // If extension is not included, fetch permissions based on the product
+        if (extensionIncluded === false) {
+          const { data: filePermissions, error } = await supabase
+            .from('filedownload_permissions')
+            .select('file_type, can_be_requested, required_entitlements')
+            .eq('product', product);
 
-      return {
-        FileName: fileName,
-        status: version,
-        disabled,
-        subfolder,
-      };
-    });
+          if (error) {
+            throw new Error('Error fetching file permissions');
+          }
+
+          const fileTypes1: any[] = [];
+
+          if (filePermissions?.length) {
+            filePermissions.forEach((permission: any) => {
+              fileTypes1.push({
+                file_type: permission.file_type.trim().toLowerCase(),
+                can_be_requested: permission.can_be_requested,
+                required_entitlements: permission.required_entitlements,
+              });
+            });
+          }
+
+          const matchingPermissions = filePermissions.filter((permission) =>
+            fileName.includes(permission.file_type),
+          );
+
+          // Determine if any matching permission has can_be_requested as true
+          can_be_requested = matchingPermissions.some(
+            (permission) => permission.can_be_requested === true,
+          );
+
+          // Get the required_entitlements from the first matching permission (if any)
+          if (matchingPermissions.length > 0) {
+            required_entitlements =
+              matchingPermissions[0].required_entitlements;
+          }
+        }
+
+        const disabled =
+          permissionVersion !== null &&
+          ((version === 'current' && extensionIncluded) ||
+            (version === 'all' && extensionIncluded));
+
+        return {
+          FileName: fileName,
+          status: version,
+          disabled,
+          subfolder,
+          can_be_requested,
+          required_entitlements,
+        };
+      }),
+    );
 
     return {
       errorCode: 0,
