@@ -562,6 +562,8 @@ const Page = () => {
             setDomainError(error.message);
           }
         }
+      } else if (organizationNameError != '') {
+        //
       } else {
         const isValid = await validateForm();
 

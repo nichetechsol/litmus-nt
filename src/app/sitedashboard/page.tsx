@@ -1201,7 +1201,7 @@ const Page = () => {
                 <div className='xxl:col-span-6 xl:col-span-6  col-span-12'>
                   <div className='box'>
                     <div className='box-header flex justify-between'>
-                      <div className='box-title'>Billing Address</div>
+                      <div className='box-title'>Billing Information</div>
                     </div>
                     <div className='box-body'>
                       <div className='flex justify-between items-center  gap-2'>
