@@ -1042,10 +1042,166 @@ async function processEntitlements(org_id: any, site_id: any) {
     };
   }
 }
+async function automaticallyCreateSite(
+  raw_user_meta_data: any,
+  orgId: any,
+): Promise<any> {
+  try {
+    // Extract organization details from raw_user_meta_data
+    const site_name = raw_user_meta_data['Site Name'];
+    if (!site_name) {
+      return { errorCode: 1, message: 'Site name is required', data: null };
+    }
 
+    // Check if the site already exists in the site_details table
+    const { data: existingSite, error: existingSiteError } = await supabase
+      .from('sites_detail')
+      .select('id')
+      .eq('name', site_name);
+
+    if (existingSiteError && existingSiteError.code !== 'PGRST116') {
+      // Error other than 'row not found'
+      return {
+        errorCode: 1,
+        message: 'Error checking site existence',
+        data: null,
+      };
+    }
+    if (existingSite !== null) {
+      if (existingSite?.length > 0) {
+        // Site already exists
+        return { errorCode: 1, message: 'Site already exists', data: null };
+      }
+    }
+    // Fetch the default site type from general_settings
+    const { data: defaultSiteTypeData, error: defaultSiteTypeError } =
+      await supabase
+        .from('general_settings')
+        .select('value_text')
+        .eq('setting_name', 'default_site_type');
+
+    if (defaultSiteTypeError) {
+      return {
+        errorCode: 1,
+        message: 'Error fetching default site type',
+        data: null,
+      };
+    }
+
+    const defaultSiteType: any = defaultSiteTypeData[0].value_text;
+    // Fetch the corresponding ID for the default site type
+    const { data: siteTypeData, error: siteTypeError } = await supabase
+      .from('site_types')
+      .select('id')
+      .eq('name', defaultSiteType);
+
+    if (siteTypeError || !siteTypeData) {
+      return {
+        errorCode: 1,
+        message: 'Error fetching site type ID',
+        data: null,
+      };
+    }
+
+    const defaultSiteTypeId = siteTypeData[0].id;
+    // Fetch the state ID based on state name
+    const stateName = raw_user_meta_data['State/Province'];
+    const { data: stateData, error: stateError } = await supabase
+      .from('state')
+      .select('id,country_id')
+      .ilike('name', stateName);
+
+    if (stateError) {
+      return { errorCode: 1, message: 'Error fetching state ID', data: null };
+    }
+
+    if (stateData.length === 0) {
+      return { errorCode: 1, message: 'State not found', data: null };
+    }
+
+    const stateId = stateData[0].id;
+    const countryId = stateData[0].country_id;
+    // Insert the new site into the site_details table
+    // const { data: siteInsertData, error: siteInsertError } = await supabase
+    //   .from('sites_detail')
+    const { data: siteInsertData, error } = await supabase
+      .from('sites_detail')
+      .insert([
+        {
+          name: site_name,
+          type_id: defaultSiteTypeId,
+          org_id: orgId,
+          address1: raw_user_meta_data['Street Address'],
+          city: raw_user_meta_data['City'],
+          pin_code: raw_user_meta_data['Postal Code'],
+          status: 'Y',
+          country_id: countryId,
+          state_id: stateId,
+        },
+      ])
+      .select();
+
+    if (error) {
+      return { errorCode: 1, message: 'Error inserting new site', data: null };
+    }
+
+    const siteId = siteInsertData[0].id; // Ensure siteInsertData is an array and access the first item
+
+    // Add the user to the site with the role of "Owner"
+    const email = raw_user_meta_data['email'];
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email)
+      .single();
+
+    if (userError || !userData) {
+      return { errorCode: 1, message: 'Error fetching user data', data: null };
+    }
+    const userId = userData.id;
+
+    const { error: userInsertError } = await supabase
+      .from('site_users')
+      .insert([
+        {
+          site_id: siteId,
+          user_id: userId,
+          role_id: 1, // Owner role
+        },
+      ]);
+
+    if (userInsertError) {
+      return {
+        errorCode: 1,
+        message: 'Error assigning user to site',
+        data: null,
+      };
+    }
+
+    // Fetch and apply the default entitlements
+    const entitlementResult = await processEntitlements(orgId, siteId);
+
+    if (entitlementResult.errorCode !== 0) {
+      return {
+        errorCode: 1,
+        message: 'Error processing entitlements',
+        data: null,
+      };
+    }
+
+    return {
+      errorCode: 0,
+      data: { siteId, site_name },
+      message: 'Site created successfully.',
+    };
+  } catch (error) {
+    return { errorCode: 1, message: 'Error creating site', data: null };
+  }
+}
 export {
   addSites,
   addSitesConfirm,
+  automaticallyCreateSite,
   deleteSite,
   findOrInsertEntitlementValue,
   processEntitlements,

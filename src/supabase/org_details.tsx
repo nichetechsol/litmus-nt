@@ -447,6 +447,199 @@ async function addOrganization(data: {
   }
 }
 
+async function automaticallyCreateOrg(
+  raw_user_meta_data: any,
+): Promise<Result<any>> {
+  try {
+    // Extract organization details from raw_user_meta_data
+    const name = raw_user_meta_data['Organization Name']; //organization name
+    const type_name = raw_user_meta_data['I am a Litmus'];
+    const isAccountBusinessAccount =
+      raw_user_meta_data['This is a business Account'];
+    // Check if any of the fields are blank or undefined
+    const isAnyFieldBlank = !name || !type_name || !isAccountBusinessAccount;
+
+    if (isAnyFieldBlank) {
+      // Fetch general settings in parallel
+      const emptyFieldPromise = supabase
+        .from('general_settings')
+        .select('*')
+        .eq('setting_name', 'empty_user_meta_data');
+
+      // You can handle the settingsPromise here, for example, with .then() or async/await
+      await emptyFieldPromise.then(({ data, error }) => {
+        if (error) {
+          return { errorCode: 1, data: null, message: error.message };
+        }
+      });
+    }
+    // Fetch general settings in parallel
+    const settingsPromise = supabase
+      .from('general_settings')
+      .select('*')
+      .eq('setting_name', 'org_retention');
+
+    // Determine type_id based on "I am a Litmus" value
+    let type_id: any;
+    if (type_name == 'end_user') {
+      type_id = 1;
+    }
+    if (type_name == 'oem') {
+      type_id = 2;
+    }
+    if (type_name == 'partner') {
+      type_id = 3;
+    }
+
+    // Check if the organization already exists in org_details
+    const { data: existingOrg, error: existingOrgError } = await supabase
+      .from('org_details')
+      .select('id')
+      .eq('name', name)
+      .single();
+
+    if (existingOrgError && existingOrgError.code !== 'PGRST116') {
+      // Error other than 'row not found'
+      return {
+        errorCode: 1,
+        message: 'Error checking organization existence',
+        data: null,
+      };
+    }
+
+    if (existingOrg) {
+      // Organization already exists
+      return {
+        errorCode: 1,
+        message: 'Organization already exists',
+        data: null,
+      };
+    }
+
+    // Insert organization into the database using Supabase
+    const insertOrgPromise = supabase
+      .from('org_details')
+      .insert([
+        {
+          name: name,
+          type_id: type_id,
+          status: 'Y',
+          retention_setting: 0, // Default value; will update after fetching settings
+        },
+      ])
+      .select();
+    // Wait for both operations
+    const [settingsResult, insertOrgResult] = await Promise.all([
+      settingsPromise,
+      insertOrgPromise,
+    ]);
+
+    if (settingsResult.error || insertOrgResult.error) {
+      return {
+        errorCode: 1,
+        message: 'Error fetching settings or inserting organization',
+        data: null,
+      };
+    }
+    const orgId = insertOrgResult.data[0].id;
+    const retValue = settingsResult.data?.[0]?.value_number || 0;
+
+    // Update retention setting
+    await supabase
+      .from('org_details')
+      .update({ retention_setting: retValue })
+      .eq('id', orgId);
+
+    const email = raw_user_meta_data.email;
+    const userEmailDomain = email.split('@')[1];
+
+    // Check if the domain is public
+    const { data: knownPublicDomains, error: knownDomainsError } =
+      await supabase
+        .from('known_public_domains')
+        .select('*')
+        .eq('domain_name', userEmailDomain);
+
+    if (knownDomainsError) {
+      return {
+        errorCode: 1,
+        data: knownDomainsError.message,
+        message: 'Error checking known public domains',
+      };
+    }
+
+    const isDomainInKnownPublic = knownPublicDomains.length > 0;
+    const isaccountbusinessacount = !isDomainInKnownPublic;
+
+    // Check and insert domains using insertDomains function
+    const domainResult = await insertDomains(orgId, [userEmailDomain]);
+    if (!domainResult.success) {
+      return { errorCode: 1, message: domainResult.error, data: null };
+    }
+    // Fetch user ID from users table
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email)
+      .single();
+
+    if (userError) {
+      return { errorCode: 1, message: 'Error fetching user ID', data: null };
+    }
+    if (!userData) {
+      return { errorCode: 1, message: 'User not found', data: null };
+    }
+
+    const userId = userData.id;
+
+    // Insert user into the org_user table
+    const userInsertPromise = supabase
+      .from('org_users')
+      .insert([
+        {
+          user_id: userId,
+          role_id: 1,
+          org_id: orgId,
+        },
+      ])
+      .select();
+
+    const entitlementResult = await orgDefaultEntitlement(
+      isaccountbusinessacount,
+      orgId,
+    );
+
+    if (entitlementResult.errorCode !== 0) {
+      return {
+        errorCode: 1,
+        message: 'error fetching entitlements',
+        data: null,
+      };
+    }
+
+    // Wait for user insert and domain insert operations
+    const [userInsertResult] = await Promise.all([userInsertPromise]);
+
+    if (userInsertResult.error) {
+      return {
+        errorCode: 1,
+        message: 'Error inserting organization user',
+        data: null,
+      };
+    }
+
+    // // Fetch and apply default entitlements
+    // const entitlementResult = await orgDefaultEntitlement(isaccountbusinessacount, orgId);
+
+    return {
+      errorCode: 0,
+      data: { orgId, name, isaccountbusinessacount },
+      message: 'Organization added and user assigned successfully.',
+    };
+  } catch (error) {
+    return { errorCode: 1, message: 'Organization is not added', data: null };
+  }
+}
 const insertDomains = async (orgId: any, domains: string[]) => {
   try {
     // Fetch existing domains in bulk
@@ -1773,6 +1966,7 @@ async function checkDomainAssociationsModify(
 export {
   addOrganization,
   associateUsersWithOrganization,
+  automaticallyCreateOrg,
   checkBusinessDomain,
   checkDomainAssociations,
   checkDomainAssociationsModify,

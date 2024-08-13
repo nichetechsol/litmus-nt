@@ -1,6 +1,10 @@
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { checkBusinessDomain } from '@/supabase/org_details';
+import {
+  automaticallyCreateOrg,
+  checkBusinessDomain,
+} from '@/supabase/org_details';
+import { automaticallyCreateSite } from '@/supabase/site_details_crud';
 
 import { supabase } from './db';
 
@@ -278,5 +282,47 @@ async function checkLicensePlan(userId: any): Promise<CheckLicensePlanResult> {
     };
   }
 }
+async function autoOrgAndSiteGenerate(raw_user_meta_data: any): Promise<any> {
+  try {
+    // Step 1: Create the Organization
+    const orgResult = await automaticallyCreateOrg(raw_user_meta_data);
 
-export { checkLicensePlan, Login };
+    if (orgResult.errorCode !== 0) {
+      return { errorCode: 1, message: orgResult.message, data: null };
+    }
+
+    const orgId = orgResult.data?.orgId;
+    if (!orgId) {
+      return {
+        errorCode: 1,
+        message: 'Failed to retrieve organization ID',
+        data: null,
+      };
+    }
+
+    // Step 2: Create the Site using the retrieved orgId
+    const siteResult = await automaticallyCreateSite(raw_user_meta_data, orgId);
+
+    if (siteResult.errorCode !== 0) {
+      return { errorCode: 1, message: siteResult.message, data: null };
+    }
+
+    return {
+      errorCode: 0,
+      message: 'Organization and site created successfully.',
+      data: {
+        orgId: orgId,
+        siteId: siteResult.data?.siteId,
+        siteName: siteResult.data?.site_name,
+      },
+    };
+  } catch (error) {
+    return {
+      errorCode: 1,
+      message: 'Error creating organization and site',
+      data: null,
+    };
+  }
+}
+
+export { autoOrgAndSiteGenerate, checkLicensePlan, Login };
