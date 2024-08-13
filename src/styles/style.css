@@ -20454,3 +20454,8 @@ li.page-item.disabled a {
 .custom-swal-overlay .swal-modal {
   z-index: 10000001 !important; /* Ensure modal is on top of overlay */
 }
+.custom-tooltip {
+  width: 50%;
+  left: auto;
+  right: 0 !important;
+}

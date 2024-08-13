@@ -36,6 +36,8 @@ interface files {
   status: string;
   subfolder: string;
   disabled: boolean;
+  can_be_requested: boolean;
+  required_entitlements: string | null;
 }
 const Page = () => {
   const navigate = useRouter();
@@ -429,7 +431,7 @@ const Page = () => {
                         ? files?.map((file: any) => (
                             <>
                               <li className='mb-[0.9rem] p-4 hover:bg-light border dark:border-defaultborder/10 rounded-md relative"'>
-                                <div className='flex items-center flex-wrap'>
+                                <div className='flex relative  items-center flex-wrap'>
                                   <div className='me-2'>
                                     <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
                                       <i className='ri-file-line text-[1rem]  text-white'></i>
@@ -448,7 +450,7 @@ const Page = () => {
                                     Size 16MB
                                   </p> */}
                                   </div>
-                                  <div className='font-semibold text-[0.9375rem] '>
+                                  <div className='font-semibold flex   justify-between  text-[0.9375rem] '>
                                     {file.disabled ? (
                                       <a
                                         onClick={() =>
@@ -465,21 +467,37 @@ const Page = () => {
                                       </a>
                                     ) : (
                                       <>
-                                        {bucketName &&
-                                        bucketName == 'Litmus_Products' &&
-                                        currentSelectedFolder?.product_type ==
-                                          'litmus_edge' ? (
-                                          <a
-                                            onClick={() => handleRequestMail()}
-                                            // href={files.downloadLink}
-                                            className='text-[1rem] !w-[7.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'
-                                            style={{ cursor: 'pointer' }}
-                                          >
-                                            {/* <i className='ri-mail-line text-[.8rem] text-white'></i> */}
-                                            <p className='text-white text-[.8rem]'>
-                                              Request Access
-                                            </p>
-                                          </a>
+                                        {file.status &&
+                                        file.status == 'current' &&
+                                        file.can_be_requested ? (
+                                          <div className=' flex   justify-between '>
+                                            <div
+                                              onClick={() =>
+                                                handleRequestMail()
+                                              }
+                                              className='text-[1rem] !w-[7.9rem] ltr rounded-sm  !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'
+                                              style={{ cursor: 'pointer' }}
+                                            >
+                                              <p className='text-white text-[.8rem]'>
+                                                Request Access
+                                              </p>
+                                            </div>
+                                            &nbsp;
+                                          </div>
+                                        ) : null}
+                                        {file.status === 'current' &&
+                                        file.required_entitlements != null ? (
+                                          <div className=' group'>
+                                            <a
+                                              className='text-[1rem] !w-[1.9rem] rounded !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'
+                                              style={{ cursor: 'pointer' }}
+                                            >
+                                              <i className='ri-information-line text-[1rem]  text-white '></i>
+                                            </a>
+                                            <div className='absolute hidden tool-custom group-hover:block bg-gray-400 text-black text-xs rounded p-2 z-10 bottom-full mb-2  custom-tooltip break-words'>
+                                              {`To access this feature, you need following entitlements for ${file?.required_entitlements}`}
+                                            </div>
+                                          </div>
                                         ) : null}
                                       </>
                                     )}

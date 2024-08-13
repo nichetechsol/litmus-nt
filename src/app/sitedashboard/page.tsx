@@ -21,7 +21,7 @@ import {
   roleSchema,
 } from '@/helper/ValidationHelper';
 import { getActivitiesBySiteID, logActivity } from '@/supabase/activity';
-import { showReqLicenceButton } from '@/supabase/licence';
+import { reqProductsforLitmus, showReqLicenceButton } from '@/supabase/licence';
 import { getUserRole } from '@/supabase/org_details';
 import { searchUsers } from '@/supabase/org_user';
 import { downloadProduct, fetchProductData } from '@/supabase/products';
@@ -53,6 +53,9 @@ interface licenseData {
 }
 interface Products {
   FileName: string;
+  required_entitlements: string;
+  status: string;
+  can_be_requested: boolean;
   downloadLink: string;
   disabled: boolean;
   subfolder: string;
@@ -794,6 +797,27 @@ const Page = () => {
     }
   };
 
+  const handleRequestMail = async () => {
+    // toast.warning('Work In Progress..', { autoClose: 3000 });
+    const data = {
+      userName: userEmail,
+      name: orgName,
+      token: onlyToken,
+    };
+    setLoading(true);
+    try {
+      const response: any = await reqProductsforLitmus(data);
+      if (response) {
+        setLoading(false);
+        toast.success(response.message, { autoClose: 3000 });
+      } else if (response.errorCode === 0) {
+        toast.error(response.message, { autoClose: 3000 });
+      }
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`, { autoClose: 3000 });
+    }
+  };
+
   return (
     <>
       {loading && <Loader />}
@@ -1110,7 +1134,8 @@ const Page = () => {
                                       {product.FileName}
                                     </p>
                                   </div>
-                                  {product.disabled && (
+                                  {product.disabled &&
+                                  product.disabled === true ? (
                                     <div className='font-semibold text-[0.9375rem] '>
                                       <a
                                         onClick={() => {
@@ -1127,6 +1152,40 @@ const Page = () => {
                                         <i className='ri-download-line  text-[.8rem]  text-white'></i>
                                       </a>
                                     </div>
+                                  ) : (
+                                    <>
+                                      {product.status &&
+                                      product.status == 'current' &&
+                                      product.can_be_requested ? (
+                                        <div className=' relative group flex justify-between '>
+                                          <a
+                                            onClick={() => handleRequestMail()}
+                                            className='text-[1rem] !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'
+                                            style={{ cursor: 'pointer' }}
+                                          >
+                                            <i className='ri-mail-line text-[1rem]  text-white '></i>
+                                          </a>
+                                          <div className='absolute hidden tool-custom group-hover:block bg-gray-400 text-black text-xs rounded p-2 z-10 bottom-full mb-2 max-w-xs break-words'>
+                                            Request Access
+                                          </div>
+                                          &nbsp;
+                                        </div>
+                                      ) : null}
+                                      {product.status === 'current' &&
+                                      product.required_entitlements != null ? (
+                                        <div className='relative group'>
+                                          <a
+                                            className='text-[1rem] !w-[1.9rem] rounded-sm !h-[1.9rem] !leading-[1.9rem] inline-flex items-center justify-center bg-primary'
+                                            style={{ cursor: 'pointer' }}
+                                          >
+                                            <i className='ri-information-line text-[1rem]  text-white '></i>
+                                          </a>
+                                          <div className='absolute hidden tool-custom group-hover:block bg-gray-400 text-black text-xs rounded p-2 z-10 bottom-full mb-2 max-w-xs break-words'>
+                                            {`To access this feature, you need following entitlements for ${product?.required_entitlements}`}
+                                          </div>
+                                        </div>
+                                      ) : null}
+                                    </>
                                   )}
                                 </div>
                               </li>
