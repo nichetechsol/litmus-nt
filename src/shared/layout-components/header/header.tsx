@@ -10,6 +10,7 @@ import swal from 'sweetalert';
 
 import InitialsComponent from '@/helper/NameHelper';
 import store from '@/shared/redux/store';
+import supabase from '@/supabase/db';
 // import Modalsearch from '../modal-search/modalsearch';
 // import { "" } from '@/next.config';
 import { getUserRole } from '@/supabase/org_details';
@@ -639,7 +640,7 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                                 closeModal: true,
                               },
                             },
-                          }).then((willLogout: any) => {
+                          }).then(async (willLogout: any) => {
                             document.body.classList.remove('no-scroll');
                             if (willLogout) {
                               setLoading(true);
@@ -659,7 +660,25 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                               localStorage.removeItem('user_email');
                               localStorage.removeItem('add_orgUser');
                               localStorage.removeItem('ActivityLogs');
-                              history.push('/');
+                              try {
+                                // Sign out from Supabase
+                                await supabase.auth.signOut();
+
+                                // Add a small delay to ensure the sign-out process is fully complete
+                                setTimeout(() => {
+                                  const postLogoutRedirectUri = `http://localhost:3000`;
+
+                                  const microsoftLogoutUrl = `https://login.microsoftonline.com/f3553495-ea6b-4ee0-bdd8-fa3106e6c93c/oauth2/v2.0/logout?post_logout_redirect_uri=${postLogoutRedirectUri}`;
+
+                                  // Assign the location to ensure redirection
+                                  window.location.assign(microsoftLogoutUrl);
+                                  history.push('/');
+                                }, 2000); // 100ms delay
+                              } catch (error) {
+                                // console.error('Error logging out:', error);
+                              }
+
+                              // history.push('/');
                               setLoading(false);
                             }
                           });

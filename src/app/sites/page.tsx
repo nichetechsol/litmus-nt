@@ -124,6 +124,7 @@ const Page: React.FC = () => {
     }
   }, []);
   const [userrole2, setuserrole2] = useState('');
+  //Added by Srishti - get the role of user in sites
   useEffect(() => {
     const fetchData2 = async () => {
       try {
@@ -188,6 +189,7 @@ const Page: React.FC = () => {
   const closeModalButtonRef = useRef<HTMLButtonElement>(null);
   const [addbuttonclass, setaddbuttonclass] = useState<boolean>(false);
 
+  //Added by Kunal - For Greay out Button in Add/Edit Site Form
   useEffect(() => {
     const validate = async () => {
       if (AddSiteNameError == '') {
@@ -228,6 +230,7 @@ const Page: React.FC = () => {
     message,
     AddSiteNameError,
   ]);
+
   const openModal = () => {
     document.body.classList.add('no-scroll1');
   };
@@ -235,7 +238,7 @@ const Page: React.FC = () => {
   const closeModal = () => {
     document.body.classList.remove('no-scroll1');
   };
-  /// for getting details of site
+  /////Added by Kunal -  For Getting details of site
   const FetchSiteDetails = async () => {
     try {
       setLoading(true);
@@ -259,7 +262,7 @@ const Page: React.FC = () => {
     FetchSiteDetails();
   }, [org_id]);
 
-  ///searching site
+  /// //Added by Kunal -Searching in site
   const fetchData1 = async () => {
     try {
       const result1: any = await fetchSiteSidebarList(
@@ -288,13 +291,14 @@ const Page: React.FC = () => {
       //
     }
   };
+  //Added by Kunal - Delay in search as on every word typed api Should not be called
   useEffect(() => {
     const handler = setTimeout(() => {
       // This code runs after the user has stopped typing for 300ms
       if (searchTerm !== undefined) {
         fetchData1();
       }
-    }, 300); // 300ms delay
+    }, 300);
 
     // Cleanup function to clear the timeout if searchTerm changes before 300ms
     return () => {
@@ -302,7 +306,7 @@ const Page: React.FC = () => {
     };
   }, [searchTerm]);
 
-  /// for submit
+  /// //Added by Kunal - for clearing the form when closed
   const handelclosemodel = () => {
     closeModal();
     setAddSiteName('');
@@ -331,7 +335,7 @@ const Page: React.FC = () => {
     setPincodeError('');
     setMessageError('');
   };
-
+  /// //Added by Kunal - for Seting the type in form
   function handleCall() {
     const SiteTypesFetch = async () => {
       try {
@@ -346,6 +350,7 @@ const Page: React.FC = () => {
         //
       }
     };
+    /// //Added by Kunal - for adding the dropdown of country
     const AddSiteCounrtyDropDown = async () => {
       try {
         const data = await countryList();
@@ -361,7 +366,7 @@ const Page: React.FC = () => {
     AddSiteCounrtyDropDown();
     SiteTypesFetch();
   }
-  ///////////////////for crud validations/////
+  /// //Added by Kunal - Validation Schema for validation
   const validationSchema = Yup.object().shape({
     AddSiteName: SiteNameSchema,
     SelectedValueDropdown: SiteTypeDropdownSchema,
@@ -373,7 +378,7 @@ const Page: React.FC = () => {
     Pincode: PincodeSchema,
     message: MessageSchema,
   });
-  /////
+  /// //Added by Kunal - for setting the name
   const handelAddSiteName = (e: React.ChangeEvent<HTMLInputElement>) => {
     const NewSiteName = e.target.value.trimStart();
     setAddSiteName(NewSiteName);
@@ -385,6 +390,7 @@ const Page: React.FC = () => {
         setAddSiteNameError(err.message);
       });
   };
+  /// //Added by Kunal - for adding the discription
   const handleMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newMessage = e.target.value.trimStart();
     setMessage(newMessage);
@@ -396,9 +402,8 @@ const Page: React.FC = () => {
         setMessageError(err.message);
       });
   };
-  // for dropdown//
 
-  // for dropdown change
+  /// //Added by Kunal --for dropdown change
   const handelchangeTypeDropDown = (
     e: React.ChangeEvent<HTMLSelectElement>,
   ) => {
@@ -413,7 +418,7 @@ const Page: React.FC = () => {
         //
       });
   };
-
+  /// //Added by Kunal - for setting the address 1
   const handelchangeAddress1 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newaddres1 = e.target.value.trimStart();
     setAddress1(newaddres1);
@@ -425,6 +430,7 @@ const Page: React.FC = () => {
         setAddress1Error(err.message);
       });
   };
+  /// //Added by Kunal - for setting the address 2
   const handelchangeAddress2 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newaddres2 = e.target.value.trimStart();
     setAddress2(newaddres2);
@@ -436,7 +442,7 @@ const Page: React.FC = () => {
         setAddress2Error(err.message);
       });
   };
-  // for state dropdown
+  //   /// //Added by Kunal -for state dropdown
   useEffect(() => {
     const AddstateDropdown = async () => {
       try {
@@ -453,6 +459,7 @@ const Page: React.FC = () => {
     };
     AddstateDropdown();
   }, [SelectedValueCounrty]);
+  /// //Added by Kunal - for state change and dropdown
   const handelchangeState = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const NewStateselected = parseInt(e.target.value);
     setSelectedValueState(NewStateselected);
@@ -465,7 +472,7 @@ const Page: React.FC = () => {
       });
   };
 
-  // for country dropdown
+  //   /// //Added by Kunal -for country dropdown and change
 
   const handelchangeCountry = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const Newcountryselected = parseInt(e.target.value);
@@ -480,7 +487,7 @@ const Page: React.FC = () => {
       });
   };
 
-  // for city
+  //   /// //Added by Kunal - for setting  city
   const handelAddSiteCity = (e: React.ChangeEvent<HTMLInputElement>) => {
     const NewSiteCity = e.target.value.trimStart();
     setCity(NewSiteCity);
@@ -492,7 +499,7 @@ const Page: React.FC = () => {
         setCityError(err.message);
       });
   };
-  // for pincode
+  //   /// //Added by Kunal -for setting  pincode
   const handelAddSitePincode = (e: React.ChangeEvent<HTMLInputElement>) => {
     const Newpincode = e.target.value.trim();
     setPincode(Newpincode);
@@ -504,7 +511,7 @@ const Page: React.FC = () => {
         setPincodeError(err.message);
       });
   };
-
+  /// //Added by Kunal - for validation is there then show and not allow to submit
   const validateForm = async () => {
     try {
       await validationSchema.validate(
