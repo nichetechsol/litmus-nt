@@ -233,7 +233,7 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
+        // setLoading(true);
         const start: any = (activePage2 - 1) * perPage2;
         const end: any = start + perPage2 - 1;
         if (site_id) {
@@ -245,10 +245,10 @@ const Page = () => {
           } else {
             //
           }
-          setLoading(false);
+          // setLoading(false);
         }
       } catch (error: any) {
-        setLoading(false);
+        // setLoading(false);
       }
     };
     fetchData();

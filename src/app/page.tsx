@@ -272,6 +272,8 @@ const LoginForm = () => {
                 }
                 navigate.push('/organization');
                 setLoading(false);
+              } else if (result == undefined || result == null) {
+                setLoading(false);
               } else {
                 swal({
                   icon: 'error',
@@ -286,6 +288,8 @@ const LoginForm = () => {
 
               // User is already logged in, redirect to the desired page
               // navigate.push('/organization'); // or any other page you want to redirect to
+            } else {
+              setLoading(false);
             }
           };
 
@@ -293,6 +297,7 @@ const LoginForm = () => {
             checkUser();
           }, 2000);
         } else {
+          setLoading(false);
           // User is logged out
         }
       },

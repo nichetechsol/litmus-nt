@@ -76,6 +76,7 @@ interface Typeor {
 }
 type OrgBusinessStatus = 'business' | 'none_business';
 const Page = () => {
+  const router = useRouter();
   const [tokenVerify, setTokenVerify] = useState(false);
   const [onlyToken, setOnlyToken] = useState('');
   const navigate = useRouter();
@@ -123,7 +124,9 @@ const Page = () => {
   >([]);
 
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
-
+  // useEffect(()=>{
+  //   router.reload();
+  // })
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
       const tokens = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
