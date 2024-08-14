@@ -490,6 +490,7 @@ async function automaticallyCreateOrg(
     if (type_name == 'partner') {
       type_id = 3;
     }
+    let orgId: any;
 
     // Check if the organization already exists in org_details
     const { data: existingOrg, error: existingOrgError } = await supabase
@@ -506,14 +507,13 @@ async function automaticallyCreateOrg(
         data: null,
       };
     }
-
     if (existingOrg) {
-      // Organization already exists
-      return {
-        errorCode: 1,
-        message: 'Organization already exists',
-        data: null,
-      };
+      orgId = existingOrg.id;
+      // return {
+      //   errorCode: 0,
+      //   data: { orgId, name, isAccountBusinessAccount },
+      //   message: 'Organization is already.',
+      // };
     }
 
     // Insert organization into the database using Supabase
@@ -541,7 +541,7 @@ async function automaticallyCreateOrg(
         data: null,
       };
     }
-    const orgId = insertOrgResult.data[0].id;
+    orgId = insertOrgResult.data[0].id;
     const retValue = settingsResult.data?.[0]?.value_number || 0;
 
     // Update retention setting

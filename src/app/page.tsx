@@ -1,16 +1,16 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable @next/next/no-img-element */
 'use client';
 import CryptoJS from 'crypto-js';
 import Link from 'next/link';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import React, {
   ChangeEvent,
   Fragment,
   KeyboardEvent,
   useEffect,
-  useLayoutEffect,
   useState,
 } from 'react';
 import swal from 'sweetalert';
@@ -18,7 +18,8 @@ import * as Yup from 'yup';
 
 import { emailSchemaSign, passwordSchema } from '@/helper/ValidationHelper';
 import Footer from '@/shared/layout-components/footer/footer';
-import { Login } from '@/supabase/auth';
+import { addUser, AsureAuth, GetUser, Login } from '@/supabase/auth';
+import supabase from '@/supabase/db';
 import Loader from '@/utils/Loader/Loader';
 
 import { basePath } from '../../next.config';
@@ -38,6 +39,9 @@ const LoginForm = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useRouter();
   // const [tokenVerify, setTokenVerify] = useState(true);
+  const handleLogin = async () => {
+    await AsureAuth('azure');
+  };
   const ENCRYPTION_KEY = 'pass123';
   const encryptData = (data: string | number | null | undefined): string => {
     if (!data && data !== 0) {
@@ -191,17 +195,17 @@ const LoginForm = () => {
       }
     }
   };
-  useLayoutEffect(() => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
-      if (token) {
-        // setTokenVerify(true);
-        redirect('/organization');
-      } else {
-        // setTokenVerify(false);
-      }
-    }
-  }, []);
+  // useLayoutEffect(() => {
+  //   if (typeof window !== 'undefined') {
+  //     const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
+  //     if (token) {
+  //       // setTokenVerify(true);
+  //       redirect('/organization');
+  //     } else {
+  //       // setTokenVerify(false);
+  //     }
+  //   }
+  // }, []);
 
   // useEffect(() => {
   //   const storedEmail = localStorage.getItem('rememberedEmail');
@@ -212,6 +216,93 @@ const LoginForm = () => {
   //     setRememberMe(true);
   //   }
   // }, []);
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session) {
+          // User is logged in
+          // alert('signed IN');
+          setLoading(true);
+          // navigate.push('/organization');
+          const checkUser = async () => {
+            const user = await GetUser();
+
+            if (user) {
+              const variabletaken = user.user.user_metadata.custom_claims;
+              const auth_id = user.user.id;
+              const result = await addUser(user, variabletaken, auth_id);
+              if (result?.errorCode === 0) {
+                const encryptedEmail1 = encryptData(email);
+                localStorage.setItem('user_email', encryptedEmail1);
+                const user_id: any = result.user[0]?.id;
+                const user_firstname: any = variabletaken['First Name'];
+                const user_lastname: any = variabletaken['Last Name'];
+                const add_orgUser: any = result.add_orgUser ? 'true' : 'false';
+                const org_exists: any = result.org_exists ? 'true' : 'false';
+
+                const encryptedUserId = encryptData(user_id);
+                const encryptedUserFirstName = encryptData(
+                  user_firstname ? user_firstname : '',
+                );
+                const encryptedUserLastName = encryptData(
+                  user_lastname ? user_lastname : '',
+                );
+                const encryptedAddOrgUser = encryptData(
+                  add_orgUser ? add_orgUser : '',
+                );
+                const encryptedOrgExists = encryptData(
+                  org_exists ? org_exists : '',
+                );
+
+                if (encryptedUserId) {
+                  localStorage.setItem('user_id', encryptedUserId);
+                }
+
+                if (encryptedUserFirstName) {
+                  localStorage.setItem('user_fname', encryptedUserFirstName);
+                }
+                if (encryptedUserLastName) {
+                  localStorage.setItem('user_lname', encryptedUserLastName);
+                }
+                if (encryptedAddOrgUser) {
+                  localStorage.setItem('add_orgUser', encryptedAddOrgUser);
+                }
+                if (encryptedOrgExists) {
+                  localStorage.setItem('org_exists', encryptedOrgExists);
+                }
+                navigate.push('/organization');
+                setLoading(false);
+              } else {
+                swal({
+                  icon: 'error',
+                  text: result.message,
+                });
+                setLoading(false);
+              }
+              const encryptedstoredEntraInfo = encryptData(variabletaken);
+              if (encryptedstoredEntraInfo) {
+                localStorage.setItem('entraInfo', encryptedstoredEntraInfo);
+              }
+
+              // User is already logged in, redirect to the desired page
+              // navigate.push('/organization'); // or any other page you want to redirect to
+            }
+          };
+
+          setTimeout(async () => {
+            checkUser();
+          }, 2000);
+        } else {
+          // User is logged out
+        }
+      },
+    );
+
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
+  }, []);
+
   useEffect(() => {
     const storedEncryptedEmail = localStorage.getItem('rememberedEmail');
     const storedEncryptedPassword = localStorage.getItem('rememberedPassword');
@@ -374,6 +465,13 @@ const LoginForm = () => {
                               onClick={handleSubmit}
                             >
                               Sign In
+                            </button>
+
+                            <button
+                              className='ti-btn ti-btn-primary !bg-primary !text-white !font-medium'
+                              onClick={handleLogin}
+                            >
+                              Login with Azure
                             </button>
                             {/* <Link onClick={(e)=>{handleSubmit(e)}} href="#!" className="ti-btn ti-btn-primary !bg-primary !text-white !font-medium">Sign In</Link> */}
                           </div>
