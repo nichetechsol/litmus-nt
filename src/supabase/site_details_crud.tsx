@@ -1067,86 +1067,97 @@ async function automaticallyCreateSite(
         data: null,
       };
     }
+    let siteId;
     if (existingSite !== null) {
       if (existingSite?.length > 0) {
         // Site already exists
-        return { errorCode: 1, message: 'Site already exists', data: null };
+        siteId = existingSite[0].id;
+      } else {
+        // Fetch the default site type from general_settings
+        const { data: defaultSiteTypeData, error: defaultSiteTypeError } =
+          await supabase
+            .from('general_settings')
+            .select('value_text')
+            .eq('setting_name', 'default_site_type');
+
+        if (defaultSiteTypeError) {
+          return {
+            errorCode: 1,
+            message: 'Error fetching default site type',
+            data: null,
+          };
+        }
+
+        const defaultSiteType: any = defaultSiteTypeData[0].value_text;
+        // Fetch the corresponding ID for the default site type
+        const { data: siteTypeData, error: siteTypeError } = await supabase
+          .from('site_types')
+          .select('id')
+          .eq('name', defaultSiteType);
+
+        if (siteTypeError || !siteTypeData) {
+          return {
+            errorCode: 1,
+            message: 'Error fetching site type ID',
+            data: null,
+          };
+        }
+
+        const defaultSiteTypeId = siteTypeData[0].id;
+        // Fetch the state ID based on state name
+        let stateId = null;
+        let countryId = null;
+        const stateName = raw_user_meta_data['State/Province'];
+        const { data: stateData, error: stateError } = await supabase
+          .from('state')
+          .select('id,country_id')
+          .ilike('name', stateName);
+
+        if (stateError) {
+          return {
+            errorCode: 1,
+            message: 'Error fetching state ID',
+            data: null,
+          };
+        }
+
+        if (stateData.length > 0) {
+          // return { errorCode: 1, message: 'State not found', data: null };
+          stateId = stateData[0].id;
+          countryId = stateData[0].country_id;
+        }
+
+        // Insert the new site into the site_details table
+        // const { data: siteInsertData, error: siteInsertError } = await supabase
+        //   .from('sites_detail')
+        const { data: siteInsertData, error } = await supabase
+          .from('sites_detail')
+          .insert([
+            {
+              name: site_name,
+              type_id: defaultSiteTypeId,
+              org_id: orgId,
+              address1: raw_user_meta_data['Street Address'],
+              city: raw_user_meta_data['City'],
+              pin_code: raw_user_meta_data['Postal Code'],
+              status: 'Y',
+              country_id: countryId,
+              state_id: stateId,
+            },
+          ])
+          .select();
+
+        if (error) {
+          return {
+            errorCode: 1,
+            message: 'Error inserting new site',
+            data: null,
+          };
+        }
+
+        siteId = siteInsertData[0].id; // Ensure siteInsertData is an array and access the first item
       }
     }
-    // Fetch the default site type from general_settings
-    const { data: defaultSiteTypeData, error: defaultSiteTypeError } =
-      await supabase
-        .from('general_settings')
-        .select('value_text')
-        .eq('setting_name', 'default_site_type');
-
-    if (defaultSiteTypeError) {
-      return {
-        errorCode: 1,
-        message: 'Error fetching default site type',
-        data: null,
-      };
-    }
-
-    const defaultSiteType: any = defaultSiteTypeData[0].value_text;
-    // Fetch the corresponding ID for the default site type
-    const { data: siteTypeData, error: siteTypeError } = await supabase
-      .from('site_types')
-      .select('id')
-      .eq('name', defaultSiteType);
-
-    if (siteTypeError || !siteTypeData) {
-      return {
-        errorCode: 1,
-        message: 'Error fetching site type ID',
-        data: null,
-      };
-    }
-
-    const defaultSiteTypeId = siteTypeData[0].id;
-    // Fetch the state ID based on state name
-    const stateName = raw_user_meta_data['State/Province'];
-    const { data: stateData, error: stateError } = await supabase
-      .from('state')
-      .select('id,country_id')
-      .ilike('name', stateName);
-
-    if (stateError) {
-      return { errorCode: 1, message: 'Error fetching state ID', data: null };
-    }
-
-    if (stateData.length === 0) {
-      return { errorCode: 1, message: 'State not found', data: null };
-    }
-
-    const stateId = stateData[0].id;
-    const countryId = stateData[0].country_id;
-    // Insert the new site into the site_details table
-    // const { data: siteInsertData, error: siteInsertError } = await supabase
-    //   .from('sites_detail')
-    const { data: siteInsertData, error } = await supabase
-      .from('sites_detail')
-      .insert([
-        {
-          name: site_name,
-          type_id: defaultSiteTypeId,
-          org_id: orgId,
-          address1: raw_user_meta_data['Street Address'],
-          city: raw_user_meta_data['City'],
-          pin_code: raw_user_meta_data['Postal Code'],
-          status: 'Y',
-          country_id: countryId,
-          state_id: stateId,
-        },
-      ])
-      .select();
-
-    if (error) {
-      return { errorCode: 1, message: 'Error inserting new site', data: null };
-    }
-
-    const siteId = siteInsertData[0].id; // Ensure siteInsertData is an array and access the first item
-
     // Add the user to the site with the role of "Owner"
     const email = raw_user_meta_data['email'];
     const { data: userData, error: userError } = await supabase

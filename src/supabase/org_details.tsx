@@ -473,11 +473,6 @@ async function automaticallyCreateOrg(
         }
       });
     }
-    // Fetch general settings in parallel
-    const settingsPromise = supabase
-      .from('general_settings')
-      .select('*')
-      .eq('setting_name', 'org_retention');
 
     // Determine type_id based on "I am a Litmus" value
     let type_id: any;
@@ -514,36 +509,47 @@ async function automaticallyCreateOrg(
       //   data: { orgId, name, isAccountBusinessAccount },
       //   message: 'Organization is already.',
       // };
+    } else {
+      // Insert organization into the database using Supabase
+      const insertOrgPromise = supabase
+        .from('org_details')
+        .insert([
+          {
+            name,
+            type_id,
+            status: 'Y',
+            retention_setting: 0,
+          },
+        ])
+        .select();
+
+      const [insertOrgResult] = await Promise.all([insertOrgPromise]);
+
+      if (insertOrgResult.error) {
+        return {
+          errorCode: 1,
+          message: 'Error inserting organization',
+          data: null,
+        };
+      }
+
+      orgId = insertOrgResult.data[0].id;
     }
-
-    // Insert organization into the database using Supabase
-    const insertOrgPromise = supabase
-      .from('org_details')
-      .insert([
-        {
-          name: name,
-          type_id: type_id,
-          status: 'Y',
-          retention_setting: 0, // Default value; will update after fetching settings
-        },
-      ])
-      .select();
     // Wait for both operations
-    const [settingsResult, insertOrgResult] = await Promise.all([
-      settingsPromise,
-      insertOrgPromise,
-    ]);
+    const settingsPromise: any = supabase
+      .from('general_settings')
+      .select('*')
+      .eq('setting_name', 'org_retention');
 
-    if (settingsResult.error || insertOrgResult.error) {
+    const settingsResult = await settingsPromise;
+    if (settingsResult.error) {
       return {
         errorCode: 1,
         message: 'Error fetching settings or inserting organization',
         data: null,
       };
     }
-    orgId = insertOrgResult.data[0].id;
     const retValue = settingsResult.data?.[0]?.value_number || 0;
-
     // Update retention setting
     await supabase
       .from('org_details')
