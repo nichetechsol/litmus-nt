@@ -599,7 +599,7 @@ async function automaticallyCreateOrg(
     const userId = userData.id;
 
     // Insert user into the org_user table
-    const userInsertPromise = supabase
+    const userInsertResult = await supabase
       .from('org_users')
       .insert([
         {
@@ -624,7 +624,7 @@ async function automaticallyCreateOrg(
     }
 
     // Wait for user insert and domain insert operations
-    const [userInsertResult] = await Promise.all([userInsertPromise]);
+    // const [userInsertResult] = await Promise.all([userInsertPromise]);
 
     if (userInsertResult.error) {
       return {

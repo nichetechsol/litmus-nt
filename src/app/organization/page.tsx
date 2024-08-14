@@ -259,6 +259,10 @@ const Page = () => {
             localStorage.setItem('org_exists', encryptedOrgExists);
           }
           setOrgsWithSites(data.data);
+          if (!localStorage.getItem('reloaded')) {
+            localStorage.setItem('reloaded', 'true');
+            window.location.reload();
+          }
         } else {
           toast.error(data.message, { autoClose: 3000 });
         }

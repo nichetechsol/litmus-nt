@@ -644,41 +644,46 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                             document.body.classList.remove('no-scroll');
                             if (willLogout) {
                               setLoading(true);
-                              localStorage.removeItem(
-                                'sb-emsjiuztcinhapaurcrl-auth-token',
-                              );
-                              localStorage.removeItem('org_id');
-                              localStorage.removeItem('org_name');
-                              localStorage.removeItem('site_id');
-                              localStorage.removeItem('site_name');
-                              localStorage.removeItem('user_role');
-                              localStorage.removeItem('user_id');
-                              localStorage.removeItem('site_owner_name');
-                              localStorage.removeItem('user_fname');
-                              localStorage.removeItem('user_lname');
-                              localStorage.removeItem('org_type_id');
-                              localStorage.removeItem('user_email');
-                              localStorage.removeItem('add_orgUser');
-                              localStorage.removeItem('ActivityLogs');
-                              try {
-                                // Sign out from Supabase
-                                await supabase.auth.signOut();
 
-                                // Add a small delay to ensure the sign-out process is fully complete
-                                setTimeout(() => {
-                                  const postLogoutRedirectUri = `http://localhost:3000`;
+                              if (localStorage.getItem('azure')) {
+                                localStorage.removeItem('azure');
+                                localStorage.removeItem('org_id');
+                                localStorage.removeItem('org_name');
+                                localStorage.removeItem('site_id');
+                                localStorage.removeItem('site_name');
+                                localStorage.removeItem('user_role');
+                                localStorage.removeItem('user_id');
+                                localStorage.removeItem('site_owner_name');
+                                localStorage.removeItem('user_fname');
+                                localStorage.removeItem('user_lname');
+                                localStorage.removeItem('org_type_id');
+                                localStorage.removeItem('user_email');
+                                localStorage.removeItem('add_orgUser');
+                                localStorage.removeItem('ActivityLogs');
+                                try {
+                                  // Sign out from Supabase
+                                  await supabase.auth.signOut();
 
-                                  const microsoftLogoutUrl = `https://login.microsoftonline.com/f3553495-ea6b-4ee0-bdd8-fa3106e6c93c/oauth2/v2.0/logout?post_logout_redirect_uri=${postLogoutRedirectUri}`;
+                                  // Add a small delay to ensure the sign-out process is fully complete
+                                  setTimeout(() => {
+                                    const postLogoutRedirectUri = `http://localhost:3000`;
 
-                                  // Assign the location to ensure redirection
-                                  window.location.assign(microsoftLogoutUrl);
-                                  history.push('/');
-                                }, 2000); // 100ms delay
-                              } catch (error) {
-                                // console.error('Error logging out:', error);
+                                    const microsoftLogoutUrl = `https://login.microsoftonline.com/f3553495-ea6b-4ee0-bdd8-fa3106e6c93c/oauth2/v2.0/logout?post_logout_redirect_uri=${postLogoutRedirectUri}`;
+                                    // Assign the location to ensure redirection
+                                    window.location.assign(microsoftLogoutUrl);
+                                    // history.push('/');
+                                  }, 2000); // 100ms delay
+                                } catch (error) {
+                                  // console.error('Error logging out:', error);
+                                }
+                              } else {
+                                localStorage.removeItem(
+                                  'sb-emsjiuztcinhapaurcrl-auth-token',
+                                );
+
+                                history.push('/');
                               }
 
-                              // history.push('/');
                               setLoading(false);
                             }
                           });

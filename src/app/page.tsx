@@ -234,6 +234,7 @@ const LoginForm = () => {
               if (result?.errorCode === 0) {
                 const encryptedEmail1 = encryptData(email);
                 localStorage.setItem('user_email', encryptedEmail1);
+                localStorage.setItem('azure', 'true');
                 const user_id: any = result.user[0]?.id;
                 const user_firstname: any = variabletaken['First Name'];
                 const user_lastname: any = variabletaken['Last Name'];
@@ -295,7 +296,7 @@ const LoginForm = () => {
 
           setTimeout(async () => {
             checkUser();
-          }, 2000);
+          }, 10000);
         } else {
           setLoading(false);
           // User is logged out
