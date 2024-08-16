@@ -1,6 +1,10 @@
 /* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
+  automaticallyCreateOrganization,
+  automaticeCreateSite,
+} from '@/supabase/automatic';
+import {
   automaticallyCreateOrg,
   checkBusinessDomain,
 } from '@/supabase/org_details';
@@ -357,6 +361,119 @@ async function GetUser() {
     return null; // Return null or handle the error appropriately
   }
 }
+// async function addUser(
+//   auth_data: any,
+//   user_data: any,
+//   auth_id: any,
+// ): Promise<any> {
+//   try {
+//     if (user_data != null) {
+//       const organizations_name = user_data['Organization Name'];
+//       const type = user_data['I am a Litmus'];
+//       const first_name = user_data['First Name'];
+//       const last_name = user_data['First Name'];
+//       const email = user_data['email'];
+
+//       // Check if the email already exists
+//       const { data: existingUser, error: existingUserError } = await supabase
+//         .from('users')
+//         .select('id')
+//         .eq('email', email)
+//         .single();
+//       let userId: any;
+//       let userData: any;
+//       if (existingUser) {
+//         userId = existingUser.id;
+//         userData = existingUser;
+//         // Update the user's first name and last name if they exist
+//         const { data: updatedUser, error: updateError } = await supabase
+//           .from('users')
+//           .update({
+//             firstname: first_name,
+//             lastname: last_name,
+//           })
+//           .eq('id', userId)
+//           .select();
+
+//         if (updateError) {
+//           throw updateError;
+//         }
+
+//         userData = updatedUser;
+//       } else {
+//         // Insert the new user if email doesn't exist
+//         const { data: user, error: insertError } = await supabase
+//           .from('users')
+//           .insert([
+//             {
+//               email: email,
+//               firstname: first_name,
+//               lastname: last_name,
+//               auth_id: auth_id,
+//             },
+//           ])
+//           .select();
+
+//         if (insertError) {
+//           throw insertError;
+//         }
+//         userData = user;
+//         userId = user[0].id;
+//       }
+
+//       if (existingUserError && existingUserError.code !== 'PGRST120') {
+//         // Handle other potential errors from the query
+//         throw existingUserError;
+//       }
+
+//       await autoOrgAndSiteGenerate(user_data);
+//       const userEmail = email;
+//       await handleDomainUserAssignment(userId, userEmail);
+//       // Check the number of organizations where the user has role_id = 1
+//       const { data: orgUsersData, error: orgUsersError } = await supabase
+//         .from('org_users')
+//         .select('*')
+//         .eq('user_id', userId);
+
+//       if (orgUsersError) {
+//         return {
+//           errorCode: 1,
+//           message: 'Error fetching organization user data',
+//         };
+//       }
+
+//       let add_orgUser = false;
+//       let org_exists = false;
+//       if (orgUsersData.length > 0) {
+//         org_exists = true;
+//         for (const orgUser of orgUsersData) {
+//           if (orgUser.role_id === 1) {
+//             add_orgUser = true;
+//           }
+//         }
+//       } else {
+//         add_orgUser = true;
+//         org_exists = false;
+//       }
+//       if (userData.length > 0) {
+//         return {
+//           errorCode: 0,
+//           auth: auth_data,
+//           user: userData,
+//           org_exists: org_exists,
+//           add_orgUser: add_orgUser,
+//         };
+//       } else {
+//         return { errorCode: 1, message: 'User data is not found' };
+//       }
+//     }
+//   } catch (error) {
+//     return {
+//       errorCode: 2,
+//       message: 'An error occurred while adding the user',
+//     };
+//   }
+// }
 async function addUser(
   auth_data: any,
   user_data: any,
@@ -364,25 +481,29 @@ async function addUser(
 ): Promise<any> {
   try {
     if (user_data != null) {
-      const organizations_name = user_data['Organization Name'];
+      const organization_name = user_data['Organization Name'];
+      const siteName = user_data['Site Name'];
       const type = user_data['I am a Litmus'];
       const first_name = user_data['First Name'];
       const last_name = user_data['First Name'];
       const email = user_data['email'];
+      const address = user_data['Street Address'];
+      const cityName = user_data['City'];
+      const pin_code = user_data['Postal Code'];
+      const stateName = user_data['State/Province'];
 
       // Check if the email already exists
-      const { data: existingUser, error: existingUserError } = await supabase
+      const { data: existingUser, error: existingusererror } = await supabase
         .from('users')
         .select('id')
-        .eq('email', email)
-        .single();
-      let userId: any;
+        .eq('email', email);
+      let userId: any = null;
       let userData: any;
-      if (existingUser) {
-        userId = existingUser.id;
+      if (existingUser && existingUser.length > 0) {
+        userId = existingUser[0].id;
         userData = existingUser;
         // Update the user's first name and last name if they exist
-        const { data: updatedUser, error: updateError } = await supabase
+        const updatedUser = await supabase
           .from('users')
           .update({
             firstname: first_name,
@@ -391,14 +512,10 @@ async function addUser(
           .eq('id', userId)
           .select();
 
-        if (updateError) {
-          throw updateError;
-        }
-
         userData = updatedUser;
       } else {
         // Insert the new user if email doesn't exist
-        const { data: user, error: insertError } = await supabase
+        const user: any = await supabase
           .from('users')
           .insert([
             {
@@ -410,57 +527,69 @@ async function addUser(
           ])
           .select();
 
-        if (insertError) {
-          throw insertError;
-        }
         userData = user;
         userId = user[0].id;
       }
 
-      if (existingUserError && existingUserError.code !== 'PGRST120') {
-        // Handle other potential errors from the query
-        throw existingUserError;
-      }
+      if (userId != null) {
+        const result = await automaticallyCreateOrganization(
+          organization_name,
+          type,
+          userId,
+          email,
+        );
 
-      await autoOrgAndSiteGenerate(user_data);
-      const userEmail = email;
-      await handleDomainUserAssignment(userId, userEmail);
-      // Check the number of organizations where the user has role_id = 1
-      const { data: orgUsersData, error: orgUsersError } = await supabase
-        .from('org_users')
-        .select('*')
-        .eq('user_id', userId);
-
-      if (orgUsersError) {
-        return {
-          errorCode: 1,
-          message: 'Error fetching organization user data',
-        };
-      }
-
-      let add_orgUser = false;
-      let org_exists = false;
-      if (orgUsersData.length > 0) {
-        org_exists = true;
-        for (const orgUser of orgUsersData) {
-          if (orgUser.role_id === 1) {
-            add_orgUser = true;
-          }
+        const orgId = result.orgId;
+        if (orgId != null) {
+          await automaticeCreateSite(
+            orgId,
+            siteName,
+            stateName,
+            address,
+            pin_code,
+            cityName,
+            email,
+            userId,
+          );
         }
-      } else {
-        add_orgUser = true;
-        org_exists = false;
-      }
-      if (userData.length > 0) {
-        return {
-          errorCode: 0,
-          auth: auth_data,
-          user: userData,
-          org_exists: org_exists,
-          add_orgUser: add_orgUser,
-        };
-      } else {
-        return { errorCode: 1, message: 'User data is not found' };
+        await handleDomainUserAssignment(userId, email);
+        // Check the number of organizations where the user has role_id = 1
+        const { data: orgUsersData, error: orgUsersError } = await supabase
+          .from('org_users')
+          .select('*')
+          .eq('user_id', userId);
+
+        if (orgUsersError) {
+          return {
+            errorCode: 1,
+            message: 'Error fetching organization user data',
+          };
+        }
+
+        let add_orgUser = false;
+        let org_exists = false;
+        if (orgUsersData.length > 0) {
+          org_exists = true;
+          for (const orgUser of orgUsersData) {
+            if (orgUser.role_id === 1) {
+              add_orgUser = true;
+            }
+          }
+        } else {
+          add_orgUser = true;
+          org_exists = false;
+        }
+        if (userData.data.length > 0) {
+          return {
+            errorCode: 0,
+            auth: auth_data,
+            user: userData,
+            org_exists: org_exists,
+            add_orgUser: add_orgUser,
+          };
+        } else {
+          return { errorCode: 1, message: 'User data is not found' };
+        }
       }
     }
   } catch (error) {
@@ -470,7 +599,6 @@ async function addUser(
     };
   }
 }
-
 export {
   addUser,
   AsureAuth,

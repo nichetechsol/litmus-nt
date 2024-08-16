@@ -232,10 +232,10 @@ const LoginForm = () => {
               const auth_id = user.user.id;
               const result = await addUser(user, variabletaken, auth_id);
               if (result?.errorCode === 0) {
-                const encryptedEmail1 = encryptData(email);
+                const encryptedEmail1 = encryptData(result.user.data[0]?.email);
                 localStorage.setItem('user_email', encryptedEmail1);
                 localStorage.setItem('azure', 'true');
-                const user_id: any = result.user[0]?.id;
+                const user_id: any = result.user.data[0]?.id;
                 const user_firstname: any = variabletaken['First Name'];
                 const user_lastname: any = variabletaken['Last Name'];
                 const add_orgUser: any = result.add_orgUser ? 'true' : 'false';
