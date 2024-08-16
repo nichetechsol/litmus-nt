@@ -382,6 +382,23 @@ async function automaticeCreateSite(
 
   if (existingSite && existingSite.length > 0) {
     site_id = existingSite[0].id;
+    // Check if the user is already associated with the site
+    const { data: existingUser } = await supabase
+      .from('site_users')
+      .select('*')
+      .eq('site_id', site_id)
+      .eq('user_id', userId);
+
+    if (!existingUser || existingUser.length === 0) {
+      // Insert the user into the site_users table
+      await supabase.from('site_users').insert([
+        {
+          site_id: site_id,
+          user_id: userId,
+          role_id: 1, // Owner role
+        },
+      ]);
+    }
   } else {
     // Fetch default site type ID
     let defaultSiteTypeId = 1;
@@ -438,24 +455,23 @@ async function automaticeCreateSite(
 
     // Process entitlements after site creation
     await processEntitlements(orgId, site_id);
-  }
+    // Check if the user is already associated with the site
+    const { data: existingUser } = await supabase
+      .from('site_users')
+      .select('*')
+      .eq('site_id', site_id)
+      .eq('user_id', userId);
 
-  // Check if the user is already associated with the site
-  const { data: existingUser } = await supabase
-    .from('site_users')
-    .select('*')
-    .eq('site_id', site_id)
-    .eq('user_id', userId);
-
-  if (!existingUser || existingUser.length === 0) {
-    // Insert the user into the site_users table
-    await supabase.from('site_users').insert([
-      {
-        site_id: site_id,
-        user_id: userId,
-        role_id: 1, // Owner role
-      },
-    ]);
+    if (!existingUser || existingUser.length === 0) {
+      // Insert the user into the site_users table
+      await supabase.from('site_users').insert([
+        {
+          site_id: site_id,
+          user_id: userId,
+          role_id: 1, // Owner role
+        },
+      ]);
+    }
   }
 
   return {

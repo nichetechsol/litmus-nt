@@ -660,6 +660,7 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                                 localStorage.removeItem('user_email');
                                 localStorage.removeItem('add_orgUser');
                                 localStorage.removeItem('ActivityLogs');
+                                localStorage.removeItem('entraInfo');
                                 try {
                                   // Sign out from Supabase
                                   await supabase.auth.signOut();

@@ -352,6 +352,12 @@ async function GetUser() {
       data: { user },
     } = await supabase.auth.getUser();
 
+    if (user) {
+      const variabletaken = user.user_metadata.custom_claims;
+      const auth_id = user.id;
+      const result = await addUser(user, variabletaken, auth_id);
+      return result;
+    }
     if (error) {
       throw error; // Propagate the error to the catch block
     }

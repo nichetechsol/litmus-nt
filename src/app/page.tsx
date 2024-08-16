@@ -18,7 +18,7 @@ import * as Yup from 'yup';
 
 import { emailSchemaSign, passwordSchema } from '@/helper/ValidationHelper';
 import Footer from '@/shared/layout-components/footer/footer';
-import { addUser, AsureAuth, GetUser, Login } from '@/supabase/auth';
+import { AsureAuth, GetUser, Login } from '@/supabase/auth';
 import supabase from '@/supabase/db';
 import Loader from '@/utils/Loader/Loader';
 
@@ -184,6 +184,7 @@ const LoginForm = () => {
         if (encryptedOrgExists) {
           localStorage.setItem('org_exists', encryptedOrgExists);
         }
+
         navigate.push('/organization');
         setLoading(false);
       } else {
@@ -222,22 +223,23 @@ const LoginForm = () => {
         if (session) {
           // User is logged in
           // alert('signed IN');
-          setLoading(true);
+
           // navigate.push('/organization');
           const checkUser = async () => {
-            const user = await GetUser();
+            setLoading(true);
+            const result = await GetUser();
 
-            if (user) {
-              const variabletaken = user.user.user_metadata.custom_claims;
-              const auth_id = user.user.id;
-              const result = await addUser(user, variabletaken, auth_id);
+            if (result) {
+              // const variabletaken = user.user.user_metadata.custom_claims;
+              // const auth_id = user.user.id;
+              // const result = await addUser(user, variabletaken, auth_id);
               if (result?.errorCode === 0) {
                 const encryptedEmail1 = encryptData(result.user.data[0]?.email);
                 localStorage.setItem('user_email', encryptedEmail1);
                 localStorage.setItem('azure', 'true');
                 const user_id: any = result.user.data[0]?.id;
-                const user_firstname: any = variabletaken['First Name'];
-                const user_lastname: any = variabletaken['Last Name'];
+                const user_firstname: any = result.user.data[0]?.firstname;
+                const user_lastname: any = result.user.data[0]?.lastname;
                 const add_orgUser: any = result.add_orgUser ? 'true' : 'false';
                 const org_exists: any = result.org_exists ? 'true' : 'false';
 
@@ -282,7 +284,9 @@ const LoginForm = () => {
                 });
                 setLoading(false);
               }
-              const encryptedstoredEntraInfo = encryptData(variabletaken);
+              const encryptedstoredEntraInfo = encryptData(
+                result.auth.user_metadata.custom_claims,
+              );
               if (encryptedstoredEntraInfo) {
                 localStorage.setItem('entraInfo', encryptedstoredEntraInfo);
               }
