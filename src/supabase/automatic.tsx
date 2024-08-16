@@ -182,7 +182,7 @@ async function automaticallyCreateOrganization(
 
     const retValue =
       retentionData && retentionData.length > 0
-        ? parseInt(retentionData[0].value_text)
+        ? parseInt(retentionData[0].value_number)
         : 7;
 
     // Insert organization details
@@ -204,60 +204,60 @@ async function automaticallyCreateOrganization(
 
     // Apply default entitlements based on business account status
     await orgDefaultEntitlement(isBusinessAccount, orgId);
-  }
-
-  // Check if the domain exists in the domains table
-  let domainId: any;
-  const { data: existingDomains } = await supabase
-    .from('domains')
-    .select('id, name')
-    .eq('name', userEmailDomain);
-
-  if (existingDomains && existingDomains.length > 0) {
-    domainId = existingDomains[0].id;
-  } else {
-    const { data: insertedDomains } = await supabase
+    // Check if the domain exists in the domains table
+    let domainId: any;
+    const { data: existingDomains } = await supabase
       .from('domains')
-      .insert([{ name: userEmailDomain }])
-      .select('id, name');
+      .select('id, name')
+      .eq('name', userEmailDomain);
 
-    if (insertedDomains && insertedDomains.length > 0) {
-      domainId = insertedDomains[0].id;
+    if (existingDomains && existingDomains.length > 0) {
+      domainId = existingDomains[0].id;
+    } else {
+      const { data: insertedDomains } = await supabase
+        .from('domains')
+        .insert([{ name: userEmailDomain }])
+        .select('id, name');
+
+      if (insertedDomains && insertedDomains.length > 0) {
+        domainId = insertedDomains[0].id;
+      }
+    }
+    // Check if org_domain already exists
+    const { data: existingOrgDomain } = await supabase
+      .from('org_domains')
+      .select('*')
+      .eq('org_id', orgId)
+      .eq('domain_id', domainId);
+
+    if (!existingOrgDomain || existingOrgDomain.length === 0) {
+      await supabase
+        .from('org_domains')
+        .insert([{ org_id: orgId, domain_id: domainId }])
+        .select();
     }
   }
 
-  // Check if org_domain already exists
-  const { data: existingOrgDomain } = await supabase
-    .from('org_domains')
-    .select('*')
-    .eq('org_id', orgId)
-    .eq('domain_id', domainId);
-
-  if (!existingOrgDomain || existingOrgDomain.length === 0) {
-    await supabase
-      .from('org_domains')
-      .insert([{ org_id: orgId, domain_id: domainId }])
-      .select();
-  }
-
   // Check if the user is already associated with the organization
-  const { data: existingUser } = await supabase
-    .from('org_users')
-    .select('id')
-    .eq('user_id', userId)
-    .eq('org_id', orgId);
-
-  if (!existingUser || existingUser.length === 0) {
-    await supabase
+  if (orgId != null) {
+    const { data: existingUser } = await supabase
       .from('org_users')
-      .insert([
-        {
-          user_id: userId,
-          role_id: 1, // Assuming role_id 1 is the default role
-          org_id: orgId,
-        },
-      ])
-      .select();
+      .select('id')
+      .eq('user_id', userId)
+      .eq('org_id', orgId);
+
+    if (!existingUser || existingUser.length === 0) {
+      await supabase
+        .from('org_users')
+        .insert([
+          {
+            user_id: userId,
+            role_id: 1, // Assuming role_id 1 is the default role
+            org_id: orgId,
+          },
+        ])
+        .select();
+    }
   }
 
   return {

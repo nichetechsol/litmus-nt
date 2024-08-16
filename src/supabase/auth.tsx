@@ -485,7 +485,7 @@ async function addUser(
       const siteName = user_data['Site Name'];
       const type = user_data['I am a Litmus'];
       const first_name = user_data['First Name'];
-      const last_name = user_data['First Name'];
+      const last_name = user_data['Last Name'];
       const email = user_data['email'];
       const address = user_data['Street Address'];
       const cityName = user_data['City'];
