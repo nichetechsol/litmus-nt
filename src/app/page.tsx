@@ -300,7 +300,7 @@ const LoginForm = () => {
 
           setTimeout(async () => {
             checkUser();
-          }, 10000);
+          }, 2000);
         } else {
           setLoading(false);
           // User is logged out

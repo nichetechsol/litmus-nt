@@ -667,8 +667,8 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
 
                                   // Add a small delay to ensure the sign-out process is fully complete
                                   setTimeout(() => {
-                                    const postLogoutRedirectUri = `http://localhost:3000`;
-
+                                    // const postLogoutRedirectUri = `http://localhost:3000`;
+                                    const postLogoutRedirectUri = `${window.location.protocol}//${window.location.host}`;
                                     const microsoftLogoutUrl = `https://login.microsoftonline.com/f3553495-ea6b-4ee0-bdd8-fa3106e6c93c/oauth2/v2.0/logout?post_logout_redirect_uri=${postLogoutRedirectUri}`;
                                     // Assign the location to ensure redirection
                                     window.location.assign(microsoftLogoutUrl);
