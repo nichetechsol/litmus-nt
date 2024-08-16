@@ -460,7 +460,12 @@ const Page = () => {
       if (organizationNameError == '') {
         try {
           await validationSchema.validate(
-            { organizationName, domains, selectedType, message },
+            {
+              organizationName,
+              domains,
+              selectedType,
+              message: message === null ? undefined : message,
+            },
             { abortEarly: false },
           );
           setaddbuttonclass(true);
