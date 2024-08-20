@@ -723,11 +723,22 @@ const listofallFiles = async (data: any) => {
           }
         }
 
-        const disabled =
-          permissionVersion !== null &&
-          ((version === 'current' && extensionIncluded) ||
-            (version === 'all' && extensionIncluded));
+        // const disabled =
+        //   permissionVersion &&
+        //   version &&
+        //   ((version === 'current' && extensionIncluded) ||
+        //     (version === 'all' && extensionIncluded));
 
+        let disabled = false;
+
+        if (extensionIncluded) {
+          if (
+            (permissionVersion && version === 'current') ||
+            (!permissionVersion && (version === 'all' || version === 'current'))
+          ) {
+            disabled = true;
+          }
+        }
         return {
           FileName: fileName,
           status: version,
@@ -1118,12 +1129,15 @@ const fetchProductData = async (data: any) => {
 
         let can_be_requested = false;
         let required_entitlements = null;
+        let version: any = true;
 
         // If extension is not included, fetch permissions based on the product
         if (extensionIncluded === false) {
           const { data: filePermissions, error } = await supabase
             .from('filedownload_permissions')
-            .select('file_type, can_be_requested, required_entitlements')
+            .select(
+              'file_type, can_be_requested, required_entitlements,version',
+            )
             .eq('product', product.name.toLowerCase());
 
           if (error) {
@@ -1131,7 +1145,6 @@ const fetchProductData = async (data: any) => {
           }
 
           const fileTypes1: any[] = [];
-
           if (filePermissions?.length) {
             filePermissions.forEach((permission: any) => {
               fileTypes1.push({
@@ -1150,6 +1163,9 @@ const fetchProductData = async (data: any) => {
           can_be_requested = matchingPermissions.some(
             (permission) => permission.can_be_requested === true,
           );
+          version = matchingPermissions.some(
+            (permission) => permission.version === 'current',
+          );
 
           // Get the required_entitlements from the first matching permission (if any)
           if (matchingPermissions.length > 0) {
@@ -1157,11 +1173,19 @@ const fetchProductData = async (data: any) => {
               matchingPermissions[0].required_entitlements;
           }
         }
-
+        let disabled = false;
+        if (extensionIncluded) {
+          if (
+            (permissionVersion && version === true) ||
+            (!permissionVersion && (version === true || version === false))
+          ) {
+            disabled = true;
+          }
+        }
         return {
           FileName: fileName,
           status: 'current',
-          disabled: extensionIncluded,
+          disabled: disabled,
           folder: productFolder,
           subfolder: currentFolder.name,
           required_entitlements,

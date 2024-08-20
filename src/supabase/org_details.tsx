@@ -1803,8 +1803,9 @@ async function orgDefaultEntitlement(isBusinessAccount: any, orgId: any) {
 
     // Step 3: Collect entitlement names and values
     const entitlementNames = Object.keys(entitlementData);
-    const entitlementValues = Object.values(entitlementData);
-
+    const entitlementValues = Object.values(entitlementData).map((value) =>
+      typeof value === 'string' ? value.toLowerCase() : value,
+    );
     // Fetch all entitlement names
     const { data: entitlementNameData, error: entitlementNameError } =
       await supabase

@@ -536,13 +536,14 @@ async function addUser(
         userData = user;
         userId = user[0].id;
       }
-
+      const token = auth_data.access_token;
       if (userId != null) {
         const result = await automaticallyCreateOrganization(
           organization_name,
           type,
           userId,
           email,
+          token,
         );
 
         const orgId = result.orgId;
@@ -556,6 +557,7 @@ async function addUser(
             cityName,
             email,
             userId,
+            // token,
           );
         }
         await handleDomainUserAssignment(userId, email);

@@ -965,6 +965,9 @@ async function processEntitlements(org_id: any, site_id: any) {
   try {
     for (const [key, value] of Object.entries(entitlementsData)) {
       // Step 1: Find the key in the entitlements_name table
+      // Convert value to lowercase if it's a string
+      const lowercaseValue =
+        typeof value === 'string' ? value.toLowerCase() : value;
       const { data: entNameData, error: entNameError } = await supabase
         .from('entitlements_name')
         .select('id')
@@ -992,7 +995,7 @@ async function processEntitlements(org_id: any, site_id: any) {
       entNameId = entNameData[0].id;
 
       // Step 2: Find or insert the corresponding value in the entitlement_values table
-      const entValueId = await findOrInsertEntitlementValue(value);
+      const entValueId = await findOrInsertEntitlementValue(lowercaseValue);
 
       if (!entValueId) {
         console.error(
