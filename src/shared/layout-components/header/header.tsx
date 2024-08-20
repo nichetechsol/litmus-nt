@@ -349,18 +349,6 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
   const [org_id, setOrg_id] = useState<any>('');
   const [site_id, setSite_id] = useState<any>('');
   const [user_email, setUser_email] = useState<any>('');
-  // useEffect(() => {
-  //   const userid: any = localStorage.getItem('user_id');
-  //   const userfname: any = localStorage.getItem('user_fname');
-  //   const userlname: any = localStorage.getItem('user_lname');
-  //   const userrole: any = localStorage.getItem('user_role');
-  //   const orgid: any = localStorage.getItem('org_id');
-  //   setuser_id(userid);
-  //   setUser_fname(userfname);
-  //   setUserlname(userlname);
-  //   setUserrole(userrole);
-  //   setOrg_id(orgid);
-  // }, [pathname]);
 
   const [userRoleName, setUserRoleName] = useState('');
   useEffect(() => {
@@ -570,13 +558,6 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                         )}
                       </span>
                     </div>
-                    {/* <Image
-                    className='inline-block rounded-full '
-                    src='/assets/images/user.jpg'
-                    width='32'
-                    height='32'
-                    alt='Image Description'
-                  /> */}
                   </button>
                   <div
                     className='md:block  dropdown-profile'
@@ -596,26 +577,6 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                     aria-labelledby='dropdown-profile'
                   >
                     <ul className='text-defaulttextcolor font-medium dark:text-[#8c9097] dark:text-white/50'>
-                      {/* <li>
-                      <Link className="w-full ti-dropdown-item !text-[0.8125rem] !gap-x-0  !p-[0.65rem] !inline-flex" href="/components/pages/profile/">
-                        <i className="ti ti-user-circle text-[1.125rem] me-2 opacity-[0.7]"></i>Profile
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="w-full ti-dropdown-item !text-[0.8125rem] !gap-x-0  !p-[0.65rem] !inline-flex" href="/components/pages/email/mail-app/"><i
-                        className="ti ti-inbox text-[1.125rem] me-2 opacity-[0.7]"></i>Inbox <span
-                          className="!py-1 !px-[0.45rem] !font-semibold !rounded-sm text-success text-[0.75em] bg-success/10 ms-auto">25</span>
-                      </Link>
-                    </li>
-                    <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !gap-x-0 !p-[0.65rem] !inline-flex" href="/components/pages/todo-list/"><i
-                      className="ti ti-clipboard-check text-[1.125rem] me-2 opacity-[0.7]"></i>Task Manager</Link></li>
-                    <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !gap-x-0 !p-[0.65rem] !inline-flex" href="/components/pages/email/mail-settings/"><i
-                      className="ti ti-adjustments-horizontal text-[1.125rem] me-2 opacity-[0.7]"></i>Settings</Link></li>
-                    <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !gap-x-0 !p-[0.65rem] !inline-flex " href="#!"><i
-                      className="ti ti-wallet text-[1.125rem] me-2 opacity-[0.7]"></i>Bal: $7,12,950</Link></li>
-                    <li><Link className="w-full ti-dropdown-item !text-[0.8125rem] !p-[0.65rem] !gap-x-0 !inline-flex" href="/components/pages/chat/"><i
-                      className="ti ti-headset text-[1.125rem] me-2 opacity-[0.7]"></i>Support</Link></li> */}
-
                       <li
                         onClick={() => {
                           document.body.classList.add('no-scroll');
@@ -660,24 +621,34 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                                 localStorage.removeItem('user_email');
                                 localStorage.removeItem('add_orgUser');
                                 localStorage.removeItem('ActivityLogs');
-                                localStorage.removeItem('entraInfo');
                                 try {
-                                  // Sign out from Supabase
                                   await supabase.auth.signOut();
-
-                                  // Add a small delay to ensure the sign-out process is fully complete
                                   setTimeout(() => {
                                     // const postLogoutRedirectUri = `http://localhost:3000`;
                                     const postLogoutRedirectUri = `${window.location.protocol}//${window.location.host}`;
                                     const microsoftLogoutUrl = `https://login.microsoftonline.com/f3553495-ea6b-4ee0-bdd8-fa3106e6c93c/oauth2/v2.0/logout?post_logout_redirect_uri=${postLogoutRedirectUri}`;
                                     // Assign the location to ensure redirection
                                     window.location.assign(microsoftLogoutUrl);
-                                    // history.push('/');
-                                  }, 2000); // 100ms delay
+                                  }, 2000);
                                 } catch (error) {
                                   // console.error('Error logging out:', error);
                                 }
                               } else {
+                                localStorage.removeItem('azure');
+                                localStorage.removeItem('org_id');
+                                localStorage.removeItem('org_name');
+                                localStorage.removeItem('site_id');
+                                localStorage.removeItem('site_name');
+                                localStorage.removeItem('user_role');
+                                localStorage.removeItem('user_id');
+                                localStorage.removeItem('site_owner_name');
+                                localStorage.removeItem('user_fname');
+                                localStorage.removeItem('user_lname');
+                                localStorage.removeItem('org_type_id');
+                                localStorage.removeItem('user_email');
+                                localStorage.removeItem('add_orgUser');
+                                localStorage.removeItem('ActivityLogs');
+
                                 localStorage.removeItem(
                                   'sb-emsjiuztcinhapaurcrl-auth-token',
                                 );
@@ -699,18 +670,10 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                     </ul>
                   </div>
                 </div>
-                {/* <div className="header-element md:px-[0.48rem]">
-              <button aria-label="button" type="button"
-                className="hs-dropdown-toggle switcher-icon inline-flex flex-shrink-0 justify-center items-center gap-2  rounded-full font-medium  align-middle transition-all text-xs dark:text-[#8c9097] dark:text-white/50 dark:hover:text-white dark:focus:ring-white/10 dark:focus:ring-offset-white/10"
-                data-hs-overlay="#hs-overlay-switcher">
-                <i className="bx bx-cog header-link-icon animate-spin-slow"></i>
-              </button>
-            </div> */}
               </div>
             </div>
           </nav>
         </div>
-        {/* <Modalsearch /> */}
       </Fragment>
     </>
   );

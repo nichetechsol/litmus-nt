@@ -284,12 +284,6 @@ const LoginForm = () => {
                 });
                 setLoading(false);
               }
-              const encryptedstoredEntraInfo = encryptData(
-                result.auth.user_metadata.custom_claims,
-              );
-              if (encryptedstoredEntraInfo) {
-                localStorage.setItem('entraInfo', encryptedstoredEntraInfo);
-              }
 
               // User is already logged in, redirect to the desired page
               // navigate.push('/organization'); // or any other page you want to redirect to
