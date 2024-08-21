@@ -541,78 +541,113 @@ async function addUser(
         userData = user;
         userId = user[0].id;
       }
-      const token = session.access_token;
       if (userId != null) {
-        const result = await automaticallyCreateOrganization(
-          organization_name,
-          type,
-          userId,
-          email,
-          token,
-        );
+        await handleDomainUserAssignment(userId, email);
+        // Check the number of organizations where the user has role_id = 1
+        const { data: orgUsersData, error: orgUsersError } = await supabase
+          .from('org_users')
+          .select('*')
+          .eq('user_id', userId);
 
-        const orgId = result.orgId;
-        if (orgId != null) {
-          const result2 = await automaticeCreateSite(
-            orgId,
-            siteName,
-            stateName,
-            address,
-            pin_code,
-            cityName,
-            email,
-            userId,
-            token,
-            organization_name,
-          );
-          const siteId = result2.siteId;
-          if (siteId != null) {
-            await handleDomainUserAssignment(userId, email);
-            // Check the number of organizations where the user has role_id = 1
-            const { data: orgUsersData, error: orgUsersError } = await supabase
-              .from('org_users')
-              .select('*')
-              .eq('user_id', userId);
+        if (orgUsersError) {
+          return {
+            errorCode: 1,
+            message: 'Error fetching organization user data',
+          };
+        }
 
-            if (orgUsersError) {
-              return {
-                errorCode: 1,
-                message: 'Error fetching organization user data',
-              };
-            }
-
-            let add_orgUser = false;
-            let org_exists = false;
-            if (orgUsersData.length > 0) {
-              org_exists = true;
-              for (const orgUser of orgUsersData) {
-                if (orgUser.role_id === 1) {
-                  add_orgUser = true;
-                }
-              }
-            } else {
+        let add_orgUser = false;
+        let org_exists = false;
+        if (orgUsersData.length > 0) {
+          org_exists = true;
+          for (const orgUser of orgUsersData) {
+            if (orgUser.role_id === 1) {
               add_orgUser = true;
-              org_exists = false;
             }
-            if (userData.data.length > 0) {
-              return {
-                errorCode: 0,
-                auth: auth_data,
-                user: userData,
-                org_exists: org_exists,
-                add_orgUser: add_orgUser,
-              };
+          }
+          if (userData.data.length > 0) {
+            return {
+              errorCode: 0,
+              auth: auth_data,
+              user: userData,
+              org_exists: org_exists,
+              add_orgUser: add_orgUser,
+            };
+          } else {
+            return { errorCode: 1, message: 'User data is not found' };
+          }
+        } else {
+          const token = session.access_token;
+          const result = await automaticallyCreateOrganization(
+            organization_name,
+            type,
+            userId,
+            email,
+            token,
+          );
+
+          const orgId = result.orgId;
+          if (orgId != null) {
+            const result2 = await automaticeCreateSite(
+              orgId,
+              siteName,
+              stateName,
+              address,
+              pin_code,
+              cityName,
+              email,
+              userId,
+              token,
+              organization_name,
+            );
+            const siteId = result2.siteId;
+            if (siteId != null) {
+              await handleDomainUserAssignment(userId, email);
+              // Check the number of organizations where the user has role_id = 1
+              const { data: orgUsersData, error: orgUsersError } =
+                await supabase
+                  .from('org_users')
+                  .select('*')
+                  .eq('user_id', userId);
+
+              if (orgUsersError) {
+                return {
+                  errorCode: 1,
+                  message: 'Error fetching organization user data',
+                };
+              }
+
+              let add_orgUser = false;
+              let org_exists = false;
+              if (orgUsersData.length > 0) {
+                org_exists = true;
+                for (const orgUser of orgUsersData) {
+                  if (orgUser.role_id === 1) {
+                    add_orgUser = true;
+                  }
+                }
+              } else {
+                add_orgUser = true;
+                org_exists = false;
+              }
+              if (userData.data.length > 0) {
+                return {
+                  errorCode: 0,
+                  auth: auth_data,
+                  user: userData,
+                  org_exists: org_exists,
+                  add_orgUser: add_orgUser,
+                };
+              } else {
+                return { errorCode: 1, message: 'User data is not found' };
+              }
             } else {
               return { errorCode: 1, message: 'User data is not found' };
             }
           } else {
             return { errorCode: 1, message: 'User data is not found' };
           }
-        } else {
-          return { errorCode: 1, message: 'User data is not found' };
         }
-      } else {
-        return { errorCode: 1, message: 'User data is not found' };
       }
     }
   } catch (error) {
