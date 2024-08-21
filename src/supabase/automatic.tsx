@@ -79,7 +79,6 @@ async function automaticallyCreateOrganization(
     }
 
     // Apply default entitlements based on business account status
-    await orgDefaultEntitlement(isBusinessAccount, orgId);
     // Check if the domain exists in the domains table
     let domainId: any;
     const { data: existingDomains } = await supabase
@@ -113,36 +112,40 @@ async function automaticallyCreateOrganization(
         .select();
     }
     // Send emails asynchronously
-    const emailPromise = (async () => {
-      const emailData = await fetchEmailData(
-        type_id === 1 ? 'Add_Org_EndUser' : 'Add_Org_OEM_Partner',
-      );
-      const to = emailData.data.To;
-      const subject = emailData.data.email_subject.replace(
-        '{{Org Name}}',
-        organization_name,
-      );
-      const heading = emailData.data.email_heading.replace(
-        '{{Org Name}}',
-        organization_name,
-      );
-      const content = emailData.data.email_content
-        .replace('{{User Name}}', email)
-        .replace('{{Org Name}}', organization_name)
-        .replace(/{{Org Type}}/g, type || '');
+    if (orgId != null) {
+      await orgDefaultEntitlement(isBusinessAccount, orgId);
 
-      sendEmailFunction(to, subject, heading, content, token);
-    })();
+      const emailPromise = (async () => {
+        const emailData = await fetchEmailData(
+          type_id === 1 ? 'Add_Org_EndUser' : 'Add_Org_OEM_Partner',
+        );
+        const to = emailData.data.To;
+        const subject = emailData.data.email_subject.replace(
+          '{{Org Name}}',
+          organization_name,
+        );
+        const heading = emailData.data.email_heading.replace(
+          '{{Org Name}}',
+          organization_name,
+        );
+        const content = emailData.data.email_content
+          .replace('{{User Name}}', email)
+          .replace('{{Org Name}}', organization_name)
+          .replace(/{{Org Type}}/g, type || '');
 
-    // Log activity asynchronously
-    const logPromise = logActivity({
-      org_id: orgId,
-      user_id: userId,
-      activity_type: 'create_org',
-    });
+        sendEmailFunction(to, subject, heading, content, token);
+      })();
 
-    // Wait for email sending and logging to complete
-    await Promise.all([emailPromise, logPromise]);
+      // Log activity asynchronously
+      const logPromise = logActivity({
+        org_id: orgId,
+        user_id: userId,
+        activity_type: 'create_org',
+      });
+
+      // Wait for email sending and logging to complete
+      await Promise.all([emailPromise, logPromise]);
+    }
   }
 
   // Check if the user is already associated with the organization
@@ -183,7 +186,8 @@ async function automaticeCreateSite(
   cityName: any,
   email: any,
   userId: any,
-  // token: any,
+  token: any,
+  organization_name: any,
 ): Promise<any> {
   // Check if the site already exists
   let site_id: any;
@@ -291,6 +295,20 @@ async function automaticeCreateSite(
       user_id: userId,
       activity_type: 'create_site',
     });
+    const userName: any = email;
+    const site_name: any = siteName;
+    const orgName: any = organization_name;
+    const email_data: any = await fetchEmailData('Add_Site_Limit_Not_Exceed');
+    const to = email_data.data.To;
+    const subject = email_data.data.email_subject;
+    const heading = email_data.data.email_heading;
+    const content = email_data.data.email_content;
+
+    const contentData = content
+      .replace('{{User Name}}', userName)
+      .replace('{{Site Name}}', site_name)
+      .replace('{{Org name}}', orgName);
+    sendEmailFunction(to, subject, heading, contentData, token);
   }
 
   return {

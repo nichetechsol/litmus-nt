@@ -5,7 +5,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   basePath: '',
-  output: 'export',
+  // output: 'export',
   reactStrictMode: true,
   swcMinify: true,
 

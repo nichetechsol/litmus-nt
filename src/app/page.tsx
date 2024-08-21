@@ -11,6 +11,7 @@ import React, {
   Fragment,
   KeyboardEvent,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import swal from 'sweetalert';
@@ -217,14 +218,16 @@ const LoginForm = () => {
   //     setRememberMe(true);
   //   }
   // }, []);
+  const checkUserCalled = useRef<boolean>(false);
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (session) {
+        if (session && !checkUserCalled.current) {
           // User is logged in
           // alert('signed IN');
-
+          setLoading(true);
           // navigate.push('/organization');
+
           const checkUser = async () => {
             setLoading(true);
             const result = await GetUser();
@@ -293,7 +296,7 @@ const LoginForm = () => {
           };
 
           setTimeout(async () => {
-            checkUser();
+            await checkUser();
           }, 5000);
         } else {
           setLoading(false);
