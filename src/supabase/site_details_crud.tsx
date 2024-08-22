@@ -687,7 +687,6 @@ async function viewSite(site_id: any): Promise<Result<any>> {
       .single();
 
     if (error || !siteDetails) {
-      console.error('Error fetching site details:', error);
       return {
         errorCode: 1,
         message: 'Error fetching site details',
@@ -718,7 +717,6 @@ async function viewSite(site_id: any): Promise<Result<any>> {
       data: siteWithDetails,
     };
   } catch (error) {
-    console.error('Error viewing site:', error);
     return { errorCode: 1, message: 'Unexpected error', data: null };
   }
 }
@@ -888,13 +886,11 @@ async function fetchDefaultEntitlements(): Promise<any> {
       .eq('setting_name', 'default_site_entitlements');
 
     if (error) {
-      console.error('Error fetching default entitlements:', error);
       return null;
     }
 
     return data[0].value_json;
   } catch (error) {
-    console.error('Unexpected error:', error);
     return null;
   }
 }
@@ -921,7 +917,6 @@ async function findOrInsertEntitlementValue(
     .eq(valueColumn, value);
 
   if (entValueError) {
-    console.error('Error fetching entitlement value:', entValueError);
     return null;
   }
 
@@ -934,10 +929,6 @@ async function findOrInsertEntitlementValue(
       .select('*');
 
     if (insertError) {
-      console.error(
-        `Error inserting entitlement value for value: ${value}`,
-        insertError,
-      );
       return null;
     }
 
@@ -951,7 +942,6 @@ async function processEntitlements(org_id: any, site_id: any) {
   const entitlementsData = await fetchDefaultEntitlements();
 
   if (!entitlementsData) {
-    console.error('No entitlements data found');
     return {
       data: null,
       message: 'No entitlements data found',
@@ -974,10 +964,6 @@ async function processEntitlements(org_id: any, site_id: any) {
         .eq('name', key);
 
       if (entNameError) {
-        console.error(
-          `Error fetching entitlement name for key: ${key}`,
-          entNameError,
-        );
         errors.push({ key, error: entNameError });
         continue;
       }
@@ -998,9 +984,6 @@ async function processEntitlements(org_id: any, site_id: any) {
       const entValueId = await findOrInsertEntitlementValue(lowercaseValue);
 
       if (!entValueId) {
-        console.error(
-          `Failed to find or insert entitlement value for key: ${key}`,
-        );
         errors.push({
           key,
           error: 'Failed to find or insert entitlement value',
@@ -1019,16 +1002,11 @@ async function processEntitlements(org_id: any, site_id: any) {
         });
 
       if (insertError) {
-        console.error(
-          `Error inserting into entitlements_package for key: ${key}`,
-          insertError,
-        );
         errors.push({ key, error: insertError });
         continue;
       }
 
       results.push({ key, success: true });
-      console.log(`Successfully inserted entitlement for key: ${key}`);
     }
 
     return {
@@ -1037,7 +1015,6 @@ async function processEntitlements(org_id: any, site_id: any) {
       errorCode: errors.length > 0 ? 1 : 0,
     };
   } catch (error) {
-    console.error('Unexpected error:', error);
     return {
       data: null,
       message: 'Unexpected error occurred',
