@@ -199,10 +199,13 @@ const Page: React.FC = () => {
               AddSiteName,
               SelectedValueDropdown,
               Address1,
+              Address2,
+
               SelectedValueCounrty,
               SelectedValueState,
               City,
               Pincode,
+              message,
             },
             { abortEarly: false },
           );
@@ -744,13 +747,25 @@ const Page: React.FC = () => {
     setChangeFlage(false);
     setAddSiteName(SingleSite.site.name);
     setSelectedValueDropdown(SingleSite?.site.type_id);
-    setAddress1(SingleSite?.site?.address1);
-    setAddress2(SingleSite?.site?.address2);
-    SetSelectedValueCounrty(SingleSite?.site.country_id);
-    setSelectedValueState(SingleSite?.site.state_id);
-    setCity(SingleSite?.site?.city);
-    setPincode(SingleSite?.site.pin_code);
-    setMessage(SingleSite?.site.about_site);
+    setAddress1(
+      SingleSite?.site?.address1 == null ? '' : SingleSite?.site?.address1,
+    );
+    setAddress2(
+      SingleSite?.site?.address2 == null ? '' : SingleSite?.site?.address2,
+    );
+    SetSelectedValueCounrty(
+      SingleSite?.site.country_id == null ? '' : SingleSite?.site.country_id,
+    );
+    setSelectedValueState(
+      SingleSite?.site.state_id == null ? '' : SingleSite?.site.state_id,
+    );
+    setCity(SingleSite?.site?.city == null ? '' : SingleSite?.site?.city);
+    setPincode(
+      SingleSite?.site.pin_code == null ? '' : SingleSite?.site.pin_code,
+    );
+    setMessage(
+      SingleSite?.site.about_site == null ? '' : SingleSite?.site.about_site,
+    );
     seteditsiteid(SingleSite?.site.id);
     // remaning descriptopn
 

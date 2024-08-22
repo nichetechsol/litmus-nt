@@ -1108,7 +1108,7 @@ async function viewOrganization(org_id: any): Promise<Result<any>> {
     const orgWithDomains: any = {
       id: orgDetails.id,
       name: orgDetails.name,
-      description: orgDetails.description,
+      description: orgDetails.description == null ? '' : orgDetails.description,
       type_id: orgDetails.type_id,
       status: orgDetails.status,
       // type_name: orgType.name,
