@@ -370,7 +370,7 @@ const LoginForm = () => {
                     text: result.message,
                   });
                 }
-                window.location.reload();
+                // window.location.reload();
                 setLoading(false);
               }
 
@@ -383,7 +383,7 @@ const LoginForm = () => {
 
           setTimeout(async () => {
             await checkUser();
-          }, 5000);
+          }, 10000);
         } else {
           setLoading(false);
           // User is logged out

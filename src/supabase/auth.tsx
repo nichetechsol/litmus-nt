@@ -504,12 +504,15 @@ async function addUser(
       const stateName = user_data['State/Province'];
 
       // Check if the email already exists
+      let userId: any = null;
+      let orgId: any = null;
+      let siteId: any = null;
+      let userData: any;
       const { data: existingUser, error: existingusererror } = await supabase
         .from('users')
         .select('id')
         .eq('email', email);
-      let userId: any = null;
-      let userData: any;
+
       if (existingUser && existingUser.length > 0) {
         userId = existingUser[0].id;
         userData = existingUser;
@@ -587,7 +590,7 @@ async function addUser(
             token,
           );
 
-          const orgId = result.orgId;
+          orgId = result.orgId;
           if (orgId != null) {
             const result2 = await automaticeCreateSite(
               orgId,
@@ -601,7 +604,7 @@ async function addUser(
               token,
               organization_name,
             );
-            const siteId = result2.siteId;
+            siteId = result2.siteId;
             if (siteId != null) {
               await handleDomainUserAssignment(userId, email);
               // Check the number of organizations where the user has role_id = 1
