@@ -11,7 +11,6 @@ import React, {
   Fragment,
   KeyboardEvent,
   useEffect,
-  useRef,
   useState,
 } from 'react';
 import swal from 'sweetalert';
@@ -218,88 +217,13 @@ const LoginForm = () => {
   //     setRememberMe(true);
   //   }
   // }, []);
-  const checkUserCalled = useRef<boolean>(false);
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (session && !checkUserCalled.current) {
+        if (session) {
           // User is logged in
-          // alert('signed IN');
-          setLoading(true);
-          // navigate.push('/organization');
-
-          const checkUser = async () => {
-            setLoading(true);
-            const result = await GetUser();
-
-            if (result) {
-              // const variabletaken = user.user.user_metadata.custom_claims;
-              // const auth_id = user.user.id;
-              // const result = await addUser(user, variabletaken, auth_id);
-              if (result?.errorCode === 0) {
-                const encryptedEmail1 = encryptData(result.user.data[0]?.email);
-                localStorage.setItem('user_email', encryptedEmail1);
-                localStorage.setItem('azure', 'true');
-                const user_id: any = result.user.data[0]?.id;
-                const user_firstname: any = result.user.data[0]?.firstname;
-                const user_lastname: any = result.user.data[0]?.lastname;
-                const add_orgUser: any = result.add_orgUser ? 'true' : 'false';
-                const org_exists: any = result.org_exists ? 'true' : 'false';
-
-                const encryptedUserId = encryptData(user_id);
-                const encryptedUserFirstName = encryptData(
-                  user_firstname ? user_firstname : '',
-                );
-                const encryptedUserLastName = encryptData(
-                  user_lastname ? user_lastname : '',
-                );
-                const encryptedAddOrgUser = encryptData(
-                  add_orgUser ? add_orgUser : '',
-                );
-                const encryptedOrgExists = encryptData(
-                  org_exists ? org_exists : '',
-                );
-
-                if (encryptedUserId) {
-                  localStorage.setItem('user_id', encryptedUserId);
-                }
-
-                if (encryptedUserFirstName) {
-                  localStorage.setItem('user_fname', encryptedUserFirstName);
-                }
-                if (encryptedUserLastName) {
-                  localStorage.setItem('user_lname', encryptedUserLastName);
-                }
-                if (encryptedAddOrgUser) {
-                  localStorage.setItem('add_orgUser', encryptedAddOrgUser);
-                }
-                if (encryptedOrgExists) {
-                  localStorage.setItem('org_exists', encryptedOrgExists);
-                }
-                navigate.push('/organization');
-                setLoading(false);
-              } else if (result == undefined || result == null) {
-                setLoading(false);
-              } else {
-                swal({
-                  icon: 'error',
-                  text: result.message,
-                });
-                setLoading(false);
-              }
-
-              // User is already logged in, redirect to the desired page
-              // navigate.push('/organization'); // or any other page you want to redirect to
-            } else {
-              setLoading(false);
-            }
-          };
-
-          setTimeout(async () => {
-            await checkUser();
-          }, 5000);
+          // navigate.push('/home');
         } else {
-          setLoading(false);
           // User is logged out
         }
       },
@@ -309,6 +233,164 @@ const LoginForm = () => {
       authListener?.subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    const checkUser = async () => {
+      setLoading(true);
+      const result = await GetUser();
+      if (result) {
+        setLoading(true);
+        if (result?.errorCode === 0) {
+          setLoading(true);
+          const encryptedEmail1 = encryptData(result.user.data[0]?.email);
+          localStorage.setItem('user_email', encryptedEmail1);
+          localStorage.setItem('azure', 'true');
+          const user_id: any = result.user.data[0]?.id;
+          const user_firstname: any = result.user.data[0]?.firstname;
+          const user_lastname: any = result.user.data[0]?.lastname;
+          const add_orgUser: any = result.add_orgUser ? 'true' : 'false';
+          const org_exists: any = result.org_exists ? 'true' : 'false';
+
+          const encryptedUserId = encryptData(user_id);
+          const encryptedUserFirstName = encryptData(
+            user_firstname ? user_firstname : '',
+          );
+          const encryptedUserLastName = encryptData(
+            user_lastname ? user_lastname : '',
+          );
+          const encryptedAddOrgUser = encryptData(
+            add_orgUser ? add_orgUser : '',
+          );
+          const encryptedOrgExists = encryptData(org_exists ? org_exists : '');
+
+          if (encryptedUserId) {
+            localStorage.setItem('user_id', encryptedUserId);
+          }
+
+          if (encryptedUserFirstName) {
+            localStorage.setItem('user_fname', encryptedUserFirstName);
+          }
+          if (encryptedUserLastName) {
+            localStorage.setItem('user_lname', encryptedUserLastName);
+          }
+          if (encryptedAddOrgUser) {
+            localStorage.setItem('add_orgUser', encryptedAddOrgUser);
+          }
+          if (encryptedOrgExists) {
+            localStorage.setItem('org_exists', encryptedOrgExists);
+          }
+          navigate.push('/organization');
+          setLoading(false);
+        } else if (result == undefined || result == null) {
+          setLoading(false);
+        } else {
+          if (result.message != 'User data is not found') {
+            swal({
+              icon: 'error',
+              text: result.message,
+            });
+          }
+          setLoading(false);
+        }
+      }
+    };
+
+    setTimeout(() => {
+      checkUser();
+      setLoading(false);
+    }, 5000);
+  }, []);
+  // useEffect(() => {
+  //   const { data: authListener } = supabase.auth.onAuthStateChange(
+  //     async (event, session) => {
+  //       if (session) {
+  //         // User is logged in
+  //         // alert('signed IN');
+  //         setLoading(true);
+  //         // navigate.push('/organization');
+
+  //         const checkUser = async () => {
+  //           setLoading(true);
+  //           const result = await GetUser();
+
+  //           if (result) {
+  //             // const variabletaken = user.user.user_metadata.custom_claims;
+  //             // const auth_id = user.user.id;
+  //             // const result = await addUser(user, variabletaken, auth_id);
+  //             if (result?.errorCode === 0) {
+  //               const encryptedEmail1 = encryptData(result.user.data[0]?.email);
+  //               localStorage.setItem('user_email', encryptedEmail1);
+  //               localStorage.setItem('azure', 'true');
+  //               const user_id: any = result.user.data[0]?.id;
+  //               const user_firstname: any = result.user.data[0]?.firstname;
+  //               const user_lastname: any = result.user.data[0]?.lastname;
+  //               const add_orgUser: any = result.add_orgUser ? 'true' : 'false';
+  //               const org_exists: any = result.org_exists ? 'true' : 'false';
+
+  //               const encryptedUserId = encryptData(user_id);
+  //               const encryptedUserFirstName = encryptData(
+  //                 user_firstname ? user_firstname : '',
+  //               );
+  //               const encryptedUserLastName = encryptData(
+  //                 user_lastname ? user_lastname : '',
+  //               );
+  //               const encryptedAddOrgUser = encryptData(
+  //                 add_orgUser ? add_orgUser : '',
+  //               );
+  //               const encryptedOrgExists = encryptData(
+  //                 org_exists ? org_exists : '',
+  //               );
+
+  //               if (encryptedUserId) {
+  //                 localStorage.setItem('user_id', encryptedUserId);
+  //               }
+
+  //               if (encryptedUserFirstName) {
+  //                 localStorage.setItem('user_fname', encryptedUserFirstName);
+  //               }
+  //               if (encryptedUserLastName) {
+  //                 localStorage.setItem('user_lname', encryptedUserLastName);
+  //               }
+  //               if (encryptedAddOrgUser) {
+  //                 localStorage.setItem('add_orgUser', encryptedAddOrgUser);
+  //               }
+  //               if (encryptedOrgExists) {
+  //                 localStorage.setItem('org_exists', encryptedOrgExists);
+  //               }
+  //               navigate.push('/organization');
+  //               setLoading(false);
+  //             } else if (result == undefined || result == null) {
+  //               setLoading(false);
+  //             } else {
+  //               swal({
+  //                 icon: 'error',
+  //                 text: result.message,
+  //               });
+  //               setLoading(false);
+  //             }
+
+  //             // User is already logged in, redirect to the desired page
+  //             // navigate.push('/organization'); // or any other page you want to redirect to
+  //           } else {
+  //             setLoading(false);
+  //           }
+  //         };
+
+  //         setTimeout(async () => {
+  //           await checkUser();
+  //         }, 5000);
+  //       } else {
+  //         setLoading(false);
+  //         // User is logged out
+  //       }
+  //     },
+  //   );
+
+  //   return () => {
+  //     authListener?.subscription.unsubscribe();
+  //   };
+  // }, []);
 
   useEffect(() => {
     const storedEncryptedEmail = localStorage.getItem('rememberedEmail');
