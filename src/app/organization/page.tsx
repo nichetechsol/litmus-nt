@@ -464,7 +464,6 @@ const Page = () => {
               organizationName,
               domains,
               selectedType,
-              message: message === null ? undefined : message,
             },
             { abortEarly: false },
           );

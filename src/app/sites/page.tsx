@@ -199,12 +199,10 @@ const Page: React.FC = () => {
               AddSiteName,
               SelectedValueDropdown,
               Address1,
-              Address2: Address2 === null ? undefined : Address2,
               SelectedValueCounrty,
               SelectedValueState,
               City,
               Pincode,
-              message: message === null ? undefined : message,
             },
             { abortEarly: false },
           );

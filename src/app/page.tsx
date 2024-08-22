@@ -370,6 +370,7 @@ const LoginForm = () => {
                     text: result.message,
                   });
                 }
+                window.location.reload();
                 setLoading(false);
               }
 
