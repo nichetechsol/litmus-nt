@@ -5,8 +5,8 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   basePath: '',
-  // output: 'export',
-  reactStrictMode: true,
+  output: 'export',
+  reactStrictMode: false,
   swcMinify: true,
 
   // Uncoment to add domain whitelist

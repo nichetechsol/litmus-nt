@@ -526,7 +526,7 @@ async function addUser(
         userData = updatedUser;
       } else {
         // Insert the new user if email doesn't exist
-        const user: any = await supabase
+        const { data: user } = await supabase
           .from('users')
           .insert([
             {
@@ -537,9 +537,10 @@ async function addUser(
             },
           ])
           .select();
-
-        userData = user;
-        userId = user[0].id;
+        if (user && user.length > 0) {
+          userData = user;
+          userId = user[0].id;
+        }
       }
       if (userId != null) {
         await handleDomainUserAssignment(userId, email);
