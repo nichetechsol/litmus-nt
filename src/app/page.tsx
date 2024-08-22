@@ -291,13 +291,14 @@ const LoginForm = () => {
               text: result.message,
             });
           }
+          window.location.reload();
           setLoading(false);
         }
       }
     };
 
-    setTimeout(() => {
-      checkUser();
+    setTimeout(async () => {
+      await checkUser();
       setLoading(false);
     }, 5000);
   }, []);

@@ -653,7 +653,7 @@ async function addUser(
   } catch (error) {
     return {
       errorCode: 2,
-      message: 'An error occurred while adding the user',
+      message: 'User data is not found',
     };
   }
 }
