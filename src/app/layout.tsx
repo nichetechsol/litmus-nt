@@ -72,6 +72,7 @@ const layouts: { [route: string]: LayoutComponent } = {
   '/products': ContentLayout,
   '/solution': ContentLayout,
   '/license': ContentLayout,
+  '/entitlement': ContentLayout,
 };
 export default function RootLayout({
   children,

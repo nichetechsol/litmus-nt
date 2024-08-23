@@ -26,6 +26,7 @@ import {
   orgEntitlementList,
   orgUserList,
 } from '@/supabase/dashboard';
+import { checkLicensePlanEntitlement } from '@/supabase/licence';
 import { getLocationOfSites } from '@/supabase/org_dashboard';
 import { getUserRole } from '@/supabase/org_details';
 import {
@@ -173,6 +174,8 @@ const OrgDashboard = () => {
     null,
   );
   const [activity_log, setActivity_log] = useState<activitylogs[] | null>(null);
+  const [ShowRequestEntBtn, setShowRequestEntBtn] = useState<boolean>(false);
+  const [userrole2, setuserrole2] = useState();
 
   //Added by Srishti -  Count display on top
   const CountData = async () => {
@@ -274,6 +277,19 @@ const OrgDashboard = () => {
 
     fetchData();
   }, [org_id, activePage2, perPage2]);
+  const RequestentitkementBtn = async () => {
+    try {
+      const data = await checkLicensePlanEntitlement(org_id, userrole2);
+      if (data.errorCode === 0) {
+        setShowRequestEntBtn(data.reqEntitlementButton);
+      }
+    } catch (error: any) {
+      toast.error('Error Fetching Type..', { autoClose: 3000 });
+    }
+  };
+  useEffect(() => {
+    RequestentitkementBtn();
+  }, [userrole2]);
 
   //Added by Srishti - Location of Sites
   useEffect(() => {
@@ -765,7 +781,6 @@ const OrgDashboard = () => {
       }
     }
   };
-  const [userrole2, setuserrole2] = useState();
   const roleChange = async () => {
     try {
       if (user_id && org_id) {
@@ -905,6 +920,30 @@ const OrgDashboard = () => {
                   <div className='box'>
                     <div className='box-header flex justify-between'>
                       <div className='box-title'>List Of Entitlement</div>
+                      <div>
+                        {userrole2 === 1 || userrole2 === 2 ? (
+                          ShowRequestEntBtn ? (
+                            <button
+                              className='btn btn-primary  btn-wave mb-3 top-margin-1'
+                              type='button'
+                              onClick={() => {
+                                setLoading(true);
+                                navigate.push('/entitlement');
+                                setLoading(false);
+                              }}
+                            >
+                              <div className=' py-2 ti-btn-sm px-3 ti-btn ent-btn bg-primary text-white !font-medium w-full !mb-0 top-margin-1'>
+                                <i className='ri-add-circle-line !text-[1rem]'></i>
+                                Request Entitlement
+                              </div>
+                            </button>
+                          ) : (
+                            <div></div>
+                          )
+                        ) : (
+                          <div></div>
+                        )}
+                      </div>
                     </div>
                     <div className='box-body'>
                       <ul className='list-none crm-top-deals mb-0'>

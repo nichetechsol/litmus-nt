@@ -20459,3 +20459,9 @@ li.page-item.disabled a {
   left: auto;
   right: 0 !important;
 }
+.inner-box {
+  --tw-shadow: 0 0px 8px 0px rgb(0 0 0 / 10%);
+}
+.ent-btn {
+  min-width: 10.5rem;
+}
