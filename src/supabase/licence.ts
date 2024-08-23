@@ -334,7 +334,7 @@ const showReqLicenceButton = async ({
     return false;
   }
 };
-
+//for license limit_exceed_entitlements
 const findEntitlementValueId = async (
   orgId: number,
   type: string,
@@ -380,7 +380,7 @@ const findEntitlementValueId = async (
     return null;
   }
 };
-
+//request entitlement button
 const checkLicensePlanEntitlement = async (
   orgId: number,
   role_id: any,
@@ -423,7 +423,7 @@ const checkLicensePlanEntitlement = async (
     };
   }
 };
-
+//to render the license plans and entitlement
 async function renderLicense(orgId: number) {
   try {
     // Query to check if the organization has specific entitlements
@@ -532,16 +532,70 @@ async function renderLicense(orgId: number) {
     };
   }
 }
+async function reqLicenseLimitMail(data: any): Promise<any> {
+  // Fetch email configuration
+  try {
+    const emailResult = await fetchEmailData('Add_License_Limit_Exceed_Litmus');
+    const userName: string = data.userName;
+    const orgName: string = data.org_name;
+    const siteName: string = data.site_name;
+    const emailData = emailResult.data;
+    const to: string = emailData.To;
+    const subject: string = emailData.email_subject;
+    const heading: string = emailData.email_heading;
+    const contentTemplate: string = emailData.email_content;
 
+    const contentData = contentTemplate
+      .replace('{{User Name}}', userName)
+      .replace('{{Site Name}}', siteName)
+      .replace('{{Org Name}}', orgName);
+
+    // Send email
+    await sendEmailFunction(to, subject, heading, contentData, data.token);
+
+    const email_data: any = await fetchEmailData(
+      'Add_License_Limit_Exceed_User ',
+    );
+    const toUser = data.userName;
+    const subjectUser = email_data.data.email_subject;
+    const headingUser = email_data.data.email_heading;
+    const contentUser = email_data.data.email_content;
+    const toData = toUser.replace('{{Target User EMail}}', toUser);
+    const contentUserData = contentUser
+      .replace('{{Org Name}}', orgName)
+      .replace('{{Site Name}}', siteName);
+
+    // Send email
+    await sendEmailFunction(
+      toData,
+      subjectUser,
+      headingUser,
+      contentUserData,
+      data.token,
+    );
+    return {
+      errorCode: 0,
+      message: 'License Limit request sent successfully.',
+      data: null,
+    };
+  } catch (error) {
+    // Handle unexpected errors
+    return {
+      errorCode: 1,
+      message: 'Unexpected error',
+      data: null,
+    };
+  }
+}
 export {
   addLicence,
   checkLicensePlanEntitlement,
-  // fetchLicenseData,
   findEntitlementValueId,
   getLicenceData,
   getSKUList,
   renderLicense,
   reqLicense,
+  reqLicenseLimitMail,
   reqProductsforLitmus,
   showReqLicenceButton,
 };
