@@ -7,9 +7,10 @@ interface PlanOptions {
   litmusUNS: boolean;
   apiProtalAcess: boolean;
 }
-import { redirect } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
+import swal from 'sweetalert';
 
 import { decryptData } from '@/helper/Encryption_Decryption';
 import { renderLicense } from '@/supabase/licence';
@@ -18,15 +19,13 @@ import Loader from '@/utils/Loader/Loader';
 // For entailemts show
 
 const Page = () => {
-  const [user_id, setuser_id] = useState<any>('');
   const [org_id, setorg_id] = useState<any>('');
-  const [orgName, setorgName] = useState<any>('');
-  const [userEmail, setUseremail] = useState<any>('');
   const [PlaansAvilable, setPlaansAvilable] = useState<string[]>([]);
   const [litmusUnsPlan, setlitmusUnsPlan] = useState<boolean>(true);
   const [ApiPortalAcessPlan, seApiPortalAcessPlane] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const [tokenVerify, setTokenVerify] = useState(false);
+  const navigate = useRouter();
 
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
@@ -41,15 +40,38 @@ const Page = () => {
     }
   }, []);
   useEffect(() => {
-    const decryptedUserId = decryptData(localStorage.getItem('user_id'));
     const decryptedOrgId = decryptData(localStorage.getItem('org_id'));
-    const decryptedOrgName = decryptData(localStorage.getItem('org_name'));
-    const decrypteduserEmail = decryptData(localStorage.getItem('user_email'));
 
-    setuser_id(decryptedUserId);
     setorg_id(decryptedOrgId);
-    setorgName(decryptedOrgName);
-    setUseremail(decrypteduserEmail);
+    if (!decryptedOrgId) {
+      // swal('Please select organization', { icon: 'error' });
+      // redirect('/organization');
+      document.body.classList.add('no-scroll');
+      swal('Please select organization', { icon: 'error' }).then(() => {
+        document.body.classList.remove('no-scroll');
+        navigate.push('/organization');
+        // redirect('/organization');
+      });
+      setTimeout(() => {
+        // Ensure loader is behind the SweetAlert
+        const swalContainer: any = document.querySelector('.swal-overlay');
+        if (swalContainer) {
+          swalContainer.style.zIndex = '10000000';
+        }
+
+        // Ensure modal is on top of overlay
+        const swalModal: any = document.querySelector('.swal-modal');
+        if (swalModal) {
+          swalModal.style.zIndex = '10000001';
+        }
+
+        // Ensure loader is behind
+        const loaderOverlay: any = document.querySelector('.loader-overlay');
+        if (loaderOverlay) {
+          loaderOverlay.style.zIndex = '9999998'; // Lower than SweetAlert
+        }
+      }, 0);
+    }
   }, []);
   const Showentitlement = async () => {
     try {
@@ -188,10 +210,10 @@ const Page = () => {
                           </div>
                         </ul>
                       ) : (
-                        <div></div>
+                        ''
                       )}
                       {PlaansAvilable.length == 0 ? (
-                        <div>No plans found</div>
+                        <div>{loading ? '' : <p>No plans found</p>}</div>
                       ) : (
                         ''
                       )}
@@ -210,8 +232,8 @@ const Page = () => {
                         ApiPortalAcessPlan === false ? (
                           <ul className='list-none crm-top-deals mb-0'>
                             <div className='grid grid-cols-12 gap-x-6'>
-                              <div className='xxl:col-span-4 xl:col-span-4 sm:col-span-12 col-span-12'>
-                                {litmusUnsPlan == false ? (
+                              {litmusUnsPlan == false ? (
+                                <div className='xxl:col-span-4 xl:col-span-4 sm:col-span-12 col-span-12'>
                                   <div className='box inner-box'>
                                     <div className='box-header flex justify-between'>
                                       <div className='box-title'>
@@ -236,12 +258,12 @@ const Page = () => {
                                       </ul>
                                     </div>
                                   </div>
-                                ) : (
-                                  <div></div>
-                                )}
-                              </div>
-                              <div className='xxl:col-span-4 xl:col-span-4 sm:col-span-12 col-span-12'>
-                                {ApiPortalAcessPlan == false ? (
+                                </div>
+                              ) : (
+                                ''
+                              )}
+                              {ApiPortalAcessPlan == false ? (
+                                <div className='xxl:col-span-4 xl:col-span-4 sm:col-span-12 col-span-12'>
                                   <div className='box inner-box'>
                                     <div className='box-header flex justify-between'>
                                       <div className='box-title'>
@@ -264,14 +286,16 @@ const Page = () => {
                                       </ul>
                                     </div>
                                   </div>
-                                ) : (
-                                  <div></div>
-                                )}
-                              </div>
+                                </div>
+                              ) : (
+                                ''
+                              )}
                             </div>
                           </ul>
                         ) : (
-                          <div>No entitlements found</div>
+                          <div>
+                            {loading ? '' : <p>No entitlements found</p>}
+                          </div>
                         )}
                       </div>
                     </>
