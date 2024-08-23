@@ -335,10 +335,212 @@ const showReqLicenceButton = async ({
   }
 };
 
+const findEntitlementValueId = async (
+  orgId: number,
+  type: string,
+  license_tier: string,
+  license_catalog: string,
+  license_plan: string,
+  columnName: any,
+): Promise<any> => {
+  try {
+    // Step 1: Find the `license_limit_entitlement` from the `license_type` table
+    const { data: licenseData, error: licenseError } = await supabase
+      .from('licence_type')
+      .select(columnName)
+      .ilike('type', type)
+      .ilike('license_tier', license_tier)
+      .ilike('license_catalog', license_catalog)
+      .ilike('license_plan', license_plan)
+      .single();
+
+    if (licenseError) {
+      return null;
+    }
+
+    const entitlementNameId = licenseData?.[columnName];
+    if (!entitlementNameId) {
+      return null;
+    }
+
+    // Step 2: Find the `entitlement_value_id` in the `entitlements_package` table based on `entitlement_name_id` and `org_id`
+    const { data: entitlementData, error: entitlementError } = await supabase
+      .from('entitlements_package')
+      .select('entitlement_value_id(value_text, value_number, value_bool)')
+      .eq('org_id', orgId)
+      .eq('entitlement_name_id', entitlementNameId)
+      .single();
+
+    if (entitlementError) {
+      return null;
+    }
+
+    return entitlementData?.entitlement_value_id || null;
+  } catch (error: any) {
+    return null;
+  }
+};
+
+const checkLicensePlanEntitlement = async (
+  orgId: number,
+  role_id: any,
+): Promise<any> => {
+  try {
+    // Check if the userRole is 1 or 2
+    if (role_id !== 1 && role_id !== 2) {
+      // If the user role is not 1 or 2, return false
+      return {
+        errorCode: 0,
+        reqEntitlementButton: false,
+      };
+    }
+    const { data, error } = await supabase
+      .from('entitlements_package')
+      .select('entitlement_value_id')
+      .eq('org_id', orgId)
+      .eq('entitlement_name_id', 14) // 14 corresponds to "License Plan"
+      .single();
+
+    if (error || !data) {
+      // If there's an error or no data is returned, return false
+      return {
+        errorCode: 1,
+        reqEntitlementButton: false,
+      };
+    }
+
+    // Check if data exists and if entitlement_value_id is present
+    const reqEntitlementButton = data?.entitlement_value_id !== undefined;
+
+    return {
+      errorCode: 0,
+      reqEntitlementButton,
+    };
+  } catch (err) {
+    return {
+      errorCode: 1,
+      reqEntitlementButton: false,
+    };
+  }
+};
+
+async function renderLicense(orgId: number) {
+  try {
+    // Query to check if the organization has specific entitlements
+    const { data: entitlements, error: entitlementsError } = await supabase
+      .from('entitlements_package')
+      .select(
+        `
+        entitlement_name_id,
+        entitlement_value_id,
+        entitlements_name!inner(name),
+        entitlements_values(value_text, value_number, value_bool)
+      `,
+      )
+      .eq('org_id', orgId)
+      .in('entitlements_name.name', [
+        'License Plan',
+        'Litmus UNS',
+        'API Portal Access',
+      ]);
+
+    // Handle possible query error
+    if (entitlementsError) {
+      return {
+        errorCode: 1,
+        message: 'Error fetching entitlements',
+        data: null,
+      };
+    }
+
+    if (!entitlements || entitlements.length === 0) {
+      return {
+        errorCode: 2,
+        message: 'No entitlements found for the organization',
+        data: null,
+      };
+    }
+
+    let availablePlans: any = [];
+    let litmusUNS: any = false;
+    let apiProtalAcess: any = false;
+    // Check if the organization has a specific "License Plan" entitlement
+    const licensePlan: any = entitlements.find(
+      (entitlement: any) =>
+        entitlement.entitlements_name.name == 'License Plan',
+    );
+
+    if (licensePlan != null) {
+      switch (licensePlan.entitlements_values.value_text) {
+        case 'trial':
+          availablePlans = ['Foundation', 'Growth', 'Scale'];
+          break;
+        case 'foundation':
+          availablePlans = ['Growth', 'Scale'];
+          break;
+        case 'foundation plus':
+          availablePlans = ['Growth', 'Scale'];
+          break;
+        case 'growth':
+          availablePlans = ['Foundation', 'Scale'];
+          break;
+        case 'scale':
+          availablePlans = ['Foundation', 'Growth'];
+          break;
+        default:
+          availablePlans = [];
+      }
+    }
+
+    // Check for "Litmus UNS" entitlement
+    const litmusUNSData = entitlements.find(
+      (entitlement: any) =>
+        entitlement.entitlements_name.name == 'Litmus UNS' &&
+        entitlement.entitlements_values.value_bool == true,
+    );
+
+    if (!litmusUNSData) {
+      litmusUNS = false;
+    } else {
+      litmusUNS = true;
+    }
+    const apiProtalAcessData = entitlements.find(
+      (entitlement: any) =>
+        entitlement.entitlements_name.name == 'API Portal Access' &&
+        entitlement.entitlements_values.value_bool == true,
+    );
+
+    if (!apiProtalAcessData) {
+      apiProtalAcess = false;
+    } else {
+      apiProtalAcess = true;
+    }
+    return {
+      errorCode: 0,
+      message: 'Fetch Plan Successfully',
+      data: {
+        availablePlans,
+        litmusUNS,
+        apiProtalAcess,
+      },
+    };
+  } catch (error) {
+    return {
+      errorCode: 1,
+      message: `An unexpected error occurred: ${error}`,
+      data: null,
+    };
+  }
+}
+
 export {
   addLicence,
+  checkLicensePlanEntitlement,
+  // fetchLicenseData,
+  findEntitlementValueId,
   getLicenceData,
   getSKUList,
+  renderLicense,
   reqLicense,
   reqProductsforLitmus,
   showReqLicenceButton,
