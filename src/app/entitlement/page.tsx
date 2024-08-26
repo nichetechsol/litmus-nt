@@ -13,7 +13,11 @@ import { toast, ToastContainer } from 'react-toastify';
 import swal from 'sweetalert';
 
 import { decryptData } from '@/helper/Encryption_Decryption';
-import { renderLicense } from '@/supabase/licence';
+import {
+  renderLicense,
+  requestMail,
+  requestQuotaMail,
+} from '@/supabase/licence';
 import Loader from '@/utils/Loader/Loader';
 
 // For entailemts show
@@ -25,7 +29,14 @@ const Page = () => {
   const [ApiPortalAcessPlan, seApiPortalAcessPlane] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const [tokenVerify, setTokenVerify] = useState(false);
+  const [orgName, setorgName] = useState<any>('');
+  const [onlyToken, setOnlyToken] = useState('');
+
+  const [email, setEmail] = useState<string>('');
+
   const navigate = useRouter();
+
+  // api key
 
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
@@ -36,12 +47,20 @@ const Page = () => {
       } else {
         setTokenVerify(true);
         const tokens = JSON.parse(token);
+        setOnlyToken(tokens.access_token);
       }
     }
   }, []);
   useEffect(() => {
     const decryptedOrgId = decryptData(localStorage.getItem('org_id'));
+    const encryptedemail = localStorage.getItem('user_email');
+    const decryptemail = decryptData(encryptedemail);
+    const decryptedOrgName = decryptData(localStorage.getItem('org_name'));
+    setorgName(decryptedOrgName);
 
+    if (decryptemail) {
+      setEmail(decryptemail);
+    }
     setorg_id(decryptedOrgId);
     if (!decryptedOrgId) {
       // swal('Please select organization', { icon: 'error' });
@@ -98,13 +117,54 @@ const Page = () => {
   useEffect(() => {
     Showentitlement();
   }, [org_id]);
+
+  const RequestPlans = async (plan: string) => {
+    try {
+      setLoading(true);
+      const data1 = {
+        org_name: orgName,
+        userName: email,
+        license_plan_name: plan,
+        token: onlyToken,
+      };
+      if (data1) {
+        const result = await requestQuotaMail(data1);
+        if (result.errorCode == 0) {
+          setLoading(false);
+          toast.success(result.message);
+        }
+      }
+    } catch (error) {
+      toast.error('Something went wrong mail not snet');
+    }
+  };
+  const RequestEntitlements = async (Entitlement: any) => {
+    try {
+      setLoading(true);
+      const data = {
+        org_name: orgName,
+        userName: email,
+        token: onlyToken,
+        entitlement_name: Entitlement,
+      };
+      const result = await requestMail(data);
+      if (data) {
+        if (result.errorCode == 0) {
+          setLoading(false);
+          toast.success(result.message);
+        }
+      }
+    } catch (error) {
+      toast.error('Something went wrong mail not snet');
+    }
+  };
+
   return (
     <>
       {loading && <Loader />}
       {tokenVerify && (
         <>
           <ToastContainer />
-
           <div className='md:flex block items-center justify-between my-[1.5rem] page-header-breadcrumb'>
             <div>
               <p className='font-semibold text-[1.125rem] p-new text-defaulttextcolor dark:text-defaulttextcolor/70 !mb-0 '>
@@ -140,11 +200,16 @@ const Page = () => {
                                         </p>
 
                                         <p className='font-semibold p-new text-wrap mt-3'>
-                                          Starts at 21005/month
+                                          Starts at 1250$/month
                                         </p>
                                       </div>
 
-                                      <button className='hs-dropdown-toggle py-2 ti-btn-sm mt-3  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'>
+                                      <button
+                                        className='hs-dropdown-toggle py-2 ti-btn-sm mt-3  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
+                                        onClick={() =>
+                                          RequestPlans('Foundation')
+                                        }
+                                      >
                                         Request Quota
                                       </button>
                                     </ul>
@@ -167,11 +232,14 @@ const Page = () => {
                                         </p>
 
                                         <p className='font-semibold p-new text-wrap mt-3'>
-                                          Starts at 21005/month
+                                          Starts at 2100$/month
                                         </p>
                                       </div>
 
-                                      <button className='hs-dropdown-toggle py-2 ti-btn-sm mt-3  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'>
+                                      <button
+                                        className='hs-dropdown-toggle py-2 ti-btn-sm mt-3  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
+                                        onClick={() => RequestPlans('Growth')}
+                                      >
                                         Request Quota
                                       </button>
                                     </ul>
@@ -199,7 +267,10 @@ const Page = () => {
                                 </p> */}
                                       </div>
 
-                                      <button className='hs-dropdown-toggle py-2 ti-btn-sm mt-3  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'>
+                                      <button
+                                        className='hs-dropdown-toggle py-2 ti-btn-sm mt-3  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
+                                        onClick={() => RequestPlans('Scale')}
+                                      >
                                         Request Quota
                                       </button>
                                     </ul>
@@ -252,7 +323,12 @@ const Page = () => {
                                           </p>
                                         </div>
 
-                                        <button className='hs-dropdown-toggle py-2 ti-btn-sm mt-3  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'>
+                                        <button
+                                          className='hs-dropdown-toggle py-2 ti-btn-sm mt-3  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
+                                          onClick={() =>
+                                            RequestEntitlements('Litmus UNS')
+                                          }
+                                        >
                                           Request
                                         </button>
                                       </ul>
@@ -280,7 +356,14 @@ const Page = () => {
                                           </p>
                                         </div>
 
-                                        <button className='hs-dropdown-toggle py-2 ti-btn-sm mt-3  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'>
+                                        <button
+                                          className='hs-dropdown-toggle py-2 ti-btn-sm mt-3  px-3 ti-btn  ti-btn-w-sm bg-primary text-white !font-medium w-full !mb-0'
+                                          onClick={() =>
+                                            RequestEntitlements(
+                                              ' API Portal Access',
+                                            )
+                                          }
+                                        >
                                           Request
                                         </button>
                                       </ul>
