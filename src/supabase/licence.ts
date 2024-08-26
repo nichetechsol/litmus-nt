@@ -124,6 +124,49 @@ interface AddLicenceParams {
 //     return null;
 //   }
 // };
+const checkLimit = async (data: any): Promise<any> => {
+  try {
+    // Fetch entitlements package data (same as before)
+
+    let requestButton = false;
+
+    // Check if the license exceeds the allowed entitlement
+    const license_exceed_allowed_entitlement: any =
+      await findEntitlementValueId(
+        data.orgId,
+        data.license_exceed_allowed_entitlement,
+      );
+
+    if (license_exceed_allowed_entitlement.value_bool === true) {
+      const license_limit_entitlement = await findEntitlementValueId(
+        data.orgId,
+        data.license_limit_entitlement,
+      );
+      const license_number_entitlement = await findEntitlementValueId(
+        data.orgId,
+        data.license_number_entitlement,
+      );
+      const value_entitlement =
+        license_number_entitlement.value_number + data.increase_by;
+      if (license_limit_entitlement && license_number_entitlement) {
+        if (license_limit_entitlement.value_number > value_entitlement) {
+          requestButton = true;
+        } else {
+          requestButton = false;
+        }
+      }
+    }
+
+    return {
+      errorCode: 0,
+      requestButton,
+      message: 'Fetch license information',
+    }; // Return the final array
+  } catch (error: any) {
+    return null;
+  }
+};
+
 const getSKUList = async ({ orgId }: GetSKUParams): Promise<any> => {
   if (!orgId) {
     return 'Invalid parameters';
@@ -824,6 +867,7 @@ async function requestMail(data: any): Promise<any> {
 export {
   addLicence,
   checkLicensePlanEntitlement,
+  checkLimit,
   findEntitlementValueId,
   getLicenceData,
   getSKUList,

@@ -2,7 +2,7 @@
 'use client';
 import React, { useState } from 'react';
 
-import { fetchProductData } from '@/supabase/products';
+import { checkLimit } from '@/supabase/licence';
 
 const OrgDashboard = () => {
   const [result, setResult] = useState<any>(null);
@@ -15,10 +15,13 @@ const OrgDashboard = () => {
 
     try {
       const data1 = {
-        org_id: 175,
-        org_type_id: 1,
+        orgId: 175,
+        license_limit_entitlement: 24,
+        increase_by: 1000,
+        license_number_entitlement: 29,
+        license_exceed_allowed_entitlement: 18,
       };
-      const data: any = await fetchProductData(data1);
+      const data: any = await checkLimit(data1);
 
       if (data) {
         setResult(data);
