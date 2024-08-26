@@ -587,6 +587,84 @@ async function reqLicenseLimitMail(data: any): Promise<any> {
     };
   }
 }
+async function requestQuotaMail(data: any): Promise<any> {
+  // Fetch email configuration
+  try {
+    const emailResult = await fetchEmailData('Request_Quota');
+    const userName: string = data.userName;
+    const orgName: string = data.org_name;
+    const licensePlanName: any = data.license_plan_name;
+
+    const emailData = emailResult.data;
+    const to: string = emailData.To;
+    const subject: string = emailData.email_subject;
+    const heading: string = emailData.email_heading;
+    const contentTemplate: string = emailData.email_content;
+
+    const headingData: string = heading
+      .replace('{{Target User Name}}', userName)
+      .replace('{{License Plan Name}}', licensePlanName);
+    const contentData = contentTemplate
+      .replace('{{Target User Name}}', userName)
+      .replace('{{License Plan Name}}', licensePlanName)
+      .replace('{{Org Name}}', orgName);
+
+    // Send email
+    await sendEmailFunction(to, subject, headingData, contentData, data.token);
+    return {
+      errorCode: 0,
+      message: 'request quota mail sent successfully.',
+      data: null,
+    };
+  } catch (error) {
+    // Handle unexpected errors
+    return {
+      errorCode: 1,
+      message: 'Unexpected error',
+      data: null,
+    };
+  }
+}
+async function requestMail(data: any): Promise<any> {
+  try {
+    const email_data: any = await fetchEmailData('Request_Entitlement');
+
+    const userName: string = data.userName;
+    const orgName: string = data.org_name;
+    const entitlementName: string = data.entitlement_name;
+    const to = email_data.data.To;
+    const subject = email_data.data.email_subject;
+    const heading = email_data.data.email_heading;
+    const content = email_data.data.email_content;
+
+    const headingUserData = heading.replace('{{Target User Name}}', userName);
+    const contentUserData = content
+      .replace('{{Target User Name}}', userName)
+      .replace('{{Entitlement Name}}', entitlementName)
+      .replace('{{Org Name}}', orgName);
+
+    // Send email
+    await sendEmailFunction(
+      to,
+      subject,
+      headingUserData,
+      contentUserData,
+      data.token,
+    );
+    return {
+      errorCode: 0,
+      message: 'RequestButton Mail sent successfully.',
+      data: null,
+    };
+  } catch (error) {
+    // Handle unexpected errors
+    return {
+      errorCode: 1,
+      message: 'Unexpected error',
+      data: null,
+    };
+  }
+}
 export {
   addLicence,
   checkLicensePlanEntitlement,
@@ -597,5 +675,7 @@ export {
   reqLicense,
   reqLicenseLimitMail,
   reqProductsforLitmus,
+  requestMail,
+  requestQuotaMail,
   showReqLicenceButton,
 };
