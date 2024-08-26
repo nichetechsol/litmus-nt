@@ -34,21 +34,111 @@ interface AddLicenceParams {
   user_id: number;
 }
 
+// const getSKUList = async ({ orgId }: GetSKUParams): Promise<any> => {
+//   if (!orgId) {
+//     return 'Invalid parameters';
+//   }
+
+//   try {
+//     // Fetch entitlements package data
+//     const { data: entitlements_package, error: entitlementsError } =
+//       await supabase
+//         .from('entitlements_package')
+//         .select(
+//           `
+//         entitlements_name!inner(name),
+
+//         entitlements_values(value_text)
+//       `,
+//         )
+//         .in('entitlements_name.name', [
+//           'License Tier',
+//           'License Catalog',
+//           'License Plan',
+//           'Add-on Licenses',
+//         ])
+//         .eq('org_id', orgId)
+//         .returns<EntitlementPackage[]>();
+
+//     if (entitlementsError) {
+//       throw entitlementsError;
+//     }
+
+//     if (!entitlements_package || entitlements_package.length === 0) {
+//       return 'No entitlements_package found';
+//     }
+
+//     const entPkgData: Record<string, string> = entitlements_package.reduce(
+//       (acc, item) => {
+//         acc[item.entitlements_name.name] = item.entitlements_values.value_text;
+//         return acc;
+//       },
+//       {} as Record<string, string>,
+//     );
+
+//     // Extract entitlements values
+//     const entitlements_values = entitlements_package.map(
+//       (item) => item.entitlements_values.value_text,
+//     );
+
+//     // Fetch license types
+//     const { data: licence_type, error: licenseError } = await supabase
+//       .from('licence_type')
+//       .select('id, name, license_sku_name, type')
+//       .in('license_tier', entitlements_values)
+//       .in('license_plan', entitlements_values)
+//       .in('license_catalog', entitlements_values);
+
+//     if (licenseError) {
+//       throw licenseError;
+//     }
+
+//     let licence_addon_type: {
+//       id: any;
+//       name: any;
+//       license_sku_name: any;
+//       type: any;
+//     }[] = [];
+
+//     //Fetch Addons
+//     if (entPkgData['Add-on Licenses'] == 'TRUE') {
+//       const { data: addonType, error: licenseAddonError } = await supabase
+//         .from('licence_type')
+//         .select('id, name, license_sku_name, type')
+//         .in('license_tier', entitlements_values)
+//         .eq('type', 'addon')
+//         .in('license_catalog', entitlements_values);
+
+//       if (licenseAddonError) {
+//         throw licenseAddonError;
+//       }
+
+//       licence_addon_type = addonType;
+//     }
+
+//     // Combine license types and add-on types if applicable
+//     const allLicenses = [...licence_type, ...licence_addon_type];
+
+//     return allLicenses;
+//   } catch (error: any) {
+//     return null;
+//   }
+// };
 const getSKUList = async ({ orgId }: GetSKUParams): Promise<any> => {
   if (!orgId) {
     return 'Invalid parameters';
   }
 
   try {
-    // Fetch entitlements package data
+    // Fetch entitlements package data (same as before)
     const { data: entitlements_package, error: entitlementsError } =
       await supabase
         .from('entitlements_package')
         .select(
           `
-        entitlements_name!inner(name),
-        entitlements_values(value_text)
-      `,
+          entitlements_name!inner(name),
+          entitlements_values(value_text, value_bool, value_number)
+        `,
         )
         .in('entitlements_name.name', [
           'License Tier',
@@ -67,58 +157,128 @@ const getSKUList = async ({ orgId }: GetSKUParams): Promise<any> => {
       return 'No entitlements_package found';
     }
 
-    const entPkgData: Record<string, string> = entitlements_package.reduce(
-      (acc, item) => {
-        acc[item.entitlements_name.name] = item.entitlements_values.value_text;
+    // Create a dictionary of entitlements
+    const entPkgData: Record<string, any> = entitlements_package.reduce(
+      (acc, item: any) => {
+        acc[item.entitlements_name.name] = {
+          value_text: item.entitlements_values.value_text,
+          value_bool: item.entitlements_values.value_bool,
+          value_number: item.entitlements_values.value_number,
+        };
         return acc;
       },
-      {} as Record<string, string>,
+      {} as Record<string, any>,
     );
 
-    // Extract entitlements values
-    const entitlements_values = entitlements_package.map(
-      (item) => item.entitlements_values.value_text,
-    );
+    // Extract relevant entitlement values (same as before)
+    const license_tier_value =
+      entPkgData['License Tier']?.value_text ??
+      entPkgData['License Tier']?.value_bool ??
+      entPkgData['License Tier']?.value_number;
+    const license_plan_value =
+      entPkgData['License Plan']?.value_text ??
+      entPkgData['License Plan']?.value_bool ??
+      entPkgData['License Plan']?.value_number;
+    const license_catalog_value =
+      entPkgData['License Catalog']?.value_text ??
+      entPkgData['License Catalog']?.value_bool ??
+      entPkgData['License Catalog']?.value_number;
+    const licence_addon_value =
+      entPkgData['Add-on Licenses']?.value_text ??
+      entPkgData['Add-on Licenses']?.value_bool ??
+      entPkgData['Add-on Licenses']?.value_number;
 
-    // Fetch license types
-    const { data: licence_type, error: licenseError } = await supabase
+    // Initialize the final license list
+    let allLicenses = [];
+
+    // Fetch licenses for all types except 'addon'
+    const { data: licenseTierPlanCatalog, error: licenseError } = await supabase
       .from('licence_type')
-      .select('id, name, license_sku_name, type')
-      .in('license_tier', entitlements_values)
-      .in('license_plan', entitlements_values)
-      .in('license_catalog', entitlements_values);
+      .select('*')
+      .eq('license_tier', license_tier_value)
+      .eq('license_plan', license_plan_value)
+      .eq('license_catalog', license_catalog_value)
+      .neq('type', 'addon'); // Exclude 'addon' type
 
     if (licenseError) {
       throw licenseError;
     }
 
-    let licence_addon_type: {
-      id: any;
-      name: any;
-      license_sku_name: any;
-      type: any;
-    }[] = [];
+    allLicenses = licenseTierPlanCatalog;
 
-    //Fetch Addons
-    if (entPkgData['Add-on Licenses'] == 'TRUE') {
-      const { data: addonType, error: licenseAddonError } = await supabase
+    // Check if "Add-on Licenses" is TRUE
+    if (licence_addon_value === true) {
+      const { data: addonLicenses, error: addonLicenseError } = await supabase
         .from('licence_type')
-        .select('id, name, license_sku_name, type')
-        .in('license_tier', entitlements_values)
+        .select('*')
+        .eq('license_tier', license_tier_value)
         .eq('type', 'addon')
-        .in('license_catalog', entitlements_values);
+        .eq('license_catalog', license_catalog_value);
 
-      if (licenseAddonError) {
-        throw licenseAddonError;
+      if (addonLicenseError) {
+        throw addonLicenseError;
       }
 
-      licence_addon_type = addonType;
+      // Combine license types and add-on types if applicable
+      allLicenses = [...allLicenses, ...addonLicenses];
     }
 
-    // Combine license types and add-on types if applicable
-    const allLicenses = [...licence_type, ...licence_addon_type];
+    // Array to hold the final licenses with the requestButton value
+    const licensesWithRequestButton = [];
 
-    return allLicenses;
+    // Iterate through all licenses and determine the requestButton value
+    for (const license of allLicenses) {
+      const exceedAllowedEntitlement =
+        license.license_exceed_allowed_entitlement;
+      const exceedLicenseLimitEntitlement = license.license_limit_entitlement;
+      const exceedLicenseNumberEntitlement = license.license_number_entitlement;
+      let requestButton = false; // Initialize the requestButton
+
+      // Check if the license exceeds the allowed entitlement
+      if (exceedAllowedEntitlement) {
+        if (exceedAllowedEntitlement != null) {
+          const license_exceed_allowed_entitlement: any =
+            await findEntitlementValueId(orgId, exceedAllowedEntitlement);
+
+          if (license_exceed_allowed_entitlement.value_bool === true) {
+            const license_limit_entitlement = await findEntitlementValueId(
+              orgId,
+              exceedLicenseLimitEntitlement,
+            );
+            const license_number_entitlement = await findEntitlementValueId(
+              orgId,
+              exceedLicenseNumberEntitlement,
+            );
+            if (license_limit_entitlement && license_number_entitlement) {
+              if (
+                license_limit_entitlement.value_number <=
+                license_number_entitlement.value_number
+              ) {
+                requestButton = true;
+              } else {
+                requestButton = false;
+              }
+            }
+          } else {
+            requestButton = false;
+          }
+        }
+      } else {
+        requestButton = true;
+      }
+
+      // Push the license along with the requestButton value into the final array
+      licensesWithRequestButton.push({
+        ...license,
+        requestButton,
+      });
+    }
+
+    return {
+      errorCode: 0,
+      data: licensesWithRequestButton,
+      message: 'Fetch license information',
+    }; // Return the final array
   } catch (error: any) {
     return null;
   }
@@ -337,38 +497,34 @@ const showReqLicenceButton = async ({
 //for license limit_exceed_entitlements
 const findEntitlementValueId = async (
   orgId: number,
-  type: string,
-  license_tier: string,
-  license_catalog: string,
-  license_plan: string,
-  columnName: any,
+  entitlement: any,
 ): Promise<any> => {
   try {
     // Step 1: Find the `license_limit_entitlement` from the `license_type` table
-    const { data: licenseData, error: licenseError } = await supabase
-      .from('licence_type')
-      .select(columnName)
-      .ilike('type', type)
-      .ilike('license_tier', license_tier)
-      .ilike('license_catalog', license_catalog)
-      .ilike('license_plan', license_plan)
-      .single();
+    // const { data: licenseData, error: licenseError } = await supabase
+    //   .from('licence_type')
+    //   .select(columnName)
+    //   .ilike('type', type)
+    //   .ilike('license_tier', license_tier)
+    //   .ilike('license_catalog', license_catalog)
+    //   .ilike('license_plan', license_plan)
+    //   .single();
 
-    if (licenseError) {
-      return null;
-    }
+    // if (licenseError) {
+    //   return null;
+    // }
 
-    const entitlementNameId = licenseData?.[columnName];
-    if (!entitlementNameId) {
-      return null;
-    }
+    // const entitlementNameId = licenseData?.[columnName];
+    // if (!entitlementNameId) {
+    //   return null;
+    // }
 
     // Step 2: Find the `entitlement_value_id` in the `entitlements_package` table based on `entitlement_name_id` and `org_id`
     const { data: entitlementData, error: entitlementError } = await supabase
       .from('entitlements_package')
       .select('entitlement_value_id(value_text, value_number, value_bool)')
       .eq('org_id', orgId)
-      .eq('entitlement_name_id', entitlementNameId)
+      .eq('entitlement_name_id', entitlement)
       .single();
 
     if (entitlementError) {
@@ -613,7 +769,7 @@ async function requestQuotaMail(data: any): Promise<any> {
     await sendEmailFunction(to, subject, headingData, contentData, data.token);
     return {
       errorCode: 0,
-      message: 'request quota mail sent successfully.',
+      message: 'Request Quota mail sent successfully.',
       data: null,
     };
   } catch (error) {
@@ -653,7 +809,7 @@ async function requestMail(data: any): Promise<any> {
     );
     return {
       errorCode: 0,
-      message: 'RequestButton Mail sent successfully.',
+      message: 'Request Entiltement mail sent successfully.',
       data: null,
     };
   } catch (error) {
