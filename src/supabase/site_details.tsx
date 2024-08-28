@@ -250,7 +250,7 @@ async function fetchSiteDetails(
         ownerNames,
         country: site?.country?.name ?? '',
         state: site?.state?.name ?? '',
-        type_name: site?.type_name?.name ?? '',
+        type_name: site?.type?.name ?? '',
       };
     });
 
