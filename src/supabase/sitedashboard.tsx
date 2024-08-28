@@ -541,8 +541,8 @@ async function sitesCounts(site_id: any, org_id: any): Promise<FunctionReturn> {
         productCount: productsCount,
         sites_details: {
           ...sites_details,
-          country: sites_details.country.name,
-          state: sites_details.state.name,
+          country: sites_details?.country?.name ?? '',
+          state: sites_details?.state?.name ?? '',
         },
       },
     };
