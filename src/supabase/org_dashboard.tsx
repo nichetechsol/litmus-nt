@@ -49,7 +49,13 @@ async function getLocationOfSites(data: {
     }
 
     const countryIds = sites_detail.map((site: SiteDetail) => site.country_id);
-
+    if (countryIds[0] == null) {
+      return {
+        errorCode: 0,
+        data: null, // Return null data
+        message: 'No valid country IDs found for the sites.',
+      };
+    }
     // Fetch country names
     const { data: countries, error: countriesError } = await supabase
       .from('country')

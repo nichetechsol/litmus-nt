@@ -248,9 +248,9 @@ async function fetchSiteDetails(
           },
         })),
         ownerNames,
-        country: site.country?.name || null,
-        state: site.state?.name || null,
-        type_name: site.type?.name || null,
+        country: site?.country?.name ?? '',
+        state: site?.state?.name ?? '',
+        type_name: site?.type_name?.name ?? '',
       };
     });
 
