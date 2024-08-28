@@ -165,7 +165,7 @@ const LoginForm = () => {
         );
         const encryptedAddOrgUser = encryptData(add_orgUser ? add_orgUser : '');
         const encryptedOrgExists = encryptData(org_exists ? org_exists : '');
-
+        localStorage.setItem('azure', 'false');
         if (encryptedUserId) {
           localStorage.setItem('user_id', encryptedUserId);
         }

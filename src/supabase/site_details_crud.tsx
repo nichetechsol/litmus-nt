@@ -899,7 +899,7 @@ async function findOrInsertEntitlementValue(
   value: any,
 ): Promise<number | null> {
   const valueType = typeof value;
-  let entValueId;
+  // let entValueId;
 
   // Determine the value column and check if the value exists
   let valueColumn = '';
@@ -911,29 +911,29 @@ async function findOrInsertEntitlementValue(
     valueColumn = 'value_bool';
   }
 
-  const { data: entValueData, error: entValueError } = await supabase
-    .from('entitlements_values')
-    .select('*')
-    .eq(valueColumn, value);
+  // const { data: entValueData, error: entValueError } = await supabase
+  //   .from('entitlements_values')
+  //   .select('*')
+  //   .eq(valueColumn, value);
 
-  if (entValueError) {
+  // if (entValueError) {
+  //   return null;
+  // }
+
+  // if (entValueData?.length > 0) {
+  //   entValueId = entValueData[0].id;
+  // } else {
+  const { data: insertData, error: insertError } = await supabase
+    .from('entitlements_values')
+    .insert({ [valueColumn]: value })
+    .select('*');
+
+  if (insertError) {
     return null;
   }
 
-  if (entValueData?.length > 0) {
-    entValueId = entValueData[0].id;
-  } else {
-    const { data: insertData, error: insertError } = await supabase
-      .from('entitlements_values')
-      .insert({ [valueColumn]: value })
-      .select('*');
-
-    if (insertError) {
-      return null;
-    }
-
-    entValueId = insertData[0].id;
-  }
+  const entValueId = insertData[0].id;
+  // }
 
   return entValueId;
 }

@@ -219,17 +219,17 @@ async function automaticeCreateSite(
     }
 
     // Fetch state ID based on state name
-    let stateId = null;
-    let countryId = null;
-    const { data: stateData } = await supabase
-      .from('state')
-      .select('id, country_id')
-      .ilike('name', stateName);
+    // let stateId = null;
+    // let countryId = null;
+    // const { data: stateData } = await supabase
+    //   .from('state')
+    //   .select('id, country_id')
+    //   .ilike('name', stateName);
 
-    if (stateData && stateData.length > 0) {
-      stateId = stateData[0].id;
-      countryId = stateData[0].country_id;
-    }
+    // if (stateData && stateData.length > 0) {
+    //   stateId = stateData[0].id;
+    //   countryId = stateData[0].country_id;
+    // }
 
     // Insert the site details
     const { data: siteInsertData } = await supabase
@@ -239,12 +239,12 @@ async function automaticeCreateSite(
           name: siteName,
           type_id: defaultSiteTypeId,
           org_id: orgId,
-          address1: address,
-          city: cityName,
-          pin_code: pin_code,
-          status: 'Y',
-          country_id: countryId,
-          state_id: stateId,
+          address1: null,
+          city: null,
+          pin_code: null,
+          status: null,
+          country_id: null,
+          state_id: null,
         },
       ])
       .select();

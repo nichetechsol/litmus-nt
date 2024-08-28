@@ -257,7 +257,11 @@ const Page = () => {
     try {
       if (site_id && org_id) {
         const data: any = await sitesCounts(site_id, org_id);
-        setSiteCountData(data);
+        if (data.errorCode === 0) {
+          setSiteCountData(data);
+        } else {
+          //
+        }
       }
     } catch (error: any) {
       //
@@ -1275,8 +1279,13 @@ const Page = () => {
                               <b className='info-name'>Address:</b>
                               <p className='ms-1 over-text text-muted fw-normal d-inline-block'>
                                 {siteCountData &&
-                                  `${siteCountData?.data?.sites_details
-                                    ?.address1}${
+                                  `${
+                                    siteCountData?.data?.sites_details
+                                      ?.address1 === null
+                                      ? ''
+                                      : siteCountData?.data?.sites_details
+                                          ?.address1
+                                  }${
                                     siteCountData?.data?.sites_details?.address2
                                       ? `, ${siteCountData?.data?.sites_details?.address2}`
                                       : ''
@@ -1288,7 +1297,10 @@ const Page = () => {
                               <b>Country :</b>
                               <span className='ms-1 text-muted fw-normal d-inline-block'>
                                 {siteCountData &&
-                                  siteCountData?.data?.sites_details?.country}
+                                siteCountData?.data?.sites_details?.country ===
+                                  null
+                                  ? ''
+                                  : siteCountData?.data?.sites_details?.country}
                               </span>
                             </li>
                             <li className='list-group-item fw-semibold'>

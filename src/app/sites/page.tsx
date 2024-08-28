@@ -1,25 +1,18 @@
-/* eslint-disable unused-imports/no-unused-imports */
-/* eslint-disable simple-import-sort/imports */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 
 'use client';
 import Link from 'next/link';
-import CryptoJS from 'crypto-js';
 import { redirect, useRouter } from 'next/navigation';
-import InitialsComponent from '@/helper/NameHelper';
-import React, {
-  ReactNode,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
-import * as Yup from 'yup';
-import swal from 'sweetalert';
-
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
+import swal from 'sweetalert';
+import * as Yup from 'yup';
+
 import 'react-toastify/dist/ReactToastify.css';
+
+import { decryptData, encryptData } from '@/helper/Encryption_Decryption';
+import InitialsComponent from '@/helper/NameHelper';
 import {
   MessageSchema,
   PincodeSchema,
@@ -30,11 +23,11 @@ import {
   SiteNameSchema,
   SiteStateDropdownSchema,
   SiteTypeDropdownSchema,
-  TypeDropdownSchema,
 } from '@/helper/ValidationHelper';
 import Seo from '@/shared/layout-components/seo/seo';
 import { countryList } from '@/supabase/country';
-import { getUserRole } from '@/supabase/org_details';
+import { getOrgUserRole } from '@/supabase/org_user';
+import { refreshToken } from '@/supabase/session';
 import {
   fetchSiteDetails,
   fetchSiteSidebarList,
@@ -49,9 +42,6 @@ import {
 import { fetchSiteType } from '@/supabase/site_type';
 import { stateList } from '@/supabase/state';
 import Loader from '@/utils/Loader/Loader';
-import { getOrgUserRole } from '@/supabase/org_user';
-import { decryptData, encryptData } from '@/helper/Encryption_Decryption';
-import { refreshToken } from '@/supabase/session';
 interface Country {
   id: number;
   name: string;
@@ -243,9 +233,10 @@ const Page: React.FC = () => {
   const FetchSiteDetails = async () => {
     try {
       setLoading(true);
-      const data1 = await fetchSiteDetails(org_id, user_id);
-      if (org_id) {
-        if (data1) {
+      if (org_id && user_id) {
+        const data1 = await fetchSiteDetails(org_id, user_id);
+
+        if (data1.errorCode === 0) {
           setOSitesList(data1.data ? data1.data : []);
 
           setLoading(false);
@@ -1477,52 +1468,6 @@ const Page: React.FC = () => {
                               key={SingleSite?.site?.id}
                             >
                               <div className='box task-pending-card '>
-                                {/* {SingleSite?.user_role_id === 1 ||
-                                SingleSite?.user_role_id === 2 ? (
-                                  // <div className='hs-dropdown ti-dropdown'>
-                                  //   <Link
-                                  //     aria-label='anchor'
-                                  //     href='#!'
-                                  //     className='flex items-center justify-center w-[1.75rem] h-[1.75rem]  !text-[0.8rem] !py-1 !px-2 rounded-sm bg-light border-light shadow-none !font-medium'
-                                  //     aria-expanded='false'
-                                  //     onClick={(e) => {
-                                  //       e.preventDefault(); // Prevent default navigation action
-                                  //       e.stopPropagation(); // Prevent click from bubbling up
-                                  //     }}
-                                  //   >
-                                  //     <i className='fe fe-more-vertical text-[0.8rem]'></i>
-                                  //   </Link>
-                                  //   <ul className='hs-dropdown-menu ti-dropdown-menu hidden'>
-                                  //     <li>
-                                  //       <button
-                                  //         className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
-                                  //         data-bs-toggle='modal'
-                                  //         data-hs-overlay='#todo-compose'
-                                  //         onClick={(e) => {
-                                  //           e.stopPropagation(); // Prevent card click
-                                  //           handeledit(SingleSite); // Your function to handle the edit action
-                                  //         }}
-                                  //       >
-                                  //         Edit
-                                  //       </button>
-                                  //     </li>
-                                  //     <li>
-                                  //       <button
-                                  //         className='ti-dropdown-item !py-2 !px-[0.9375rem] !text-[0.8125rem] !font-medium block'
-                                  //         onClick={(e: any) => {
-                                  //           e.stopPropagation(); // Prevent card click
-                                  //           handelDelete(SingleSite); // Your function to handle the edit action
-                                  //         }}
-                                  //       >
-                                  //         Delete
-                                  //       </button>
-                                  //     </li>
-                                  //   </ul>
-                                  // </div>
-                                ) : (
-                                  ''
-                                )} */}
-
                                 <div
                                   className='box-body'
                                   style={{ cursor: 'pointer' }}
@@ -1577,35 +1522,6 @@ const Page: React.FC = () => {
                                             : ''}
                                         </div>
                                       </div>
-                                      {/* <div className='hs-tooltip ti-main-tooltip '>
-                                        <h1
-                                          className='h1-new hs-tooltip-toggle w-100'
-                                          style={{
-                                            fontSize: '1.1rem',
-                                            fontWeight: 'bold',
-                                            marginBottom: '0.5rem',
-                                          }}
-                                        >
-                                          <Link
-                                            aria-label='anchor'
-                                            href='#!'
-                                          ></Link>
-                                          {SingleSite?.site
-                                            ? SingleSite?.site?.name
-                                            : ''}
-                                          {SingleSite?.site?.name.length >
-                                            18 && (
-                                            <span
-                                              className='hs-tooltip-content  ti-main-tooltip-content py-1 px-2 !bg-black !text-xs !font-medium !text-white shadow-sm '
-                                              role='tooltip'
-                                            >
-                                              {SingleSite?.site
-                                                ? SingleSite?.site?.name
-                                                : ''}
-                                            </span>
-                                          )}
-                                        </h1>
-                                      </div> */}
                                     </div>
                                     {SingleSite?.user_role_id === 1 ||
                                     SingleSite?.user_role_id === 2 ? (
@@ -1671,13 +1587,32 @@ const Page: React.FC = () => {
                                           <p className='ms-1 pnew-white-space over-text text-muted fw-normal d-inline-block'>
                                             {SingleSite?.site && (
                                               <>
-                                                {SingleSite?.site?.address1}
-                                                {SingleSite?.site?.address2
-                                                  ? `, ${SingleSite?.site?.address2}`
-                                                  : ''}
-                                                {`, ${SingleSite?.site?.city}`}
-                                                {`, ${SingleSite?.state}`}
-                                                {`, ${SingleSite?.country}`}
+                                                {SingleSite?.site?.address1 ===
+                                                null
+                                                  ? ''
+                                                  : SingleSite?.site?.address1}
+                                                {SingleSite?.site?.address2 ===
+                                                null
+                                                  ? ''
+                                                  : `, ${SingleSite?.site?.address2}`}
+                                                {` ${
+                                                  SingleSite?.site?.city == null
+                                                    ? ''
+                                                    : `,${SingleSite?.site?.city}`
+                                                }`}
+                                                {` ${
+                                                  SingleSite?.state == null ||
+                                                  SingleSite?.state == ''
+                                                    ? '-'
+                                                    : `,${SingleSite?.state}`
+                                                }`}
+                                                {` ${
+                                                  SingleSite?.country ===
+                                                    null ||
+                                                  SingleSite?.country === ''
+                                                    ? ''
+                                                    : ` ,${SingleSite?.country}`
+                                                }`}
                                               </>
                                             )}
                                           </p>
