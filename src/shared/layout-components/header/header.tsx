@@ -606,7 +606,7 @@ const Header = ({ local_varaiable, ThemeChanger }: any) => {
                             if (willLogout) {
                               setLoading(true);
 
-                              if (localStorage.getItem('azure')) {
+                              if (localStorage.getItem('azure') === 'true') {
                                 localStorage.removeItem('azure');
                                 localStorage.removeItem('org_id');
                                 localStorage.removeItem('org_name');

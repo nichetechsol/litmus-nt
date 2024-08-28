@@ -301,7 +301,7 @@ const OrgDashboard = () => {
           const sets = { org_id: org_id };
           const data: any = await getLocationOfSites(sets);
 
-          if (data.data) {
+          if (data.errorCode === 0) {
             setLocationOfSites(data.data);
             // setLoading(false);
           } else {
@@ -1020,7 +1020,7 @@ const OrgDashboard = () => {
                               </div>
                             </li>
                           ))}
-                        {locationOfSites && locationOfSites.length == 0 && (
+                        {locationOfSites === null && (
                           <div className='col-md-12 w-100 mt-4'>
                             <p className='text-center'>No Location Found</p>{' '}
                           </div>
