@@ -932,7 +932,7 @@ const OrgDashboard = () => {
                                 setLoading(false);
                               }}
                             >
-                              <div className=' py-2 ti-btn-sm px-3 ti-btn ent-btn bg-primary text-white !font-medium w-full !mb-0 top-margin-1'>
+                              <div className=' py-2 ti-btn-sm px-3 ti-btn ent-btn bg-primary text-white !font-medium !w-full !mb-0 top-margin-1'>
                                 <i className='ri-add-circle-line !text-[1rem]'></i>
                                 Request Entitlement
                               </div>
