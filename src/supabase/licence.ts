@@ -136,21 +136,47 @@ const checkLimit = async (data: any): Promise<any> => {
         data.orgId,
         data.license_exceed_allowed_entitlement,
       );
-
-    if (license_exceed_allowed_entitlement.value_bool === true) {
-      const license_limit_entitlement = await findEntitlementValueId(
-        data.orgId,
-        data.license_limit_entitlement,
-      );
-      const license_number_entitlement = await findEntitlementValueId(
-        data.orgId,
-        data.license_number_entitlement,
-      );
-      const value_entitlement =
-        license_number_entitlement.value_number + data.increase_by;
-      if (license_limit_entitlement && license_number_entitlement) {
-        if (license_limit_entitlement.value_number > value_entitlement) {
-          requestButton = true;
+    if (license_exceed_allowed_entitlement === null) {
+      requestButton = false;
+    } else {
+      if (license_exceed_allowed_entitlement.value_bool === true) {
+        const license_limit_entitlement = await findEntitlementValueId(
+          data.orgId,
+          data.license_limit_entitlement,
+        );
+        const license_number_entitlement = await findEntitlementValueId(
+          data.orgId,
+          data.license_number_entitlement,
+        );
+        const value_entitlement =
+          license_number_entitlement.value_number + data.increase_by;
+        if (license_limit_entitlement && license_number_entitlement) {
+          if (license_limit_entitlement.value_number > value_entitlement) {
+            requestButton = true;
+          } else {
+            requestButton = false;
+          }
+        } else {
+          requestButton = false;
+        }
+      }
+      if (license_exceed_allowed_entitlement.value_bool === false) {
+        const license_limit_entitlement = await findEntitlementValueId(
+          data.orgId,
+          data.license_limit_entitlement,
+        );
+        const license_number_entitlement = await findEntitlementValueId(
+          data.orgId,
+          data.license_number_entitlement,
+        );
+        const value_entitlement =
+          license_number_entitlement.value_number + data.increase_by;
+        if (license_limit_entitlement && license_number_entitlement) {
+          if (license_limit_entitlement.value_number > value_entitlement) {
+            requestButton = true;
+          } else {
+            requestButton = false;
+          }
         } else {
           requestButton = false;
         }
@@ -162,7 +188,7 @@ const checkLimit = async (data: any): Promise<any> => {
       requestButton,
       message: 'Fetch license information',
     }; // Return the final array
-  } catch (error: any) {
+  } catch (error) {
     return null;
   }
 };
@@ -278,12 +304,13 @@ const getSKUList = async ({ orgId }: GetSKUParams): Promise<any> => {
       let requestButton = false; // Initialize the requestButton
 
       // Check if the license exceeds the allowed entitlement
-      if (exceedAllowedEntitlement) {
-        if (exceedAllowedEntitlement != null) {
-          const license_exceed_allowed_entitlement: any =
-            await findEntitlementValueId(orgId, exceedAllowedEntitlement);
-
-          if (license_exceed_allowed_entitlement.value_bool === true) {
+      if (exceedAllowedEntitlement != null) {
+        const license_exceed_allowed_entitlement: any =
+          await findEntitlementValueId(orgId, exceedAllowedEntitlement);
+        if (license_exceed_allowed_entitlement === null) {
+          requestButton = false;
+        } else {
+          if (license_exceed_allowed_entitlement.value_bool === false) {
             const license_limit_entitlement = await findEntitlementValueId(
               orgId,
               exceedLicenseLimitEntitlement,
@@ -302,12 +329,14 @@ const getSKUList = async ({ orgId }: GetSKUParams): Promise<any> => {
                 requestButton = false;
               }
             }
-          } else {
-            requestButton = false;
+          }
+          if (license_exceed_allowed_entitlement.value_bool === true) {
+            requestButton = true;
           }
         }
-      } else {
-        requestButton = true;
+      }
+      if (exceedAllowedEntitlement === null) {
+        requestButton = false;
       }
 
       // Push the license along with the requestButton value into the final array
@@ -322,7 +351,7 @@ const getSKUList = async ({ orgId }: GetSKUParams): Promise<any> => {
       data: licensesWithRequestButton,
       message: 'Fetch license information',
     }; // Return the final array
-  } catch (error: any) {
+  } catch (error) {
     return null;
   }
 };
