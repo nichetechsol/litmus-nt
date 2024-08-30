@@ -893,6 +893,110 @@ async function requestMail(data: any): Promise<any> {
     };
   }
 }
+// Define the asynchronous function
+async function insertLicence(data: {
+  licenseNumber: string;
+  type: number;
+  siteId: number;
+  userId: number;
+}) {
+  try {
+    // Perform the insertion operation
+    const { data: insertLicense, error } = await supabase
+      .from('licence')
+      .insert([
+        {
+          licence_number: data.licenseNumber,
+          type: data.type,
+          site_id: data.siteId,
+          created_by: data.userId,
+        },
+      ])
+      .select(); // Use .select() if you want to return the inserted data
+
+    // Check for errors
+    if (error) {
+      return {
+        errorCode: 1,
+        data: null,
+        message: `License not inserted`,
+      };
+    }
+
+    // Handle successful insertion
+    return {
+      errorCode: 0,
+      message: 'License inserted successfully',
+      data: data,
+    }; // Optionally return the inserted data
+  } catch (err) {
+    return {
+      errorCode: 1,
+      message: `An unexpected error occurred`,
+      data: null,
+    };
+  }
+}
+async function increaseValue(data: {
+  licenseLimitEntitlement: number;
+  orgId: number;
+  increaseByValue: number;
+}) {
+  try {
+    // Fetch the current entitlement value
+    const { data: entitlementData, error: fetchError } = await supabase
+      .from('entitlements_package')
+      .select('entitlement_value_id')
+      .eq('org_id', data.orgId)
+      .eq('entitlement_name_id', data.licenseLimitEntitlement)
+      .single();
+
+    if (fetchError) {
+      return null;
+    }
+
+    const entitlementValueId = entitlementData?.entitlement_value_id;
+
+    if (!entitlementValueId) {
+      return null;
+    }
+
+    // Fetch the current value from the entitlements_values table
+    const { data: valueData, error: valueFetchError } = await supabase
+      .from('entitlements_values')
+      .select('value_number, value_bool, value_text')
+      .eq('id', entitlementValueId)
+      .single();
+
+    if (valueFetchError) {
+      return null;
+    }
+
+    const { value_number } = valueData;
+
+    // Handle the different types
+    if (value_number !== undefined) {
+      // Increment numeric value
+      const newValue = value_number + data.increaseByValue;
+      const { error: updateError } = await supabase
+        .from('entitlements_values')
+        .update({ value_number: newValue })
+        .eq('id', entitlementValueId);
+
+      if (updateError) {
+        return null;
+      }
+
+      return {
+        errorCode: 0,
+        message: 'Value updated successfully',
+        data: { newValue },
+      };
+    }
+  } catch (error: any) {
+    return null;
+  }
+}
 export {
   addLicence,
   checkLicensePlanEntitlement,
@@ -900,6 +1004,8 @@ export {
   findEntitlementValueId,
   getLicenceData,
   getSKUList,
+  increaseValue,
+  insertLicence,
   renderLicense,
   reqLicense,
   reqLicenseLimitMail,

@@ -245,9 +245,9 @@ async function checkLicensePlan(userId: any): Promise<CheckLicensePlanResult> {
         const { data: entitlementsData, error: entitlementsError } =
           await supabase
             .from('entitlements_package')
-            .select('*,entitlement_value_id(value_text)')
+            .select('*, entitlement_value_id(value_text, value_bool)')
             .in('org_id', orgIds)
-            .eq('entitlement_name_id', 14);
+            .in('entitlement_name_id', [14, 32]);
 
         if (entitlementsError) {
           return {
@@ -257,12 +257,41 @@ async function checkLicensePlan(userId: any): Promise<CheckLicensePlanResult> {
           };
         }
 
-        // Check if any entitlement matches the allowed license plans
-        const allowedLicensePlans: any[] = settingsData?.[0]?.value_text || [];
+        // Group entitlements by org_id
+        const entitlementsByOrg: Record<
+          number,
+          { hasLicensePlan: boolean; canCreateOrg: boolean }
+        > = {};
         for (const entitlement of entitlementsData) {
-          const entitlement_value_text =
-            entitlement.entitlement_value_id?.value_text;
-          if (allowedLicensePlans.includes(entitlement_value_text)) {
+          const { org_id, entitlement_name_id, entitlement_value_id } =
+            entitlement;
+          if (!entitlementsByOrg[org_id]) {
+            entitlementsByOrg[org_id] = {
+              hasLicensePlan: false,
+              canCreateOrg: false,
+            };
+          }
+
+          if (entitlement_name_id === 14) {
+            // License Plan
+            const licensePlans = settingsData?.[0]?.value_text || [];
+            if (licensePlans.includes(entitlement_value_id?.value_text)) {
+              entitlementsByOrg[org_id].hasLicensePlan = true;
+            }
+          } else if (entitlement_name_id === 32) {
+            // Can Create Organization
+            entitlementsByOrg[org_id].canCreateOrg =
+              entitlement_value_id?.value_bool === true;
+          }
+        }
+
+        // Check if any organization meets both criteria
+        for (const orgId of orgIds) {
+          const entitlements = entitlementsByOrg[orgId] || {
+            hasLicensePlan: false,
+            canCreateOrg: false,
+          };
+          if (entitlements.hasLicensePlan && entitlements.canCreateOrg) {
             add_orgUser = true;
             break; // Exit the loop early if the condition is met
           }
@@ -286,6 +315,7 @@ async function checkLicensePlan(userId: any): Promise<CheckLicensePlanResult> {
     };
   }
 }
+
 async function autoOrgAndSiteGenerate(raw_user_meta_data: any): Promise<any> {
   try {
     // Step 1: Create the Organization
