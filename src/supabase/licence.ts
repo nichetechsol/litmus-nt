@@ -148,11 +148,18 @@ const checkLimit = async (data: any): Promise<any> => {
           data.orgId,
           data.license_number_entitlement,
         );
-        const value_entitlement =
-          license_number_entitlement.value_number + data.increase_by;
-        if (license_limit_entitlement && license_number_entitlement) {
-          if (license_limit_entitlement.value_number > value_entitlement) {
-            requestButton = true;
+        if (license_number_entitlement != null) {
+          const value_entitlement =
+            license_number_entitlement.value_number + data.increase_by;
+          if (
+            license_limit_entitlement != null &&
+            license_number_entitlement != null
+          ) {
+            if (license_limit_entitlement.value_number > value_entitlement) {
+              requestButton = true;
+            } else {
+              requestButton = false;
+            }
           } else {
             requestButton = false;
           }
@@ -169,11 +176,18 @@ const checkLimit = async (data: any): Promise<any> => {
           data.orgId,
           data.license_number_entitlement,
         );
-        const value_entitlement =
-          license_number_entitlement.value_number + data.increase_by;
-        if (license_limit_entitlement && license_number_entitlement) {
-          if (license_limit_entitlement.value_number > value_entitlement) {
-            requestButton = true;
+        if (license_number_entitlement != null) {
+          const value_entitlement =
+            license_number_entitlement.value_number + data.increase_by;
+          if (
+            license_limit_entitlement != null &&
+            license_number_entitlement != null
+          ) {
+            if (license_limit_entitlement.value_number > value_entitlement) {
+              requestButton = true;
+            } else {
+              requestButton = false;
+            }
           } else {
             requestButton = false;
           }
