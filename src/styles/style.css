@@ -20465,3 +20465,9 @@ li.page-item.disabled a {
 .ent-btn {
   min-width: 10.5rem;
 }
+.tool-custom1 {
+  bottom: 21px;
+}
+.max-w-md {
+  max-width: 40rem !important;
+}

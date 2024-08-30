@@ -909,7 +909,7 @@ async function requestMail(data: any): Promise<any> {
 }
 // Define the asynchronous function
 async function insertLicence(data: {
-  licenseNumber: string;
+  licenseNumber: any;
   type: number;
   siteId: number;
   userId: number;

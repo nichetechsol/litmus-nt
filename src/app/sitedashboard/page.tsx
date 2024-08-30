@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @next/next/no-img-element */
 'use client';
 import moment from 'moment';
 import Link from 'next/link';
@@ -802,7 +801,6 @@ const Page = () => {
   };
 
   const handleRequestMail = async () => {
-    // toast.warning('Work In Progress..', { autoClose: 3000 });
     const data = {
       userName: userEmail,
       name: orgName,
@@ -1169,7 +1167,7 @@ const Page = () => {
                                           >
                                             <i className='ri-mail-line text-[1rem]  text-white '></i>
                                           </a>
-                                          <div className='absolute hidden tool-custom group-hover:block bg-gray-400 text-black text-xs rounded p-2 z-10 bottom-full mb-2 max-w-xs break-words'>
+                                          <div className='absolute hidden tool-custom group-hover:block bg-gray-400 text-black text-xs rounded p-2 z-10 bottom-full mb-2 max-w-md break-words'>
                                             Request Access
                                           </div>
                                           &nbsp;
@@ -1184,7 +1182,7 @@ const Page = () => {
                                           >
                                             <i className='ri-information-line text-[1rem]  text-white '></i>
                                           </a>
-                                          <div className='absolute hidden tool-custom group-hover:block bg-gray-400 text-black text-xs rounded p-2 z-10 bottom-full mb-2 max-w-xs break-words'>
+                                          <div className='absolute hidden tool-custom group-hover:block bg-gray-400 text-black text-xs rounded p-2 z-10 bottom-full mb-2 max-w-md break-words'>
                                             {`To access this feature, you need following entitlements for ${product?.required_entitlements}`}
                                           </div>
                                         </div>

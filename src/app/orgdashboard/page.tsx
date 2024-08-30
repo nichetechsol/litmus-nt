@@ -1020,7 +1020,8 @@ const OrgDashboard = () => {
                               </div>
                             </li>
                           ))}
-                        {locationOfSites === null && (
+                        {(locationOfSites === null ||
+                          locationOfSites.length === 0) && (
                           <div className='col-md-12 w-100 mt-4'>
                             <p className='text-center'>No Location Found</p>{' '}
                           </div>

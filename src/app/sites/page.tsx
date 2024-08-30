@@ -52,6 +52,7 @@ interface State {
   country_id: number;
 }
 interface SiteType {
+  type_id: number;
   id: number;
   name: string;
 }
@@ -273,6 +274,7 @@ const Page: React.FC = () => {
             {
               id: -1,
               name: "We couldn't find any sites",
+              type_id: 1,
             },
           ]);
         } else {
@@ -808,36 +810,10 @@ const Page: React.FC = () => {
     // Function to show SweetAlert modal
 
     const showDeleteModal = () => {
-      // document.body.style.overflow = 'hidden';
-      // document.body.style.position = 'fixed';
       document.body.classList.add('no-scroll');
       swal({
         title: 'Are you sure?',
-        // text: `Please type DELETE/ ${SingleSite?.site.name} to confirm deletion`,
-        // content: {
-        //   element: 'input',
-        //   attributes: {
-        //     placeholder: 'Type here',
-        //     type: 'text',
-        //     id: 'delete-input',
-        //     // oninput: (e: Event) => {
-        //     //   const target = e.target as HTMLInputElement;
-        //     //   let value = target.value;
 
-        //     //   // // Allow only alphabetic characters
-        //     //   // value = value.replace(/[^a-zA-Z]/g, '');
-
-        //     //   // Limit the length to 6 characters
-        //     //   // if (value.length > 6) {
-        //     //   //   value = value.substring(0, 6);
-        //     //   // }
-
-        //     //   // Convert to uppercase
-        //     //   // value = value.toUpperCase();
-        //     //   // target.value = value; // Update the input field with the transformed value
-        //     // },
-        //   },
-        // },
         content: {
           element: 'div',
           attributes: {
@@ -953,8 +929,6 @@ const Page: React.FC = () => {
       if (error instanceof Yup.ValidationError) {
         setAddSiteNameError(error.message);
       }
-      // console.error('Error checking input value:', error);
-      // setError('Error checking input value. Please try again later.');
     }
   };
   const handelblurrr = () => {
@@ -1004,12 +978,21 @@ const Page: React.FC = () => {
     }
   };
 
-  const handleSiteClick = (site: { id: number; name: string }) => {
+  const handleSiteClick = (site: {
+    id: number;
+    name: string;
+    ownerNames: string[];
+    type_id: number;
+  }) => {
     setLoading(true);
     const encryptedSiteId = encryptData(site.id.toString());
     const encryptedSiteName = encryptData(site.name);
+    const encryptedsiteOwnerName = encryptData(site.ownerNames);
+    const encryptedsitetypeId = encryptData(site.type_id);
     localStorage.setItem('site_id', encryptedSiteId);
     localStorage.setItem('site_name', encryptedSiteName);
+    localStorage.setItem('site_owner_name', encryptedsiteOwnerName);
+    localStorage.setItem('site_type_id', encryptedsitetypeId);
     navigate.push('/sitedashboard');
     setLoading(false);
   };
@@ -1409,6 +1392,9 @@ const Page: React.FC = () => {
                                     const encryptedsitename = encryptData(
                                       site.name,
                                     );
+                                    const encryptedsitetypeid = encryptData(
+                                      site.type_id,
+                                    );
                                     localStorage.setItem(
                                       'site_id',
                                       encryptedsiteid,
@@ -1416,6 +1402,10 @@ const Page: React.FC = () => {
                                     localStorage.setItem(
                                       'site_name',
                                       encryptedsitename,
+                                    );
+                                    localStorage.setItem(
+                                      'site_type_id',
+                                      encryptedsitetypeid,
                                     );
                                     navigate.push('/sitedashboard');
                                     setLoading(false);
@@ -1478,6 +1468,9 @@ const Page: React.FC = () => {
                                     const encryptedsitename = encryptData(
                                       SingleSite.site.name,
                                     );
+                                    const encryptedsitetypeid = encryptData(
+                                      SingleSite.site.type_id,
+                                    );
                                     const encryptedsiteOwnerName = encryptData(
                                       SingleSite.ownerNames,
                                     );
@@ -1492,6 +1485,10 @@ const Page: React.FC = () => {
                                     localStorage.setItem(
                                       'site_owner_name',
                                       encryptedsiteOwnerName,
+                                    );
+                                    localStorage.setItem(
+                                      'site_type_id',
+                                      encryptedsitetypeid,
                                     );
                                     navigate.push('/sitedashboard');
                                   }}
@@ -1623,7 +1620,7 @@ const Page: React.FC = () => {
                                           <span className='ms-1 pnew-white-space text-muted fw-normal d-inline-block'>
                                             {/* {SingleSite?.ownerNames?.join(', ')} */}
                                             {SingleSite?.ownerNames?.length
-                                              ? SingleSite.ownerNames.join(', ')
+                                              ? SingleSite.ownerNames.join(',')
                                               : '--'}
                                           </span>
                                         </li>
@@ -1642,42 +1639,6 @@ const Page: React.FC = () => {
                                           </span>
                                         </li>
                                       </ul>
-                                      {/* {SingleSite?.user_role_id === 1 ||
-                                      SingleSite?.user_role_id === 2 ? (
-                                        <div className='flex justify-center mt-3'>
-                                          <div
-                                            style={{ cursor: 'pointer' }}
-                                            aria-label='anchor'
-                                            data-bs-target='#formmodal'
-                                            data-bs-toggle='modal'
-                                            data-bs-whatever='@fat'
-                                            data-hs-overlay='#todo-compose'
-                                            onClick={(e) => {
-                                              e.stopPropagation(); // Prevent card click
-                                              // setModalOpen(true);
-                                              handeledit(SingleSite);
-                                            }}
-                                            className='ti-btn ti-btn-primary-full ti-btn-wave !gap-0  bg-success/10 text-success hover:bg-success hover:text-white hover:border-success'
-                                          >
-                                            <i className='ri-edit-line me-1'></i>{' '}
-                                            Edit
-                                          </div>
-                                          <div
-                                            style={{ cursor: 'pointer' }}
-                                            aria-label='anchor'
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              handelDelete(SingleSite);
-                                            }}
-                                            className='ti-btn ti-btn-danger-full ti-btn-wave !gap-0 !ms-2 bg-danger/10 text-white hover:bg-white hover:text-danger hover:border-danger'
-                                          >
-                                            <i className='ri-delete-bin-line me-1'></i>{' '}
-                                            Delete
-                                          </div>
-                                        </div>
-                                      ) : (
-                                        ''
-                                      )} */}
                                     </div>
                                   </div>
                                 </div>
