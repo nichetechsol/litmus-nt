@@ -5,6 +5,7 @@ import axios from 'axios';
 import { redirect } from 'next/navigation';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
+import swal from 'sweetalert';
 
 import 'react-toastify/dist/ReactToastify.css';
 
