@@ -13,6 +13,7 @@ import { decryptData } from '@/helper/Encryption_Decryption';
 import {
   checkLimit,
   getSKUList,
+  increaseValue,
   insertLicence,
   reqLicenseLimitMail,
 } from '@/supabase/licence';
@@ -71,6 +72,9 @@ const Page = () => {
     settype_id(sitetypeid);
   }, []);
   const [selectedSku, setSelectedSku] = useState<string>('');
+  const [selectedSKUdetails, setSelectedSKUdetails] = useState<License | null>(
+    null,
+  );
   const [selectedSkuClass, setSelectedSkuClass] = useState<0 | 1 | 2 | null>(
     null,
   );
@@ -112,6 +116,7 @@ const Page = () => {
     setLoading(true);
     if (licenseData.license_exceed_allowed_entitlement === null) {
       setSelectedSku(licenseData.license_sku_name);
+      setSelectedSKUdetails(licenseData);
       setSelectedSkuClass(classx);
       setLoading(false);
     } else {
@@ -162,6 +167,7 @@ const Page = () => {
                   const result = await reqLicenseLimitMail(data);
                   if (result.errorCode === 0) {
                     setSelectedSku(licenseData.license_sku_name);
+                    setSelectedSKUdetails(licenseData);
                     setSelectedSkuClass(classx);
                     setLoading(false);
 
@@ -201,6 +207,7 @@ const Page = () => {
   };
   const handleCancel = () => {
     setSelectedSku('');
+    setSelectedSKUdetails(null);
     setSelectedSkuClass(null);
   };
   const handleAddLicense = async () => {
@@ -241,7 +248,21 @@ const Page = () => {
             const resultforinsertlicense = await insertLicence(data);
             if (resultforinsertlicense) {
               if (resultforinsertlicense.errorCode === 0) {
-                // const resultforinsertlicense= await increaseValue(data);
+                if (selectedSKUdetails) {
+                  const dataForIncreaseBy = {
+                    licenseLimitEntitlement:
+                      selectedSKUdetails.license_limit_entitlement,
+                    orgId: org_id,
+                    increaseByValue: selectedSKUdetails.increase_by,
+                  };
+                  const resultforinsertlicense =
+                    await increaseValue(dataForIncreaseBy);
+                  if (resultforinsertlicense?.errorCode == 0) {
+                    toast.success('License Value inserted successfully', {
+                      autoClose: 3000,
+                    });
+                  }
+                }
               }
             }
           } catch {

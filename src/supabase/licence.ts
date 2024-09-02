@@ -953,7 +953,7 @@ async function insertLicence(data: {
 }
 async function increaseValue(data: {
   licenseLimitEntitlement: number;
-  orgId: number;
+  orgId: any;
   increaseByValue: number;
 }) {
   try {

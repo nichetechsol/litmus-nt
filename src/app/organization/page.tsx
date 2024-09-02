@@ -1,4 +1,3 @@
-/* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 'use client';
@@ -642,6 +641,8 @@ const Page = () => {
       });
       if (willProceed) {
         return domain;
+      } else {
+        return null;
       }
     } else if (result.associated === false) {
       return domain;
@@ -661,7 +662,6 @@ const Page = () => {
       const newDomains = [];
       let errorMessage = '';
       let errorMessage1 = '';
-      let errorMessage2 = '';
       const seenDomains = new Set();
       const bussinessTrue = new Set();
       // const bussinessTrueEmail = new Set();
@@ -711,18 +711,23 @@ const Page = () => {
                       domainOnly,
                       domain,
                     );
-                    newDomains.push(domainasso);
+                    if (domainasso != null) {
+                      newDomains.push(domainasso);
+                    }
                   } else {
                     const domainasso = await DomainAssociation(
                       domainOnly,
                       domainOnly,
                     );
-                    newDomains.push(domainasso);
+                    if (domainasso != null) {
+                      newDomains.push(domainasso);
+                    }
                   }
-                  errorMessage2 += `Domain is enough for ${domainCheckedNotEmail}.`;
                 } else {
                   const domainasso = await DomainAssociation(domain, domain);
-                  newDomains.push(domainasso);
+                  if (domainasso != null) {
+                    newDomains.push(domainasso);
+                  }
                 }
               } else {
                 if (domain.includes('@')) {
@@ -731,7 +736,9 @@ const Page = () => {
                     domainOnly,
                     domain,
                   );
-                  newDomains.push(domainasso);
+                  if (domainasso != null) {
+                    newDomains.push(domainasso);
+                  }
                 } else {
                   bussinessTrue.add(domain);
                   errorMessage1 += `Required to add full Email for ${domain}.`;
