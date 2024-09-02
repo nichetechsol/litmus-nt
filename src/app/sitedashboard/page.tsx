@@ -1,10 +1,15 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import moment from 'moment';
 import Link from 'next/link';
 import { redirect, useRouter } from 'next/navigation';
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import Pagination from 'react-js-pagination';
 import { toast, ToastContainer } from 'react-toastify';
 import swal from 'sweetalert';
@@ -194,10 +199,10 @@ const Page = () => {
   const [org_id, setorg_id] = useState<any>('');
   const [org_type_id, setOrg_type_id] = useState<any>('');
   const [site_id, setsite_id] = useState<any>('');
-  const [site_name, setSite_name] = useState<any>('');
-  const [site_owner_name, SetSite_owner_name] = useState<any>('');
-  const [orgName, setorgName] = useState<any>('');
-  const [userEmail, setUseremail] = useState<any>('');
+  const [site_name, setSite_name] = useState<string>('');
+  const [site_owner_name, SetSite_owner_name] = useState<string>('');
+  const [orgName, setorgName] = useState<string>('');
+  const [userEmail, setUseremail] = useState<string>('');
   useEffect(() => {
     const userid = decryptData(localStorage.getItem('user_id'));
     const orgid = decryptData(localStorage.getItem('org_id'));
@@ -246,13 +251,13 @@ const Page = () => {
           }
           // setLoading(false);
         }
-      } catch (error: any) {
+      } catch (error) {
         // setLoading(false);
       }
     };
     fetchData();
   }, [site_id, activePage2, perPage2]);
-  const countData = async () => {
+  const countData = useCallback(async () => {
     try {
       if (site_id && org_id) {
         const data: any = await sitesCounts(site_id, org_id);
@@ -262,13 +267,13 @@ const Page = () => {
           //
         }
       }
-    } catch (error: any) {
+    } catch (error) {
       //
     }
-  };
+  }, [org_id, site_id]);
   useEffect(() => {
     countData();
-  }, [org_id, site_id, orgUserData]);
+  }, [org_id, site_id, orgUserData, countData]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -276,13 +281,13 @@ const Page = () => {
           const data: any = await licenceData(site_id);
           setLicence(data.data);
         }
-      } catch (error: any) {
+      } catch (error) {
         //
       }
     };
     fetchData();
   }, [site_id]);
-  const fetchData8 = async () => {
+  const fetchData8 = useCallback(async () => {
     try {
       if (site_id) {
         const data: any = await getActivitiesBySiteID({
@@ -294,15 +299,15 @@ const Page = () => {
 
         setActivity_log(data.activities);
       }
-    } catch (error: any) {
+    } catch (error) {
       //
     }
-  };
+  }, [site_id]);
   useEffect(() => {
     fetchData8();
-  }, [site_id, orgUserData]);
+  }, [site_id, orgUserData, fetchData8]);
 
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     try {
       const start: any = (activePage - 1) * perPage;
       const end: any = start + perPage - 1;
@@ -311,13 +316,13 @@ const Page = () => {
         setOrgUserData(data.data);
         setTotalItemsCount(data.totalCount);
       }
-    } catch (error: any) {
+    } catch (error) {
       //
     }
-  };
+  }, [activePage, perPage, search, site_id]);
   const [userrole3, setuserrole3] = useState<any>('');
-  const [showReqLicBtn, setshowReqLicBtn] = useState<any>(false);
-  const roleChange = async () => {
+  const [showReqLicBtn, setshowReqLicBtn] = useState<boolean>(false);
+  const roleChange = useCallback(async () => {
     try {
       const data: any = await getSiteUserRole(user_id, site_id);
       if (data) {
@@ -332,17 +337,17 @@ const Page = () => {
       } else {
         setshowReqLicBtn(false);
       }
-    } catch (error: any) {
+    } catch (error) {
       //
     }
-  };
+  }, [org_id, site_id, user_id]);
   useEffect(() => {
     roleChange();
-  }, [org_id, user_id]);
+  }, [org_id, roleChange, user_id]);
 
   useEffect(() => {
     fetchUserData();
-  }, [site_id, activePage, search]);
+  }, [site_id, activePage, search, fetchUserData]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -404,7 +409,7 @@ const Page = () => {
         if (result1 && result1.data) {
           setRoles(result1.data);
         }
-      } catch (error: any) {
+      } catch (error) {
         //
       }
     };
@@ -423,7 +428,7 @@ const Page = () => {
       if (result1) {
         setDataTOAutoFill(result1.data);
       }
-    } catch (error: any) {
+    } catch (error) {
       // toast.error(error.message, { autoClose: 3000 });
     }
     emailSchema
@@ -469,7 +474,7 @@ const Page = () => {
       if (result1) {
         setDataTOAutoFill2(result1.data);
       }
-    } catch (error: any) {
+    } catch (error) {
       // toast.error(error.message, { autoClose: 3000 });
     }
     nameSchema2

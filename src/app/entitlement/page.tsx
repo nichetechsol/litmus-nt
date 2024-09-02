@@ -1,14 +1,8 @@
-/* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-interface PlanOptions {
-  availablePlans: string[];
-  litmusUNS: boolean;
-  apiProtalAcess: boolean;
-}
 import { redirect, useRouter } from 'next/navigation';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import swal from 'sweetalert';
 
@@ -23,14 +17,14 @@ import Loader from '@/utils/Loader/Loader';
 // For entailemts show
 
 const Page = () => {
-  const [org_id, setorg_id] = useState<any>('');
+  const [org_id, setorg_id] = useState<number>();
   const [PlaansAvilable, setPlaansAvilable] = useState<string[]>([]);
   const [litmusUnsPlan, setlitmusUnsPlan] = useState<boolean>(true);
   const [ApiPortalAcessPlan, seApiPortalAcessPlane] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const [tokenVerify, setTokenVerify] = useState(false);
-  const [orgName, setorgName] = useState<any>('');
-  const [onlyToken, setOnlyToken] = useState('');
+  const [orgName, setorgName] = useState<string>('');
+  const [onlyToken, setOnlyToken] = useState<string>('');
 
   const [email, setEmail] = useState<string>('');
 
@@ -92,7 +86,7 @@ const Page = () => {
       }, 0);
     }
   }, []);
-  const Showentitlement = async () => {
+  const Showentitlement = useCallback(async () => {
     try {
       setLoading(true);
       if (org_id) {
@@ -108,15 +102,15 @@ const Page = () => {
           // }
         }
       }
-    } catch (error: any) {
+    } catch (error) {
       setLoading(false);
       toast.error('Error Fetching Type..', { autoClose: 3000 });
     }
-  };
+  }, [org_id]);
 
   useEffect(() => {
     Showentitlement();
-  }, [org_id]);
+  }, [Showentitlement, org_id]);
 
   const RequestPlans = async (plan: string) => {
     try {

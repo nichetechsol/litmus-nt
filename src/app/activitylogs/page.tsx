@@ -1,11 +1,11 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-'use client';
 /* eslint-disable @typescript-eslint/no-explicit-any */
+'use client';
 import moment from 'moment';
 import { redirect } from 'next/navigation';
 import React, {
   lazy,
   Suspense,
+  useCallback,
   useEffect,
   useLayoutEffect,
   useState,
@@ -50,9 +50,9 @@ export default function Activitylogs() {
 
   const [org_id, setorg_id] = useState<any>('');
   const [Site_id, setSite_id] = useState<any>('');
-  const [site_name, setSite_name] = useState<any>('');
+  const [site_name, setSite_name] = useState<string>('');
   const [name, setName] = useState<string>('');
-  const [orgName, setorgName] = useState<any>('');
+  const [orgName, setorgName] = useState<string>('');
   const [hasMore, setHasMore] = useState(true); // Flag to indicate more data available
   const [start, setStart] = useState(0);
 
@@ -70,7 +70,7 @@ export default function Activitylogs() {
     setorgName(decryptedOrgName);
     setSite_name(sitename);
   }, [CamePage]);
-  const activitylogs = async () => {
+  const activitylogs = useCallback(async () => {
     try {
       setLoading(true);
       let data: any;
@@ -124,11 +124,11 @@ export default function Activitylogs() {
       setLoading(false);
       // Handle error
     }
-  };
+  }, [CamePage, Site_id, orgName, org_id, site_name, start]);
 
   useEffect(() => {
     activitylogs();
-  }, [org_id, Site_id, CamePage]); // Initial load
+  }, [org_id, Site_id, CamePage, activitylogs]); // Initial load
 
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
@@ -162,7 +162,14 @@ export default function Activitylogs() {
     window.addEventListener('scroll', handleScroll);
 
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [Siteactivity_log, hasMore, CamePage, activity_log]); // Add `CamePage` to dependencies if needed
+  }, [
+    Siteactivity_log,
+    hasMore,
+    CamePage,
+    activity_log,
+    totalCount,
+    activitylogs,
+  ]); // Add `CamePage` to dependencies if needed
 
   const orgActivitylog = () => {
     return (

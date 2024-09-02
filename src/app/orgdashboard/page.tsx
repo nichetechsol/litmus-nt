@@ -1,11 +1,15 @@
-/* eslint-disable @next/next/no-img-element */
-/* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import moment from 'moment';
 import { redirect, useRouter } from 'next/navigation';
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import Pagination from 'react-js-pagination';
 import { toast, ToastContainer } from 'react-toastify';
 import swal from 'sweetalert';
@@ -39,7 +43,6 @@ import {
 } from '@/supabase/org_user';
 import { refreshToken } from '@/supabase/session';
 import Loader from '@/utils/Loader/Loader';
-
 interface OrgUser {
   id: any;
   firstname: any;
@@ -101,29 +104,24 @@ const OrgDashboard = () => {
       }
     }
   }, []);
-  const [user_id, setuser_id] = useState<any>('');
+  const [user_id, setuser_id] = useState<string>('');
   const [org_id, setorg_id] = useState<any>('');
-  const [orgName, setorgName] = useState<any>('');
-  const [userEmail, setUseremail] = useState<any>('');
-
+  const [orgName, setorgName] = useState<string>('');
+  const [userEmail, setUseremail] = useState<string>('');
   useEffect(() => {
     const decryptedUserId = decryptData(localStorage.getItem('user_id'));
     const decryptedOrgId = decryptData(localStorage.getItem('org_id'));
     const decryptedOrgName = decryptData(localStorage.getItem('org_name'));
     const decrypteduserEmail = decryptData(localStorage.getItem('user_email'));
-
     setuser_id(decryptedUserId);
     setorg_id(decryptedOrgId);
     setorgName(decryptedOrgName);
     setUseremail(decrypteduserEmail);
     if (!decryptedOrgId) {
-      // swal('Please select organization', { icon: 'error' });
-      // redirect('/organization');
       document.body.classList.add('no-scroll');
       swal('Please select organization', { icon: 'error' }).then(() => {
         document.body.classList.remove('no-scroll');
         navigate.push('/organization');
-        // redirect('/organization');
       });
       setTimeout(() => {
         // Ensure loader is behind the SweetAlert
@@ -131,13 +129,11 @@ const OrgDashboard = () => {
         if (swalContainer) {
           swalContainer.style.zIndex = '10000000';
         }
-
         // Ensure modal is on top of overlay
         const swalModal: any = document.querySelector('.swal-modal');
         if (swalModal) {
           swalModal.style.zIndex = '10000001';
         }
-
         // Ensure loader is behind
         const loaderOverlay: any = document.querySelector('.loader-overlay');
         if (loaderOverlay) {
@@ -146,14 +142,11 @@ const OrgDashboard = () => {
       }, 0);
     }
   }, []);
-
   const [activePage, setActivePage] = useState(1);
   const [search, setsearch] = useState('');
   const [perPage] = useState(10); // Number of items per page
   const [totalItemsCount, setTotalItemsCount] = useState<number>(0);
-
   const closeModalButtonRef = useRef<HTMLButtonElement>(null);
-
   const [orgData, setOrgData] = useState<{
     entitlementCount: number;
     errorCode: number;
@@ -162,11 +155,9 @@ const OrgDashboard = () => {
     entitlementExceed: string;
   } | null>(null);
   const [orgUserData, setOrgUserData] = useState<OrgUser[] | null>(null);
-
   const [entitlementListData, setEntitlementListData] = useState<
     Entitlement[] | null
   >(null);
-
   const [activePage2, setActivePage2] = useState(1);
   const [perPage2] = useState(10);
   const [totalItemsCount2, setTotalItemsCount2] = useState(0);
@@ -176,9 +167,8 @@ const OrgDashboard = () => {
   const [activity_log, setActivity_log] = useState<activitylogs[] | null>(null);
   const [ShowRequestEntBtn, setShowRequestEntBtn] = useState<boolean>(false);
   const [userrole2, setuserrole2] = useState();
-
   //Added by Srishti -  Count display on top
-  const CountData = async () => {
+  const CountData = useCallback(async () => {
     try {
       // setLoading(true);
       if (org_id) {
@@ -193,13 +183,12 @@ const OrgDashboard = () => {
     } catch (error: any) {
       toast.error(error.message, { autoClose: 3000 });
     }
-  };
+  }, [org_id]);
   useEffect(() => {
     CountData();
-  }, [org_id, orgUserData]);
-
+  }, [org_id, orgUserData, CountData]);
   //Added by Srishti -  Activity Logs
-  const fetchData7 = async () => {
+  const fetchData7 = useCallback(async () => {
     try {
       // setLoading(true);
       if (org_id) {
@@ -216,24 +205,21 @@ const OrgDashboard = () => {
           //
         }
       }
-    } catch (error: any) {
+    } catch (error) {
       //
     }
-  };
+  }, [org_id]);
   useEffect(() => {
     fetchData7();
-  }, [org_id, orgUserData]);
-
+  }, [org_id, orgUserData, fetchData7]);
   //Added by Srishti & Pagination by Prerna -  User management
-  const fetchData2 = async () => {
+  const fetchData2 = useCallback(async () => {
     try {
       setLoading(true);
-
       const start: any = (activePage - 1) * perPage; // Calculate start index
       const end: any = start + perPage - 1; // Calculate end index
       if (org_id) {
         const data: any = await orgUserList(org_id, start, end, search);
-
         if (data.data) {
           setOrgUserData(data.data.userList);
           setTotalItemsCount(data.data?.totalCount); // Set total items count for pagination
@@ -247,11 +233,10 @@ const OrgDashboard = () => {
       toast.error(error.message, { autoClose: 3000 });
       setLoading(false);
     }
-  };
+  }, [activePage, org_id, perPage, search]);
   useEffect(() => {
     fetchData2();
-  }, [search, org_id, activePage]);
-
+  }, [search, org_id, activePage, fetchData2]);
   //Added by Srishti & Pagination by Prerna - List of Entitlement
   useEffect(() => {
     const fetchData = async () => {
@@ -261,7 +246,6 @@ const OrgDashboard = () => {
         const end: any = start + perPage2 - 1; // Calculate end index
         if (org_id) {
           const data: any = await orgEntitlementList(org_id, start, end);
-
           if (data.data) {
             setEntitlementListData(data?.data?.entitlements);
             setTotalItemsCount2(data.data?.totalCount);
@@ -274,33 +258,29 @@ const OrgDashboard = () => {
         toast.error(error.message, { autoClose: 3000 });
       }
     };
-
     fetchData();
   }, [org_id, activePage2, perPage2]);
-  const RequestentitkementBtn = async () => {
+  const RequestentitkementBtn = useCallback(async () => {
     try {
       const data = await checkLicensePlanEntitlement(org_id, userrole2);
       if (data.errorCode === 0) {
         setShowRequestEntBtn(data.reqEntitlementButton);
       }
-    } catch (error: any) {
+    } catch (error) {
       toast.error('Error Fetching Type..', { autoClose: 3000 });
     }
-  };
+  }, [org_id, userrole2]);
   useEffect(() => {
     RequestentitkementBtn();
-  }, [userrole2]);
-
+  }, [RequestentitkementBtn, userrole2]);
   //Added by Srishti - Location of Sites
   useEffect(() => {
     const fetchData = async () => {
       try {
         // setLoading(true);
-
         if (org_id) {
           const sets = { org_id: org_id };
           const data: any = await getLocationOfSites(sets);
-
           if (data.errorCode === 0) {
             setLocationOfSites(data.data);
             // setLoading(false);
@@ -312,11 +292,9 @@ const OrgDashboard = () => {
         //
       }
     };
-
     fetchData();
   }, [org_id]);
   const navigate = useRouter();
-
   const [changeFlage, setChangeFlage] = useState<boolean>(false);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -330,7 +308,6 @@ const OrgDashboard = () => {
   // const [loading, setLoading] = useState<boolean>(false);
   const [roles, setRoles] = useState<roles[] | null>(null);
   const [addbuttonclass, setaddbuttonclass] = useState<boolean>(false);
-
   // Added by kunal - for grey out btn
   useEffect(() => {
     const validate = async () => {
@@ -341,18 +318,14 @@ const OrgDashboard = () => {
         setaddbuttonclass(false);
       }
     };
-
     validate();
   }, [email, role]);
-
   // Added by Srishti - Getting role of the user currently Logged In
   useEffect(() => {
     const fetchRoles = async () => {
       try {
         // setLoading(true);
-
         const result1: any = await getUserRole(); // Replace with your actual API call
-
         if (result1.data) {
           setRoles(result1.data);
           // setLoading(false);
@@ -363,21 +336,17 @@ const OrgDashboard = () => {
         toast.error(error.message, { autoClose: 3000 });
       }
     };
-
     fetchRoles();
   }, []);
-
-  const [isOpen, setIsOpen] = useState(false);
+  // const [isOpen, setIsOpen] = useState(false);
   const openModal = () => {
-    setIsOpen(true);
+    // setIsOpen(true);
     document.body.classList.add('no-scroll1');
   };
-
   const closeModal = () => {
-    setIsOpen(false);
+    // setIsOpen(false);
     document.body.classList.remove('no-scroll1');
   };
-
   //Added by Srishti & auto-fill done by Kunal - Add user form management and auto-populate feilds
   const [DataTOAutoFill, setDataTOAutoFill] = useState<string[]>([]);
   const [isFocusedOnEmail, setIsFocusedOnEmail] = useState(false);
@@ -391,10 +360,9 @@ const OrgDashboard = () => {
       const result1: any = await searchUsers(newEmail);
       if (result1) {
         setDataTOAutoFill(result1.data);
-
         // setLoading(false);
       }
-    } catch (error: any) {
+    } catch (error) {
       // toast.error(error.message, { autoClose: 3000 });
     }
     emailSchema
@@ -402,7 +370,6 @@ const OrgDashboard = () => {
       .then(() => setEmailError(''))
       .catch((err: Yup.ValidationError) => setEmailError(err.message));
   };
-
   const [DataTOAutoFill1, setDataTOAutoFill1] = useState<string[]>([]);
   const [isFocusedOnFName, setIsFocusedOnFName] = useState(false);
   const handleFirstNameChange = async (
@@ -417,10 +384,9 @@ const OrgDashboard = () => {
       const result1: any = await searchUsers(newFirstName);
       if (result1) {
         setDataTOAutoFill1(result1.data);
-
         // setLoading(false);
       }
-    } catch (error: any) {
+    } catch (error) {
       // toast.error(error.message, { autoClose: 3000 });
     }
     nameSchema
@@ -428,7 +394,6 @@ const OrgDashboard = () => {
       .then(() => setFirstNameError(''))
       .catch((err: Yup.ValidationError) => setFirstNameError(err.message));
   };
-
   const [DataTOAutoFill2, setDataTOAutoFill2] = useState<string[]>([]);
   const [isFocusedOnLName, setIsFocusedOnLName] = useState(false);
   const handleLastNameChange = async (
@@ -443,10 +408,9 @@ const OrgDashboard = () => {
       const result1: any = await searchUsers(newLastName);
       if (result1) {
         setDataTOAutoFill2(result1.data);
-
         // setLoading(false);
       }
-    } catch (error: any) {
+    } catch (error) {
       // toast.error(error.message, { autoClose: 3000 });
     }
     nameSchema2
@@ -454,17 +418,14 @@ const OrgDashboard = () => {
       .then(() => setLastNameError(''))
       .catch((err: Yup.ValidationError) => setLastNameError(err.message));
   };
-
   const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newRole = e.target.value;
     setRole(newRole);
-
     roleSchema
       .validate(newRole)
       .then(() => setRoleError(''))
       .catch((err: Yup.ValidationError) => setRoleError(err.message));
   };
-
   //Added by Srishti & Kunal - set State for edit and add in add user form and clearning it
   const handleEdit = (user: any) => {
     openModal();
@@ -493,7 +454,6 @@ const OrgDashboard = () => {
     setDataTOAutoFill1([]);
     setDataTOAutoFill2([]);
   };
-
   //Added by Srishti - Remove user from organization
   const handleDelete = (user: any) => {
     document.body.classList.add('no-scroll');
@@ -515,7 +475,6 @@ const OrgDashboard = () => {
             userrole2,
             user.role_id,
           );
-
           if (response.errorCode === 0) {
             if (user.id === user_id) {
               navigate.push('/organization');
@@ -523,7 +482,6 @@ const OrgDashboard = () => {
               document.body.classList.add('no-scroll');
               swal(response.data, { icon: 'success' }).then(() => {
                 document.body.classList.remove('no-scroll');
-
                 fetchData2();
               });
             }
@@ -546,7 +504,6 @@ const OrgDashboard = () => {
       }
     });
   };
-
   //Added by Srishti - Apply Validation over add user/edit user form and SUpabase fn call of the same
   const validateForm = async () => {
     try {
@@ -569,7 +526,6 @@ const OrgDashboard = () => {
           err.inner.find((error) => error.path === 'lastName')?.message || '';
         const roleErrorMsg =
           err.inner.find((error) => error.path === 'role')?.message || '';
-
         setEmailError(emailErrorMsg);
         setFirstNameError(firstNameErrorMsg);
         setLastNameError(lastNameErrorMsg);
@@ -578,7 +534,6 @@ const OrgDashboard = () => {
       return false;
     }
   };
-
   const handleSubmit = async () => {
     setLoading(true);
     const isValid = await validateForm();
@@ -617,18 +572,14 @@ const OrgDashboard = () => {
             }).then(async (willSendInvite) => {
               if (willSendInvite) {
                 setLoading(true);
-
                 const data = {
                   targetUserEmail: email.toLowerCase(),
                   token: onlyToken,
                   userName: userEmail,
                   orgName: orgName,
                 };
-
                 await refreshToken();
-
                 const result = await inviteSendToUser(data);
-
                 if (result.errorCode === 0) {
                   setLoading(false);
                   toast.success(result.message, { autoClose: 3000 });
@@ -640,7 +591,6 @@ const OrgDashboard = () => {
                 }
               }
             });
-
             const button = document.getElementById('close-modal-btn');
             if (button) {
               button.click();
@@ -664,7 +614,6 @@ const OrgDashboard = () => {
           result = await modifyUserOfOrganization(userData);
           if (result.errorCode == 0) {
             toast.success(result.message, { autoClose: 3000 });
-
             const button = document.getElementById('close-modal-btn');
             if (button) {
               button.click(); // Directly trigger click event on button
@@ -677,7 +626,6 @@ const OrgDashboard = () => {
             }
           }
         }
-
         if (closeModalButtonRef.current) {
           closeModalButtonRef.current.click();
         }
@@ -717,7 +665,6 @@ const OrgDashboard = () => {
         }
       }
     };
-
     if (isFocusedOnEmail) {
       scrollToHighlightedItem(emailListRef);
     } else if (isFocusedOnFName) {
@@ -781,11 +728,10 @@ const OrgDashboard = () => {
       }
     }
   };
-  const roleChange = async () => {
+  const roleChange = useCallback(async () => {
     try {
       if (user_id && org_id) {
         const data: any = await getOrgUserRole(user_id, org_id);
-
         if (data.data) {
           setuserrole2(data.data.id);
         } else {
@@ -795,10 +741,10 @@ const OrgDashboard = () => {
     } catch (error: any) {
       toast.error(error.message, { autoClose: 3000 });
     }
-  };
+  }, [org_id, user_id]);
   useEffect(() => {
     roleChange();
-  }, [user_id, org_id]);
+  }, [user_id, org_id, roleChange]);
   const handelautofill = (e: any) => {
     if (e) {
       setEmail(e.email ? e.email : '');
@@ -812,7 +758,6 @@ const OrgDashboard = () => {
       setDataTOAutoFill2([]);
     }
   };
-
   return (
     <>
       {loading && <Loader />}
@@ -915,7 +860,6 @@ const OrgDashboard = () => {
                     </div>
                   </div>
                 </div>
-
                 <div className='xxl:col-span-6 xl:col-span-6 sm:col-span-12 col-span-12'>
                   <div className='box'>
                     <div className='box-header flex justify-between'>
@@ -1030,7 +974,6 @@ const OrgDashboard = () => {
                     </div>
                   </div>
                 </div>
-
                 <div className='xxl:col-span-12 xl:col-span-12 col-span-12'>
                   <div className='box custom-card '>
                     <div className='box-header b-activity flex-middle justify-between'>
@@ -1048,7 +991,6 @@ const OrgDashboard = () => {
                           />
                         </div>
                         <div className=' grid '>
-                          {' '}
                           {userrole2 === 1 || userrole2 === 2 ? (
                             <button
                               className='btn btn-primary btn-wave mb-3  top-margin-1'
@@ -1141,8 +1083,7 @@ const OrgDashboard = () => {
                                                     onMouseDown={() =>
                                                       handelautofill(e)
                                                     }
-                                                    className={` list-group-item
-                                                    ${
+                                                    className={` list-group-item ${
                                                       index === highlightedIndex
                                                         ? 'highlighted'
                                                         : ''
@@ -1161,7 +1102,6 @@ const OrgDashboard = () => {
                                         </div>
                                       )}{' '}
                                     </div>
-
                                     <div className='xl:col-span-12 col-span-12'>
                                       <label
                                         htmlFor='task-name'
@@ -1171,10 +1111,9 @@ const OrgDashboard = () => {
                                       </label>
                                       <input
                                         type='text'
-                                        className={`form-control w-full 
-                                          ${
-                                            firstNameError ? 'input-error' : ''
-                                          } `}
+                                        className={`form-control w-full  ${
+                                          firstNameError ? 'input-error' : ''
+                                        } `}
                                         id='task-name'
                                         disabled={!changeFlage}
                                         placeholder='Enter First Name'
@@ -1208,12 +1147,11 @@ const OrgDashboard = () => {
                                                   onMouseDown={() =>
                                                     handelautofill(e)
                                                   }
-                                                  className={` list-group-item
-                                                 ${
-                                                   index === highlightedIndex
-                                                     ? 'highlighted'
-                                                     : ''
-                                                 }`}
+                                                  className={` list-group-item ${
+                                                    index === highlightedIndex
+                                                      ? 'highlighted'
+                                                      : ''
+                                                  }`}
                                                 >
                                                   {e.firstname}({e.email})
                                                 </li>
@@ -1290,7 +1228,6 @@ const OrgDashboard = () => {
                                         </div>
                                       )}
                                     </div>
-
                                     <div className='xl:col-span-12 col-span-12'>
                                       <label
                                         htmlFor='task-name'
@@ -1362,7 +1299,6 @@ const OrgDashboard = () => {
                         </div>
                       </div>
                     </div>
-
                     <div className='box-body'>
                       <div className='overflow-x-auto'>
                         <table className='table min-w-full whitespace-nowrap table-hover border table-bordered'>
@@ -1374,7 +1310,6 @@ const OrgDashboard = () => {
                               >
                                 Name
                               </th>
-
                               <th
                                 scope='col'
                                 className='!text-start !text-[0.85rem]'
@@ -1385,7 +1320,6 @@ const OrgDashboard = () => {
                                 scope='col'
                                 className='!text-start !text-[0.85rem]'
                               >
-                                {' '}
                                 Role
                               </th>
                               {userrole2 === 1 || userrole2 === 2 ? (
@@ -1417,7 +1351,6 @@ const OrgDashboard = () => {
                                         }`}{' '}
                                       </div>
                                     </td>
-
                                     <td>{user.email}</td>
                                     <td>
                                       <span className='!me-2 inline-flex justify-center items-center'>
@@ -1441,7 +1374,6 @@ const OrgDashboard = () => {
                                           >
                                             <i className='ri-edit-line'></i>
                                           </div>
-
                                           <div
                                             style={{ cursor: 'pointer' }}
                                             aria-label='anchor'
@@ -1483,9 +1415,7 @@ const OrgDashboard = () => {
                             )}
                             {orgUserData && orgUserData.length == 0 && (
                               <tr className='bg-white border-0'>
-                                {' '}
                                 <td colSpan={5} className='border-0'>
-                                  {' '}
                                   <div className='col-md-12 w-100 mt-4'>
                                     <p className='text-center'>No User Found</p>{' '}
                                   </div>
@@ -1505,7 +1435,6 @@ const OrgDashboard = () => {
                         <div className='box-title'>
                           Activity Logs
                           <span className='text-gray-600'>
-                            {' '}
                             (Last 7 days Activities)
                           </span>
                         </div>
@@ -1591,8 +1520,8 @@ const OrgDashboard = () => {
                                                               ?.lastname
                                                           : activity?.user_id
                                                               ?.email
-                                                      } created a new org. named '${activity
-                                                        ?.org_id?.name}'`
+                                                      } created a new org. named '
+                                                  ${activity?.org_id?.name}'`
                                                     : activity?.activity_type ===
                                                       'add_user_site'
                                                     ? `${
@@ -1607,24 +1536,24 @@ const OrgDashboard = () => {
                                                               .lastname
                                                           : activity.user_id
                                                               .email
-                                                      } added a new user named '${
-                                                        activity?.target_user_id
-                                                          ?.firstname &&
-                                                        activity?.target_user_id
-                                                          ?.lastname
-                                                          ? activity
-                                                              ?.target_user_id
-                                                              ?.firstname +
-                                                            ' ' +
-                                                            activity
-                                                              ?.target_user_id
-                                                              ?.lastname
-                                                          : activity
-                                                              ?.target_user_id
-                                                              ?.email
-                                                      }' within the site '${
-                                                        activity.site_id.name
-                                                      }'`
+                                                      } added a new user named '
+                                                    ${
+                                                      activity?.target_user_id
+                                                        ?.firstname &&
+                                                      activity?.target_user_id
+                                                        ?.lastname
+                                                        ? activity
+                                                            ?.target_user_id
+                                                            ?.firstname +
+                                                          ' ' +
+                                                          activity
+                                                            ?.target_user_id
+                                                            ?.lastname
+                                                        : activity
+                                                            ?.target_user_id
+                                                            ?.email
+                                                    }' within the site 
+                                                    '${activity.site_id.name}'`
                                                     : activity?.activity_type ===
                                                       'remove_user_site'
                                                     ? `${
@@ -1639,24 +1568,24 @@ const OrgDashboard = () => {
                                                               .lastname
                                                           : activity.user_id
                                                               .email
-                                                      } removed a user named '${
-                                                        activity?.target_user_id
-                                                          ?.firstname &&
-                                                        activity?.target_user_id
-                                                          ?.lastname
-                                                          ? activity
-                                                              .target_user_id
-                                                              .firstname +
-                                                            ' ' +
-                                                            activity
-                                                              ?.target_user_id
-                                                              ?.lastname
-                                                          : activity
-                                                              ?.target_user_id
-                                                              ?.email
-                                                      }' within the site '${
-                                                        activity.site_id.name
-                                                      }'`
+                                                      } removed a user named '
+                                                    ${
+                                                      activity?.target_user_id
+                                                        ?.firstname &&
+                                                      activity?.target_user_id
+                                                        ?.lastname
+                                                        ? activity
+                                                            .target_user_id
+                                                            .firstname +
+                                                          ' ' +
+                                                          activity
+                                                            ?.target_user_id
+                                                            ?.lastname
+                                                        : activity
+                                                            ?.target_user_id
+                                                            ?.email
+                                                    }' within the site '
+                                                    ${activity.site_id.name}'`
                                                     : activity?.activity_type ===
                                                       'create_site'
                                                     ? `${
@@ -1671,10 +1600,11 @@ const OrgDashboard = () => {
                                                               ?.lastname
                                                           : activity?.user_id
                                                               ?.email
-                                                      } created a new site named ${activity
-                                                        ?.site_id
-                                                        ?.name} within the organization '${activity
-                                                        ?.org_id?.name}'`
+                                                      } 
+                                                    created a new site named ${activity
+                                                      ?.site_id
+                                                      ?.name} within the organization '${activity
+                                                      ?.org_id?.name}'`
                                                     : activity?.activity_type ===
                                                       'add_user_org'
                                                     ? `${
@@ -1689,23 +1619,24 @@ const OrgDashboard = () => {
                                                               ?.lastname
                                                           : activity?.user_id
                                                               ?.email
-                                                      } added a new user named '${
-                                                        activity?.target_user_id
-                                                          ?.firstname &&
-                                                        activity?.target_user_id
-                                                          ?.lastname
-                                                          ? activity
-                                                              ?.target_user_id
-                                                              ?.firstname +
-                                                            ' ' +
-                                                            activity
-                                                              ?.target_user_id
-                                                              ?.lastname
-                                                          : activity
-                                                              ?.target_user_id
-                                                              ?.email
-                                                      }' within the organization ${activity
-                                                        ?.org_id?.name}`
+                                                      } added a new user named '
+                                                    ${
+                                                      activity?.target_user_id
+                                                        ?.firstname &&
+                                                      activity?.target_user_id
+                                                        ?.lastname
+                                                        ? activity
+                                                            ?.target_user_id
+                                                            ?.firstname +
+                                                          ' ' +
+                                                          activity
+                                                            ?.target_user_id
+                                                            ?.lastname
+                                                        : activity
+                                                            ?.target_user_id
+                                                            ?.email
+                                                    }' within the organization 
+                                                    ${activity?.org_id?.name}`
                                                     : activity?.activity_type ===
                                                       'remove_user_org'
                                                     ? `${
@@ -1751,10 +1682,10 @@ const OrgDashboard = () => {
                                                               ?.lastname
                                                           : activity?.user_id
                                                               ?.email
-                                                      } downloaded a file named '${activity
-                                                        ?.details
-                                                        ?.filename}' within the site '${activity
-                                                        ?.org_id.name}'`
+                                                      } downloaded a file named '
+                                                    ${activity?.details
+                                                      ?.filename}' within the site '${activity
+                                                      ?.org_id.name}'`
                                                     : activity?.activity_type ===
                                                         'update_org' ||
                                                       activity?.activity_type ===
@@ -1778,9 +1709,8 @@ const OrgDashboard = () => {
                                                               ?.lastname
                                                           : activity.user_id
                                                               ?.email
-                                                      } added a new license within the organization ${
-                                                        activity.org_id.name
-                                                      }`
+                                                      } added a new license within the organization
+                                                     ${activity.org_id.name}`
                                                     : activity?.activity_type ===
                                                         'edit_site_name' ||
                                                       activity?.activity_type ===

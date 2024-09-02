@@ -1,10 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 'use client';
 import Link from 'next/link';
 import { redirect, useRouter } from 'next/navigation';
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import swal from 'sweetalert';
 import * as Yup from 'yup';
@@ -94,9 +100,9 @@ const Page: React.FC = () => {
   const navigate = useRouter();
   const [org_id, Setorg_id] = useState<any>('');
   const [user_id, setuser_id] = useState<any>('');
-  const [orgName, setorgName] = useState<any>('');
+  const [orgName, setorgName] = useState<string>('');
   const [onlyToken, setOnlyToken] = useState('');
-  const [userEmail, setUseremail] = useState<any>('');
+  const [userEmail, setUseremail] = useState<string>('');
   useEffect(() => {
     const decryptedUserid = decryptData(localStorage.getItem('user_id'));
     const decryptedOrgId = decryptData(localStorage.getItem('org_id'));
@@ -121,22 +127,19 @@ const Page: React.FC = () => {
       try {
         if (user_id && org_id) {
           const data: any = await getOrgUserRole(user_id, org_id);
-
           if (data) {
             setuserrole2(data.data.id);
           } else {
             //
           }
         }
-      } catch (error: any) {
+      } catch (error) {
         //
       }
     };
-
     fetchData2();
   }, [user_id, org_id]);
   const [changeFlage, setChangeFlage] = useState<boolean>(false);
-
   const [loading, setLoading] = useState<boolean>(false);
   const [SitesList, setOSitesList] = useState<SiteDetailsWithUsers[] | null>(
     null,
@@ -152,7 +155,6 @@ const Page: React.FC = () => {
   const [SelectedValueDropdown, setSelectedValueDropdown] = useState<
     number | string
   >('');
-
   const [Address1, setAddress1] = useState<string>('');
   const [Address1Error, setAddress1Error] = useState<string>('');
   const [Address2, setAddress2] = useState<string>('');
@@ -164,13 +166,11 @@ const Page: React.FC = () => {
   const [SelectedValueCounrty, SetSelectedValueCounrty] = useState<
     number | string
   >(''); // Default to 0 or any other valid number
-
   const [FetchdropDState, setFetchdropDState] = useState<State[] | null>(null);
   const [stateListError, setstateListError] = useState<string>('');
   const [SelectedValueState, setSelectedValueState] = useState<number | string>(
     '',
   );
-
   const [City, setCity] = useState<string>('');
   const [CityError, setCityError] = useState<string>('');
   const [Pincode, setPincode] = useState<string>('');
@@ -179,7 +179,18 @@ const Page: React.FC = () => {
   const [messageError, setMessageError] = useState('');
   const closeModalButtonRef = useRef<HTMLButtonElement>(null);
   const [addbuttonclass, setaddbuttonclass] = useState<boolean>(false);
-
+  /// //Added by Kunal - Validation Schema for validation
+  const validationSchema = Yup.object().shape({
+    AddSiteName: SiteNameSchema,
+    SelectedValueDropdown: SiteTypeDropdownSchema,
+    Address1: SiteAddressSchema,
+    Address2: SiteAddress2Schema,
+    SelectedValueCounrty: SiteCountryDropdownSchema,
+    SelectedValueState: SiteStateDropdownSchema,
+    City: SiteCitySchema,
+    Pincode: PincodeSchema,
+    message: MessageSchema,
+  });
   //Added by Kunal - For Greay out Button in Add/Edit Site Form
   useEffect(() => {
     const validate = async () => {
@@ -191,7 +202,6 @@ const Page: React.FC = () => {
               SelectedValueDropdown,
               Address1,
               Address2,
-
               SelectedValueCounrty,
               SelectedValueState,
               City,
@@ -208,7 +218,6 @@ const Page: React.FC = () => {
         setaddbuttonclass(false);
       }
     };
-
     validate();
   }, [
     AddSiteName,
@@ -221,40 +230,36 @@ const Page: React.FC = () => {
     Pincode,
     message,
     AddSiteNameError,
+    validationSchema,
   ]);
-
   const openModal = () => {
     document.body.classList.add('no-scroll1');
   };
-
   const closeModal = () => {
     document.body.classList.remove('no-scroll1');
   };
   /////Added by Kunal -  For Getting details of site
-  const FetchSiteDetails = async () => {
+  const FetchSiteDetails = useCallback(async () => {
     try {
       setLoading(true);
       if (org_id && user_id) {
         const data1 = await fetchSiteDetails(org_id, user_id);
-
         if (data1.errorCode === 0) {
           setOSitesList(data1.data ? data1.data : []);
-
           setLoading(false);
         } else {
           setLoading(false);
           //
         }
       }
-    } catch (error: any) {
+    } catch (error) {
       setLoading(false);
       //
     }
-  };
+  }, [org_id, user_id]);
   useEffect(() => {
     FetchSiteDetails();
-  }, [org_id]);
-
+  }, [FetchSiteDetails, org_id]);
   /// //Added by Kunal -Searching in site
   const fetchData1 = async () => {
     try {
@@ -263,7 +268,6 @@ const Page: React.FC = () => {
         org_id,
         user_id,
       );
-
       if (result1.errorCode === 0 && result1.data.length > 0) {
         setsidebarSite(result1.data);
       } else if (result1.errorCode === 1) {
@@ -281,7 +285,7 @@ const Page: React.FC = () => {
           setsidebarSite([]);
         }
       }
-    } catch (error: any) {
+    } catch (error) {
       //
     }
   };
@@ -293,13 +297,11 @@ const Page: React.FC = () => {
         fetchData1();
       }
     }, 300);
-
     // Cleanup function to clear the timeout if searchTerm changes before 300ms
     return () => {
       clearTimeout(handler);
     };
   }, [searchTerm]);
-
   /// //Added by Kunal - for clearing the form when closed
   const handelclosemodel = () => {
     closeModal();
@@ -308,19 +310,15 @@ const Page: React.FC = () => {
     setAddress1('');
     setAddress2('');
     SetSelectedValueCounrty('');
-
     setCountryListError('');
     setstateListError('');
     setCityError('');
     setMessageError('');
-
     setAddSiteNameError('');
     setTypeDropdownError('');
     setAddress1Error('');
     setAddress2Error('');
-
     setPincode('');
-
     setMessage('');
     settypeDropdown(null);
     setFetchdropDCounrty(null);
@@ -334,13 +332,12 @@ const Page: React.FC = () => {
     const SiteTypesFetch = async () => {
       try {
         const data = await fetchSiteType();
-
         if (data && data.data) {
           settypeDropdown(data.data);
         } else {
           //
         }
-      } catch (error: any) {
+      } catch (error) {
         //
       }
     };
@@ -353,25 +350,13 @@ const Page: React.FC = () => {
         } else {
           //
         }
-      } catch (error: any) {
+      } catch (error) {
         //
       }
     };
     AddSiteCounrtyDropDown();
     SiteTypesFetch();
   }
-  /// //Added by Kunal - Validation Schema for validation
-  const validationSchema = Yup.object().shape({
-    AddSiteName: SiteNameSchema,
-    SelectedValueDropdown: SiteTypeDropdownSchema,
-    Address1: SiteAddressSchema,
-    Address2: SiteAddress2Schema,
-    SelectedValueCounrty: SiteCountryDropdownSchema,
-    SelectedValueState: SiteStateDropdownSchema,
-    City: SiteCitySchema,
-    Pincode: PincodeSchema,
-    message: MessageSchema,
-  });
   /// //Added by Kunal - for setting the name
   const handelAddSiteName = (e: React.ChangeEvent<HTMLInputElement>) => {
     const NewSiteName = e.target.value.trimStart();
@@ -396,7 +381,6 @@ const Page: React.FC = () => {
         setMessageError(err.message);
       });
   };
-
   /// //Added by Kunal --for dropdown change
   const handelchangeTypeDropDown = (
     e: React.ChangeEvent<HTMLSelectElement>,
@@ -409,7 +393,6 @@ const Page: React.FC = () => {
       })
       .catch((err: Yup.ValidationError) => {
         setTypeDropdownError(err.message);
-        //
       });
   };
   /// //Added by Kunal - for setting the address 1
@@ -441,13 +424,12 @@ const Page: React.FC = () => {
     const AddstateDropdown = async () => {
       try {
         const data = await stateList(SelectedValueCounrty);
-
         if (data && data) {
           setFetchdropDState(data.data);
         } else {
           //
         }
-      } catch (error: any) {
+      } catch (error) {
         //
       }
     };
@@ -465,9 +447,7 @@ const Page: React.FC = () => {
         setstateListError(err.message);
       });
   };
-
   //   /// //Added by Kunal -for country dropdown and change
-
   const handelchangeCountry = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const Newcountryselected = parseInt(e.target.value);
     SetSelectedValueCounrty(Newcountryselected);
@@ -480,7 +460,6 @@ const Page: React.FC = () => {
         setCountryListError(err.message);
       });
   };
-
   //   /// //Added by Kunal - for setting  city
   const handelAddSiteCity = (e: React.ChangeEvent<HTMLInputElement>) => {
     const NewSiteCity = e.target.value.trimStart();
@@ -543,15 +522,12 @@ const Page: React.FC = () => {
           err.inner.find((error) => error.path === 'Address1')?.message || '';
         const SiteAdd2err =
           err.inner.find((error) => error.path === 'Address2')?.message || '';
-
         const SiteCountryErr =
           err.inner.find((error) => error.path === 'SelectedValueCounrty')
             ?.message || '';
-
         const SiteStateErr =
           err.inner.find((error) => error.path === 'SelectedValueState')
             ?.message || '';
-
         const SiteCityErr =
           err.inner.find((error) => error.path === 'City')?.message || '';
         const SiteDescriptionErr =
@@ -574,7 +550,6 @@ const Page: React.FC = () => {
   const [editsiteid, seteditsiteid] = useState();
   const handleSubmit = async () => {
     const isValid = await validateForm();
-
     if (isValid) {
       if (changeFlage) {
         const data: any = {
@@ -598,7 +573,6 @@ const Page: React.FC = () => {
           setLoading(true);
           await refreshToken();
           const result = await addSites(data);
-
           if (result.errorCode == 0) {
             setLoading(false);
             if (closeModalButtonRef.current) {
@@ -691,7 +665,6 @@ const Page: React.FC = () => {
           setLoading(true);
           await refreshToken();
           const result = await updateSite(updatedata);
-
           if (result.errorCode == 0) {
             setLoading(false);
             if (closeModalButtonRef.current) {
@@ -761,7 +734,6 @@ const Page: React.FC = () => {
     );
     seteditsiteid(SingleSite?.site.id);
     // remaning descriptopn
-
     handleCall();
     setLoading(false);
   };
@@ -773,7 +745,7 @@ const Page: React.FC = () => {
     // remaning descriptopn
     setChangeFlage(true);
   };
-  function createCustomContent(name: any) {
+  function createCustomContent(name: string) {
     return `
     <div>
       <p>Please type <b>DELETE</b> or <b>${name}</b> to confirm deletion</p>
@@ -781,14 +753,13 @@ const Page: React.FC = () => {
     </div>
   `;
   }
-  function createCustomContent2(name: any) {
+  function createCustomContent2(name: string) {
     return `
     <div>
       <p>Please type <b>DELETE</b> or <b>${name}</b> to confirm deletion</p>
     </div>
   `;
   }
-
   const handelDelete = (SingleSite: any): any => {
     const showError = () => {
       document.body.classList.add('no-scroll');
@@ -806,9 +777,7 @@ const Page: React.FC = () => {
         document.body.classList.remove('no-scroll');
       });
     };
-
     // Function to show SweetAlert modal
-
     const showDeleteModal = () => {
       document.body.classList.add('no-scroll');
       swal({
@@ -848,7 +817,6 @@ const Page: React.FC = () => {
           'delete-input',
         ) as HTMLInputElement;
         const userInput = inputElem?.value;
-
         if (userInput === 'DELETE' || userInput == SingleSite?.site.name) {
           // Clear any existing error message
           const email = decryptData(localStorage.getItem('user_email'));
@@ -858,7 +826,6 @@ const Page: React.FC = () => {
             orgName: orgName, // Ensure orgName is defined
             token: onlyToken, // Ensure onlyToken is defined
           };
-
           // Call your deletion API function
           setLoading(true); // Set loading state to true
           requestSiteDeletion(data)
@@ -898,28 +865,21 @@ const Page: React.FC = () => {
         } else if (value === null) {
           // User pressed cancel, do nothing
         } else {
-          // Invalid input, show error message and show modal again
           showError();
-          // toast.error(
-          //   `You need to type DELETE/${SingleSite?.site.name} to confirm`,
-          // );
-          // showDeleteModal();
+
           setTimeout(() => {
             showDeleteModal(); // Show modal again
           }, 3000);
         }
       });
     };
-
     // Initial call to show the modal
     showDeleteModal();
   };
-
   // for sitename already exsist
   const checkInputValue = async (value: any) => {
     try {
       const response = await siteNameCheck(value, editsiteid);
-
       if (response) {
         if (response.errorCode == 1) {
           setAddSiteNameError(response.message);
@@ -936,7 +896,6 @@ const Page: React.FC = () => {
       checkInputValue(AddSiteName);
     }
   };
-  //
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
   const handelkeyyy = (e: React.KeyboardEvent) => {
     if (sidebarSite) {
@@ -957,16 +916,13 @@ const Page: React.FC = () => {
           prevIndex < sidebarSite.length - 1 ? prevIndex + 1 : 0,
         );
       }
-
       // Get the focused list item
       const listItem = document.getElementById(`site-item-${focusedIndex}`);
       const container = document.querySelector('.scrollable-container');
-
       if (listItem && container) {
         const listItemRect = listItem.getBoundingClientRect();
         const containerRect = container.getBoundingClientRect();
         const buffer = 50; // Add some buffer space
-
         // Check if the list item is out of view and adjust scroll position if necessary
         if (listItemRect.top < containerRect.top + buffer) {
           container.scrollTop -= containerRect.top + buffer - listItemRect.top;
@@ -1089,8 +1045,7 @@ const Page: React.FC = () => {
                                   <select
                                     className={`form-select  ${
                                       SelectedValueDropdown ? '' : 'input-error'
-                                    } 
-                                      ${typeDropdownError ? 'input-error' : ''}
+                                    } ${typeDropdownError ? 'input-error' : ''}
                                     ${
                                       SelectedValueDropdown === ''
                                         ? 'deselect-main'
@@ -1109,7 +1064,6 @@ const Page: React.FC = () => {
                                         </option>
                                       ))}
                                   </select>
-
                                   {typeDropdownError && (
                                     <div className='text-danger'>
                                       {typeDropdownError}
@@ -1197,7 +1151,6 @@ const Page: React.FC = () => {
                                         </option>
                                       ))}
                                   </select>
-
                                   {CountryListError && (
                                     <div className='text-danger'>
                                       {CountryListError}
@@ -1212,8 +1165,9 @@ const Page: React.FC = () => {
                                     State <span className='text-danger'>*</span>
                                   </label>
                                   <select
-                                    className={`form-select 
-                                      ${SelectedValueState ? '' : 'input-error'}
+                                    className={`form-select ${
+                                      SelectedValueState ? '' : 'input-error'
+                                    }
                                       ${stateListError ? 'input-error' : ''}
                                       ${
                                         SelectedValueState === ''
