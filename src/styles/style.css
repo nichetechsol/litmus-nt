@@ -20471,3 +20471,11 @@ li.page-item.disabled a {
 .max-w-md {
   max-width: 40rem !important;
 }
+@supports (-webkit-touch-callout: none) {
+  .no-scroll1 {
+    @apply overflow-hidden h-full overscroll-none;
+  }
+}
+[data-toggled='open'] .app-sidebar .main-sidebar-header {
+  display: block !important;
+}

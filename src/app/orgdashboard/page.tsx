@@ -119,6 +119,7 @@ const OrgDashboard = () => {
     setUseremail(decrypteduserEmail);
     if (!decryptedOrgId) {
       document.body.classList.add('no-scroll');
+      setLoading(false);
       swal('Please select organization', { icon: 'error' }).then(() => {
         document.body.classList.remove('no-scroll');
         navigate.push('/organization');
