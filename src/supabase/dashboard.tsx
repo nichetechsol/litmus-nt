@@ -579,12 +579,8 @@ async function orgEntitlementList(
   end: any,
 ): Promise<Result<{ totalCount: number; entitlements: EntitlementList[] }>> {
   try {
-    // Fetch entitlements with names and values using joins
-    const {
-      data: entitlements,
-      count,
-      error,
-    } = await supabase
+    // Fetch all entitlements with names and values using joins
+    const { data: entitlements, error: entitlementsError } = await supabase
       .from('entitlements_package')
       .select(
         `
@@ -592,12 +588,10 @@ async function orgEntitlementList(
         entitlement_name:entitlements_name(name,show_on_dashboard,entitlement_level),
         entitlement_value:entitlements_values(*)
       `,
-        { count: 'exact' },
       )
-      .eq('org_id', org_id)
-      .range(start, end);
+      .eq('org_id', org_id);
 
-    if (error) {
+    if (entitlementsError) {
       return {
         errorCode: 1,
         data: null,
@@ -605,30 +599,20 @@ async function orgEntitlementList(
       };
     }
 
-    const entitlementList: EntitlementList[] = entitlements
+    // Filter the entitlements based on show_on_dashboard and entitlement_level
+    const filteredEntitlements = entitlements
       .map((entitlement) => {
-        // Determine which value is present
         let entitlementValueResolved: any;
-        if (
-          entitlement.entitlement_value.value_text !== null &&
-          entitlement.entitlement_value.value_text !== undefined
-        ) {
+        if (entitlement.entitlement_value.value_text !== null) {
           entitlementValueResolved = entitlement.entitlement_value.value_text;
           entitlementValueResolved =
             entitlementValueResolved.charAt(0).toUpperCase() +
             entitlementValueResolved.slice(1);
-        } else if (
-          entitlement.entitlement_value.value_number !== null &&
-          entitlement.entitlement_value.value_number !== undefined
-        ) {
+        } else if (entitlement.entitlement_value.value_number !== null) {
           entitlementValueResolved = entitlement.entitlement_value.value_number;
-        } else if (
-          entitlement.entitlement_value.value_bool !== null &&
-          entitlement.entitlement_value.value_bool !== undefined
-        ) {
+        } else if (entitlement.entitlement_value.value_bool !== null) {
           entitlementValueResolved = entitlement.entitlement_value.value_bool;
         } else {
-          // If no value is present, return null to filter out later
           return null;
         }
 
@@ -640,16 +624,22 @@ async function orgEntitlementList(
       })
       .filter(
         (entitlement) =>
-          entitlement && // Filter out nulls
-          entitlement.entitlement_name.entitlement_level === 'ORG' && // Filter by entitlement_level
+          entitlement &&
+          entitlement.entitlement_name.entitlement_level === 'ORG' &&
           entitlement.entitlement_name.show_on_dashboard === true,
-      ); // Filter by show_on_dashboard
+      );
+
+    // Get the total count of filtered entitlements
+    const totalCount = filteredEntitlements.length;
+
+    // Apply pagination
+    const paginatedEntitlements = filteredEntitlements.slice(start, end + 1);
 
     return {
       errorCode: 0,
       data: {
-        totalCount: count || 0, // Provide a default value in case count is undefined
-        entitlements: entitlementList,
+        totalCount: totalCount,
+        entitlements: paginatedEntitlements,
       },
     };
   } catch (error) {

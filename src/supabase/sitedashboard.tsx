@@ -755,12 +755,8 @@ async function entitlementSite(site_id: any, start: any, end: any) {
       };
     }
 
-    // Fetch the entitlements with related name and value details in one query
-    const {
-      data: entitlements,
-      count: totalCount,
-      error,
-    } = await supabase
+    // Fetch all the entitlements for the given site_id
+    const { data: entitlements, error } = await supabase
       .from('entitlements_package')
       .select(
         `
@@ -774,10 +770,8 @@ async function entitlementSite(site_id: any, start: any, end: any) {
           value_bool
         )
       `,
-        { count: 'exact' },
       )
-      .eq('site_id', site_id)
-      .range(start, end);
+      .eq('site_id', site_id);
 
     if (error) {
       return {
@@ -787,36 +781,28 @@ async function entitlementSite(site_id: any, start: any, end: any) {
       };
     }
 
-    const entitlementList = entitlements
+    // Filter the entitlements
+    const filteredEntitlements = entitlements
       .map((entitlement) => {
         const { entitlements_name, entitlements_values } = entitlement;
 
         // Determine which value is present
         let entitlementValueResolved: any;
-        if (
-          entitlements_values.value_text !== null &&
-          entitlements_values.value_text !== undefined
-        ) {
+        if (entitlements_values.value_text !== null) {
           entitlementValueResolved = entitlements_values.value_text;
           entitlementValueResolved =
             entitlementValueResolved.charAt(0).toUpperCase() +
             entitlementValueResolved.slice(1);
-        } else if (
-          entitlements_values.value_number !== null &&
-          entitlements_values.value_number !== undefined
-        ) {
+        } else if (entitlements_values.value_number !== null) {
           entitlementValueResolved = entitlements_values.value_number;
-        } else if (
-          entitlements_values.value_bool !== null &&
-          entitlements_values.value_bool !== undefined
-        ) {
+        } else if (entitlements_values.value_bool !== null) {
           entitlementValueResolved = entitlements_values.value_bool;
         } else {
           // If no value is present, skip this entitlement
           return null;
         }
 
-        // Create detailed entitlement object
+        // Create a detailed entitlement object
         return {
           ...entitlement,
           entitlementName: entitlements_name.name,
@@ -826,15 +812,21 @@ async function entitlementSite(site_id: any, start: any, end: any) {
       .filter(
         (entitlement) =>
           entitlement && // Filter out nulls
-          entitlement.entitlements_name.entitlement_level == 'SITE' && // Filter by entitlement_level
+          entitlement.entitlements_name.entitlement_level === 'SITE' && // Filter by entitlement_level
           entitlement.entitlements_name.show_on_dashboard === true,
-      ); // Filter by show_on_dashboard
+      );
 
-    // Return the license details with type names
+    // Get the total count of filtered entitlements
+    const totalCount = filteredEntitlements.length;
+
+    // Apply pagination
+    const paginatedEntitlements = filteredEntitlements.slice(start, end + 1);
+
+    // Return the filtered, paginated list and total count
     return {
       errorCode: 0,
       message: 'Success',
-      data: entitlementList,
+      data: paginatedEntitlements,
       totalCount: totalCount,
     };
   } catch (error) {
