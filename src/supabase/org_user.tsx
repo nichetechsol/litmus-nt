@@ -217,17 +217,7 @@ async function addUserToOrganization(
               contentData,
               UserData.token,
             );
-            // await fetchEmailData('Add_User_To_Org');
 
-            // Send the invitation email
-            // await sendEmailFunction(
-            //   'shruti@nichetech.in', // To
-            //   'Add User To Organization', // Subject
-            //   'add_orgUser', // Type
-            //   UserData.token, // Token (Generate or provide the actual token)
-            //   emaildata, // Data
-            // );
-            // Log the activity before sending the invitation
             const logResult = await logActivity({
               org_id: UserData.org_id,
               user_id: UserData.user_id,

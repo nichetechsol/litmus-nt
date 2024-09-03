@@ -218,20 +218,6 @@ async function automaticeCreateSite(
       }
     }
 
-    // Fetch state ID based on state name
-    // let stateId = null;
-    // let countryId = null;
-    // const { data: stateData } = await supabase
-    //   .from('state')
-    //   .select('id, country_id')
-    //   .ilike('name', stateName);
-
-    // if (stateData && stateData.length > 0) {
-    //   stateId = stateData[0].id;
-    //   countryId = stateData[0].country_id;
-    // }
-
-    // Insert the site details
     const { data: siteInsertData } = await supabase
       .from('sites_detail')
       .insert([

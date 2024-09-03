@@ -723,12 +723,6 @@ const listofallFiles = async (data: any) => {
           }
         }
 
-        // const disabled =
-        //   permissionVersion &&
-        //   version &&
-        //   ((version === 'current' && extensionIncluded) ||
-        //     (version === 'all' && extensionIncluded));
-
         let disabled = false;
 
         if (extensionIncluded) {
