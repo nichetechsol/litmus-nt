@@ -258,6 +258,8 @@ const Page = () => {
                   const resultforinsertlicense =
                     await increaseValue(dataForIncreaseBy);
                   if (resultforinsertlicense?.errorCode == 0) {
+                    setSelectedSku('');
+                    setSelectedSKUdetails(null);
                     toast.success('License Value inserted successfully', {
                       autoClose: 3000,
                     });
@@ -273,6 +275,8 @@ const Page = () => {
       setLoading(false);
     } catch (error) {
       setLoading(false);
+      setSelectedSku('');
+      setSelectedSKUdetails(null);
       if (axios.isAxiosError(error)) {
         toast.error(
           `Error: ${error.response?.data?.message || 'Something went wrong'}`,
