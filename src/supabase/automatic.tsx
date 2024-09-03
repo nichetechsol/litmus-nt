@@ -2,7 +2,10 @@
 import { logActivity } from '@/supabase/activity';
 import { sendEmailFunction } from '@/supabase/email';
 import fetchEmailData from '@/supabase/email_configuration';
-import { orgDefaultEntitlement } from '@/supabase/org_details';
+import {
+  checkBusinessDomain,
+  orgDefaultEntitlement,
+} from '@/supabase/org_details';
 import { processEntitlements } from '@/supabase/site_details_crud';
 
 import { supabase } from './db';
@@ -14,8 +17,6 @@ async function automaticallyCreateOrganization(
   email: any,
   token: any,
 ): Promise<any> {
-  const userEmailDomain = email.split('@')[1];
-
   // Map type to type_id
   let type_id: any;
   switch (type) {
@@ -33,12 +34,18 @@ async function automaticallyCreateOrganization(
   }
 
   // Fetch known public domains to check if it's a business account
-  const { data: existingDomain } = await supabase
-    .from('known_public_domains')
-    .select('domain_name')
-    .eq('domain_name', userEmailDomain);
+  let domain = email.split('@')[1];
+  let isBusinessAccount = false;
+  const result = await checkBusinessDomain(domain);
 
-  const isBusinessAccount = !existingDomain || existingDomain.length === 0;
+  const domainExists = result.domain;
+  if (domainExists === true) {
+    domain = email;
+    isBusinessAccount = false;
+  } else {
+    domain = email.split('@')[1];
+    isBusinessAccount = true;
+  }
 
   // Check if the organization already exists
   let orgId = null;
@@ -84,14 +91,14 @@ async function automaticallyCreateOrganization(
     const { data: existingDomains } = await supabase
       .from('domains')
       .select('id, name')
-      .eq('name', userEmailDomain);
+      .eq('name', domain);
 
     if (existingDomains && existingDomains.length > 0) {
       domainId = existingDomains[0].id;
     } else {
       const { data: insertedDomains } = await supabase
         .from('domains')
-        .insert([{ name: userEmailDomain }])
+        .insert([{ name: domain }])
         .select('id, name');
 
       if (insertedDomains && insertedDomains.length > 0) {
