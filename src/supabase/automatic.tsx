@@ -49,44 +49,56 @@ async function automaticallyCreateOrganization(
 
   // Check if the organization already exists
   let orgId = null;
-  const { data: orgCheckData } = await supabase
-    .from('org_details')
-    .select('id')
-    .eq('name', organization_name);
+  let updatedOrgName = organization_name;
+  let suffix = 1;
+  let isUniqueName = false;
 
-  if (orgCheckData && orgCheckData.length > 0) {
-    orgId = orgCheckData[0].id;
-  } else {
-    // Fetch organization retention setting
-    const { data: retentionData } = await supabase
-      .from('general_settings')
-      .select('*')
-      .eq('setting_name', 'org_retention');
-
-    const retValue =
-      retentionData && retentionData.length > 0
-        ? parseInt(retentionData[0].value_number)
-        : 7;
-
-    // Insert organization details
-    const { data: insertOrg } = await supabase
+  while (!isUniqueName) {
+    const { data: orgCheckData } = await supabase
       .from('org_details')
-      .insert([
-        {
-          name: organization_name,
-          type_id: type_id,
-          status: 'Y',
-          retention_setting: retValue, // Update retention setting
-        },
-      ])
-      .select();
+      .select('id')
+      .eq('name', updatedOrgName);
 
-    if (insertOrg && insertOrg.length > 0) {
-      orgId = insertOrg[0].id;
+    if (orgCheckData && orgCheckData.length > 0) {
+      // Organization name exists, increment suffix and update name
+      updatedOrgName = `${organization_name} ${suffix}`;
+      suffix++;
+    } else {
+      // Organization name is available, exit the loop
+      isUniqueName = true;
     }
+  }
 
-    // Apply default entitlements based on business account status
-    // Check if the domain exists in the domains table
+  // After exiting the loop, `updatedOrgName` will have the unique name
+  const { data: retentionData } = await supabase
+    .from('general_settings')
+    .select('*')
+    .eq('setting_name', 'org_retention');
+
+  const retValue =
+    retentionData && retentionData.length > 0
+      ? parseInt(retentionData[0].value_number)
+      : 7;
+
+  // Insert organization details with the updated name
+  const { data: insertOrg } = await supabase
+    .from('org_details')
+    .insert([
+      {
+        name: updatedOrgName, // Use the updated organization name
+        type_id: type_id,
+        status: 'Y',
+        retention_setting: retValue, // Update retention setting
+      },
+    ])
+    .select();
+
+  if (insertOrg && insertOrg.length > 0) {
+    orgId = insertOrg[0].id;
+  }
+
+  // Send emails asynchronously
+  if (orgId != null) {
     let domainId: any;
     const { data: existingDomains } = await supabase
       .from('domains')
@@ -118,45 +130,38 @@ async function automaticallyCreateOrganization(
         .insert([{ org_id: orgId, domain_id: domainId }])
         .select();
     }
-    // Send emails asynchronously
-    if (orgId != null) {
-      await orgDefaultEntitlement(isBusinessAccount, orgId);
+    await orgDefaultEntitlement(isBusinessAccount, orgId);
 
-      const emailPromise = (async () => {
-        const emailData = await fetchEmailData(
-          type_id === 1 ? 'Add_Org_EndUser' : 'Add_Org_OEM_Partner',
-        );
-        const to = emailData.data.To;
-        const subject = emailData.data.email_subject.replace(
-          '{{Org Name}}',
-          organization_name,
-        );
-        const heading = emailData.data.email_heading.replace(
-          '{{Org Name}}',
-          organization_name,
-        );
-        const content = emailData.data.email_content
-          .replace('{{User Name}}', email)
-          .replace('{{Org Name}}', organization_name)
-          .replace(/{{Org Type}}/g, type || '');
+    const emailPromise = (async () => {
+      const emailData = await fetchEmailData(
+        type_id === 1 ? 'Add_Org_EndUser' : 'Add_Org_OEM_Partner',
+      );
+      const to = emailData.data.To;
+      const subject = emailData.data.email_subject.replace(
+        '{{Org Name}}',
+        organization_name,
+      );
+      const heading = emailData.data.email_heading.replace(
+        '{{Org Name}}',
+        organization_name,
+      );
+      const content = emailData.data.email_content
+        .replace('{{User Name}}', email)
+        .replace('{{Org Name}}', organization_name)
+        .replace(/{{Org Type}}/g, type || '');
 
-        sendEmailFunction(to, subject, heading, content, token);
-      })();
+      sendEmailFunction(to, subject, heading, content, token);
+    })();
 
-      // Log activity asynchronously
-      const logPromise = logActivity({
-        org_id: orgId,
-        user_id: userId,
-        activity_type: 'create_org',
-      });
+    // Log activity asynchronously
+    const logPromise = logActivity({
+      org_id: orgId,
+      user_id: userId,
+      activity_type: 'create_org',
+    });
 
-      // Wait for email sending and logging to complete
-      await Promise.all([emailPromise, logPromise]);
-    }
-  }
-
-  // Check if the user is already associated with the organization
-  if (orgId != null) {
+    // Wait for email sending and logging to complete
+    await Promise.all([emailPromise, logPromise]);
     const { data: existingUser } = await supabase
       .from('org_users')
       .select('id')
@@ -198,101 +203,125 @@ async function automaticeCreateSite(
 ): Promise<any> {
   // Check if the site already exists
   let site_id: any;
-  const { data: existingSite } = await supabase
-    .from('sites_detail')
-    .select('id')
-    .eq('name', siteName)
-    .eq('org_id', orgId);
+  let updatedSiteName = siteName;
+  let suffix = 1;
+  let isUniqueName = false;
 
-  if (existingSite && existingSite.length > 0) {
-    site_id = existingSite[0].id;
-  } else {
-    // Fetch default site type ID
-    let defaultSiteTypeId = 1;
-    const { data: defaultSiteTypeData } = await supabase
-      .from('general_settings')
-      .select('value_text')
-      .eq('setting_name', 'default_site_type');
-
-    if (defaultSiteTypeData && defaultSiteTypeData.length > 0) {
-      const defaultSiteType: any = defaultSiteTypeData[0].value_text;
-      const { data: siteTypeData } = await supabase
-        .from('site_types')
-        .select('id')
-        .eq('name', defaultSiteType);
-      if (siteTypeData && siteTypeData.length > 0) {
-        defaultSiteTypeId = siteTypeData[0].id;
-      }
-    }
-
-    const { data: siteInsertData } = await supabase
+  while (!isUniqueName) {
+    const { data: existingSite } = await supabase
       .from('sites_detail')
-      .insert([
-        {
-          name: siteName,
-          type_id: defaultSiteTypeId,
-          org_id: orgId,
-          address1: null,
-          city: null,
-          pin_code: null,
-          status: null,
-          country_id: null,
-          state_id: null,
-        },
-      ])
-      .select();
+      .select('id')
+      .eq('name', updatedSiteName);
 
-    if (siteInsertData && siteInsertData.length > 0) {
-      site_id = siteInsertData[0].id;
+    if (existingSite && existingSite.length > 0) {
+      // Organization name exists, increment suffix and update name
+      updatedSiteName = `${siteName} ${suffix}`;
+      suffix++;
+    } else {
+      // Organization name is available, exit the loop
+      isUniqueName = true;
     }
   }
-  if (site_id != null) {
-    // Process entitlements after site creation
-    await processEntitlements(orgId, site_id);
-    // Check if the user is already associated with the site
-    const { data: existingUser } = await supabase
-      .from('site_users')
-      .select('*')
-      .eq('site_id', site_id)
-      .eq('user_id', userId);
+  // const { data: existingSite } = await supabase
+  //   .from('sites_detail')
+  //   .select('id')
+  //   .eq('name', siteName)
+  //   .eq('org_id', orgId);
 
-    if (!existingUser || existingUser.length === 0) {
-      // Insert the user into the site_users table
-      await supabase.from('site_users').insert([
-        {
-          site_id: site_id,
-          user_id: userId,
-          role_id: 1, // Owner role
-        },
-      ]);
+  // if (existingSite && existingSite.length > 0) {
+  //   site_id = existingSite[0].id;
+  // } else {
+  // Fetch default site type ID
+  let defaultSiteTypeId = 1;
+  const { data: defaultSiteTypeData } = await supabase
+    .from('general_settings')
+    .select('value_text')
+    .eq('setting_name', 'default_site_type');
+
+  if (defaultSiteTypeData && defaultSiteTypeData.length > 0) {
+    const defaultSiteType: any = defaultSiteTypeData[0].value_text;
+    const { data: siteTypeData } = await supabase
+      .from('site_types')
+      .select('id')
+      .eq('name', defaultSiteType);
+    if (siteTypeData && siteTypeData.length > 0) {
+      defaultSiteTypeId = siteTypeData[0].id;
     }
-    await logActivity({
-      org_id: orgId,
-      site_id: site_id,
-      user_id: userId,
-      activity_type: 'create_site',
-    });
-    const userName: any = email;
-    const site_name: any = siteName;
-    const orgName: any = organization_name;
-    const email_data: any = await fetchEmailData('Add_Site_Limit_Not_Exceed');
-    const to = email_data.data.To;
-    const subject = email_data.data.email_subject;
-    const heading = email_data.data.email_heading;
-    const content = email_data.data.email_content;
-
-    const contentData = content
-      .replace('{{User Name}}', userName)
-      .replace('{{Site Name}}', site_name)
-      .replace('{{Org name}}', orgName);
-    sendEmailFunction(to, subject, heading, contentData, token);
   }
 
-  return {
-    errorCode: 0,
-    message: 'Site automatically created successfully',
-    siteId: site_id,
-  };
+  const { data: siteInsertData } = await supabase
+    .from('sites_detail')
+    .insert([
+      {
+        name: updatedSiteName,
+        type_id: defaultSiteTypeId,
+        org_id: orgId,
+        address1: null,
+        city: null,
+        pin_code: null,
+        status: null,
+        country_id: null,
+        state_id: null,
+      },
+    ])
+    .select();
+
+  if (siteInsertData && siteInsertData.length > 0) {
+    site_id = siteInsertData[0].id;
+    if (site_id != null) {
+      // Process entitlements after site creation
+      await processEntitlements(orgId, site_id);
+      // Check if the user is already associated with the site
+      const { data: existingUser } = await supabase
+        .from('site_users')
+        .select('*')
+        .eq('site_id', site_id)
+        .eq('user_id', userId);
+
+      if (!existingUser || existingUser.length === 0) {
+        // Insert the user into the site_users table
+        await supabase.from('site_users').insert([
+          {
+            site_id: site_id,
+            user_id: userId,
+            role_id: 1, // Owner role
+          },
+        ]);
+      }
+      await logActivity({
+        org_id: orgId,
+        site_id: site_id,
+        user_id: userId,
+        activity_type: 'create_site',
+      });
+      const userName: any = email;
+      const site_name: any = siteName;
+      const orgName: any = organization_name;
+      const email_data: any = await fetchEmailData('Add_Site_Limit_Not_Exceed');
+      const to = email_data.data.To;
+      const subject = email_data.data.email_subject;
+      const heading = email_data.data.email_heading;
+      const content = email_data.data.email_content;
+
+      const contentData = content
+        .replace('{{User Name}}', userName)
+        .replace('{{Site Name}}', site_name)
+        .replace('{{Org name}}', orgName);
+      sendEmailFunction(to, subject, heading, contentData, token);
+    }
+    return {
+      errorCode: 0,
+      message: 'Site automatically created successfully',
+      siteId: site_id,
+    };
+  } else {
+    return {
+      errorCode: 0,
+      message: 'Site automatically created successfully',
+      siteId: null,
+    };
+  }
+  // }
 }
 
 export { automaticallyCreateOrganization, automaticeCreateSite };
