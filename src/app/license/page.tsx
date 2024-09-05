@@ -17,6 +17,7 @@ import {
   insertLicence,
   reqLicenseLimitMail,
 } from '@/supabase/licence';
+import { licenceKeyAPI } from '@/supabase/licenceKey';
 import Loader from '@/utils/Loader/Loader';
 
 interface License {
@@ -219,110 +220,97 @@ const Page = () => {
     }
 
     //STATIC API MADE BY NICHETECH
-    const API_KEY_FOR_Nichetech = 'zaCELgL.0imfnc8mVLWwsAawjYr4Rx-Af50DDqtlx';
-    try {
-      // setLoading(true);
-      const headers = {
-        Authorization: API_KEY_FOR_Nichetech,
-        'Content-Type': 'application/json',
-      };
+    // const API_KEY_FOR_Nichetech = 'zaCELgL.0imfnc8mVLWwsAawjYr4Rx-Af50DDqtlx';
+    // try {
+    //   // setLoading(true);
+    //   const headers = {
+    //     Authorization: API_KEY_FOR_Nichetech,
+    //     'Content-Type': 'application/json',
+    //   };
 
-      const body = {
-        licenseName: selectedSku,
-      };
+    //   const body = {
+    //     licenseName: selectedSku,
+    //   };
 
-      const response = await axios.post(
-        'https://empapi.nichetechqa.com/api/license/key',
-        body,
-        { headers },
-      );
-      if (response) {
-        const data = {
-          licenseNumber: response.data,
-          type: site_type_id,
-          siteId: site_id,
-          userId: user_id,
-        };
-        if (data) {
-          try {
-            const resultforinsertlicense = await insertLicence(data);
-            if (resultforinsertlicense.data != null) {
-              if (resultforinsertlicense.errorCode === 0) {
-                if (selectedSKUdetails) {
-                  const dataForIncreaseBy = {
-                    licenseLimitEntitlement:
-                      selectedSKUdetails.license_limit_entitlement,
-                    orgId: org_id,
-                    increaseByValue: selectedSKUdetails.increase_by,
-                  };
-                  const resultforinsertlicense =
-                    await increaseValue(dataForIncreaseBy);
+    //   const response = await axios.post(
+    //     'https://empapi.nichetechqa.com/api/license/key',
+    //     body,
+    //     { headers },
+    //   );
+    //   if (response) {
+    //     const data = {
+    //       licenseNumber: response.data,
+    //       type: site_type_id,
+    //       siteId: site_id,
+    //       userId: user_id,
+    //     };
+    //     if (data) {
+    //       try {
+    //         const resultforinsertlicense = await insertLicence(data);
+    //         if (resultforinsertlicense.data != null) {
+    //           if (resultforinsertlicense.errorCode === 0) {
+    //             if (selectedSKUdetails) {
+    //               const dataForIncreaseBy = {
+    //                 licenseLimitEntitlement:
+    //                   selectedSKUdetails.license_limit_entitlement,
+    //                 orgId: org_id,
+    //                 increaseByValue: selectedSKUdetails.increase_by,
+    //               };
+    //               const resultforinsertlicense =
+    //                 await increaseValue(dataForIncreaseBy);
 
-                  if (
-                    resultforinsertlicense?.errorCode == 0 &&
-                    resultforinsertlicense != null
-                  ) {
-                    setSelectedSku('');
-                    setSelectedSKUdetails(null);
-                    toast.success('License Value inserted successfully', {
-                      autoClose: 3000,
-                    });
-                  } else {
-                    toast.error(resultforinsertlicense?.message, {
-                      autoClose: 3000,
-                    });
-                  }
-                }
-              }
-            } else {
-              toast.error(resultforinsertlicense.message, { autoClose: 3000 });
-            }
-          } catch {
-            setLoading(false);
-          }
-        }
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error(
-          `Error: ${
-            error.response?.data?.message || 'Something went wrong(NICHETECH)'
-          }`,
-          { autoClose: 3000 },
-        );
-      } else {
-        toast.error('Unexpected error occurred', { autoClose: 3000 });
-      }
-    }
+    //               if (
+    //                 resultforinsertlicense?.errorCode == 0 &&
+    //                 resultforinsertlicense != null
+    //               ) {
+    //                 setSelectedSku('');
+    //                 setSelectedSKUdetails(null);
+    //                 toast.success('License Value inserted successfully', {
+    //                   autoClose: 3000,
+    //                 });
+    //               } else {
+    //                 toast.error(resultforinsertlicense?.message, {
+    //                   autoClose: 3000,
+    //                 });
+    //               }
+    //             }
+    //           }
+    //         } else {
+    //           toast.error(resultforinsertlicense.message, { autoClose: 3000 });
+    //         }
+    //       } catch {
+    //         setLoading(false);
+    //       }
+    //     }
+    //   }
+    // } catch (error) {
+    //   if (axios.isAxiosError(error)) {
+    //     toast.error(
+    //       `Error: ${
+    //         error.response?.data?.message || 'Something went wrong(NICHETECH)'
+    //       }`,
+    //       { autoClose: 3000 },
+    //     );
+    //   } else {
+    //     toast.error('Unexpected error occurred', { autoClose: 3000 });
+    //   }
+    // }
 
     ////API GIVEN BY LITMUS
     const API_KEY = 'f11c9bf3-c56a-49cd-a9ae-480eeaa140b6';
     try {
       // setLoading(true);
-      const headers = {
-        Authorization: API_KEY,
-        'Content-Type': 'application/json',
-      };
-
-      const body = {
-        licenseName: selectedSku,
-      };
-
-      const response = await axios.post(
-        'https://litmus.licensing-portal.staging.litmus.io/licensing-portal/license/key',
-        body,
-        { headers },
-      );
-      if (response) {
-        const data = {
-          licenseNumber: response,
+      const data = await licenceKeyAPI(selectedSku, API_KEY); // Call your abstracted function here
+      if (data) {
+        const licenseData = {
+          licenseNumber: data, // Assuming the response from fetchLicenseKey is the license key
           type: site_type_id,
           siteId: site_id,
           userId: user_id,
         };
-        if (data) {
+        if (licenseData) {
           try {
-            const resultforinsertlicense = await insertLicence(data);
+            const resultforinsertlicense = await insertLicence(licenseData);
             if (resultforinsertlicense.data != null) {
               if (resultforinsertlicense.errorCode === 0) {
                 if (selectedSKUdetails) {
@@ -354,7 +342,7 @@ const Page = () => {
             } else {
               toast.error(resultforinsertlicense.message, { autoClose: 3000 });
             }
-          } catch {
+          } catch (error) {
             setLoading(false);
           }
         }
@@ -367,14 +355,95 @@ const Page = () => {
       if (axios.isAxiosError(error)) {
         toast.error(
           `Error: ${
-            error.response?.data?.message || 'Something went wrong(LITMUS)'
+            error.response?.data?.message || 'Something went wrong (LITMUS)'
           }`,
-          { autoClose: 3000 },
+          {
+            autoClose: 3000,
+          },
         );
       } else {
         toast.error('Unexpected error occurred', { autoClose: 3000 });
       }
     }
+
+    // try {
+    //   // setLoading(true);
+    //   const headers = {
+    //     Authorization: API_KEY,
+    //     'Content-Type': 'application/json',
+    //   };
+
+    //   const body = {
+    //     licenseName: selectedSku,
+    //   };
+
+    //   const response = await axios.post(
+    //     'https://litmus.licensing-portal.staging.litmus.io/licensing-portal/license/key',
+    //     body,
+    //     { headers },
+    //   );
+    //   if (response) {
+    //     const data = {
+    //       licenseNumber: response,
+    //       type: site_type_id,
+    //       siteId: site_id,
+    //       userId: user_id,
+    //     };
+    //     if (data) {
+    //       try {
+    //         const resultforinsertlicense = await insertLicence(data);
+    //         if (resultforinsertlicense.data != null) {
+    //           if (resultforinsertlicense.errorCode === 0) {
+    //             if (selectedSKUdetails) {
+    //               const dataForIncreaseBy = {
+    //                 licenseLimitEntitlement:
+    //                   selectedSKUdetails.license_limit_entitlement,
+    //                 orgId: org_id,
+    //                 increaseByValue: selectedSKUdetails.increase_by,
+    //               };
+    //               const resultforinsertlicense =
+    //                 await increaseValue(dataForIncreaseBy);
+
+    //               if (
+    //                 resultforinsertlicense?.errorCode == 0 &&
+    //                 resultforinsertlicense != null
+    //               ) {
+    //                 setSelectedSku('');
+    //                 setSelectedSKUdetails(null);
+    //                 toast.success('License Value inserted successfully', {
+    //                   autoClose: 3000,
+    //                 });
+    //               } else {
+    //                 toast.error(resultforinsertlicense?.message, {
+    //                   autoClose: 3000,
+    //                 });
+    //               }
+    //             }
+    //           }
+    //         } else {
+    //           toast.error(resultforinsertlicense.message, { autoClose: 3000 });
+    //         }
+    //       } catch {
+    //         setLoading(false);
+    //       }
+    //     }
+    //   }
+    //   setLoading(false);
+    // } catch (error) {
+    //   setLoading(false);
+    //   setSelectedSku('');
+    //   setSelectedSKUdetails(null);
+    //   if (axios.isAxiosError(error)) {
+    //     toast.error(
+    //       `Error: ${
+    //         error.response?.data?.message || 'Something went wrong(LITMUS)'
+    //       }`,
+    //       { autoClose: 3000 },
+    //     );
+    //   } else {
+    //     toast.error('Unexpected error occurred', { autoClose: 3000 });
+    //   }
+    // }
   };
   return (
     <>
