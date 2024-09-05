@@ -189,7 +189,14 @@ const Page = () => {
             });
           } else if (result.requestButton == false) {
             setLoading(false);
-            setSelectedSku(licenseData.license_sku_name);
+            if (result.proceedShow == true) {
+              setSelectedSku(licenseData.license_sku_name);
+            } else {
+              setSelectedSku('');
+              toast.warning('You cannot request this License.', {
+                autoClose: 3000,
+              });
+            }
           } else {
             setLoading(false);
             toast.warning('You cannot request this License.', {
