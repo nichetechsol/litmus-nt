@@ -115,6 +115,8 @@ const Page = () => {
 
   const handleSelectSku = async (licenseData: License, classx: 0 | 1 | 2) => {
     setLoading(true);
+    setSelectedSku('');
+
     if (licenseData.license_exceed_allowed_entitlement === null) {
       setSelectedSku(licenseData.license_sku_name);
       setSelectedSKUdetails(licenseData);
