@@ -132,7 +132,7 @@ const Page = () => {
       try {
         const result = await checkLimit(objForCheckLimitApi);
         if (result && result.errorCode === 0) {
-          if (result.requestButton) {
+          if (result.requestButton == true) {
             setLoading(false);
             swal({
               title:
@@ -187,6 +187,9 @@ const Page = () => {
                 handleCancel();
               }
             });
+          } else if (result.requestButton == false) {
+            setLoading(false);
+            setSelectedSku(licenseData.license_sku_name);
           } else {
             setLoading(false);
             toast.warning('You cannot request this License.', {
