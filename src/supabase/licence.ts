@@ -39,7 +39,7 @@ const checkLimit = async (data: any): Promise<any> => {
     // Fetch entitlements package data (same as before)
 
     let requestButton = false;
-
+    let proceedShow = false;
     // Check if the license exceeds the allowed entitlement
     const license_exceed_allowed_entitlement: any =
       await findEntitlementValueId(
@@ -67,8 +67,10 @@ const checkLimit = async (data: any): Promise<any> => {
           ) {
             if (license_limit_entitlement.value_number > value_entitlement) {
               requestButton = true;
+              proceedShow = true;
             } else {
               requestButton = false;
+              proceedShow = true;
             }
           } else {
             requestButton = false;
@@ -95,6 +97,7 @@ const checkLimit = async (data: any): Promise<any> => {
           ) {
             if (license_limit_entitlement.value_number > value_entitlement) {
               requestButton = true;
+              proceedShow = true;
             } else {
               requestButton = false;
             }
@@ -110,6 +113,7 @@ const checkLimit = async (data: any): Promise<any> => {
     return {
       errorCode: 0,
       requestButton,
+      proceedShow,
       message: 'Fetch license information',
     }; // Return the final array
   } catch (error) {
