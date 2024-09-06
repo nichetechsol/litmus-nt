@@ -139,15 +139,15 @@ async function automaticallyCreateOrganization(
       const to = emailData.data.To;
       const subject = emailData.data.email_subject.replace(
         '{{Org Name}}',
-        organization_name,
+        updatedOrgName,
       );
       const heading = emailData.data.email_heading.replace(
         '{{Org Name}}',
-        organization_name,
+        updatedOrgName,
       );
       const content = emailData.data.email_content
         .replace('{{User Name}}', email)
-        .replace('{{Org Name}}', organization_name)
+        .replace('{{Org Name}}', updatedOrgName)
         .replace(/{{Org Type}}/g, type || '');
 
       sendEmailFunction(to, subject, heading, content, token);
@@ -176,6 +176,7 @@ async function automaticallyCreateOrganization(
             user_id: userId,
             role_id: 1, // Assuming role_id 1 is the default role
             org_id: orgId,
+            updatedOrgName: updatedOrgName,
           },
         ])
         .select();
@@ -295,7 +296,7 @@ async function automaticeCreateSite(
         activity_type: 'create_site',
       });
       const userName: any = email;
-      const site_name: any = siteName;
+      const site_name: any = updatedSiteName;
       const orgName: any = organization_name;
       const email_data: any = await fetchEmailData('Add_Site_Limit_Not_Exceed');
       const to = email_data.data.To;

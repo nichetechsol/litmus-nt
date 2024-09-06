@@ -1050,27 +1050,27 @@ const Page = () => {
                       <ul className='list-none crm-top-deals mb-0'>
                         {licence && licence.length > 0
                           ? licence.map((user, index) => (
-                              <li className='mb-[0.9rem]' key={index}>
-                                <div className='flex items-start flex-wrap'>
+                              <li className='mb-[0.3rem]' key={index}>
+                                <div className='flex flex-wrap justify-center items-center'>
                                   <div className='me-2'>
                                     <span className='avatar avatar-rounded avatar-sm bg-primary p-1'>
                                       <i className='ri-profile-line text-[1rem]  text-white'></i>
                                     </span>
                                   </div>
                                   <div className='flex-grow flex-license'>
-                                    <p className='pnew-white-space  font-semibold mb-[1.4px]  text-[0.813rem]'>
+                                    <p className='pnew-white-space  font-semibold mb-[1.4px] text-[0.815rem]'>
                                       {user.licence_number}
                                     </p>
-                                    <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
-                                      {/* {user.expiry.split('T')[0]} */}
+                                    {/* <p className='text-[#8c9097] dark:text-white/50 text-[0.75rem]'>
+                                   
                                       {user
                                         ? moment(user.expiry).format(
                                             'MM/DD/YYYY HH:mm',
                                           )
                                         : ''}
-                                    </p>
+                                    </p> */}
                                   </div>
-                                  <div className='font-semibold text-[0.9375rem] '>
+                                  {/* <div className='font-semibold text-[0.9375rem] '>
                                     <h1>
                                       {' '}
                                       {moment().isAfter(user.expiry) ? (
@@ -1089,7 +1089,7 @@ const Page = () => {
                                         </span>
                                       )}
                                     </h1>
-                                  </div>
+                                  </div> */}
                                 </div>
                               </li>
                             ))

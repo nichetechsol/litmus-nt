@@ -231,87 +231,9 @@ const Page = () => {
       return;
     }
 
-    //STATIC API MADE BY NICHETECH
-    // const API_KEY_FOR_Nichetech = 'zaCELgL.0imfnc8mVLWwsAawjYr4Rx-Af50DDqtlx';
-    // try {
-    //   // setLoading(true);
-    //   const headers = {
-    //     Authorization: API_KEY_FOR_Nichetech,
-    //     'Content-Type': 'application/json',
-    //   };
-
-    //   const body = {
-    //     licenseName: selectedSku,
-    //   };
-
-    //   const response = await axios.post(
-    //     'https://empapi.nichetechqa.com/api/license/key',
-    //     body,
-    //     { headers },
-    //   );
-    //   if (response) {
-    //     const data = {
-    //       licenseNumber: response.data,
-    //       type: site_type_id,
-    //       siteId: site_id,
-    //       userId: user_id,
-    //     };
-    //     if (data) {
-    //       try {
-    //         const resultforinsertlicense = await insertLicence(data);
-    //         if (resultforinsertlicense.data != null) {
-    //           if (resultforinsertlicense.errorCode === 0) {
-    //             if (selectedSKUdetails) {
-    //               const dataForIncreaseBy = {
-    //                 licenseLimitEntitlement:
-    //                   selectedSKUdetails.license_limit_entitlement,
-    //                 orgId: org_id,
-    //                 increaseByValue: selectedSKUdetails.increase_by,
-    //               };
-    //               const resultforinsertlicense =
-    //                 await increaseValue(dataForIncreaseBy);
-
-    //               if (
-    //                 resultforinsertlicense?.errorCode == 0 &&
-    //                 resultforinsertlicense != null
-    //               ) {
-    //                 setSelectedSku('');
-    //                 setSelectedSKUdetails(null);
-    //                 toast.success('License Value inserted successfully', {
-    //                   autoClose: 3000,
-    //                 });
-    //               } else {
-    //                 toast.error(resultforinsertlicense?.message, {
-    //                   autoClose: 3000,
-    //                 });
-    //               }
-    //             }
-    //           }
-    //         } else {
-    //           toast.error(resultforinsertlicense.message, { autoClose: 3000 });
-    //         }
-    //       } catch {
-    //         setLoading(false);
-    //       }
-    //     }
-    //   }
-    // } catch (error) {
-    //   if (axios.isAxiosError(error)) {
-    //     toast.error(
-    //       `Error: ${
-    //         error.response?.data?.message || 'Something went wrong(NICHETECH)'
-    //       }`,
-    //       { autoClose: 3000 },
-    //     );
-    //   } else {
-    //     toast.error('Unexpected error occurred', { autoClose: 3000 });
-    //   }
-    // }
-
     ////API GIVEN BY LITMUS
     const API_KEY = 'f11c9bf3-c56a-49cd-a9ae-480eeaa140b6';
     try {
-      // setLoading(true);
       const data = await licenceKeyAPI(selectedSku, API_KEY); // Call your abstracted function here
       if (data) {
         const licenseData = {
