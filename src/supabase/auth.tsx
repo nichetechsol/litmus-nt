@@ -410,7 +410,7 @@ async function addUser(
 ): Promise<any> {
   try {
     if (user_data != null) {
-      let organization_name = user_data['Organization Name'];
+      const organization_name = user_data['Organization Name'];
       const siteName = user_data['Site Name'];
       const type = user_data['I am a Litmus'];
       const first_name = user_data['First Name'];
@@ -510,8 +510,6 @@ async function addUser(
 
           orgId = result.orgId;
           if (orgId != null) {
-            organization_name = result.updatedOrgName;
-
             const result2 = await automaticeCreateSite(
               orgId,
               siteName,
