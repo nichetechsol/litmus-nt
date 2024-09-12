@@ -3,7 +3,10 @@
 
 import supabase from '@/supabase/db';
 import { sendEmailFunction } from '@/supabase/email';
-import fetchEmailData from '@/supabase/email_configuration';
+import fetchEmailData, {
+  EmailConfiguration,
+  Result,
+} from '@/supabase/email_configuration';
 
 interface GetSKUParams {
   orgId: number;
@@ -292,45 +295,56 @@ async function reqLicense(data: any) {
 
   try {
     // Fetch email data for License_Request
-    const email_data: any = await fetchEmailData('License_Request');
-    const to = email_data.data.To; //here To is email_config table's To
-    const subject = email_data.data.email_subject;
-    const heading = email_data.data.email_heading;
-    const content = email_data.data.email_content;
+    const email_data: Result<EmailConfiguration> =
+      await fetchEmailData('License_Request');
+    if (email_data.data) {
+      const to = email_data.data.To; //here To is email_config table's To
+      const subject = email_data.data.email_subject;
+      const heading = email_data.data.email_heading;
+      const content = email_data.data.email_content;
 
-    const headingData = heading.replace('{{User Name}}', userName);
-    const contentData = content
-      .replace('{{User Name}}', userName)
-      .replace('{{Site Name}}', siteName)
-      .replace('{{Org Name}}', orgName)
-      .replace('{{License SKU}}', license_sku_name);
+      const headingData = heading.replace('{{User Name}}', userName);
+      const contentData = content
+        .replace('{{User Name}}', userName)
+        .replace('{{Site Name}}', siteName)
+        .replace('{{Org Name}}', orgName)
+        .replace('{{License SKU}}', license_sku_name);
 
-    await sendEmailFunction(to, subject, headingData, contentData, data.token);
-
+      await sendEmailFunction(
+        to,
+        subject,
+        headingData,
+        contentData,
+        data.token,
+      );
+    }
     // Fetch email data for License_Request_User
-    const emailData: any = await fetchEmailData('License_Request_User');
-
-    const toRequestUser = data.userName;
-    const subjectRequestUser = emailData.data.email_subject;
-    const headingRequestUser = emailData.data.email_heading;
-    const contentRequestUser = emailData.data.email_content;
-
-    const toData = toRequestUser.replace(
-      '{{Target User EMail}}',
-      toRequestUser,
+    const emailData: Result<EmailConfiguration> = await fetchEmailData(
+      'License_Request_User',
     );
-    const contentDataRequestUser = contentRequestUser
-      .replace('{{Site Name}}', siteName)
-      .replace('{{Org Name}}', orgName)
-      .replace('{{License SKU}}', license_sku_name);
+    if (emailData.data) {
+      const toRequestUser = data.userName;
+      const subjectRequestUser = emailData.data.email_subject;
+      const headingRequestUser = emailData.data.email_heading;
+      const contentRequestUser = emailData.data.email_content;
 
-    await sendEmailFunction(
-      toData,
-      subjectRequestUser,
-      headingRequestUser,
-      contentDataRequestUser,
-      data.token,
-    );
+      const toData = toRequestUser.replace(
+        '{{Target User EMail}}',
+        toRequestUser,
+      );
+      const contentDataRequestUser = contentRequestUser
+        .replace('{{Site Name}}', siteName)
+        .replace('{{Org Name}}', orgName)
+        .replace('{{License SKU}}', license_sku_name);
+
+      await sendEmailFunction(
+        toData,
+        subjectRequestUser,
+        headingRequestUser,
+        contentDataRequestUser,
+        data.token,
+      );
+    }
     return {
       errorCode: 0,
       message: 'License request sent successfully.',
@@ -691,49 +705,54 @@ async function renderLicense(orgId: number) {
 async function reqLicenseLimitMail(data: any): Promise<any> {
   // Fetch email configuration
   try {
-    const emailResult = await fetchEmailData('Add_License_Limit_Exceed_Litmus');
+    const emailResult: Result<EmailConfiguration> = await fetchEmailData(
+      'Add_License_Limit_Exceed_Litmus',
+    );
     const userName: string = data.userName;
     const orgName: string = data.org_name;
     const siteName: string = data.site_name;
-    const emailData = emailResult.data;
-    const to: string = emailData.To;
-    const subject: string = emailData.email_subject;
-    const heading: string = emailData.email_heading;
-    const contentTemplate: string = emailData.email_content;
+    if (emailResult.data) {
+      const emailData = emailResult.data;
+      const to: string = emailData.To;
+      const subject: string = emailData.email_subject;
+      const heading: string = emailData.email_heading;
+      const contentTemplate: string = emailData.email_content;
 
-    const contentData = contentTemplate
-      .replace('{{User Name}}', userName)
-      .replace('{{Site Name}}', siteName)
-      .replace('{{Org Name}}', orgName);
+      const contentData = contentTemplate
+        .replace('{{User Name}}', userName)
+        .replace('{{Site Name}}', siteName)
+        .replace('{{Org Name}}', orgName);
 
-    // Send email
-    await sendEmailFunction(to, subject, heading, contentData, data.token);
-
-    const email_data: any = await fetchEmailData(
+      // Send email
+      await sendEmailFunction(to, subject, heading, contentData, data.token);
+    }
+    const email_data: Result<EmailConfiguration> = await fetchEmailData(
       'Add_License_Limit_Exceed_User ',
     );
-    const toUser = data.userName;
-    const subjectUser = email_data.data.email_subject;
-    const headingUser = email_data.data.email_heading;
-    const contentUser = email_data.data.email_content;
-    const toData = toUser.replace('{{Target User EMail}}', toUser);
-    const contentUserData = contentUser
-      .replace('{{Org Name}}', orgName)
-      .replace('{{Site Name}}', siteName);
+    if (email_data.data) {
+      const toUser = data.userName;
+      const subjectUser = email_data.data.email_subject;
+      const headingUser = email_data.data.email_heading;
+      const contentUser = email_data.data.email_content;
+      const toData = toUser.replace('{{Target User EMail}}', toUser);
+      const contentUserData = contentUser
+        .replace('{{Org Name}}', orgName)
+        .replace('{{Site Name}}', siteName);
 
-    // Send email
-    await sendEmailFunction(
-      toData,
-      subjectUser,
-      headingUser,
-      contentUserData,
-      data.token,
-    );
-    return {
-      errorCode: 0,
-      message: 'License Limit request sent successfully.',
-      data: null,
-    };
+      // Send email
+      await sendEmailFunction(
+        toData,
+        subjectUser,
+        headingUser,
+        contentUserData,
+        data.token,
+      );
+      return {
+        errorCode: 0,
+        message: 'License Limit request sent successfully.',
+        data: null,
+      };
+    }
   } catch (error) {
     // Handle unexpected errors
     return {
@@ -746,32 +765,40 @@ async function reqLicenseLimitMail(data: any): Promise<any> {
 async function requestQuotaMail(data: any): Promise<any> {
   // Fetch email configuration
   try {
-    const emailResult = await fetchEmailData('Request_Quota');
+    const emailResult: Result<EmailConfiguration> =
+      await fetchEmailData('Request_Quota');
     const userName: string = data.userName;
     const orgName: string = data.org_name;
     const licensePlanName: any = data.license_plan_name;
+    if (emailResult.data) {
+      const emailData = emailResult.data;
+      const to: string = emailData.To;
+      const subject: string = emailData.email_subject;
+      const heading: string = emailData.email_heading;
+      const contentTemplate: string = emailData.email_content;
 
-    const emailData = emailResult.data;
-    const to: string = emailData.To;
-    const subject: string = emailData.email_subject;
-    const heading: string = emailData.email_heading;
-    const contentTemplate: string = emailData.email_content;
+      const headingData: string = heading
+        .replace('{{Target User Name}}', userName)
+        .replace('{{License Plan Name}}', licensePlanName);
+      const contentData = contentTemplate
+        .replace('{{Target User Name}}', userName)
+        .replace('{{License Plan Name}}', licensePlanName)
+        .replace('{{Org Name}}', orgName);
 
-    const headingData: string = heading
-      .replace('{{Target User Name}}', userName)
-      .replace('{{License Plan Name}}', licensePlanName);
-    const contentData = contentTemplate
-      .replace('{{Target User Name}}', userName)
-      .replace('{{License Plan Name}}', licensePlanName)
-      .replace('{{Org Name}}', orgName);
-
-    // Send email
-    await sendEmailFunction(to, subject, headingData, contentData, data.token);
-    return {
-      errorCode: 0,
-      message: 'Request Quota mail sent successfully.',
-      data: null,
-    };
+      // Send email
+      await sendEmailFunction(
+        to,
+        subject,
+        headingData,
+        contentData,
+        data.token,
+      );
+      return {
+        errorCode: 0,
+        message: 'Request Quota mail sent successfully.',
+        data: null,
+      };
+    }
   } catch (error) {
     // Handle unexpected errors
     return {

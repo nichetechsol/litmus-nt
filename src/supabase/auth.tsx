@@ -1,5 +1,5 @@
-/* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable unused-imports/no-unused-vars */
 import {
   automaticallyCreateOrganization,
   automaticeCreateSite,
@@ -20,63 +20,25 @@ interface AuthData {
 }
 interface CheckLicensePlanResult {
   errorCode: number;
-  org_exists?: any;
-  add_orgUser?: any;
+  org_exists?: boolean;
+  add_orgUser?: boolean;
 }
 interface UserData {
   id: string;
   auth_id: string;
-  [key: string]: any;
+  firstname: string;
+  lastname: string;
+  user_role: number;
 }
 
-interface LoginResult {
+export interface LoginResult {
   errorCode: number;
   message?: string;
   auth?: AuthData;
   user?: UserData[];
-  add_orgUser?: any;
-  org_exists?: any;
+  add_orgUser?: boolean;
+  org_exists?: boolean;
 }
-
-// // Function for logging in
-// async function Login(email: string, password: string): Promise<LoginResult> {
-//   try {
-//     // Fetch organization details
-//     const { data: authData, error: authError } =
-//       await supabase.auth.signInWithPassword({
-//         email: email,
-//         password: password,
-//       });
-
-//     if (authError) {
-//       if (authError.message === 'Invalid login credentials') {
-//         return { errorCode: 1, message: authError.message };
-//       } else {
-//         return { errorCode: 1, message: authError.message };
-//       }
-//     }
-
-//     if (!authData || !authData.user) {
-//       return { errorCode: 1, message: 'Invalid data' };
-//     }
-
-//     const { data: userData, error: userError } = await supabase
-//       .from('users')
-//       .select('*')
-//       .eq('auth_id', authData.user.id);
-
-//     if (userError) {
-//       return { errorCode: 1, message: userError.message };
-//     }
-
-//     return { errorCode: 0, auth: authData, user: userData };
-//   } catch (error) {
-//     return { errorCode: -1, message: (error as Error).message }; // Return a general error code
-//   }
-// }
-
-// export { Login };
-// Function for logging in
 async function Login(email: string, password: string): Promise<LoginResult> {
   try {
     // Fetch organization details
@@ -513,10 +475,6 @@ async function addUser(
             const result2 = await automaticeCreateSite(
               orgId,
               siteName,
-              stateName,
-              address,
-              pin_code,
-              cityName,
               email,
               userId,
               token,

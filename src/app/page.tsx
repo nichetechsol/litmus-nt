@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 'use client';
 import CryptoJS from 'crypto-js';
@@ -17,7 +15,7 @@ import * as Yup from 'yup';
 
 import { emailSchemaSign, passwordSchema } from '@/helper/ValidationHelper';
 import Footer from '@/shared/layout-components/footer/footer';
-import { AsureAuth, GetUser, Login } from '@/supabase/auth';
+import { AsureAuth, GetUser, Login, LoginResult } from '@/supabase/auth';
 import supabase from '@/supabase/db';
 import Loader from '@/utils/Loader/Loader';
 
@@ -143,164 +141,62 @@ const LoginForm = () => {
       }
 
       setLoading(true);
-      const result: any = await Login(email, password);
+      const result: LoginResult = await Login(email, password);
       if (result?.errorCode === 0) {
-        const encryptedEmail1 = encryptData(email);
-        localStorage.setItem('user_email', encryptedEmail1);
-        const user_id: any = result.user[0]?.id;
-        const user_role: any = result.user[0]?.user_role;
-        const user_firstname: any = result.user[0]?.firstname;
-        const user_lastname: any = result.user[0]?.lastname;
-        const add_orgUser: any = result.add_orgUser ? 'true' : 'false';
-        const org_exists: any = result.org_exists ? 'true' : 'false';
+        if (result?.user) {
+          const encryptedEmail1 = encryptData(email);
+          localStorage.setItem('user_email', encryptedEmail1);
+          const user_id = result?.user[0]?.id;
+          const user_role = result.user[0]?.user_role;
+          const user_firstname = result.user[0]?.firstname;
+          const user_lastname = result.user[0]?.lastname;
+          const add_orgUser = result.add_orgUser ? 'true' : 'false';
+          const org_exists = result.org_exists ? 'true' : 'false';
 
-        const encryptedUserId = encryptData(user_id);
-        const encryptedUserRole = encryptData(user_role);
-        const encryptedUserFirstName = encryptData(
-          user_firstname ? user_firstname : '',
-        );
-        const encryptedUserLastName = encryptData(
-          user_lastname ? user_lastname : '',
-        );
-        const encryptedAddOrgUser = encryptData(add_orgUser ? add_orgUser : '');
-        const encryptedOrgExists = encryptData(org_exists ? org_exists : '');
-        localStorage.setItem('azure', 'false');
-        if (encryptedUserId) {
-          localStorage.setItem('user_id', encryptedUserId);
-        }
-        if (encryptedUserRole) {
-          localStorage.setItem('user_role', encryptedUserRole);
-        }
-        if (encryptedUserFirstName) {
-          localStorage.setItem('user_fname', encryptedUserFirstName);
-        }
-        if (encryptedUserLastName) {
-          localStorage.setItem('user_lname', encryptedUserLastName);
-        }
-        if (encryptedAddOrgUser) {
-          localStorage.setItem('add_orgUser', encryptedAddOrgUser);
-        }
-        if (encryptedOrgExists) {
-          localStorage.setItem('org_exists', encryptedOrgExists);
-        }
+          const encryptedUserId = encryptData(user_id);
+          const encryptedUserRole = encryptData(user_role);
+          const encryptedUserFirstName = encryptData(
+            user_firstname ? user_firstname : '',
+          );
+          const encryptedUserLastName = encryptData(
+            user_lastname ? user_lastname : '',
+          );
+          const encryptedAddOrgUser = encryptData(
+            add_orgUser ? add_orgUser : '',
+          );
+          const encryptedOrgExists = encryptData(org_exists ? org_exists : '');
+          localStorage.setItem('azure', 'false');
+          if (encryptedUserId) {
+            localStorage.setItem('user_id', encryptedUserId);
+          }
+          if (encryptedUserRole) {
+            localStorage.setItem('user_role', encryptedUserRole);
+          }
+          if (encryptedUserFirstName) {
+            localStorage.setItem('user_fname', encryptedUserFirstName);
+          }
+          if (encryptedUserLastName) {
+            localStorage.setItem('user_lname', encryptedUserLastName);
+          }
+          if (encryptedAddOrgUser) {
+            localStorage.setItem('add_orgUser', encryptedAddOrgUser);
+          }
+          if (encryptedOrgExists) {
+            localStorage.setItem('org_exists', encryptedOrgExists);
+          }
 
-        navigate.push('/organization');
-        setLoading(false);
-      } else {
-        swal({
-          icon: 'error',
-          text: result.message,
-        });
-        setLoading(false);
+          navigate.push('/organization');
+          setLoading(false);
+        } else {
+          swal({
+            icon: 'error',
+            text: result.message,
+          });
+          setLoading(false);
+        }
       }
     }
   };
-  // useLayoutEffect(() => {
-  //   if (typeof window !== 'undefined') {
-  //     const token = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
-  //     if (token) {
-  //       // setTokenVerify(true);
-  //       redirect('/organization');
-  //     } else {
-  //       // setTokenVerify(false);
-  //     }
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   const storedEmail = localStorage.getItem('rememberedEmail');
-  //   const storedPassword = localStorage.getItem('rememberedPassword');
-  //   if (storedEmail && storedPassword) {
-  //     setEmail(storedEmail);
-  //     setPassword(storedPassword);
-  //     setRememberMe(true);
-  //   }
-  // }, []);
-  // useEffect(() => {
-  //   const { data: authListener } = supabase.auth.onAuthStateChange(
-  //     async (event, session) => {
-  //       if (session) {
-  //         // User is logged in
-  //         // navigate.push('/home');
-  //       } else {
-  //         // User is logged out
-  //       }
-  //     },
-  //   );
-
-  //   return () => {
-  //     authListener?.subscription.unsubscribe();
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   setLoading(true);
-  //   const checkUser = async () => {
-  //     setLoading(true);
-  //     const result = await GetUser();
-  //     if (result) {
-  //       setLoading(true);
-  //       if (result?.errorCode === 0) {
-  //         setLoading(true);
-  //         const encryptedEmail1 = encryptData(result.user.data[0]?.email);
-  //         localStorage.setItem('user_email', encryptedEmail1);
-  //         localStorage.setItem('azure', 'true');
-  //         const user_id: any = result.user.data[0]?.id;
-  //         const user_firstname: any = result.user.data[0]?.firstname;
-  //         const user_lastname: any = result.user.data[0]?.lastname;
-  //         const add_orgUser: any = result.add_orgUser ? 'true' : 'false';
-  //         const org_exists: any = result.org_exists ? 'true' : 'false';
-
-  //         const encryptedUserId = encryptData(user_id);
-  //         const encryptedUserFirstName = encryptData(
-  //           user_firstname ? user_firstname : '',
-  //         );
-  //         const encryptedUserLastName = encryptData(
-  //           user_lastname ? user_lastname : '',
-  //         );
-  //         const encryptedAddOrgUser = encryptData(
-  //           add_orgUser ? add_orgUser : '',
-  //         );
-  //         const encryptedOrgExists = encryptData(org_exists ? org_exists : '');
-
-  //         if (encryptedUserId) {
-  //           localStorage.setItem('user_id', encryptedUserId);
-  //         }
-
-  //         if (encryptedUserFirstName) {
-  //           localStorage.setItem('user_fname', encryptedUserFirstName);
-  //         }
-  //         if (encryptedUserLastName) {
-  //           localStorage.setItem('user_lname', encryptedUserLastName);
-  //         }
-  //         if (encryptedAddOrgUser) {
-  //           localStorage.setItem('add_orgUser', encryptedAddOrgUser);
-  //         }
-  //         if (encryptedOrgExists) {
-  //           localStorage.setItem('org_exists', encryptedOrgExists);
-  //         }
-  //         navigate.push('/organization');
-  //         setLoading(false);
-  //       } else if (result == undefined || result == null) {
-  //         setLoading(false);
-  //       } else {
-  //         if (result.message != 'User data is not found') {
-  //           swal({
-  //             icon: 'error',
-  //             text: result.message,
-  //           });
-  //         }
-  //         // window.location.reload();
-  //         setLoading(false);
-  //       }
-  //     }
-  //   };
-
-  //   setTimeout(async () => {
-  //     await checkUser();
-  //     setLoading(false);
-  //   }, 5000);
-  // }, []);
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -318,22 +214,17 @@ const LoginForm = () => {
               const result = await GetUser();
 
               if (result) {
-                // const variabletaken = user.user.user_metadata.custom_claims;
-                // const auth_id = user.user.id;
-                // const result = await addUser(user, variabletaken, auth_id);
                 if (result?.errorCode === 0) {
                   const encryptedEmail1 = encryptData(
                     result.user.data[0]?.email,
                   );
                   localStorage.setItem('user_email', encryptedEmail1);
                   localStorage.setItem('azure', 'true');
-                  const user_id: any = result.user.data[0]?.id;
-                  const user_firstname: any = result.user.data[0]?.firstname;
-                  const user_lastname: any = result.user.data[0]?.lastname;
-                  const add_orgUser: any = result.add_orgUser
-                    ? 'true'
-                    : 'false';
-                  const org_exists: any = result.org_exists ? 'true' : 'false';
+                  const user_id = result.user.data[0]?.id;
+                  const user_firstname = result.user.data[0]?.firstname;
+                  const user_lastname = result.user.data[0]?.lastname;
+                  const add_orgUser = result.add_orgUser ? 'true' : 'false';
+                  const org_exists = result.org_exists ? 'true' : 'false';
 
                   const encryptedUserId = encryptData(user_id);
                   const encryptedUserFirstName = encryptData(
@@ -403,7 +294,7 @@ const LoginForm = () => {
     return () => {
       authListener?.subscription.unsubscribe();
     };
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     const storedEncryptedEmail = localStorage.getItem('rememberedEmail');

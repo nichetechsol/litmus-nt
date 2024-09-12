@@ -3,7 +3,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { logActivity } from '@/supabase/activity';
-import fetchEmailData from '@/supabase/email_configuration';
+import fetchEmailData, {
+  EmailConfiguration,
+} from '@/supabase/email_configuration';
 import { findOrInsertEntitlementValue } from '@/supabase/site_details_crud';
 
 import { supabase } from './db';
@@ -349,24 +351,26 @@ async function addOrganization(data: {
 
     // Send emails asynchronously
     const emailPromise = (async () => {
-      const emailData = await fetchEmailData(
+      const emailData: Result<EmailConfiguration> = await fetchEmailData(
         data.type_id === 1 ? 'Add_Org_EndUser' : 'Add_Org_OEM_Partner',
       );
-      const to = emailData.data.To;
-      const subject = emailData.data.email_subject.replace(
-        '{{Org Name}}',
-        data.name,
-      );
-      const heading = emailData.data.email_heading.replace(
-        '{{Org Name}}',
-        data.name,
-      );
-      const content = emailData.data.email_content
-        .replace('{{User Name}}', data.userName)
-        .replace('{{Org Name}}', data.name)
-        .replace(/{{Org Type}}/g, data.type_name || '');
+      if (emailData.data) {
+        const to = emailData.data.To;
+        const subject = emailData.data.email_subject.replace(
+          '{{Org Name}}',
+          data.name,
+        );
+        const heading = emailData.data.email_heading.replace(
+          '{{Org Name}}',
+          data.name,
+        );
+        const content = emailData.data.email_content
+          .replace('{{User Name}}', data.userName)
+          .replace('{{Org Name}}', data.name)
+          .replace(/{{Org Type}}/g, data.type_name || '');
 
-      sendEmailFunction(to, subject, heading, content, data.token);
+        sendEmailFunction(to, subject, heading, content, data.token);
+      }
     })();
 
     // Log activity asynchronously
@@ -1243,47 +1247,59 @@ async function requestOrgDeletion(org_id: any): Promise<Result<any>> {
 async function reqOrgDeleteMail(data: any): Promise<any> {
   // Fetch email configuration
   try {
-    const emailResult = await fetchEmailData('Org_Delete_Request');
+    const emailResult: Result<EmailConfiguration> =
+      await fetchEmailData('Org_Delete_Request');
     const userName: string = data.userName;
     const orgName: string = data.org_name;
-    const emailData = emailResult.data;
-    const to: string = emailData.To;
-    const subject: string = emailData.email_subject;
-    const heading: string = emailData.email_heading;
-    const contentTemplate: string = emailData.email_content;
+    if (emailResult.data) {
+      const emailData = emailResult.data;
+      const to: string = emailData.To;
+      const subject: string = emailData.email_subject;
+      const heading: string = emailData.email_heading;
+      const contentTemplate: string = emailData.email_content;
 
-    const headingData = heading
-      .replace('{{User Name}}', userName)
-      .replace('{{Org Name}}', orgName);
-    const contentData = contentTemplate
-      .replace('{{User Name}}', userName)
-      .replace('{{Org Name}}', orgName);
+      const headingData = heading
+        .replace('{{User Name}}', userName)
+        .replace('{{Org Name}}', orgName);
+      const contentData = contentTemplate
+        .replace('{{User Name}}', userName)
+        .replace('{{Org Name}}', orgName);
 
-    // Send email
-    await sendEmailFunction(to, subject, headingData, contentData, data.token);
-
-    const email_data: any = await fetchEmailData('Org_Delete_Request_User');
-    const toUser = data.userName;
-    const subjectUser = email_data.data.email_subject;
-    const headingUser = email_data.data.email_heading;
-    const contentUser = email_data.data.email_content;
-    const toData = toUser.replace('{{Target User EMail}}', toUser);
-    const headingUserData = headingUser.replace('{{Org Name}}', orgName);
-    const contentUserData = contentUser.replace('{{Org Name}}', orgName);
-
-    // Send email
-    await sendEmailFunction(
-      toData,
-      subjectUser,
-      headingUserData,
-      contentUserData,
-      data.token,
+      // Send email
+      await sendEmailFunction(
+        to,
+        subject,
+        headingData,
+        contentData,
+        data.token,
+      );
+    }
+    const email_data: Result<EmailConfiguration> = await fetchEmailData(
+      'Org_Delete_Request_User',
     );
-    return {
-      errorCode: 0,
-      message: 'Organization deletion request sent successfully.',
-      data: null,
-    };
+    const toUser = data.userName;
+    if (email_data.data) {
+      const subjectUser = email_data.data.email_subject;
+      const headingUser = email_data.data.email_heading;
+      const contentUser = email_data.data.email_content;
+      const toData = toUser.replace('{{Target User EMail}}', toUser);
+      const headingUserData = headingUser.replace('{{Org Name}}', orgName);
+      const contentUserData = contentUser.replace('{{Org Name}}', orgName);
+
+      // Send email
+      await sendEmailFunction(
+        toData,
+        subjectUser,
+        headingUserData,
+        contentUserData,
+        data.token,
+      );
+      return {
+        errorCode: 0,
+        message: 'Organization deletion request sent successfully.',
+        data: null,
+      };
+    }
   } catch (error) {
     // Handle unexpected errors
     return {

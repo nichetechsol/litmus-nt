@@ -3,7 +3,9 @@
 
 import { logActivity } from '@/supabase/activity';
 import { sendEmailFunction } from '@/supabase/email';
-import fetchEmailData from '@/supabase/email_configuration';
+import fetchEmailData, {
+  EmailConfiguration,
+} from '@/supabase/email_configuration';
 
 import { supabase } from './db';
 
@@ -200,24 +202,26 @@ async function addUserToOrganization(
 
             const userName: any = UserData.userName;
             const orgName: any = UserData.orgName;
-            const email_data: any = await fetchEmailData('Add_User_To_Org');
+            const email_data: Result<EmailConfiguration> =
+              await fetchEmailData('Add_User_To_Org');
             const to = UserData.email;
-            const subject = email_data.data.email_subject;
-            const heading = email_data.data.email_heading;
-            const content = email_data.data.email_content;
-            const toData = to.replace('{{Target User EMail}}', to);
-            const headingData = heading.replace('{{Org Name}}', orgName);
-            const contentData = content
-              .replace('{{User Name}}', userName)
-              .replace('{{Org Name}}', orgName);
-            sendEmailFunction(
-              toData,
-              subject,
-              headingData,
-              contentData,
-              UserData.token,
-            );
-
+            if (email_data.data) {
+              const subject = email_data.data.email_subject;
+              const heading = email_data.data.email_heading;
+              const content = email_data.data.email_content;
+              const toData = to.replace('{{Target User EMail}}', to);
+              const headingData = heading.replace('{{Org Name}}', orgName);
+              const contentData = content
+                .replace('{{User Name}}', userName)
+                .replace('{{Org Name}}', orgName);
+              sendEmailFunction(
+                toData,
+                subject,
+                headingData,
+                contentData,
+                UserData.token,
+              );
+            }
             const logResult = await logActivity({
               org_id: UserData.org_id,
               user_id: UserData.user_id,
@@ -382,7 +386,9 @@ async function removeUserFromOrganization(
 async function inviteSendToUser(data: any) {
   try {
     // Fetch the email template data for 'Invite_Not_existing_User'
-    const emailResult = await fetchEmailData('Invite_Not_existing_User');
+    const emailResult: Result<EmailConfiguration> = await fetchEmailData(
+      'Invite_Not_existing_User',
+    );
 
     // Ensure emailResult and emailResult.data are valid
     if (!emailResult || !emailResult.data) {

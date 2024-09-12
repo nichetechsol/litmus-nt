@@ -1,7 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { logActivity } from '@/supabase/activity';
 import { sendEmailFunction } from '@/supabase/email';
-import fetchEmailData from '@/supabase/email_configuration';
+import fetchEmailData, {
+  EmailConfiguration,
+  Result,
+} from '@/supabase/email_configuration';
 import {
   checkBusinessDomain,
   orgDefaultEntitlement,
@@ -9,16 +11,26 @@ import {
 import { processEntitlements } from '@/supabase/site_details_crud';
 
 import { supabase } from './db';
+interface OrganizationResult {
+  errorCode: number;
+  message: string;
+  orgId: number | null;
+}
+interface SiteResult {
+  errorCode: number;
+  message: string;
+  siteId: number | null;
+}
 
 async function automaticallyCreateOrganization(
-  organization_name: any,
-  type: any,
-  userId: any,
-  email: any,
-  token: any,
-): Promise<any> {
+  organization_name: string,
+  type: string,
+  userId: number,
+  email: string,
+  token: string,
+): Promise<OrganizationResult> {
   // Map type to type_id
-  let type_id: any;
+  let type_id: number | null;
   switch (type) {
     case 'end_user':
       type_id = 1;
@@ -99,7 +111,7 @@ async function automaticallyCreateOrganization(
 
   // Send emails asynchronously
   if (orgId != null) {
-    let domainId: any;
+    let domainId: number | null = null; // Initialize domainId as null
     const { data: existingDomains } = await supabase
       .from('domains')
       .select('id, name')
@@ -133,24 +145,26 @@ async function automaticallyCreateOrganization(
     await orgDefaultEntitlement(isBusinessAccount, orgId);
 
     const emailPromise = (async () => {
-      const emailData = await fetchEmailData(
+      const emailData: Result<EmailConfiguration> = await fetchEmailData(
         type_id === 1 ? 'Add_Org_EndUser' : 'Add_Org_OEM_Partner',
       );
-      const to = emailData.data.To;
-      const subject = emailData.data.email_subject.replace(
-        '{{Org Name}}',
-        organization_name,
-      );
-      const heading = emailData.data.email_heading.replace(
-        '{{Org Name}}',
-        organization_name,
-      );
-      const content = emailData.data.email_content
-        .replace('{{User Name}}', email)
-        .replace('{{Org Name}}', organization_name)
-        .replace(/{{Org Type}}/g, type || '');
+      if (emailData.data) {
+        const to = emailData.data.To;
+        const subject = emailData.data.email_subject.replace(
+          '{{Org Name}}',
+          organization_name,
+        );
+        const heading = emailData.data.email_heading.replace(
+          '{{Org Name}}',
+          organization_name,
+        );
+        const content = emailData.data.email_content
+          .replace('{{User Name}}', email)
+          .replace('{{Org Name}}', organization_name)
+          .replace(/{{Org Type}}/g, type || '');
 
-      sendEmailFunction(to, subject, heading, content, token);
+        sendEmailFunction(to, subject, heading, content, token);
+      }
     })();
 
     // Log activity asynchronously
@@ -190,19 +204,15 @@ async function automaticallyCreateOrganization(
 }
 
 async function automaticeCreateSite(
-  orgId: any,
-  siteName: any,
-  stateName: any,
-  address: any,
-  pin_code: any,
-  cityName: any,
-  email: any,
-  userId: any,
-  token: any,
-  organization_name: any,
-): Promise<any> {
+  orgId: number,
+  siteName: string,
+  email: string,
+  userId: number,
+  token: string,
+  organization_name: string,
+): Promise<SiteResult> {
   // Check if the site already exists
-  let site_id: any;
+  let site_id: number;
   let updatedSiteName = siteName;
   let suffix = 1;
   let isUniqueName = false;
@@ -239,7 +249,7 @@ async function automaticeCreateSite(
     .eq('setting_name', 'default_site_type');
 
   if (defaultSiteTypeData && defaultSiteTypeData.length > 0) {
-    const defaultSiteType: any = defaultSiteTypeData[0].value_text;
+    const defaultSiteType: string = defaultSiteTypeData[0].value_text;
     const { data: siteTypeData } = await supabase
       .from('site_types')
       .select('id')
@@ -294,20 +304,24 @@ async function automaticeCreateSite(
         user_id: userId,
         activity_type: 'create_site',
       });
-      const userName: any = email;
-      const site_name: any = siteName;
-      const orgName: any = organization_name;
-      const email_data: any = await fetchEmailData('Add_Site_Limit_Not_Exceed');
-      const to = email_data.data.To;
-      const subject = email_data.data.email_subject;
-      const heading = email_data.data.email_heading;
-      const content = email_data.data.email_content;
+      const userName: string = email;
+      const site_name: string = siteName;
+      const orgName: string = organization_name;
+      const email_data: Result<EmailConfiguration> = await fetchEmailData(
+        'Add_Site_Limit_Not_Exceed',
+      );
+      if (email_data.data) {
+        const to = email_data.data.To;
+        const subject = email_data.data.email_subject;
+        const heading = email_data.data.email_heading;
+        const content = email_data.data.email_content;
 
-      const contentData = content
-        .replace('{{User Name}}', userName)
-        .replace('{{Site Name}}', site_name)
-        .replace('{{Org name}}', orgName);
-      sendEmailFunction(to, subject, heading, contentData, token);
+        const contentData = content
+          .replace('{{User Name}}', userName)
+          .replace('{{Site Name}}', site_name)
+          .replace('{{Org name}}', orgName);
+        sendEmailFunction(to, subject, heading, contentData, token);
+      }
     }
     return {
       errorCode: 0,

@@ -1,14 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable unused-imports/no-unused-vars */
 
 import supabase from '@/supabase/db';
-
-interface Result<T> {
+export interface EmailConfiguration {
+  To: string;
+  email_subject: string;
+  email_heading: string;
+  email_content: string;
+  // Add more fields as per the table structure
+}
+export interface Result<T> {
   errorCode: number;
-  message?: any;
+  message?: string;
   data: T | null;
 }
-async function fetchEmailData(action: any): Promise<Result<any>> {
+async function fetchEmailData(
+  action: any,
+): Promise<Result<EmailConfiguration>> {
   try {
     const { data: email_configuration, error } = await supabase
       .from('email_configuration')
