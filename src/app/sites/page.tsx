@@ -1,6 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 'use client';
 import Link from 'next/link';
 import { redirect, useRouter } from 'next/navigation';
@@ -119,7 +117,7 @@ const Page: React.FC = () => {
         navigate.push('/organization');
       });
     }
-  }, []);
+  }, [navigate]);
   const [userrole2, setuserrole2] = useState('');
   //Added by Srishti - get the role of user in sites
   useEffect(() => {
@@ -261,7 +259,7 @@ const Page: React.FC = () => {
     FetchSiteDetails();
   }, [FetchSiteDetails, org_id]);
   /// //Added by Kunal -Searching in site
-  const fetchData1 = async () => {
+  const fetchData1 = useCallback(async () => {
     try {
       const result1: any = await fetchSiteSidebarList(
         searchTerm ? searchTerm : null,
@@ -288,7 +286,7 @@ const Page: React.FC = () => {
     } catch (error) {
       //
     }
-  };
+  }, [org_id, searchTerm, user_id]);
   //Added by Kunal - Delay in search as on every word typed api Should not be called
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -301,7 +299,7 @@ const Page: React.FC = () => {
     return () => {
       clearTimeout(handler);
     };
-  }, [searchTerm]);
+  }, [fetchData1, searchTerm]);
   /// //Added by Kunal - for clearing the form when closed
   const handelclosemodel = () => {
     closeModal();

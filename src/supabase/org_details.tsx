@@ -1,7 +1,5 @@
 /* eslint-disable unused-imports/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { logActivity } from '@/supabase/activity';
 import fetchEmailData, {
   EmailConfiguration,
@@ -10,32 +8,81 @@ import { findOrInsertEntitlementValue } from '@/supabase/site_details_crud';
 
 import { supabase } from './db';
 import { sendEmailFunction } from './email';
-interface OrgDetail {
+export interface OrgDetail {
   id: number;
   name: string;
   description: string;
   type_id: number;
   status: string;
+  updated_at: string;
+  created_at: string;
 }
-
+export interface UpdatedRequestData {
+  name: string;
+  description: string;
+  type_id: number;
+  status: string;
+  domain: string[];
+  org_id: number;
+  user_id: number;
+  // details: string;
+  userName: string;
+  // orgName: string;
+}
+export interface checkDomainResponse {
+  errorCode: number;
+  domain: boolean;
+  message: string;
+}
+export interface DataInAddOrg {
+  user_id: number;
+  // role_id: number;
+  name: string;
+  description: string;
+  type_id: number;
+  status: string;
+  domain: string[];
+  token: string;
+  userName: string;
+  type_name: string;
+}
+// Interface for the domain details
+interface Domain {
+  id: number;
+  name: string;
+}
+interface OrganizationDetails {
+  id: number;
+  name: string;
+  description: string;
+  type_id: number;
+  status: string;
+  domains: Domain[];
+}
+// Interface for the final response object
+export interface OrganizationWithDomains extends OrganizationDetails {
+  business_account: boolean;
+}
 interface UserRole {
   id: number;
   name: string;
 }
 
 // Define return types for the functions
-interface Result<T> {
+export interface Result<T> {
   errorCode: number;
-  message?: any;
+  message?: string;
   data: T | null;
   business_account?: boolean;
 }
 
-interface OrganizationWithSiteCount {
+export interface OrganizationWithSiteCount {
   errorCode: number;
-  org_id: string;
+  org_id: number;
   org_name: string;
   sites_count: number;
+  org_type_id: number;
+  user_role_id: number | string;
 }
 
 async function fetchOrganizationAndSiteDetails(
@@ -98,7 +145,7 @@ async function fetchOrganizationAndSiteDetails(
 
 async function organizationSidebarList(
   search: string,
-  user_id: string,
+  user_id: number | null,
 ): Promise<Result<OrgDetail[]>> {
   try {
     // Fetch org_id associated with the user
@@ -169,13 +216,13 @@ async function fetchOrganizationTypes(): Promise<Result<any[]>> {
       return { errorCode: 0, data: orgTypes };
     }
   } catch (error) {
-    return { errorCode: 1, data: null, message: error };
+    return { errorCode: 1, data: null, message: 'Something went wrong' };
   }
 }
 async function associateUsersWithOrganization(
-  orgId: string,
+  orgId: number,
   domain: string,
-  user_id: string,
+  user_id: number,
 ): Promise<Result<any>> {
   try {
     // Step 1: Query users with matching domain in a single query
@@ -261,18 +308,7 @@ async function associateUsersWithOrganization(
   }
 }
 
-async function addOrganization(data: {
-  user_id: any;
-  role_id: any;
-  name: string;
-  description: string;
-  type_id: any;
-  status: string;
-  domain: string[];
-  token: any;
-  userName: any;
-  type_name: any;
-}): Promise<Result<any>> {
+async function addOrganization(data: DataInAddOrg): Promise<Result<any>> {
   try {
     // Fetch general settings in parallel
     const settingsPromise = supabase
@@ -416,7 +452,7 @@ async function automaticallyCreateOrg(
         .eq('setting_name', 'empty_user_meta_data');
 
       // You can handle the settingsPromise here, for example, with .then() or async/await
-      await emptyFieldPromise.then(({ data, error }) => {
+      await emptyFieldPromise.then(({ error }) => {
         if (error) {
           return { errorCode: 1, data: null, message: error.message };
         }
@@ -424,7 +460,7 @@ async function automaticallyCreateOrg(
     }
 
     // Determine type_id based on "I am a Litmus" value
-    let type_id: any;
+    let type_id: number | null = null;
     if (type_name == 'end_user') {
       type_id = 1;
     }
@@ -434,7 +470,7 @@ async function automaticallyCreateOrg(
     if (type_name == 'partner') {
       type_id = 3;
     }
-    let orgId: any;
+    let orgId: number;
 
     // Check if the organization already exists in org_details
     const { data: existingOrg, error: existingOrgError } = await supabase
@@ -658,10 +694,10 @@ const insertDomains = async (orgId: any, domains: string[]) => {
       success: true,
       data: associationResults,
     };
-  } catch (error: any) {
+  } catch (error) {
     return {
       success: false,
-      error: error.message,
+      error: 'Something went wrong',
     };
   }
 };
@@ -722,19 +758,10 @@ const insertDomains = async (orgId: any, domains: string[]) => {
 //     return { errorCode: 1, data: null };
 //   }
 // }
-async function updateOrganization(data: {
-  name: string;
-  description: string;
-  type_id: any;
-  status: string;
-  domain: string[];
-  org_id: any;
-  user_id: any;
-  details: any;
-  userName: any;
-  orgName: any;
-  oldOrgName: any;
-}): Promise<Result<any>> {
+
+async function updateOrganization(
+  data: UpdatedRequestData,
+): Promise<Result<any>> {
   const {
     org_id,
     name,
@@ -744,7 +771,6 @@ async function updateOrganization(data: {
     domain,
     user_id,
     userName,
-    oldOrgName,
   } = data;
 
   try {
@@ -961,7 +987,9 @@ async function orgNameCheck(name: any, org_id: any) {
     return { errorCode: 1, message: 'Failed to check organization name' };
   }
 }
-async function viewOrganization(org_id: any): Promise<Result<any>> {
+async function viewOrganization(
+  org_id: number,
+): Promise<Result<OrganizationWithDomains | null>> {
   try {
     let business_account = false;
     const { data: entitlements_package, error: entitlements_packageError } =
@@ -1330,7 +1358,9 @@ async function getUserRole(): Promise<Result<UserRole[]>> {
   }
 }
 
-async function checkBusinessDomain(domain_name: string): Promise<any> {
+async function checkBusinessDomain(
+  domain_name: string,
+): Promise<checkDomainResponse> {
   try {
     const { data: known_public_domains, error } = await supabase
       .from('known_public_domains')

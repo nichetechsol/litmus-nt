@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 'use client';
 import Link from 'next/link';
 import { redirect, useRouter } from 'next/navigation';
@@ -32,14 +30,21 @@ import {
   checkBusinessDomain,
   checkDomainAssociations,
   checkDomainAssociationsModify,
+  checkDomainResponse,
   confirmDeletion,
+  DataInAddOrg,
   deleteDomains,
   fetchOrganizationAndSiteDetails,
   fetchOrganizationTypes,
   organizationSidebarList,
+  OrganizationWithDomains,
+  OrganizationWithSiteCount,
+  OrgDetail,
   orgNameCheck,
   reqOrgDeleteMail,
   requestOrgDeletion,
+  Result,
+  UpdatedRequestData,
   updateOrganization,
   viewOrganization,
 } from '@/supabase/org_details';
@@ -53,15 +58,12 @@ const validationSchema = Yup.object().shape({
   selectedType: TypeDropdownSchema,
   message: MessageSchema,
 });
-interface OrganizationWithSiteCount {
-  org_id: string;
-  org_type_id: string;
-  org_name: string;
-  sites_count: number;
-  user_role_id: number | string;
+interface AllDomain {
+  domainname: string;
+  domainid: number;
 }
-interface organizationSidebarList {
-  id: unknown;
+interface organizationSidebarList1 {
+  id: number;
   created_at: string;
   description: string;
   name: string;
@@ -70,7 +72,7 @@ interface organizationSidebarList {
   updated_at: string;
 }
 interface SidebarOrgs {
-  data: organizationSidebarList[];
+  data: organizationSidebarList1[];
 }
 interface Typeor {
   id: number;
@@ -83,11 +85,11 @@ const Page = () => {
   const [onlyToken, setOnlyToken] = useState('');
   const navigate = useRouter();
   const [changeFlage, setChangeFlage] = useState<boolean>(true);
-  const [organizationName, setOrganizationName] = useState('');
+  const [organizationName, setOrganizationName] = useState<string>('');
   const [organizationNameError, setOrganizationNameError] = useState('');
   const [organizationNameError1, setOrganizationNameError1] =
     useState<boolean>(true);
-  const [domains, setDomains] = useState<any[]>([]);
+  const [domains, setDomains] = useState<string[]>([]);
   const [domainInput, setDomainInput] = useState<string>('');
   const [domainError, setDomainError] = useState('');
   const [typeDropdown, setTypeDropdown] = useState<Typeor[] | null>(null);
@@ -98,16 +100,16 @@ const Page = () => {
   const closeModalButtonRef = useRef<HTMLButtonElement>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [modalOpen, setModalOpen] = useState<boolean>(true);
-  const [user_id, setuser_id] = useState<string>('');
+  const [user_id, setuser_id] = useState<number | null>(null);
   const [email, setEmail] = useState<string>('');
   const [add_orgUser, setadd_orgUser] = useState<string>('');
   const [org_exists, setorg_exists] = useState<string>('');
-  const [allDomain, setAllDomain] = useState<any>('');
-  const [searchTerm, setSearchTerm] = useState<any>();
+  const [allDomain, setAllDomain] = useState<AllDomain[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>();
   const [orgsWithSites, setOrgsWithSites] = useState<
     OrganizationWithSiteCount[] | null
   >(null);
-  const [orgidForupdatetion, setorgidForupdatetion] = useState();
+  const [orgidForupdatetion, setorgidForupdatetion] = useState<number | null>();
   const [business_account, setBusiness_account] = useState<boolean>(true);
   const [addbuttonclass, setaddbuttonclass] = useState<boolean>(false);
   const [org_Business, setOrg_Business] =
@@ -143,7 +145,7 @@ const Page = () => {
     const decryptemail = decryptData(email1);
     if (decryptemail) {
       const domain = decryptemail.split('@')[1];
-      const result: any = await checkBusinessDomain(domain);
+      const result = await checkBusinessDomain(domain);
       if (result.errorCode === 0) {
         if (result.domain == true) {
           setOrg_Business('none_business');
@@ -237,21 +239,25 @@ const Page = () => {
   const fetchData = useCallback(async () => {
     try {
       if (user_id) {
-        const data: any = await fetchOrganizationAndSiteDetails(user_id);
-        if (data.errorCode === 0) {
-          if (data.data.length > 0) {
-            setorg_exists('true');
-            const encryptedOrgExists = encryptData('true');
-            localStorage.setItem('org_exists', encryptedOrgExists);
-          } else {
-            setorg_exists('false');
-            const encryptedOrgExists = encryptData('false');
-            localStorage.setItem('org_exists', encryptedOrgExists);
-          }
-          setOrgsWithSites(data.data);
-          if (!localStorage.getItem('reloaded')) {
-            localStorage.setItem('reloaded', 'true');
-            window.location.reload();
+        const data: Result<OrganizationWithSiteCount[] | null> =
+          await fetchOrganizationAndSiteDetails(user_id);
+        if (data && data.errorCode === 0) {
+          if (data.data) {
+            if (data.data.length > 0) {
+              setorg_exists('true');
+              const encryptedOrgExists = encryptData('true');
+              localStorage.setItem('org_exists', encryptedOrgExists);
+            } else {
+              setorg_exists('false');
+              const encryptedOrgExists = encryptData('false');
+              localStorage.setItem('org_exists', encryptedOrgExists);
+            }
+
+            setOrgsWithSites(data.data);
+            if (!localStorage.getItem('reloaded')) {
+              localStorage.setItem('reloaded', 'true');
+              window.location.reload();
+            }
           }
         } else {
           toast.error(data.message, { autoClose: 3000 });
@@ -289,11 +295,11 @@ const Page = () => {
   }, [AddOrgButton, fetchData, user_id]);
   const fetchData1 = useCallback(async () => {
     try {
-      const result1: any = await organizationSidebarList(
-        searchTerm ? searchTerm : null,
+      const result1: Result<OrgDetail[]> = await organizationSidebarList(
+        searchTerm ? searchTerm : '',
         user_id,
       );
-      if (result1.errorCode === 0 && result1.data.length > 0) {
+      if (result1.errorCode === 0 && result1.data && result1.data.length > 0) {
         setSidebarOrgs({ data: result1.data });
       } else if (result1.errorCode === 1) {
         setSidebarOrgs({ data: [] });
@@ -469,57 +475,59 @@ const Page = () => {
           const selectedTypeId =
             typeDropdown?.find((type) => type.name === selectedType)?.id ??
             null;
-          const data: any = {
-            user_id: user_id,
-            name: organizationName,
-            description: message,
-            type_id: selectedTypeId,
-            status: 'Y',
-            domain: domains,
-            token: onlyToken,
-            userName: email,
-            type_name: selectedType,
-          };
-          try {
-            setLoading(true);
-            await refreshToken();
-            const result = await addOrganization(data);
-            if (result.errorCode == 0) {
-              setLoading(false);
-              toast.success('Organization added successfully', {
-                autoClose: 3000,
-              });
-              const org_exists = 'true';
-              const encryptedOrgExists = encryptData(
-                org_exists ? org_exists : '',
-              );
-              if (encryptedOrgExists) {
-                localStorage.setItem('org_exists', encryptedOrgExists);
-              }
-            } else {
-              setLoading(false);
-              if (result.errorCode === 1) {
-                document.body.classList.add('no-scroll');
-                swal(result.data, { icon: 'error' }).then(() => {
-                  document.body.classList.remove('no-scroll');
+          if (user_id && selectedTypeId) {
+            const data: DataInAddOrg = {
+              user_id: user_id,
+              name: organizationName,
+              description: message,
+              type_id: selectedTypeId,
+              status: 'Y',
+              domain: domains,
+              token: onlyToken,
+              userName: email,
+              type_name: selectedType,
+            };
+            try {
+              setLoading(true);
+              await refreshToken();
+              const result = await addOrganization(data);
+              if (result.errorCode == 0) {
+                setLoading(false);
+                toast.success('Organization added successfully', {
+                  autoClose: 3000,
                 });
+                const org_exists = 'true';
+                const encryptedOrgExists = encryptData(
+                  org_exists ? org_exists : '',
+                );
+                if (encryptedOrgExists) {
+                  localStorage.setItem('org_exists', encryptedOrgExists);
+                }
+              } else {
+                setLoading(false);
+                if (result.errorCode === 1) {
+                  document.body.classList.add('no-scroll');
+                  swal(result.data, { icon: 'error' }).then(() => {
+                    document.body.classList.remove('no-scroll');
+                  });
+                }
               }
+              if (closeModalButtonRef.current) {
+                closeModalButtonRef.current.click();
+              }
+              clearFields();
+              fetchData();
+              fetchData1();
+              AddOrgButton();
+            } catch (error) {
+              setLoading(false);
+              closeModal();
+              if (closeModalButtonRef.current) {
+                closeModalButtonRef.current.click();
+              }
+              clearFields();
+              toast.error('Error Adding Organization', { autoClose: 3000 });
             }
-            if (closeModalButtonRef.current) {
-              closeModalButtonRef.current.click();
-            }
-            clearFields();
-            fetchData();
-            fetchData1();
-            AddOrgButton();
-          } catch (error) {
-            setLoading(false);
-            closeModal();
-            if (closeModalButtonRef.current) {
-              closeModalButtonRef.current.click();
-            }
-            clearFields();
-            toast.error('Error Adding Organization', { autoClose: 3000 });
           }
         }
       }
@@ -574,50 +582,52 @@ const Page = () => {
           const selectedTypeId =
             typeDropdown?.find((type) => type.name === selectedType)?.id ??
             null;
-          const updateData: any = {
-            org_id: orgidForupdatetion,
-            name: organizationName,
-            description: message,
-            type_id: selectedTypeId,
-            status: 'Y',
-            domain: domains,
-            token: onlyToken,
-            userName: email,
-            type_name: selectedType,
-            user_id: user_id,
-          };
-          try {
-            setLoading(true);
-            await refreshToken();
-            const result = await updateOrganization(updateData);
-            if (result.data != null && result.errorCode == 0) {
-              setLoading(false);
-              toast.success(result.message, { autoClose: 3000 });
-            } else {
-              setLoading(false);
-              if (result.errorCode === 1) {
-                toast.error(result.message, { autoClose: 3000 });
+          if (orgidForupdatetion && selectedTypeId && user_id && onlyToken) {
+            const updateData: UpdatedRequestData = {
+              org_id: orgidForupdatetion,
+              name: organizationName,
+              description: message,
+              type_id: selectedTypeId,
+              status: 'Y',
+              domain: domains,
+              // token: onlyToken,
+              userName: email,
+              // type_name: selectedType,
+              user_id: user_id,
+            };
+            try {
+              setLoading(true);
+              await refreshToken();
+              const result = await updateOrganization(updateData);
+              if (result.data != null && result.errorCode == 0) {
+                setLoading(false);
+                toast.success(result.message, { autoClose: 3000 });
+              } else {
+                setLoading(false);
+                if (result.errorCode === 1) {
+                  toast.error(result.message, { autoClose: 3000 });
+                }
               }
+              if (closeModalButtonRef.current) {
+                closeModalButtonRef.current.click();
+              }
+              clearFields();
+              fetchData();
+              fetchData1();
+            } catch (error) {
+              if (closeModalButtonRef.current) {
+                closeModalButtonRef.current.click();
+              }
+              clearFields();
+              setLoading(false);
+              toast.error('Error Editing Organization', { autoClose: 3000 });
             }
-            if (closeModalButtonRef.current) {
-              closeModalButtonRef.current.click();
-            }
-            clearFields();
-            fetchData();
-            fetchData1();
-          } catch (error) {
-            if (closeModalButtonRef.current) {
-              closeModalButtonRef.current.click();
-            }
-            clearFields();
-            setLoading(false);
-            toast.error('Error Editing Organization', { autoClose: 3000 });
           }
         }
       }
     }
   };
-  const DomainAssociation = async (domainOnly: any, domain: any) => {
+  const DomainAssociation = async (domainOnly: string, domain: string) => {
     const result = await checkDomainAssociations(domainOnly);
     if (result.errorCode === 0 && result.associated === true) {
       const willProceed = await swal({
@@ -680,7 +690,7 @@ const Page = () => {
             } else {
               domainCheckedNotEmail = domain;
             }
-            const result: any = await checkBusinessDomain(
+            const result: checkDomainResponse = await checkBusinessDomain(
               domainCheckedNotEmail,
             );
             if (result.errorCode === 0) {
@@ -773,7 +783,10 @@ const Page = () => {
       handleSubmit();
     }
   };
-  const handleKeyPress = async (e: any) => {
+  const handleKeyPress = async (e: {
+    key: string;
+    preventDefault: () => void;
+  }) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       await addDomain();
@@ -789,9 +802,9 @@ const Page = () => {
         setDomainError(err.message);
       });
   };
-  const removeDomain = async (index: number, domain: any) => {
-    const id: any =
-      allDomain && allDomain.find((i: any) => i.domainname == domain);
+  const removeDomain = async (index: number, domain: string) => {
+    const id: AllDomain | undefined =
+      allDomain && allDomain.find((i: AllDomain) => i.domainname == domain);
     const newdom = domains.filter((i, idx) => idx != index);
     if (changeFlage === false && id?.domainid && newdom.length >= 1) {
       const data = {
@@ -941,11 +954,12 @@ const Page = () => {
     fetchDefaultDomain();
   };
   ///// for edit ///
-  const handeledit = async (org: any) => {
+  const handeledit = async (org: OrganizationWithSiteCount) => {
     openModal();
     setLoading(true);
     setOrganizationNameError1(false);
-    const EditView: any = await viewOrganization(org.org_id);
+    const EditView: Result<OrganizationWithDomains | null> =
+      await viewOrganization(org.org_id);
     if (EditView.errorCode === 1) {
       toast.error(EditView.message, { autoClose: 3000 });
       setLoading(false);
@@ -956,26 +970,42 @@ const Page = () => {
       fetchData();
       fetchData1();
       return;
+    } else if (EditView.data && EditView.errorCode === 0) {
+      setorgidForupdatetion(org.org_id);
+      setOrganizationName(EditView?.data?.name);
+      const domains = EditView?.data?.domains.map(
+        (domain: { id: number; name: string }) => {
+          return {
+            domainname: domain.name,
+            domainid: domain.id,
+          };
+        },
+      );
+      setDomains(
+        domains
+          ? domains.map(
+              (name: { domainname: string; domainid: number }) =>
+                name.domainname,
+            )
+          : [],
+      );
+      setAllDomain(
+        domains
+          ? domains.map(
+              (name: { domainname: string; domainid: number }) => name,
+            )
+          : [],
+      );
+      const selectedTypeId =
+        typeDropdown?.find((type) => type.id === EditView?.data?.type_id)
+          ?.name ?? null;
+      setSelectedType(selectedTypeId ? selectedTypeId : '');
+      setBusiness_account(EditView?.business_account ?? false);
+      setMessage(EditView?.data.description);
+      setChangeFlage(false);
+      setLoading(false);
+      // setOrganizationName(org.org_name);
     }
-    setorgidForupdatetion(org.org_id);
-    setOrganizationName(EditView?.data?.name);
-    const domains = EditView?.data?.domains.map((domain: any) => {
-      return {
-        domainname: domain.name,
-        domainid: domain.id,
-      };
-    });
-    setDomains(domains ? domains.map((name: any) => name.domainname) : []);
-    setAllDomain(domains ? domains.map((name: any) => name) : []);
-    const selectedTypeId =
-      typeDropdown?.find((type) => type.id === EditView?.data.type_id)?.name ??
-      null;
-    setSelectedType(selectedTypeId ? selectedTypeId : '');
-    setBusiness_account(EditView?.business_account);
-    setMessage(EditView?.data.description);
-    setChangeFlage(false);
-    setLoading(false);
-    // setOrganizationName(org.org_name);
   };
   const addorg = () => {
     setorgidForupdatetion(undefined);
@@ -1022,7 +1052,7 @@ const Page = () => {
   `;
   }
   ////HANDLE DELETE FOR ORG
-  const handleDelete = async (org: any) => {
+  const handleDelete = async (org: OrganizationWithSiteCount) => {
     const showError = () => {
       document.body.classList.add('no-scroll');
       swal({
@@ -1172,7 +1202,7 @@ const Page = () => {
       setLoading(false);
     }
   };
-  const checkInputValue = async (value: any) => {
+  const checkInputValue = async (value: string) => {
     try {
       const response = await orgNameCheck(value, orgidForupdatetion);
       if (response) {
@@ -1201,7 +1231,7 @@ const Page = () => {
       } else if (e.key === 'ArrowUp') {
         setFocusedIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : 0));
       } else if (e.key === 'Enter' && focusedIndex >= 0) {
-        const org: any = sidebarOrgs.data[focusedIndex];
+        const org = sidebarOrgs.data[focusedIndex];
         if (org.id !== -1) {
           handleOrgClick(org);
         }
@@ -1376,7 +1406,7 @@ const Page = () => {
                                 <div className='xl:col-span-12 col-span-12'>
                                   <div className='grid grid-cols-12 gap-2'>
                                     {domains &&
-                                      domains.map((domain: any, index) => (
+                                      domains.map((domain: string, index) => (
                                         <div
                                           key={index}
                                           className='xl:col-span-6 col-span-6 alert alert-solid-primary alert-dismissible fade show flex'
@@ -1525,7 +1555,7 @@ const Page = () => {
                     <div className='input-group' style={{ cursor: 'pointer' }}>
                       <input
                         type='text'
-                        value={searchTerm}
+                        value={searchTerm ?? ''}
                         onChange={(e) => {
                           setSearchTerm(e?.target?.value);
                           setFocusedIndex(-1);
@@ -1564,7 +1594,7 @@ const Page = () => {
                                     if (org.id != -1) {
                                       setLoading(true);
                                       const encryptedOrgId = encryptData(
-                                        org.id as string,
+                                        org.id,
                                       );
                                       const encryptedOrgName = encryptData(
                                         org.name,
