@@ -154,7 +154,7 @@ const Page = () => {
       window.URL.revokeObjectURL(url);
     }
     setLoading(false);
-    const data = {
+    const data: any = {
       org_id: org_id,
       site_id: site_id,
       user_id: user_id,

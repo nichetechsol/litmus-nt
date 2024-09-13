@@ -408,7 +408,7 @@ async function inviteSendToUser(data: any) {
 
     // Define the sign-up link
     const signUpLink =
-      '<a href="https://central-v2-external-q4v2833u1-litmusio.vercel.app/">Sign Up Here</a>';
+      '<a href="https://central-v2-external-19k7wvykc-litmusio.vercel.app/">Sign Up Here</a>';
 
     // Replace placeholders with actual values
     const toData = toTemplate.replace(
