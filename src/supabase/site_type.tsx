@@ -3,7 +3,7 @@ import { supabase } from './db';
 
 // Define the interface for SiteType
 interface SiteType {
-  id: any;
+  id: number;
   name: string;
   // Add other fields as needed
 }

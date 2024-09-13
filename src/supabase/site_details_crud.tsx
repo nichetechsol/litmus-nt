@@ -7,9 +7,42 @@ import { sendEmailFunction } from '@/supabase/email';
 import fetchEmailData from '@/supabase/email_configuration';
 
 import { supabase } from './db';
+export interface UpdateData {
+  siteId: number;
+  name: string;
+  type_id: number | string;
+  address1: string;
+  address2: string;
+  city: string;
+  pin_code: string;
+  about_site: string;
+  status: string;
+  country_id: number | string;
+  state_id: number | string;
+  userName: string;
+  org_id: number;
+  user_id: number;
+  orgName: string;
+}
 
+interface SiteDetails {
+  id: number;
+  name: string;
+  type_id: number;
+  address1: string;
+  address2: string;
+  city: string;
+  pin_code: string;
+  about_site: string;
+  status: string;
+  country_id: number;
+  state_id: number;
+  site_types: {
+    name: string;
+  };
+}
 // Define interfaces for the site data and result structure
-interface SiteData {
+export interface SiteData {
   org_id: any;
   name: string;
   type_id: any;
@@ -22,7 +55,6 @@ interface SiteData {
   country_id: any;
   state_id: any;
   user_id: any;
-  description: any;
   token: any;
   userName: any;
   org_name: any;
@@ -306,7 +338,9 @@ async function addSitesConfirm(data: any) {
   }
 }
 
-async function updateSite(updateData: any): Promise<Result<any>> {
+async function updateSite(
+  updateData: UpdateData,
+): Promise<Result<SiteDetails[]>> {
   try {
     // Validate the input
     if (!updateData.siteId || !updateData.name || !updateData) {

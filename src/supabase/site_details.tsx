@@ -2,48 +2,49 @@
 import { supabase } from './db';
 
 interface SiteDetails {
-  id: any;
-  org_id: any;
+  id: number;
+  org_id: number;
   name: string;
-  type_id: any;
+  type_id: number;
   address1: string;
   address2?: string;
   city: string;
   pin_code: string;
   about_site?: string;
   status: string;
-  country_id: any;
-  state_id: any;
+  country_id: number;
+  state_id: number;
 }
-interface SiteDetailsWithOwner {
+export interface SiteDetailsWithOwner {
   site: SiteDetails;
-  id: any;
-  org_id: any;
+  id: number;
+  org_id: number;
   name: string;
-  type_id: any;
+  type_id: number;
   address1: string;
   address2?: string;
   city: string;
   pin_code: string;
   about_site?: string;
   status: string;
-  country_id: any;
-  state_id: any;
+  country_id: number;
+  state_id: number;
 }
 interface User {
-  id: any;
-  site_id: any;
-  user_id: any;
-  role_id: any;
+  id: number;
+  site_id: number;
+  user_id: number;
+  role_id: number;
 }
 
-interface Result<T> {
+export interface Result<T> {
   errorCode: number;
   message?: string;
   data: T | null;
 }
 
-interface SiteDetailsWithUsers {
+export interface SiteDetailsWithUsers {
+  user_role_id: number;
   site: SiteDetails;
   users: User[];
   ownerNames: string[];
@@ -53,8 +54,8 @@ interface SiteDetailsWithUsers {
 }
 
 async function fetchSiteDetails(
-  org_id: any,
-  user_id: any,
+  org_id: number,
+  user_id: number,
 ): Promise<Result<SiteDetailsWithUsers[]>> {
   try {
     // Fetch site_id associated with the user
@@ -153,9 +154,9 @@ async function fetchSiteDetails(
 }
 
 async function fetchSiteSidebarList(
-  searchQuery: string,
-  org_id: any,
-  user_id: any,
+  searchQuery: string | null,
+  org_id: number,
+  user_id: number,
 ): Promise<Result<SiteDetailsWithOwner[]>> {
   try {
     // Fetch site_ids associated with the user

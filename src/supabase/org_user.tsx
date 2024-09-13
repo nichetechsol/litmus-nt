@@ -40,13 +40,17 @@ interface User {
   firstname: string;
   lastname: string;
 }
+export interface UserRole {
+  id: any;
+  name: string;
+}
 
 interface OrgUser {
   user_id: any;
   role_id: any;
 }
 
-interface Result<T> {
+export interface Result<T> {
   errorCode: number;
   message?: string;
   data: any;
@@ -443,7 +447,7 @@ async function inviteSendToUser(data: any) {
 async function getOrgUserRole(
   user_id: any,
   org_id: any,
-): Promise<Result<null>> {
+): Promise<Result<UserRole>> {
   // Validate the input
   if (!user_id || !org_id) {
     return { errorCode: 1, data: null, message: 'Please provide valid inputs' };
@@ -487,7 +491,7 @@ async function getOrgUserRole(
     }
 
     // Log the user role details and return them
-    return { errorCode: 0, data: userRole };
+    return { errorCode: 0, data: userRole, message: 'Fetch Successfully' };
   } catch (error) {
     // Log any unexpected errors
     return {

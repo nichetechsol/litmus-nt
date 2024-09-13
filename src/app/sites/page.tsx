@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import Link from 'next/link';
 import { redirect, useRouter } from 'next/navigation';
@@ -30,17 +29,21 @@ import {
 } from '@/helper/ValidationHelper';
 import Seo from '@/shared/layout-components/seo/seo';
 import { countryList } from '@/supabase/country';
-import { getOrgUserRole } from '@/supabase/org_user';
+import { getOrgUserRole, Result, UserRole } from '@/supabase/org_user';
 import { refreshToken } from '@/supabase/session';
 import {
   fetchSiteDetails,
   fetchSiteSidebarList,
+  SiteDetailsWithOwner,
+  SiteDetailsWithUsers,
 } from '@/supabase/site_details';
 import {
   addSites,
   addSitesConfirm,
   requestSiteDeletion,
+  SiteData,
   siteNameCheck,
+  UpdateData,
   updateSite,
 } from '@/supabase/site_details_crud';
 import { fetchSiteType } from '@/supabase/site_type';
@@ -59,45 +62,16 @@ interface SiteType {
   type_id: number;
   id: number;
   name: string;
+  ownerNames?: string[];
 }
 interface SiteTpesDropDown {
   id: number;
   name: string;
 }
-interface SiteDetailsWithUsers {
-  type_name: string | null;
-  site: SiteDetails;
-  users: User[];
-  ownerNames: string[];
-  country: string | null;
-  state: string | null;
-  user_role_id?: number | null;
-}
-interface SiteDetails {
-  id: string;
-  org_id: number;
-  name: string;
-  type_id: number;
-  address1: string;
-  address2?: string;
-  city: string;
-  pin_code: string;
-  about_site?: string;
-  status: string;
-  country_id: number;
-  state_id: number;
-}
-interface User {
-  id: number;
-  site_id: number;
-  user_id: number;
-  role_id: number;
-}
-
 const Page: React.FC = () => {
   const navigate = useRouter();
-  const [org_id, Setorg_id] = useState<any>('');
-  const [user_id, setuser_id] = useState<any>('');
+  const [org_id, Setorg_id] = useState<number>();
+  const [user_id, setuser_id] = useState<number | undefined>(undefined);
   const [orgName, setorgName] = useState<string>('');
   const [onlyToken, setOnlyToken] = useState('');
   const [userEmail, setUseremail] = useState<string>('');
@@ -124,7 +98,7 @@ const Page: React.FC = () => {
     const fetchData2 = async () => {
       try {
         if (user_id && org_id) {
-          const data: any = await getOrgUserRole(user_id, org_id);
+          const data: Result<UserRole> = await getOrgUserRole(user_id, org_id);
           if (data) {
             setuserrole2(data.data.id);
           } else {
@@ -142,7 +116,7 @@ const Page: React.FC = () => {
   const [SitesList, setOSitesList] = useState<SiteDetailsWithUsers[] | null>(
     null,
   );
-  const [searchTerm, setSearchTerm] = useState<any>();
+  const [searchTerm, setSearchTerm] = useState<string | null>();
   const [sidebarSite, setsidebarSite] = useState<SiteType[]>();
   const [AddSiteName, setAddSiteName] = useState<string>('');
   const [AddSiteNameError, setAddSiteNameError] = useState<string>('');
@@ -239,13 +213,18 @@ const Page: React.FC = () => {
     try {
       setLoading(true);
       if (org_id && user_id) {
-        const data1 = await fetchSiteDetails(org_id, user_id);
-        if (data1.errorCode === 0) {
-          setOSitesList(data1.data ? data1.data : []);
-          setLoading(false);
-        } else {
-          setLoading(false);
-          //
+        const data1: Result<SiteDetailsWithUsers[]> = await fetchSiteDetails(
+          org_id,
+          user_id,
+        );
+        if (data1) {
+          if (data1.errorCode === 0) {
+            setOSitesList(data1.data ? data1.data : []);
+            setLoading(false);
+          } else {
+            setLoading(false);
+            //
+          }
         }
       }
     } catch (error) {
@@ -258,31 +237,36 @@ const Page: React.FC = () => {
   }, [FetchSiteDetails, org_id]);
   /// //Added by Kunal -Searching in site
   const fetchData1 = useCallback(async () => {
-    try {
-      const result1: any = await fetchSiteSidebarList(
-        searchTerm ? searchTerm : null,
-        org_id,
-        user_id,
-      );
-      if (result1.errorCode === 0 && result1.data.length > 0) {
-        setsidebarSite(result1.data);
-      } else if (result1.errorCode === 1) {
-        setsidebarSite([]);
-      } else {
-        if (searchTerm) {
-          setsidebarSite([
-            {
-              id: -1,
-              name: "We couldn't find any sites",
-              type_id: 1,
-            },
-          ]);
-        } else {
-          setsidebarSite([]);
+    if (org_id && user_id) {
+      try {
+        const result1: Result<SiteDetailsWithOwner[]> =
+          await fetchSiteSidebarList(
+            searchTerm ? searchTerm : null,
+            org_id,
+            user_id,
+          );
+        if (result1 && result1.data) {
+          if (result1.errorCode === 0 && result1.data.length > 0) {
+            setsidebarSite(result1.data);
+          } else if (result1.errorCode === 1) {
+            setsidebarSite([]);
+          } else {
+            if (searchTerm) {
+              setsidebarSite([
+                {
+                  id: -1,
+                  name: "We couldn't find any sites",
+                  type_id: 1,
+                },
+              ]);
+            } else {
+              setsidebarSite([]);
+            }
+          }
         }
+      } catch (error) {
+        //
       }
-    } catch (error) {
-      //
     }
   }, [org_id, searchTerm, user_id]);
   //Added by Kunal - Delay in search as on every word typed api Should not be called
@@ -327,7 +311,7 @@ const Page: React.FC = () => {
   function handleCall() {
     const SiteTypesFetch = async () => {
       try {
-        const data = await fetchSiteType();
+        const data: Result<SiteType[]> = await fetchSiteType();
         if (data && data.data) {
           settypeDropdown(data.data);
         } else {
@@ -340,7 +324,7 @@ const Page: React.FC = () => {
     /// //Added by Kunal - for adding the dropdown of country
     const AddSiteCounrtyDropDown = async () => {
       try {
-        const data = await countryList();
+        const data: Result<Country[]> = await countryList();
         if (data && data) {
           setFetchdropDCounrty(data.data);
         } else {
@@ -543,12 +527,12 @@ const Page: React.FC = () => {
       return false;
     }
   };
-  const [editsiteid, seteditsiteid] = useState();
+  const [editsiteid, seteditsiteid] = useState<number | undefined>(undefined);
   const handleSubmit = async () => {
     const isValid = await validateForm();
     if (isValid) {
       if (changeFlage) {
-        const data: any = {
+        const data: SiteData = {
           org_id: org_id,
           name: AddSiteName,
           type_id: SelectedValueDropdown,
@@ -639,50 +623,53 @@ const Page: React.FC = () => {
         }
       }
       if (changeFlage == false) {
-        const updatedata: any = {
-          org_id: org_id,
-          name: AddSiteName,
-          type_id: SelectedValueDropdown,
-          address1: Address1,
-          address2: Address2,
-          city: City,
-          pin_code: Pincode,
-          about_site: message,
-          status: 'Y',
-          country_id: SelectedValueCounrty,
-          state_id: SelectedValueState,
-          user_id: user_id,
-          token: onlyToken,
-          siteId: editsiteid,
-          userName: userEmail,
-          orgName: orgName,
-        };
-        try {
-          setLoading(true);
-          await refreshToken();
-          const result = await updateSite(updatedata);
-          if (result.errorCode == 0) {
-            setLoading(false);
-            if (closeModalButtonRef.current) {
-              closeModalButtonRef.current.click();
+        if (org_id && editsiteid && user_id) {
+          const updatedata: UpdateData = {
+            org_id: org_id,
+            name: AddSiteName,
+            type_id: SelectedValueDropdown,
+            address1: Address1,
+            address2: Address2,
+            city: City,
+            pin_code: Pincode,
+            about_site: message,
+            status: 'Y',
+            country_id: SelectedValueCounrty,
+            state_id: SelectedValueState,
+            user_id: user_id,
+            // token: onlyToken,
+            siteId: editsiteid,
+            userName: userEmail,
+            orgName: orgName,
+          };
+
+          try {
+            setLoading(true);
+            await refreshToken();
+            const result = await updateSite(updatedata);
+            if (result.errorCode == 0) {
+              setLoading(false);
+              if (closeModalButtonRef.current) {
+                closeModalButtonRef.current.click();
+              }
+              handelclosemodel();
+              closeModal();
+              FetchSiteDetails();
+              fetchData1();
+              toast.success(result.message, { autoClose: 3000 });
+            } else {
+              setLoading(false);
+              if (closeModalButtonRef.current) {
+                closeModalButtonRef.current.click();
+              }
+              handelclosemodel();
+              closeModal();
+              toast.error(result.message, { autoClose: 3000 });
             }
-            handelclosemodel();
-            closeModal();
-            FetchSiteDetails();
-            fetchData1();
-            toast.success(result.message, { autoClose: 3000 });
-          } else {
+          } catch (error) {
             setLoading(false);
-            if (closeModalButtonRef.current) {
-              closeModalButtonRef.current.click();
-            }
-            handelclosemodel();
             closeModal();
-            toast.error(result.message, { autoClose: 3000 });
           }
-        } catch (error) {
-          setLoading(false);
-          closeModal();
         }
       }
     }
@@ -703,7 +690,7 @@ const Page: React.FC = () => {
     }
   }, []);
   ///// for edit
-  const handeledit = (SingleSite: any) => {
+  const handeledit = (SingleSite: SiteDetailsWithUsers) => {
     openModal();
     setLoading(true);
     setChangeFlage(false);
@@ -756,7 +743,7 @@ const Page: React.FC = () => {
     </div>
   `;
   }
-  const handelDelete = (SingleSite: any): any => {
+  const handelDelete = (SingleSite: SiteDetailsWithUsers) => {
     const showError = () => {
       document.body.classList.add('no-scroll');
       swal({
@@ -873,7 +860,7 @@ const Page: React.FC = () => {
     showDeleteModal();
   };
   // for sitename already exsist
-  const checkInputValue = async (value: any) => {
+  const checkInputValue = async (value: string) => {
     try {
       const response = await siteNameCheck(value, editsiteid);
       if (response) {
@@ -902,7 +889,7 @@ const Page: React.FC = () => {
       } else if (e.key === 'ArrowUp') {
         setFocusedIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : 0));
       } else if (e.key === 'Enter' && focusedIndex >= 0) {
-        const site: any = sidebarSite[focusedIndex];
+        const site: SiteType = sidebarSite[focusedIndex];
         if (site.id !== -1) {
           handleSiteClick(site);
         }
@@ -933,7 +920,7 @@ const Page: React.FC = () => {
   const handleSiteClick = (site: {
     id: number;
     name: string;
-    ownerNames: string[];
+    ownerNames?: string[];
     type_id: number;
   }) => {
     setLoading(true);
@@ -1299,7 +1286,7 @@ const Page: React.FC = () => {
                       <div className='input-group'>
                         <input
                           type='text'
-                          value={searchTerm}
+                          value={searchTerm ?? ''}
                           onChange={(e) => {
                             setSearchTerm(e.target.value);
                             setFocusedIndex(-1);

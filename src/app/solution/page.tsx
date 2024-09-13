@@ -29,7 +29,7 @@ const Page = () => {
   const [subFolders, setSubFolders] = useState<subFolder[] | null>(null);
   const [selectedFolder, setSelectedFolder] = useState<any>(null);
   const [file3, setfile3] = useState<file[] | null>(null);
-  const [currentTrue, setCurrentTrue] = useState('');
+  const [currentTrue, setCurrentTrue] = useState<string>();
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
       const tokens = localStorage.getItem('sb-emsjiuztcinhapaurcrl-auth-token');
@@ -131,9 +131,12 @@ const Page = () => {
 
   const handleDownload = async (fileName: string) => {
     setLoading(true);
+    const subFolder: string = currentTrue
+      ? currentTrue.split('/').slice(-1)[0] // Extract the string from the array
+      : '';
     const result = await generateSignedUrl(
       selectedFolder.folder,
-      currentTrue ? currentTrue.split('/').slice(-1)[0] : '',
+      subFolder,
       fileName,
     );
     if (result) {
