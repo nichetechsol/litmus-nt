@@ -1,7 +1,5 @@
-/* eslint-disable unused-imports/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import supabase from '@/supabase/db';
-interface FolderResult {
+export interface FolderResult {
   folder: string;
   errorCode: number;
   message: string;
@@ -10,7 +8,19 @@ interface FolderResult {
     archivedFiles: string[];
   } | null;
 }
-
+interface FileData {
+  name: string;
+}
+interface SubFolderData {
+  files: { FileName: string }[];
+  subFolder: string;
+}
+interface MainFolder {
+  folder: string;
+  errorCode: number;
+  message: string;
+  data: SubFolderData[];
+}
 async function listSolutions() {
   try {
     const { data: litmusData, error: litmusError } = await supabase.storage
@@ -105,10 +115,10 @@ async function listSolutions() {
 
 const generateSignedUrl = async (
   folder: string,
-  subfolder: any,
-  fileName: any,
+  subfolder: string,
+  fileName: string,
 ) => {
-  const path: any = folder + '/' + subfolder + '/' + fileName;
+  const path: string = folder + '/' + subfolder + '/' + fileName;
   const { data, error } = await supabase.storage
     .from('Litmus_Solutions')
     .download(path);
@@ -144,10 +154,10 @@ async function listOfAllSolutions() {
 
   const processFiles = (
     folderPath: string,
-    files: any[],
+    files: FileData[],
     includeSubFolder: boolean,
   ) => {
-    const subFolderData: any = {
+    const subFolderData: SubFolderData = {
       files: [],
       subFolder: includeSubFolder ? folderPath : '',
     };
@@ -165,7 +175,7 @@ async function listOfAllSolutions() {
 
   const results = await Promise.all(
     folders.map(async (item) => {
-      const mainFolder: any = {
+      const mainFolder: MainFolder = {
         folder: item.name,
         errorCode: 0,
         message: 'Success',
@@ -212,7 +222,11 @@ async function listOfAllSolutions() {
           }),
         );
 
-        mainFolder.data.push(...subFolders.filter(Boolean));
+        mainFolder.data.push(
+          ...subFolders.filter(
+            (folder): folder is SubFolderData => folder !== null,
+          ),
+        );
       } else {
         const processedFiles = processFiles(item.name, folderData, false);
         if (processedFiles) mainFolder.data.push(processedFiles);

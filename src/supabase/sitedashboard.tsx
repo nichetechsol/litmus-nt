@@ -1,9 +1,7 @@
-/* eslint-disable unused-imports/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabase } from './db';
 
 interface SiteDetail {
-  org_id: any;
+  org_id: number;
   id: string;
   // Add other properties relevant to sites_detail here
 }
@@ -16,25 +14,77 @@ interface SiteDetailResponse {
 interface FunctionReturn {
   errorCode: number;
   message: string;
-  data: any | null;
+  data: SiteCountsData | null;
 }
+interface SiteDetails {
+  id: number;
+  name: string;
+  type_id: number;
+  status: string;
+  about_site: string;
+  address1: string;
+  address2: string;
+  city: string;
+  pin_code: string;
+  org_id: number;
+  state_id: number;
+  country_id: number;
+  created_at: string;
+  country: string;
+  state: string;
+}
+
+interface SiteCountsData {
+  usersCount: number;
+  licencesCount: number;
+  sandboxesCount: number;
+  productCount: number;
+  sites_details: SiteDetails;
+}
+interface SiteUser {
+  id: number;
+  user_id: number;
+  role_id: number;
+  site_id: number;
+  created_at: string;
+  updated_at: string;
+  role_name: string | null;
+  firstname: string | null;
+  lastname: string | null;
+  email: string | null;
+}
+
 interface FunctionReturnUser {
   errorCode: number;
   message: string;
-  data: any | null;
-  totalCount: any;
+  data: SiteUser[] | null;
+  totalCount: number | null;
 }
 interface FunctionReturnLicence {
   errorCode: number;
   message: string;
-  data: any | null;
+  data: Licence[] | null;
+}
+interface LicenceType {
+  name: string;
+}
+interface Licence {
+  id: number;
+  licence_number: string;
+  site_id: number;
+  type: number;
+  expiry: string | null; // `null` if expiry is not set
+  created_by: number | null; // `null` if created_by is not set
+  created_at: string;
+  licence_type: LicenceType;
+  licence_type_name: string; // Added dynamically
 }
 
 async function allSitesOfUsers(
-  site_id: any,
-  search: any,
-  start: any,
-  end: any,
+  site_id: number,
+  search: string,
+  start: number,
+  end: number,
 ): Promise<FunctionReturnUser> {
   try {
     // Fetch site users
@@ -54,7 +104,7 @@ async function allSitesOfUsers(
     }
 
     // Extract user ids
-    const userIds = siteUserData.map((siteUser: any) => siteUser.user_id);
+    const userIds = siteUserData.map((siteUser) => siteUser.user_id);
 
     // Fetch user details based on user ids
     const { data: userData, error: userError } = await supabase
@@ -73,12 +123,12 @@ async function allSitesOfUsers(
     }
 
     // Filter user details based on search parameter
-    let totalCount: any;
+    let totalCount: number;
     let filteredUserData = userData;
     if (search) {
       const searchLower = search.toLowerCase();
       filteredUserData = userData.filter(
-        (user: any) =>
+        (user) =>
           (user.firstname &&
             user.firstname.toLowerCase().includes(searchLower)) ||
           (user.lastname &&
@@ -94,16 +144,16 @@ async function allSitesOfUsers(
     const paginatedUserData = filteredUserData.slice(start, end + 1);
 
     // Extract filtered user ids for merging with site user data
-    const filteredUserIds = paginatedUserData.map((user: any) => user.id);
+    const filteredUserIds = paginatedUserData.map((user) => user.id);
 
     // Filter site user data based on filtered user ids
-    const filteredSiteUserData = siteUserData.filter((siteUser: any) =>
+    const filteredSiteUserData = siteUserData.filter((siteUser) =>
       filteredUserIds.includes(siteUser.user_id),
     );
 
     // Extract role ids from filtered site user data
     const filteredRoleIds = filteredSiteUserData.map(
-      (siteUser: any) => siteUser.role_id,
+      (siteUser) => siteUser.role_id,
     );
 
     // Fetch role details based on filtered role ids
@@ -123,13 +173,11 @@ async function allSitesOfUsers(
     }
 
     // Merge user details with filtered site users data and role details
-    const mergedData = filteredSiteUserData.map((siteUser: any) => {
+    const mergedData = filteredSiteUserData.map((siteUser) => {
       const userDetail = paginatedUserData.find(
-        (user: any) => user.id === siteUser.user_id,
+        (user) => user.id === siteUser.user_id,
       );
-      const roleDetail = roleData.find(
-        (role: any) => role.id === siteUser.role_id,
-      );
+      const roleDetail = roleData.find((role) => role.id === siteUser.role_id);
       return {
         ...siteUser,
         role_name: roleDetail ? roleDetail.name : null,
@@ -156,7 +204,7 @@ async function allSitesOfUsers(
   }
 }
 
-async function sitesDetails(site_id: any): Promise<SiteDetailResponse> {
+async function sitesDetails(site_id: number): Promise<SiteDetailResponse> {
   // Validate the input
   if (!site_id) {
     return {
@@ -194,7 +242,10 @@ async function sitesDetails(site_id: any): Promise<SiteDetailResponse> {
   }
 }
 
-async function sitesCounts(site_id: any, org_id: any): Promise<FunctionReturn> {
+async function sitesCounts(
+  site_id: number,
+  org_id: number,
+): Promise<FunctionReturn> {
   // Validate the input
   if (!site_id || !org_id) {
     return {
@@ -320,14 +371,9 @@ async function sitesCounts(site_id: any, org_id: any): Promise<FunctionReturn> {
     };
   }
 }
-interface FunctionReturnLicence {
-  errorCode: number;
-  message: string;
-  data: any | null;
-}
 
 // Function to fetch licenses and their types for a given site
-async function licenceData(site_id: any): Promise<FunctionReturnLicence> {
+async function licenceData(site_id: number): Promise<FunctionReturnLicence> {
   // Validate the input
   if (!site_id) {
     return {
@@ -394,7 +440,7 @@ async function licenceData(site_id: any): Promise<FunctionReturnLicence> {
   }
 }
 
-async function entitlementSite(site_id: any, start: any, end: any) {
+async function entitlementSite(site_id: number, start: number, end: number) {
   try {
     // Validate the input
     if (!site_id) {
@@ -437,12 +483,14 @@ async function entitlementSite(site_id: any, start: any, end: any) {
         const { entitlements_name, entitlements_values } = entitlement;
 
         // Determine which value is present
-        let entitlementValueResolved: any;
+        let entitlementValueResolved: number | string | boolean;
         if (entitlements_values.value_text !== null) {
           entitlementValueResolved = entitlements_values.value_text;
-          entitlementValueResolved =
-            entitlementValueResolved.charAt(0).toUpperCase() +
-            entitlementValueResolved.slice(1);
+          if (typeof entitlementValueResolved === 'string') {
+            entitlementValueResolved =
+              entitlementValueResolved.charAt(0).toUpperCase() +
+              entitlementValueResolved.slice(1);
+          }
         } else if (entitlements_values.value_number !== null) {
           entitlementValueResolved = entitlements_values.value_number;
         } else if (entitlements_values.value_bool !== null) {

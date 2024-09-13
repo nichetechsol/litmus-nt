@@ -2,7 +2,7 @@
 'use client';
 import React, { useState } from 'react';
 
-import { checkLimit } from '@/supabase/licence';
+import { sitesCounts } from '@/supabase/sitedashboard';
 
 const OrgDashboard = () => {
   const [result, setResult] = useState<any>(null);
@@ -14,14 +14,14 @@ const OrgDashboard = () => {
     setError(null);
 
     try {
-      const data1 = {
-        orgId: 175,
-        license_limit_entitlement: 24,
-        increase_by: 1000,
-        license_number_entitlement: 29,
-        license_exceed_allowed_entitlement: 18,
-      };
-      const data: any = await checkLimit(data1);
+      // const data1 = {
+      //   orgId: 175,
+      //   license_limit_entitlement: 24,
+      //   increase_by: 1000,
+      //   license_number_entitlement: 29,
+      //   license_exceed_allowed_entitlement: 18,
+      // };
+      const data: any = await sitesCounts(51, 175);
 
       if (data) {
         setResult(data);

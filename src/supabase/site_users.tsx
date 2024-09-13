@@ -10,8 +10,8 @@ import { supabase } from './db';
 
 // Define the interfaces for the input data and result
 interface UserData {
-  site_id: any;
-  org_id?: any;
+  site_id: number;
+  org_id?: number;
   email: string;
   firstname?: string;
   lastname?: string;
@@ -242,7 +242,7 @@ async function addUserToSites(UserData: UserData): Promise<Result<string>> {
                   user_id: UserData.user_id,
                   org_id: UserData.org_id,
                   site_id: UserData.site_id,
-                  target_user_id: users[0].id,
+                  target_user_id: parseInt(users[0].id),
                   target_user_role: UserData.role_id,
                   activity_type: 'add_user_site',
                 });
