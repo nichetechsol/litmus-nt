@@ -161,9 +161,7 @@ const Page: React.FC = () => {
     null,
   );
   const [CountryListError, setCountryListError] = useState<string>('');
-  const [SelectedValueCounrty, SetSelectedValueCounrty] = useState<
-    number | string
-  >(''); // Default to 0 or any other valid number
+  const [SelectedValueCounrty, SetSelectedValueCounrty] = useState<number>(0); // Default to 0 or any other valid number
   const [FetchdropDState, setFetchdropDState] = useState<State[] | null>(null);
   const [stateListError, setstateListError] = useState<string>('');
   const [SelectedValueState, setSelectedValueState] = useState<number | string>(
@@ -307,7 +305,7 @@ const Page: React.FC = () => {
     setSelectedValueDropdown('');
     setAddress1('');
     setAddress2('');
-    SetSelectedValueCounrty('');
+    SetSelectedValueCounrty(0);
     setCountryListError('');
     setstateListError('');
     setCityError('');
@@ -718,7 +716,7 @@ const Page: React.FC = () => {
       SingleSite?.site?.address2 == null ? '' : SingleSite?.site?.address2,
     );
     SetSelectedValueCounrty(
-      SingleSite?.site.country_id == null ? '' : SingleSite?.site.country_id,
+      SingleSite?.site.country_id == null ? 0 : SingleSite?.site.country_id,
     );
     setSelectedValueState(
       SingleSite?.site.state_id == null ? '' : SingleSite?.site.state_id,
@@ -1129,7 +1127,7 @@ const Page: React.FC = () => {
                                     } 
                                     ${CountryListError ? 'input-error' : ''}
                                     ${
-                                      SelectedValueCounrty === ''
+                                      SelectedValueCounrty === 0
                                         ? 'deselect-main'
                                         : ''
                                     }`}

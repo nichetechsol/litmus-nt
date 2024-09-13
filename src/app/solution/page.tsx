@@ -133,7 +133,7 @@ const Page = () => {
     setLoading(true);
     const result = await generateSignedUrl(
       selectedFolder.folder,
-      currentTrue ? currentTrue.split('/').slice(-1) : '',
+      currentTrue ? currentTrue.split('/').slice(-1)[0] : '',
       fileName,
     );
     if (result) {

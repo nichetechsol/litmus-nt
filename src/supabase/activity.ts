@@ -10,7 +10,7 @@ interface LogActivityParams {
   target_user_id?: number;
   target_user_role?: number;
   activity_type?: string;
-  details?: string;
+  details?: string | { filename: string };
 }
 interface GetActivitiesBySiteIDResponse {
   activities: Activity[];
