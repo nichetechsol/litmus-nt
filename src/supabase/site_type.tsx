@@ -25,7 +25,6 @@ async function fetchSiteType(): Promise<Result<SiteType[]>> {
 
     // Check for errors during fetch
     if (error) {
-      // Return error response
       return {
         errorCode: 1,
         message: 'Error fetching site types',
