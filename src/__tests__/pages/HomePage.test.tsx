@@ -1,6 +1,5 @@
-import { render, screen } from '@testing-library/react'; // Import act from @testing-library/react
+import { act, render, screen } from '@testing-library/react'; // Import act from @testing-library/react
 import { useRouter } from 'next/navigation'; // Assuming you're using useRouter from next/router
-import { act } from 'react';
 
 import HomePage from '@/app/page';
 
