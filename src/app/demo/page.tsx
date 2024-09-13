@@ -14,13 +14,6 @@ const OrgDashboard = () => {
     setError(null);
 
     try {
-      // const data1 = {
-      //   orgId: 175,
-      //   license_limit_entitlement: 24,
-      //   increase_by: 1000,
-      //   license_number_entitlement: 29,
-      //   license_exceed_allowed_entitlement: 18,
-      // };
       const data: any = await sitesCounts(51, 175);
 
       if (data) {
