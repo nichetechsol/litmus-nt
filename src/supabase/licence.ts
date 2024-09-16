@@ -13,7 +13,7 @@ interface GetSKUParams {
 }
 
 interface GetLicenceDataParams {
-  orgID: number;
+  orgID: number | null;
 }
 
 interface EntitlementName {

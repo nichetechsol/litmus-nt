@@ -27,7 +27,7 @@ import {
 import { getActivitiesBySiteID, logActivity } from '@/supabase/activity';
 import { reqProductsforLitmus, showReqLicenceButton } from '@/supabase/licence';
 import { getUserRole } from '@/supabase/org_details';
-import { searchUsers } from '@/supabase/org_user';
+import { Result, searchUsers, User } from '@/supabase/org_user';
 import { downloadProduct, fetchProductData } from '@/supabase/products';
 import { refreshToken } from '@/supabase/session';
 import {
@@ -35,6 +35,7 @@ import {
   getSiteUserRole,
   modifyUserOfSites,
   removeUserFromSites,
+  UserData,
 } from '@/supabase/site_users';
 import {
   allSitesOfUsers,
@@ -79,12 +80,14 @@ interface Entitlement {
   support_level_id: number;
 }
 interface OrgUser {
-  id: any;
-  firstname: any;
-  lastname: any;
-  email: React.ReactNode;
-  role_name: React.ReactNode;
-  user_id: any;
+  id: number;
+  firstname: string;
+  lastname: string;
+  email: string;
+  role_name: string;
+  user_id: number;
+  role_id: number;
+  site_id: number;
 }
 interface roles {
   id: string;
@@ -137,9 +140,9 @@ const Page = () => {
   const [firstNameError, setFirstNameError] = useState('');
   const [lastName, setLastName] = useState('');
   const [lastNameError, setLastNameError] = useState('');
-  const [role, setRole] = useState('');
+  const [role, setRole] = useState<any>(null);
   const [roleError, setRoleError] = useState('');
-  const [userNameId, setUserNameId] = useState('');
+  const [userNameId, setUserNameId] = useState<number>();
   const [roles, setRoles] = useState<roles[] | null>(null);
   const closeModalButtonRef = useRef<HTMLButtonElement>(null);
   const [search, setsearch] = useState('');
@@ -195,10 +198,10 @@ const Page = () => {
       }
     }
   }, []);
-  const [user_id, setuser_id] = useState<any>('');
-  const [org_id, setorg_id] = useState<any>('');
-  const [org_type_id, setOrg_type_id] = useState<any>('');
-  const [site_id, setsite_id] = useState<any>('');
+  const [user_id, setuser_id] = useState<number>();
+  const [org_id, setorg_id] = useState<number | null>(null);
+  const [org_type_id, setOrg_type_id] = useState<number>();
+  const [site_id, setsite_id] = useState<number | null>(null);
   const [site_name, setSite_name] = useState<string>('');
   const [site_owner_name, SetSite_owner_name] = useState<string>('');
   const [orgName, setorgName] = useState<string>('');
@@ -470,7 +473,7 @@ const Page = () => {
     const newLastName = e.target.value.trim().replace(/[^a-zA-Z]/g, '');
     setLastName(newLastName);
     try {
-      const result1: any = await searchUsers(newLastName);
+      const result1: Result<User[]> = await searchUsers(newLastName);
       if (result1) {
         setDataTOAutoFill2(result1.data);
       }
@@ -484,7 +487,7 @@ const Page = () => {
   };
   const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newRole = e.target.value;
-    setRole(newRole);
+    setRole(parseInt(newRole));
     roleSchema
       .validate(newRole)
       .then(() => setRoleError(''))
@@ -527,62 +530,66 @@ const Page = () => {
       try {
         let result;
         if (changeFlage) {
-          const userData: any = {
-            email: email.toLowerCase(),
-            firstname: firstName,
-            lastname: lastName,
-            role_id: role,
-            org_id: org_id,
-            user_id: user_id,
-            token: onlyToken,
-            userName: userEmail,
-            siteName: site_name,
-            orgName: orgName,
-            site_id: site_id,
-            user_role_id: userrole3,
-          };
-          await refreshToken();
-          result = await addUserToSites(userData);
-          if (result.errorCode == 0) {
-            toast.success(result.data, { autoClose: 3000 });
-            const button = document.getElementById('close-modal-btn');
-            if (button) {
-              button.click();
-            }
-          } else {
-            toast.error(result.data, { autoClose: 3000 });
-            const button = document.getElementById('close-modal-btn');
-            if (button) {
-              button.click();
+          if (org_id && site_id) {
+            const userData: UserData = {
+              email: email.toLowerCase(),
+              firstname: firstName,
+              lastname: lastName,
+              role_id: role,
+              org_id: org_id,
+              user_id: user_id,
+              token: onlyToken,
+              userName: userEmail,
+              siteName: site_name,
+              orgName: orgName,
+              site_id: site_id,
+              user_role_id: userrole3,
+            };
+            await refreshToken();
+            result = await addUserToSites(userData);
+            if (result.errorCode == 0) {
+              toast.success(result.data, { autoClose: 3000 });
+              const button = document.getElementById('close-modal-btn');
+              if (button) {
+                button.click();
+              }
+            } else {
+              toast.error(result.data, { autoClose: 3000 });
+              const button = document.getElementById('close-modal-btn');
+              if (button) {
+                button.click();
+              }
             }
           }
         } else {
-          const userData: any = {
-            email: email,
-            firstname: firstName,
-            lastname: lastName,
-            role_id: role,
-            user_id: userNameId,
-            site_id: site_id,
-            modifying_user_id: user_id,
-            token: onlyToken,
-            userName: userEmail,
-            siteName: site_name,
-            orgName: orgName,
-            user_role_id: userrole3,
-          };
-          result = await modifyUserOfSites(userData);
-          if (result.errorCode == 0) {
-            toast.success(result.message, { autoClose: 3000 });
-            const button = document.getElementById('close-modal-btn');
-            if (button) {
-              button.click();
-            }
-          } else {
-            toast.error(result.message, { autoClose: 3000 });
-            const button = document.getElementById('close-modal-btn');
-            if (button) {
-              button.click();
+          if (site_id) {
+            const userData: UserData = {
+              email: email,
+              firstname: firstName,
+              lastname: lastName,
+              role_id: role,
+              user_id: userNameId,
+              site_id: site_id,
+              modifying_user_id: user_id,
+              token: onlyToken,
+              userName: userEmail,
+              siteName: site_name,
+              orgName: orgName,
+              user_role_id: userrole3,
+            };
+            result = await modifyUserOfSites(userData);
+            if (result.errorCode == 0) {
+              toast.success(result.message, { autoClose: 3000 });
+              const button = document.getElementById('close-modal-btn');
+              if (button) {
+                button.click();
+              }
+            } else {
+              toast.error(result.message, { autoClose: 3000 });
+              const button = document.getElementById('close-modal-btn');
+              if (button) {
+                button.click();
+              }
             }
           }
         }
@@ -688,7 +695,7 @@ const Page = () => {
       }
     }
   };
-  const handleEdit = (user: any) => {
+  const handleEdit = (user: OrgUser) => {
     openModal();
     setChangeFlage(false);
     setUserNameId(user.user_id);
@@ -703,7 +710,7 @@ const Page = () => {
     setEmail('');
     setFirstName('');
     setLastName('');
-    setRole('');
+    setRole(null);
     setChangeFlage(true);
   };
   const handleDelete = (user: any) => {
@@ -792,16 +799,18 @@ const Page = () => {
     }
 
     setLoading(false);
-    const data = {
-      org_id: org_id,
-      site_id: site_id,
-      user_id: user_id,
-      activity_type: 'download_file',
-      details: { filename: fileName },
-    };
-    const response = await logActivity(data);
-    if (response) {
-      fetchData8();
+    if (org_id && site_id && user_id) {
+      const data = {
+        org_id: org_id,
+        site_id: site_id,
+        user_id: user_id,
+        activity_type: 'download_file',
+        details: { filename: fileName },
+      };
+      const response = await logActivity(data);
+      if (response) {
+        fetchData8();
+      }
     }
   };
 
@@ -1602,7 +1611,9 @@ const Page = () => {
                                           role ? '' : 'input-error'
                                         }
                                         ${roleError ? 'input-error' : ''}
-                                        ${role === '' ? 'deselect-main' : ''}`}
+                                        ${
+                                          role === null ? 'deselect-main' : ''
+                                        }`}
                                         onChange={handleRoleChange}
                                         value={role}
                                       >

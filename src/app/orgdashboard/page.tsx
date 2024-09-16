@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import moment from 'moment';
@@ -88,6 +87,7 @@ const validationSchema = Yup.object().shape({
   role: roleSchema,
 });
 const OrgDashboard = () => {
+  const navigate = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [tokenVerify, setTokenVerify] = useState(false);
   const [onlyToken, setOnlyToken] = useState('');
@@ -142,7 +142,7 @@ const OrgDashboard = () => {
         }
       }, 0);
     }
-  }, []);
+  }, [navigate]);
   const [activePage, setActivePage] = useState(1);
   const [search, setsearch] = useState('');
   const [perPage] = useState(10); // Number of items per page
@@ -295,7 +295,7 @@ const OrgDashboard = () => {
     };
     fetchData();
   }, [org_id]);
-  const navigate = useRouter();
+
   const [changeFlage, setChangeFlage] = useState<boolean>(false);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');

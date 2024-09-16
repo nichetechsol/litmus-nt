@@ -9,7 +9,7 @@ import fetchEmailData from '@/supabase/email_configuration';
 import { supabase } from './db';
 
 // Define the interfaces for the input data and result
-interface UserData {
+export interface UserData {
   site_id: number;
   org_id?: number;
   email: string;
@@ -21,7 +21,7 @@ interface UserData {
   userName: any;
   siteName: any;
   orgName: any;
-  modifying_user_id: any;
+  modifying_user_id?: any;
   user_role_id: any;
 }
 interface SiteUser {

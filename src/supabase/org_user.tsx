@@ -34,7 +34,7 @@ interface modifyUserData {
   modifying_user_id: any;
 }
 
-interface User {
+export interface User {
   id: any;
   email: string;
   firstname: string;
